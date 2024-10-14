@@ -55,12 +55,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'POS',
-        to: '/base/tables',
+        to: '/base/POS',
       },
       {
         component: CNavItem,
         name: 'Register Systems',
-        to: '/base/breadcrumbs',
+        to: '/base/RegisterSystem',
       },
       // {
       //   component: CNavItem,
@@ -212,13 +212,13 @@ const _nav = [
   // },
   {
     component: CNavGroup,
-    name: 'Products',
+    name: 'Product',
     icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'All Product',
-        to: '/icons/coreui-icons',
+        to: '/Product/AllProducts',
         // badge: {
         //   color: 'success',
         //   text: 'NEW',
@@ -247,8 +247,13 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Brands',
-        to: '/icons/brands',
+        to: '/Product/Brands',
       },
+      // {
+      //   component: CNavItem,
+      //   name: 'AddBrands',
+      //   to: '/Product/AddBrands',
+      // },
       {
         component: CNavItem,
         name: 'Attributes',

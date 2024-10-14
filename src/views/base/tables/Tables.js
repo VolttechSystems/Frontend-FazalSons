@@ -15,10 +15,10 @@ import {
 } from '@coreui/react'
 import { DocsExample } from 'src/components'
 
-const Tables = () => {
+const TablesPOS = () => {
   return (
     <CRow>
-      <CCol xs={12}>
+      {/* <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
             <strong>React Table</strong> <small>Basic example</small>
@@ -847,20 +847,21 @@ const Tables = () => {
           </CCardBody>
         </CCard>
       </CCol>
-      <CCol xs={12}>
+      <CCol xs={12}> */}
+      <CCol>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>React Table</strong> <small>Table foot</small>
+            <strong>Register Systems</strong> <small></small>
           </CCardHeader>
           <CCardBody>
-            <DocsExample href="components/table#table-foot">
+            {/* <DocsExample href="components/table#table-foot"> */}
               <CTable>
                 <CTableHead color="light">
                   <CTableRow>
-                    <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Class</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Heading</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Heading</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Registerd Systems</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Outlet</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -884,18 +885,18 @@ const Tables = () => {
                 </CTableBody>
                 <CTableHead>
                   <CTableRow>
-                    <CTableDataCell>Footer</CTableDataCell>
-                    <CTableDataCell>Footer</CTableDataCell>
-                    <CTableDataCell>Footer</CTableDataCell>
-                    <CTableDataCell>Footer</CTableDataCell>
+                  <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Registerd Systems</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Outlet</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
               </CTable>
-            </DocsExample>
+            {/* </DocsExample> */}
           </CCardBody>
         </CCard>
       </CCol>
-      <CCol xs={12}>
+      {/* <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
             <strong>React Table</strong> <small>Captions</small>
@@ -978,9 +979,9 @@ const Tables = () => {
             </DocsExample>
           </CCardBody>
         </CCard>
-      </CCol>
-    </CRow>
+      </CCol>*/}
+    </CRow> 
   )
 }
 
-export default Tables
+export default TablesPOS

@@ -20,6 +20,11 @@ const Spinners = React.lazy(() => import('./views/base/spinners/Spinners'))
 const Tabs = React.lazy(() => import('./views/base/tabs/Tabs'))
 const Tables = React.lazy(() => import('./views/base/tables/Tables'))
 const Tooltips = React.lazy(() => import('./views/base/tooltips/Tooltips'))
+const POS = React.lazy(() => import('./views/base/POS/POSTable'))
+const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
+const AllProducts = React.lazy(() => import('./views/Product/AllProducts/AllProducts'))
+const Brands = React.lazy(() => import('./views/Product/Brands/Brands'))
+const AddBrands = React.lazy(() => import('./views/Product/AddBrands/AddBrands'))
 
 // Buttons
 const Buttons = React.lazy(() => import('./views/buttons/buttons/Buttons'))
@@ -41,7 +46,7 @@ const Charts = React.lazy(() => import('./views/charts/Charts'))
 // Icons
 const CoreUIIcons = React.lazy(() => import('./views/icons/coreui-icons/CoreUIIcons'))
 const Flags = React.lazy(() => import('./views/icons/flags/Flags'))
-const Brands = React.lazy(() => import('./views/icons/brands/Brands'))
+//const Brands = React.lazy(() => import('./views/icons/brands/Brands'))
 
 // Notifications
 const Alerts = React.lazy(() => import('./views/notifications/alerts/Alerts'))
@@ -72,6 +77,11 @@ const routes = [
   { path: '/base/spinners', name: 'Spinners', element: Spinners },
   { path: '/base/tabs', name: 'Tabs', element: Tabs },
   { path: '/base/tables', name: 'Tables', element: Tables },
+  { path: '/base/POS', name: 'POS', element: POS }, // POS
+  { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
+  { path: '/Product/AllProducts', name: 'AllProducts', element: AllProducts }, //AllProducts
+  { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
+  { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
   { path: '/base/tooltips', name: 'Tooltips', element: Tooltips },
   { path: '/buttons', name: 'Buttons', element: Buttons, exact: true },
   { path: '/buttons/buttons', name: 'Buttons', element: Buttons },
