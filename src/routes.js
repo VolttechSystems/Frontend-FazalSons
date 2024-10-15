@@ -13,7 +13,7 @@ const AllProducts = React.lazy(() => import('./views/Product/AllProducts/AllProd
 const Brands = React.lazy(() => import('./views/Product/Brands/Brands'))
 const AddBrands = React.lazy(() => import('./views/Product/AddBrands/AddBrands'))
 const ParentCategory = React.lazy(() => import('./views/Product/ParentCategory/ParentCategory'))
-const AddParentCategory = React.lazy(() => import('./views/Product/ParentCategory/ParentCategory'))
+const AddParentCategory = React.lazy(() => import('./views/Product/AddParentCategory/AddParentCategory'))
 const Attributes = React.lazy(() => import('./views/Product/Attributes/Attributes'))
 const AddAttributes = React.lazy(() => import('./views/Product/AddAttributes/AddAttributes'))
 const Variations = React.lazy(() => import('./views/Product/Variations/Variations'))
