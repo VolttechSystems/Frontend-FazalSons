@@ -232,12 +232,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Parent Category',
-        to: '/icons/brands',
+        to: '/Product/ParentCategory',
       },
       {
         component: CNavItem,
         name: 'Categories',
-        to: '/icons/brands',
+        to: '/Product/Categories',
       },
       {
         component: CNavItem,
@@ -257,12 +257,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Attributes',
-        to: '/icons/brands',
+        to: '/Product/Attributes',
       },
       {
         component: CNavItem,
         name: 'Variations',
-        to: '/icons/brands',
+        to: '/Product/Variations',
       },
     ],
   },

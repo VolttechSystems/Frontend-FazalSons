@@ -17,19 +17,19 @@
 // import { Link } from 'react-router-dom'; // Import Link here
 // import { DocsExample } from 'src/components'
 
-// const Brands = () => {
+// const Attributes = () => {
 //   return (
 //     <CRow>
 //         <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-//         <Link to="/Product/AddBrands">
-//       <CButton href="#" color="primary" className="me-md-2">Add Brand</CButton>
+//         <Link to="/Product/AddAttributes">
+//       <CButton href="#" color="primary" className="me-md-2">Add Attributes</CButton>
 //       </Link>         
 //         </div>
 //       <CCol>
       
 //         <CCard className="mb-4">
 //           <CCardHeader>
-//             <strong>All Brands</strong> <small></small>
+//             <strong>Attributes</strong> <small></small>
 //           </CCardHeader>
 //           <CCardBody>
 //             {/* <DocsExample href="components/table#table-foot"> */}
@@ -37,7 +37,6 @@
 //                 <CTableHead color="light">
 //                   <CTableRow>
 //                     <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Date</CTableHeaderCell>
 //                     <CTableHeaderCell scope="col">Proposal No.</CTableHeaderCell>
 //                     <CTableHeaderCell scope="col">Proposal Name</CTableHeaderCell>
 //                     <CTableHeaderCell scope="col">Client</CTableHeaderCell>
@@ -52,14 +51,12 @@
 //                     <CTableDataCell>  </CTableDataCell>
 //                     <CTableDataCell>  </CTableDataCell>
 //                     <CTableDataCell>  </CTableDataCell>
-//                     <CTableDataCell>  </CTableDataCell>
                     
 //                   </CTableRow>
                
 //                   <CTableRow>
                   
 //                   <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Date</CTableHeaderCell>
 //                     <CTableHeaderCell scope="col">Proposal No.</CTableHeaderCell>
 //                     <CTableHeaderCell scope="col">Proposal Name</CTableHeaderCell>
 //                     <CTableHeaderCell scope="col">Client</CTableHeaderCell>
@@ -78,9 +75,7 @@
 //     )
 // }
 
-// export default Brands
-
-
+// export default Attributes
 import React, { useEffect, useState } from 'react';
 import {
   CButton,
@@ -99,61 +94,63 @@ import {
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const Brands = () => {
-  const [brands, setBrands] = useState([]); // State to store brands data
+const Attributes = () => {
+  const [attributes, setAttributes] = useState([]); // State to store attributes data
   const [loading, setLoading] = useState(true); // State to manage loading state
   const [error, setError] = useState(''); // State for error messages
 
   useEffect(() => {
-    const fetchBrands = async () => {
+    const fetchAttributes = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_brand'); // Replace with your API endpoint
-        setBrands(response.data); // Assuming the response contains the list of brands
+        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute'); // Replace with your API endpoint
+        setAttributes(response.data); // Assuming the response contains the list of attributes
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching brands:', error);
-        setError('Failed to fetch brands.');
+        console.error('Error fetching attributes:', error);
+        setError('Failed to fetch attributes.');
         setLoading(false);
       }
     };
 
-    fetchBrands();
+    fetchAttributes();
   }, []);
 
   return (
     <CRow>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Link to="/Product/AddBrands">
-          <CButton href="#" color="primary" className="me-md-2">Add Brand</CButton>
+        <Link to="/Product/AddAttributes">
+          <CButton color="primary" className="me-md-2">Add Attribute</CButton>
         </Link>
       </div>
       <CCol>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>All Brands</strong>
+            <strong>All Attributes</strong>
           </CCardHeader>
           <CCardBody>
-            {loading && <p>Loading brands...</p>}
+            {loading && <p>Loading attributes...</p>}
             {error && <p className="text-danger">{error}</p>}
             {!loading && !error && (
               <CTable>
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Brand Name</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Symbol</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Attribute Type</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Attribute</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Short Form/Symbol</CTableHeaderCell>
                     <CTableHeaderCell scope="col">Description</CTableHeaderCell>
                     <CTableHeaderCell scope="col">Status</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {brands.map((brand, index) => (
-                    <CTableRow key={brand.id}>
+                  {attributes.map((attribute, index) => (
+                    <CTableRow key={attribute.id}>
                       <CTableDataCell>{index + 1}</CTableDataCell>
-                      <CTableDataCell>{brand.brand_name}</CTableDataCell>
-                      <CTableDataCell>{brand.symbol}</CTableDataCell>
-                      <CTableDataCell>{brand.description}</CTableDataCell>
-                      <CTableDataCell>{brand.status}</CTableDataCell>
+                      <CTableDataCell>{attribute.type}</CTableDataCell> {/* Example: 'Color' or 'Size' */}
+                      <CTableDataCell>{attribute.attribute_name}</CTableDataCell> {/* Attribute name */}
+                      <CTableDataCell>{attribute.symbol}</CTableDataCell> {/* Short form or symbol */}
+                      <CTableDataCell>{attribute.description}</CTableDataCell> {/* Description */}
+                      <CTableDataCell>{attribute.status}</CTableDataCell> {/* Status: 'Active', 'Pending', 'Inactive' */}
                     </CTableRow>
                   ))}
                 </CTableBody>
@@ -166,4 +163,4 @@ const Brands = () => {
   );
 };
 
-export default Brands;
+export default Attributes;

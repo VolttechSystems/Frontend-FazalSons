@@ -17,13 +17,13 @@
 // import { DocsExample } from 'src/components'
 // import { Link } from 'react-router-dom'; // Import Link here
 
-// const AddBrands = () => {
+// const AddAttributes = () => {
 //   return (
 //     <CRow>
 //       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
       
-//       <Link to="/Product/Brands">
-//       <CButton href="#" color="primary" className="me-md-2">Brands</CButton>
+//       <Link to="/Product/Attributes">
+//       <CButton href="#" color="primary" className="me-md-2">Attributes</CButton>
 //       </Link>
     
 //             </div>
@@ -31,14 +31,22 @@
 //       <CCol xs={12}>
 //         <CCard className="mb-3">
 //           <CCardHeader>
-//             <strong>Brand Information</strong>
+//             <strong>Attribute Information</strong>
 //           </CCardHeader>
 //           <CCardBody>
             
             
 //             <CForm>
+//             <fieldset className="row mb-3">
+//     <legend className="col-form-label col-sm-2 pt-0">Attribute Type</legend>
+//     <CCol sm={8} >
+//       <CFormCheck type="radio" name="Radios" id="gridRadios3" value="option3" label="Color" />
+//       <CFormCheck type="radio" name="Radios" id="gridRadios4" value="option4" label="Size"/>
+      
+//     </CCol>
+//   </fieldset>
 //   <CRow className="mb-3">
-//     <CFormLabel htmlFor="inputEmail3" className="col-sm-2 col-form-label">Brand *</CFormLabel>
+//     <CFormLabel htmlFor="inputEmail3" className="col-sm-2 col-form-label">Attribute *</CFormLabel>
 //     <CCol sm={8} >
 //       <CFormInput type="email" id="inputEmail3"/>
 //     </CCol>
@@ -77,7 +85,7 @@
 //   )
 // }
 
-// export default AddBrands
+// export default AddAttributes
 
 import React, { useState } from 'react';
 import {
@@ -95,10 +103,11 @@ import {
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const AddBrands = () => {
+const AddAttributes = () => {
   // State for form inputs
-  const [brandName, setBrandName] = useState('');
-  const [symbol, setSymbol] = useState('');
+  const [type, setAttributeType] = useState('color'); // Default to 'color'
+  const [attribute_name, setAttributeName] = useState('');
+  const [symbol, setShortForm] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('active'); // Default status
   const [errorMessage, setErrorMessage] = useState(''); // To handle error messages
@@ -106,56 +115,81 @@ const AddBrands = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create a brand object to send in the request
-    const brandData = {
-      brand_name: brandName,
-      symbol: symbol,
+    // Create an attribute object to send in the request
+    const attributeData = {
+        type: type,
+        attribute_name: attribute_name,
+        symbol: symbol,
       description: description,
       status: status,
     };
 
     try {
-      // Send POST request to add brand
-      const response = await axios.post('http://16.170.232.76/pos/products/add_brand', brandData);
-      console.log('Brand added:', response.data);
+      // Send POST request to add attribute
+      const response = await axios.post('http://16.170.232.76/pos/products/add_attribute', attributeData);
+      console.log('Attribute added:', response.data);
       
       // Clear form fields after successful submission
-      setBrandName('');
-      setSymbol('');
+      setAttributeType('color');
+      setAttributeName('');
+      setShortForm('');
       setDescription('');
       setStatus('active'); 
 
-      alert('Brand added successfully!');
+      alert('Attribute added successfully!');
     } catch (error) {
-      console.error('There was an error adding the brand!', error);
-      setErrorMessage('Error adding brand. Please try again.'); // Set error message
+      console.error('There was an error adding the attribute!', error);
+      setErrorMessage('Error adding attribute. Please try again.'); // Set error message
     }
   };
-// ye code ko run kro okay
+
   return (
     <CRow>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Link to="/Product/Brands">
-          <CButton href="#" color="primary" className="me-md-2">Brands</CButton>
+        <Link to="/Product/Attributes">
+          <CButton href="#" color="primary" className="me-md-2">Attributes</CButton>
         </Link>
       </div>
 
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>
-            <strong>Brand Information</strong>
+            <strong>Attribute Information</strong>
           </CCardHeader>
           <CCardBody>
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>} {/* Display error message if exists */}
             <CForm onSubmit={handleSubmit}>
+              <fieldset className="row mb-3">
+                <legend className="col-form-label col-sm-2 pt-0">Attribute Type</legend>
+                <CCol sm={8}>
+                  <CFormCheck 
+                    type="radio" 
+                    name="type" 
+                    id="color" 
+                    value="color" 
+                    label="Color" 
+                    checked={type === 'color'} 
+                    onChange={(e) => setAttributeType(e.target.value)} 
+                  />
+                  <CFormCheck 
+                    type="radio" 
+                    name="type" 
+                    id="size" 
+                    value="size" 
+                    label="Size" 
+                    checked={type === 'size'} 
+                    onChange={(e) => setAttributeType(e.target.value)} 
+                  />
+                </CCol>
+              </fieldset>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="brandName" className="col-sm-2 col-form-label">Brand *</CFormLabel>
+                <CFormLabel htmlFor="attributeName" className="col-sm-2 col-form-label">Attribute *</CFormLabel>
                 <CCol sm={8}>
                   <CFormInput 
                     type="text" 
-                    id="brandName" 
-                    value={brandName} 
-                    onChange={(e) => setBrandName(e.target.value)} 
+                    id="attribute_name" 
+                    value={attribute_name} 
+                    onChange={(e) => setAttributeName(e.target.value)} 
                     required 
                   />
                 </CCol>
@@ -167,7 +201,7 @@ const AddBrands = () => {
                     type="text" 
                     id="symbol" 
                     value={symbol} 
-                    onChange={(e) => setSymbol(e.target.value)} 
+                    onChange={(e) => setShortForm(e.target.value)} 
                   />
                 </CCol>
               </CRow>
@@ -225,4 +259,4 @@ const AddBrands = () => {
   );
 };
 
-export default AddBrands;
+export default AddAttributes;
