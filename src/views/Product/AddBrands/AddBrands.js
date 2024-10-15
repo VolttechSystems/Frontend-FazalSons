@@ -116,7 +116,7 @@ const AddBrands = () => {
 
     try {
       // Send POST request to add brand
-      const response = await axios.post('http://13.60.225.81:8000/pos/products/add_brand', brandData);
+      const response = await axios.post('http://16.170.232.76/pos/products/add_brand', brandData);
       console.log('Brand added:', response.data);
       
       // Clear form fields after successful submission
