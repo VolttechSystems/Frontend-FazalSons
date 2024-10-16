@@ -18,6 +18,11 @@ const Attributes = React.lazy(() => import('./views/Product/Attributes/Attribute
 const AddAttributes = React.lazy(() => import('./views/Product/AddAttributes/AddAttributes'))
 const Variations = React.lazy(() => import('./views/Product/Variations/Variations'))
 const AddVariations = React.lazy(() => import('./views/Product/AddVariations/AddVariations'))
+const Category = React.lazy(() => import('./views/Product/Category/Category'))
+const AddCategory = React.lazy(() => import('./views/Product/AddCategory/AddCategory'))
+const SubCategory = React.lazy(() => import('./views/Product/SubCategory/SubCategory'))
+const AddSubCategory = React.lazy(() => import('./views/Product/AddSubCategory/AddSubCategory'))
+
 
 // Buttons
 const Buttons = React.lazy(() => import('./views/buttons/buttons/Buttons'))
@@ -67,6 +72,10 @@ const routes = [
   { path: '/Product/AddAttributes', name: 'AddAttributes', element: AddAttributes }, //AddAttributes
   { path: '/Product/Variations', name: 'Variations', element: Variations }, //Variations
   { path: '/Product/AddVariations', name: 'AddVariations', element: AddVariations }, //AddAttributes
+  { path: '/Product/Category', name: 'Category', element: Category }, //Category
+  { path: '/Product/AddCategory', name: 'AddCategory', element: AddCategory }, //AddCategory
+  { path: '/Product/SubCategory', name: 'SubCategory', element: SubCategory }, //SubCategory
+  { path: '/Product/AddSubCategory', name: 'AddSubCategory', element: AddSubCategory }, //AddSubCategory
   { path: '/buttons', name: 'Buttons', element: Buttons, exact: true },
   { path: '/buttons/buttons', name: 'Buttons', element: Buttons },
   { path: '/buttons/dropdowns', name: 'Dropdowns', element: Dropdowns },

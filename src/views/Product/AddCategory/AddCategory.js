@@ -10,91 +10,94 @@ import {
   CFormInput,
   CFormLabel,
   CRow,
-  CFormSelect, // Import CFormSelect for the dropdown
+  CFormSelect,
 } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const AddVariations = () => {
-  const [variation_name, setVariationName] = useState('');
-  const [symbol, setShortForm] = useState('');
+const AddCategory = () => {
+  const [category_name, setCategoryName] = useState('');
+  const [symbol, setSymbol] = useState('');
+  const [subcategory_option, setSubcategoryOption] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('active');
-  const [attributes, setAttributes] = useState([]); 
-  const [selectedAttribute, setSelectedAttribute] = useState(''); 
+  const [parentCategories, setParentCategories] = useState([]);
+  const [selectedParentCategory, setSelectedParentCategory] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fetch attributes for the dropdown
+  // Fetch parent categories for the dropdown
   useEffect(() => {
-    const fetchAttributes = async () => {
+    const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute'); // Replace with your API endpoint
-        setAttributes(response.data); // Assuming response.data contains an array of attributes
+        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category'); // Replace with your API endpoint
+        setParentCategories(response.data);
       } catch (error) {
-        console.error('Error fetching attributes:', error);
-        setErrorMessage('Failed to fetch attributes.');
+        console.error('Error fetching parent categories:', error);
+        setErrorMessage('Failed to fetch parent categories.');
       }
     };
 
-    fetchAttributes();
+    fetchParentCategories();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!selectedAttribute) {
-      setErrorMessage('Please select an attribute.');
+
+    if (!selectedParentCategory) {
+      setErrorMessage('Please select a parent category.');
       return;
     }
-  
-    const variationData = {
-      variation_name: variation_name,
+
+    const categoryData = {
+      category_name: category_name,
       symbol: symbol,
+      subcategory_option: subcategory_option,
       description: description,
       status: status,
-      attribute_name: selectedAttribute,
+      pc_name: selectedParentCategory,
     };
-  
+
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_variation', variationData);
-      console.log('Variation added:', response.data);
-      setVariationName('');
-      setShortForm('');
+      const response = await axios.post('http://16.170.232.76/pos/products/add_category', categoryData);
+      console.log('Category added:', response.data);
+      setCategoryName('');
+      setSymbol('');
+      setSubcategoryOption('');
       setDescription('');
       setStatus('active');
-      setSelectedAttribute('');
+      setSelectedParentCategory('');
       setErrorMessage('');
-      alert('Variation added successfully!');
+      alert('Category added successfully!');
     } catch (error) {
-      console.error('There was an error adding the variation!', error);
-      setErrorMessage('Error adding variation. Please try again.');
+      console.error('There was an error adding the category!', error);
+      setErrorMessage('Error adding category. Please try again.');
     }
   };
 
   return (
     <CRow>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Link to="/Product/Variations">
-          <CButton href="#" color="primary" className="me-md-2">Variations</CButton>
+        <Link to="/Product/Category">
+          <CButton href="#" color="primary" className="me-md-2">Category List</CButton>
         </Link>
       </div>
 
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>
-            <strong>Variations Information</strong>
+            <strong>Category Information</strong>
           </CCardHeader>
           <CCardBody>
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
             <CForm onSubmit={handleSubmit}>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="variationName" className="col-sm-2 col-form-label">Variation *</CFormLabel>
+                <CFormLabel htmlFor="categoryName" className="col-sm-2 col-form-label">Category Name *</CFormLabel>
                 <CCol sm={8}>
                   <CFormInput 
                     type="text" 
-                    id="variation_name" 
-                    value={variation_name} 
-                    onChange={(e) => setVariationName(e.target.value)} 
+                    id="category_name" 
+                    value={category_name} 
+                    onChange={(e) => setCategoryName(e.target.value)} 
                     required 
                   />
                 </CCol>
@@ -106,7 +109,18 @@ const AddVariations = () => {
                     type="text" 
                     id="symbol" 
                     value={symbol} 
-                    onChange={(e) => setShortForm(e.target.value)} 
+                    onChange={(e) => setSymbol(e.target.value)} 
+                  />
+                </CCol>
+              </CRow>
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="subcategoryOption" className="col-sm-2 col-form-label">Subcategory Option</CFormLabel>
+                <CCol sm={8}>
+                  <CFormInput 
+                    type="text" 
+                    id="subcategory_option" 
+                    value={subcategory_option} 
+                    onChange={(e) => setSubcategoryOption(e.target.value)} 
                   />
                 </CCol>
               </CRow>
@@ -122,17 +136,17 @@ const AddVariations = () => {
                 </CCol>
               </CRow>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="attribute" className="col-sm-2 col-form-label">Select Attribute</CFormLabel>
+                <CFormLabel htmlFor="parentCategory" className="col-sm-2 col-form-label">Select Parent Category</CFormLabel>
                 <CCol sm={8}>
                   <CFormSelect
-                    id="aa"
-                    value={selectedAttribute}
-                    onChange={(e) => setSelectedAttribute(e.target.value)} // Update selected attribute
+                    id="parentCategory"
+                    value={selectedParentCategory}
+                    onChange={(e) => setSelectedParentCategory(e.target.value)}
                     required
                   >
-                    <option value="">Choose an attribute</option>
-                    {attributes.map((attribute) => (
-                      <option key={attribute.attribute_name} value={attribute.attribute_name}>{attribute.attribute_name}</option> // Use attribute.id for the value
+                    <option value="">Choose a parent category</option>
+                    {parentCategories.map((pc) => (
+                      <option key={pc.pc_name} value={pc.pc_name}>{pc.pc_name}</option>
                     ))}
                   </CFormSelect>
                 </CCol>
@@ -144,34 +158,32 @@ const AddVariations = () => {
                     type="radio" 
                     name="status" 
                     id="active" 
-                    value="active" 
                     label="Active" 
+                    value="active" 
                     checked={status === 'active'} 
                     onChange={(e) => setStatus(e.target.value)} 
                   />
                   <CFormCheck 
                     type="radio" 
                     name="status" 
-                    id="pending" 
-                    value="pending" 
-                    label="Pending" 
-                    checked={status === 'pending'} 
+                    id="inactive" 
+                    label="Inactive" 
+                    value="inactive" 
+                    checked={status === 'inactive'} 
                     onChange={(e) => setStatus(e.target.value)} 
                   />
                   <CFormCheck 
                     type="radio" 
                     name="status" 
-                    id="inactive" 
-                    value="inactive" 
-                    label="Inactive" 
-                    checked={status === 'inactive'} 
+                    id="pending" 
+                    label="Pending" 
+                    value="pending" 
+                    checked={status === 'pending'} 
                     onChange={(e) => setStatus(e.target.value)} 
                   />
                 </CCol>
               </fieldset>
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">Save</CButton>
-              </div>
+              <CButton type="submit" color="primary">Submit</CButton>
             </CForm>
           </CCardBody>
         </CCard>
@@ -180,4 +192,4 @@ const AddVariations = () => {
   );
 };
 
-export default AddVariations;
+export default AddCategory;
