@@ -66,6 +66,7 @@ const routes = [
   { path: '/Product/AllProducts', name: 'AllProducts', element: AllProducts }, //AllProducts
   { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
+  { path: '/Product/AddBrands/:id', name: 'EditBrand', element: AddBrands }, // Edit Brand
   { path: '/Product/ParentCategory', name: 'ParentCategory', element: ParentCategory }, //ParentCategory
   { path: '/Product/AddParentCategory', name: 'AddParentCategory', element: AddParentCategory }, //AddParentCategory
   { path: '/Product/Attributes', name: 'Attributes', element: Attributes }, //Attributes
