@@ -1,17 +1,29 @@
 import React from 'react'
+
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
+
 // Base
+
+
 const POS = React.lazy(() => import('./views/base/POS/POSTable'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
 const AllProducts = React.lazy(() => import('./views/Product/AllProducts/AllProducts'))
 const Brands = React.lazy(() => import('./views/Product/Brands/Brands'))
 const AddBrands = React.lazy(() => import('./views/Product/AddBrands/AddBrands'))
+const ParentCategory = React.lazy(() => import('./views/Product/ParentCategory/ParentCategory'))
+const AddParentCategory = React.lazy(() => import('./views/Product/ParentCategory/ParentCategory'))
+const Attributes = React.lazy(() => import('./views/Product/Attributes/Attributes'))
+const AddAttributes = React.lazy(() => import('./views/Product/AddAttributes/AddAttributes'))
+const Variations = React.lazy(() => import('./views/Product/Variations/Variations'))
+const AddVariations = React.lazy(() => import('./views/Product/AddVariations/AddVariations'))
+
 // Buttons
 const Buttons = React.lazy(() => import('./views/buttons/buttons/Buttons'))
 const ButtonGroups = React.lazy(() => import('./views/buttons/button-groups/ButtonGroups'))
 const Dropdowns = React.lazy(() => import('./views/buttons/dropdowns/Dropdowns'))
+
 //Forms
 const ChecksRadios = React.lazy(() => import('./views/forms/checks-radios/ChecksRadios'))
 const FloatingLabels = React.lazy(() => import('./views/forms/floating-labels/FloatingLabels'))
@@ -21,28 +33,40 @@ const Layout = React.lazy(() => import('./views/forms/layout/Layout'))
 const Range = React.lazy(() => import('./views/forms/range/Range'))
 const Select = React.lazy(() => import('./views/forms/select/Select'))
 const Validation = React.lazy(() => import('./views/forms/validation/Validation'))
+
 const Charts = React.lazy(() => import('./views/charts/Charts'))
+
 // Icons
 const CoreUIIcons = React.lazy(() => import('./views/icons/coreui-icons/CoreUIIcons'))
 const Flags = React.lazy(() => import('./views/icons/flags/Flags'))
 //const Brands = React.lazy(() => import('./views/icons/brands/Brands'))
+
 // Notifications
 const Alerts = React.lazy(() => import('./views/notifications/alerts/Alerts'))
 const Badges = React.lazy(() => import('./views/notifications/badges/Badges'))
 const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
+
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
+  
   { path: '/base/POS', name: 'POS', element: POS }, // POS
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
   { path: '/Product/AllProducts', name: 'AllProducts', element: AllProducts }, //AllProducts
   { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
+  { path: '/Product/ParentCategory', name: 'ParentCategory', element: ParentCategory }, //ParentCategory
+  { path: '/Product/AddParentCategory', name: 'AddParentCategory', element: AddParentCategory }, //AddParentCategory
+  { path: '/Product/Attributes', name: 'Attributes', element: Attributes }, //Attributes
+  { path: '/Product/AddAttributes', name: 'AddAttributes', element: AddAttributes }, //AddAttributes
+  { path: '/Product/Variations', name: 'Variations', element: Variations }, //Variations
+  { path: '/Product/AddVariations', name: 'AddVariations', element: AddVariations }, //AddAttributes
   { path: '/buttons', name: 'Buttons', element: Buttons, exact: true },
   { path: '/buttons/buttons', name: 'Buttons', element: Buttons },
   { path: '/buttons/dropdowns', name: 'Dropdowns', element: Dropdowns },
@@ -68,4 +92,5 @@ const routes = [
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
 ]
+
 export default routes
