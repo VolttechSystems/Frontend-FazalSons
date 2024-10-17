@@ -40,7 +40,7 @@ const AddAttributeType = () => {
   // Function to handle form submission for adding/editing attribute types
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const requestData = { attribute_type: attributeType, status };
+    const requestData = { att_type: attributeType, status };
 
     try {
       if (editingIndex !== null) {
@@ -63,7 +63,7 @@ const AddAttributeType = () => {
   // Function to handle edit button click
   const handleEdit = (index) => {
     const selectedType = types[index];
-    setAttributeType(selectedType.attribute_type);
+    setAttributeType(selectedType.att_type);
     setStatus(selectedType.status);
     setEditingIndex(index);
   };
@@ -140,7 +140,7 @@ const AddAttributeType = () => {
                 <CButton color="primary" type="submit">
                   {editingIndex !== null ? 'Update' : 'Add'}
                 </CButton>
-                <CButton color="secondary" onClick={() => navigate('/Product/Attributes')}>Go to Attributes</CButton>
+                <CButton color="secondary" onClick={() => navigate('/Product/AddAttributes')}>Go to Attributes</CButton>
               </div>
             </CForm>
 
@@ -155,7 +155,7 @@ const AddAttributeType = () => {
               <CTableBody>
                 {types.map((item, index) => (
                   <CTableRow key={item.id}>
-                    <CTableDataCell>{item.attribute_type}</CTableDataCell>
+                    <CTableDataCell>{item.att_type}</CTableDataCell>
                     <CTableDataCell>{item.status}</CTableDataCell>
                     <CTableDataCell>
                       <CButton color="warning" onClick={() => handleEdit(index)}>Edit</CButton>
