@@ -236,13 +236,13 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Categories',
-        to: '/Product/Categories',
+        name: 'Category',
+        to: '/Product/Category',
       },
       {
         component: CNavItem,
         name: 'Sub-Categories',
-        to: '/icons/brands',
+        to: '/Product/SubCategory',
       },
       {
         component: CNavItem,
