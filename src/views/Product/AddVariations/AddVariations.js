@@ -10,9 +10,9 @@ import {
   CFormInput,
   CFormLabel,
   CRow,
-  CFormSelect, // Import CFormSelect for the dropdown
+  CFormSelect, 
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { useNavigate, useParams,Link } from 'react-router-dom';
 import axios from 'axios';
 
 const AddVariations = () => {
@@ -23,6 +23,8 @@ const AddVariations = () => {
   const [attributes, setAttributes] = useState([]); 
   const [selectedAttribute, setSelectedAttribute] = useState(''); 
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   // Fetch attributes for the dropdown
   useEffect(() => {
@@ -36,17 +38,35 @@ const AddVariations = () => {
       }
     };
 
+    if (id) {
+      const fetchVariationDetails = async () => {
+        try {
+          const response = await axios.get(`http://16.170.232.76/pos/products/action_variation/${id}/`);
+          const variation = response.data;
+          setVariationName(variation.variation_name);
+          setShortForm(variation.symbol);
+          setDescription(variation.description);
+          setStatus(variation.status);
+          setSelectedAttribute(variation.attribute_name);
+        } catch (error) {
+          console.error('Failed to fetch variation for editing:', error);
+          setErrorMessage('Failed to load variation details.');
+        }
+      };
+      fetchVariationDetails();
+    }
+
     fetchAttributes();
-  }, []);
+  }, [id]);
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!selectedAttribute) {
-      setErrorMessage('Please select an attribute.');
-      return;
-    }
-  
+    // if (!selectedAttribute) {
+    //       setErrorMessage('Please select an attribute.');
+    //       return;
+    //     }
     const variationData = {
       variation_name: variation_name,
       symbol: symbol,
@@ -54,20 +74,21 @@ const AddVariations = () => {
       status: status,
       attribute_name: selectedAttribute,
     };
-  
+
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_variation', variationData);
-      console.log('Variation added:', response.data);
-      setVariationName('');
-      setShortForm('');
-      setDescription('');
-      setStatus('active');
-      setSelectedAttribute('');
-      setErrorMessage('');
-      alert('Variation added successfully!');
+      if (id) {
+        
+        await axios.put(`http://16.170.232.76/pos/products/action_variation/${id}/`, variationData);
+        alert('Variation updated successfully!');
+      } else {
+        
+        await axios.post('http://16.170.232.76/pos/products/add_variation', variationData);
+        alert('Brand added successfully!');
+      }
+      navigate('/Product/Variations'); 
     } catch (error) {
-      console.error('There was an error adding the variation!', error);
-      setErrorMessage('Error adding variation. Please try again.');
+      console.error('Error saving the Variation:', error);
+      setErrorMessage('Error saving the Variation. Please try again.');
     }
   };
 
@@ -82,7 +103,7 @@ const AddVariations = () => {
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>
-            <strong>Variations Information</strong>
+            <strong>{id ? 'Edit Variation' : 'Add Variation'}</strong>
           </CCardHeader>
           <CCardBody>
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
@@ -170,7 +191,7 @@ const AddVariations = () => {
                 </CCol>
               </fieldset>
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">Save</CButton>
+              <CButton type="submit" color="primary">{id ? 'Update Variation' : 'Add Variation'}</CButton>
               </div>
             </CForm>
           </CCardBody>

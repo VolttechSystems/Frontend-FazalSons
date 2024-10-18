@@ -12,7 +12,7 @@ import {
   CRow,
   CFormSelect,
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { useNavigate, useParams,Link } from 'react-router-dom';
 import axios from 'axios';
 
 const AddCategory = () => {
@@ -24,6 +24,8 @@ const AddCategory = () => {
   const [parentCategories, setParentCategories] = useState([]);
   const [selectedParentCategory, setSelectedParentCategory] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   // Fetch parent categories for the dropdown
   useEffect(() => {
@@ -37,17 +39,66 @@ const AddCategory = () => {
       }
     };
 
+    if (id) {
+      const fetchCategoryDetails = async () => {
+        try {
+          const response = await axios.get(`http://16.170.232.76/pos/products/action_category/${id}/`);
+          const category = response.data;
+          setCategoryName(category.category_name);
+          setSymbol(category.symbol);
+          setSubcategoryOption(category.subcategory_option)
+          setDescription(category.description);
+          setStatus(category.status);
+          setSelectedParentCategory(category.pc_name);
+        } catch (error) {
+          console.error('Failed to fetch category for editing:', error);
+          setErrorMessage('Failed to load category details.');
+        }
+      };
+      fetchCategoryDetails();
+    }
+
     fetchParentCategories();
-  }, []);
+  }, [id]);
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   if (!selectedParentCategory) {
+  //     setErrorMessage('Please select a parent category.');
+  //     return;
+  //   }
+
+  //   const categoryData = {
+  //     category_name: category_name,
+  //     symbol: symbol,
+  //     subcategory_option: subcategory_option,
+  //     description: description,
+  //     status: status,
+  //     pc_name: selectedParentCategory,
+  //   };
+
+  //   try {
+  //     const response = await axios.post('http://16.170.232.76/pos/products/add_category', categoryData);
+  //     console.log('Category added:', response.data);
+  //     setCategoryName('');
+  //     setSymbol('');
+  //     setSubcategoryOption('');
+  //     setDescription('');
+  //     setStatus('active');
+  //     setSelectedParentCategory('');
+  //     setErrorMessage('');
+  //     alert('Category added successfully!');
+  //   } catch (error) {
+  //     console.error('There was an error adding the category!', error);
+  //     setErrorMessage('Error adding category. Please try again.');
+  //   }
+  // };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!selectedParentCategory) {
-      setErrorMessage('Please select a parent category.');
-      return;
-    }
-
+    
     const categoryData = {
       category_name: category_name,
       symbol: symbol,
@@ -58,19 +109,19 @@ const AddCategory = () => {
     };
 
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_category', categoryData);
-      console.log('Category added:', response.data);
-      setCategoryName('');
-      setSymbol('');
-      setSubcategoryOption('');
-      setDescription('');
-      setStatus('active');
-      setSelectedParentCategory('');
-      setErrorMessage('');
-      alert('Category added successfully!');
+      if (id) {
+        
+        await axios.put(`http://16.170.232.76/pos/products/action_category/${id}/`, categoryData);
+        alert(' category updated successfully!');
+      } else {
+        
+        await axios.post('http://16.170.232.76/pos/products/add_category', categoryData);
+        alert(' category added successfully!');
+      }
+      navigate('/Product/Category'); 
     } catch (error) {
-      console.error('There was an error adding the category!', error);
-      setErrorMessage('Error adding category. Please try again.');
+      console.error('Error saving the  category:', error);
+      setErrorMessage('Error saving the  category. Please try again.');
     }
   };
 
@@ -86,6 +137,7 @@ const AddCategory = () => {
         <CCard className="mb-3">
           <CCardHeader>
             <strong>Category Information</strong>
+            <strong>{id ? 'Edit Variation' : 'Add Variation'}</strong>
           </CCardHeader>
           <CCardBody>
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
@@ -183,7 +235,9 @@ const AddCategory = () => {
                   />
                 </CCol>
               </fieldset>
-              <CButton type="submit" color="primary">Submit</CButton>
+              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+              <CButton type="submit" color="primary">{id ? 'Update Category' : 'Add Category'}</CButton>
+              </div>
             </CForm>
           </CCardBody>
         </CCard>

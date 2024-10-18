@@ -12,23 +12,34 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Variations = () => {
   const [variations, setVariations] = useState([]);
   const [attributes, setAttributes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
 
   useEffect(() => {
-    const fetchVariations = async () => {
-      try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_variation');
-        setVariations(response.data);
-        console.log('Fetched Variations:', response.data);
-      } catch (error) {
-        console.error('Error fetching variations:', error);
-      }
-    };
+    fetchVariations();
+    fetchAttributes();
+  }, []);
+
+  
+  const fetchVariations = async () => {
+    try {
+      const response = await axios.get('http://16.170.232.76/pos/products/add_variations');
+      setVariations(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching variations:', error);
+      setError('Failed to fetch variations.');
+      setLoading(false);
+    }
+  }
 
     const fetchAttributes = async () => {
       try {
@@ -42,7 +53,24 @@ const Variations = () => {
 
     fetchVariations();
     fetchAttributes();
-  }, []);
+
+    const handleDelete = async (id) => {
+      if (window.confirm('Are you sure you want to delete this variation?')) {
+        try {
+          await axios.delete(`http://16.170.232.76/pos/products/action_variation/${id}/`);
+          alert('variation deleted successfully!');
+          fetchVariations(); 
+        } catch (error) {
+          console.error('Error deleting variation:', error);
+          alert('Failed to delete variation.');
+        }
+      }
+    };
+
+    const handleEdit = (id) => {
+      console.log("Editing variation with ID:", id);
+      navigate(`/Product/AddVariations/${id}`); 
+    };
 
   const getAttributeNameById = (attributeName) => {
     
@@ -64,30 +92,39 @@ const Variations = () => {
                 <CButton color="primary" className="me-md-2">Add Variations</CButton>
               </Link>
             </div>
+            {loading && <p>Loading variations...</p>}
+            {error && <p className="text-danger">{error}</p>}
+            {!loading && !error && (
             <CTable striped>
               <thead>
                 <CTableRow>
+                <CTableHeaderCell>Sr.#</CTableHeaderCell>
                 <CTableHeaderCell>Variation Name</CTableHeaderCell>
                   <CTableHeaderCell>Attribute</CTableHeaderCell> 
                   <CTableHeaderCell>Short Form/Symbol</CTableHeaderCell>
                   <CTableHeaderCell>Description</CTableHeaderCell>
                   <CTableHeaderCell>Status</CTableHeaderCell>
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
                 </CTableRow>
               </thead>
               <CTableBody>
-                {variations.map(variation => (
+                {variations.map((variation,index) => (
                   <CTableRow key={variation.id}>
+                    <CTableDataCell>{index + 1}</CTableDataCell>
                     <CTableDataCell>{variation.variation_name}</CTableDataCell>
-                    <CTableDataCell>
-                      {getAttributeNameById(variation.attribute_name)}
-                    </CTableDataCell>
+                    <CTableDataCell>{getAttributeNameById(variation.attribute_name)}</CTableDataCell>
                     <CTableDataCell>{variation.symbol}</CTableDataCell>
                     <CTableDataCell>{variation.description}</CTableDataCell>
                     <CTableDataCell>{variation.status}</CTableDataCell>
+                    <CTableDataCell>
+                        <CButton color="warning" size="sm" onClick={() => handleEdit(variation.id)}>Edit</CButton>
+                        <CButton color="danger" size="sm" onClick={() => handleDelete(variation.id)} className="ms-2">Delete</CButton>
+                      </CTableDataCell>
                   </CTableRow>
                 ))}
               </CTableBody>
             </CTable>
+            )}
           </CCardBody>
         </CCard>
       </CCol>

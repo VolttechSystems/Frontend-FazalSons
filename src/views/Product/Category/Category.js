@@ -12,23 +12,33 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
-  const [parentCategories, setParentCategories] = useState([]); // State for parent categories
+  const [parentCategories, setParentCategories] = useState([]); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_category'); // Replace with your API endpoint for categories
-        setCategories(response.data);
-        console.log('Fetched Categories:', response.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
+    fetchCategories();
+    fetchParentCategories();
+  }, []);
+
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('http://16.170.232.76/pos/products/add_category');
+      setCategories(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError('Failed to fetch categories.');
+      setLoading(false);
+    }
+  }
 
     const fetchParentCategories = async () => {
       try {
@@ -42,7 +52,25 @@ const Category = () => {
 
     fetchCategories();
     fetchParentCategories();
-  }, []);
+
+
+    const handleDelete = async (id) => {
+      if (window.confirm('Are you sure you want to delete this Category?')) {
+        try {
+          await axios.delete(`http://16.170.232.76/pos/products/action_category/${id}/`);
+          alert('Category deleted successfully!');
+          fetchCategories(); 
+        } catch (error) {
+          console.error('Error deleting Category:', error);
+          alert('Failed to delete Category.');
+        }
+      }
+    };
+
+    const handleEdit = (id) => {
+      console.log("Editing Category with ID:", id);
+      navigate(`/Product/AddCategory/${id}`); 
+    };
 
   const getParentCategoryName = (pc_name) => {
     const parentCategory = parentCategories.find(pc => pc.pc_name === pc_name);
@@ -62,28 +90,39 @@ const Category = () => {
                 <CButton href="#" color="primary" className="me-md-2">Add Category</CButton>
               </Link>
             </div>
+            {loading && <p>Loading variations...</p>}
+            {error && <p className="text-danger">{error}</p>}
+            {!loading && !error && (
             <CTable striped>
               <thead>
                 <CTableRow>
+                <CTableHeaderCell>Sr.#</CTableHeaderCell>
                   <CTableHeaderCell>Parent Category</CTableHeaderCell>
                   <CTableHeaderCell>Category Name</CTableHeaderCell>
                   <CTableHeaderCell>Short Form/Symbol</CTableHeaderCell>
                   <CTableHeaderCell>Description</CTableHeaderCell>
                   <CTableHeaderCell>Status</CTableHeaderCell>
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
                 </CTableRow>
               </thead>
               <CTableBody>
-                {categories.map(category => (
+                {categories.map((category,index) => (
                   <CTableRow key={category.id}>
+                    <CTableDataCell>{index + 1}</CTableDataCell>
                     <CTableDataCell>{getParentCategoryName(category.pc_name)}</CTableDataCell>
                     <CTableDataCell>{category.category_name}</CTableDataCell>
                     <CTableDataCell>{category.symbol}</CTableDataCell>
                     <CTableDataCell>{category.description}</CTableDataCell>
                     <CTableDataCell>{category.status}</CTableDataCell>
+                    <CTableDataCell>
+                        <CButton color="warning" size="sm" onClick={() => handleEdit(categories.id)}>Edit</CButton>
+                        <CButton color="danger" size="sm" onClick={() => handleDelete(categories.id)} className="ms-2">Delete</CButton>
+                      </CTableDataCell>
                   </CTableRow>
                 ))}
               </CTableBody>
             </CTable>
+            )}
           </CCardBody>
         </CCard>
       </CCol>

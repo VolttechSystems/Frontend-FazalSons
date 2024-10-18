@@ -95,9 +95,10 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Attributes = () => {
-  const [attributes, setAttributes] = useState([]); // State to store attributes data
-  const [loading, setLoading] = useState(true); // State to manage loading state
-  const [error, setError] = useState(''); // State for error messages
+  const [attributes, setAttributes] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(''); 
+  
 
   useEffect(() => {
     const fetchAttributes = async () => {
