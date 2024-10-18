@@ -76,6 +76,7 @@
 // }
 
 // export default Attributes
+
 import React, { useEffect, useState } from 'react';
 import {
   CButton,
@@ -95,9 +96,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const ParentCategory = () => {
-  const [pc, setParentcategory] = useState([]); // State to store attributes data
-  const [loading, setLoading] = useState(true); // State to manage loading state
-  const [error, setError] = useState(''); // State for error messages
+  const [pc, setParentcategory] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(''); 
 
   useEffect(() => {
     const fetchParentcategory = async () => {
@@ -147,10 +148,10 @@ const ParentCategory = () => {
                     <CTableRow key={pc.id}>
                       <CTableDataCell>{index + 1}</CTableDataCell>
                       <CTableDataCell>{pc.category_head}</CTableDataCell> 
-                      <CTableDataCell>{pc.pc_name}</CTableDataCell> {/* Attribute name */}
-                      <CTableDataCell>{pc.symbol}</CTableDataCell> {/* Short form or symbol */}
-                      <CTableDataCell>{pc.description}</CTableDataCell> {/* Description */}
-                      <CTableDataCell>{pc.status}</CTableDataCell> {/* Status: 'Active', 'Pending', 'Inactive' */}
+                      <CTableDataCell>{pc.pc_name}</CTableDataCell> 
+                      <CTableDataCell>{pc.symbol}</CTableDataCell> 
+                      <CTableDataCell>{pc.description}</CTableDataCell> 
+                      <CTableDataCell>{pc.status}</CTableDataCell> 
                     </CTableRow>
                   ))}
                 </CTableBody>

@@ -81,8 +81,8 @@ const AddParentCategory = () => {
                     required
                   >
                     <option value="" disabled>Select Category Head</option>
-                    <option value="clothing">Clothing</option>
-                    <option value="accessories">Accessories</option>
+                    <option value="clothing">Clothing & Accessories</option>
+                    {/* <option value="accessories">Accessories</option> */}
                   </CFormSelect>
                 </CCol>
               </fieldset>

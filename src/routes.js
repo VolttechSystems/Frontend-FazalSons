@@ -23,6 +23,7 @@ const Category = React.lazy(() => import('./views/Product/Category/Category'))
 const AddCategory = React.lazy(() => import('./views/Product/AddCategory/AddCategory'))
 const SubCategory = React.lazy(() => import('./views/Product/SubCategory/SubCategory'))
 const AddSubCategory = React.lazy(() => import('./views/Product/AddSubCategory/AddSubCategory'))
+const AddHeadCategory = React.lazy(() => import('./views/Product/AddHeadCategory/AddHeadCategory'))
 
 
 
@@ -82,6 +83,7 @@ const routes = [
   { path: '/Product/AddCategory', name: 'AddCategory', element: AddCategory }, //AddCategory
   { path: '/Product/SubCategory', name: 'SubCategory', element: SubCategory }, //SubCategory
   { path: '/Product/AddSubCategory', name: 'AddSubCategory', element: AddSubCategory }, //AddSubCategory
+  { path: '/Product/AddHeadCategory', name: 'AddHeadCategory', element: AddHeadCategory }, //AddHeadCategory
   { path: '/buttons', name: 'Buttons', element: Buttons, exact: true },
   { path: '/buttons/buttons', name: 'Buttons', element: Buttons },
   { path: '/buttons/dropdowns', name: 'Dropdowns', element: Dropdowns },
