@@ -12,11 +12,12 @@ import {
   CRow,
   CFormSelect,
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AddParentCategory = () => {
   // State for form inputs
+  const navigate = useNavigate(); 
   const [category_head, setCategoryHead] = useState(''); // Default to empty
   const [pc_name, setPCname] = useState('');
   const [symbol, setShortForm] = useState('');
@@ -55,6 +56,11 @@ const AddParentCategory = () => {
     }
   };
 
+  
+  const handleAddCategoryHead = () => {
+    navigate('/Product/AddHeadCategory'); 
+  };
+
   return (
     <CRow>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -82,8 +88,8 @@ const AddParentCategory = () => {
                   >
                     <option value="" disabled>Select Category Head</option>
                     <option value="clothing">Clothing & Accessories</option>
-                    {/* <option value="accessories">Accessories</option> */}
-                  </CFormSelect>
+                  </CFormSelect> <CButton color="primary" onClick={handleAddCategoryHead} className="ms-2"> + </CButton>
+
                 </CCol>
               </fieldset>
               <CRow className="mb-3">
