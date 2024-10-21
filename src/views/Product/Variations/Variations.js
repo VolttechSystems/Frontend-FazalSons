@@ -15,6 +15,17 @@ import {
 import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const Loader = () => {
+  return (
+    <div className="text-center my-5">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
+};
+
+
 const Variations = () => {
   const [variations, setVariations] = useState([]);
   const [attributes, setAttributes] = useState([]);
@@ -51,8 +62,7 @@ const Variations = () => {
       }
     };
 
-    fetchVariations();
-    fetchAttributes();
+    
 
     const handleDelete = async (id) => {
       if (window.confirm('Are you sure you want to delete this variation?')) {
@@ -92,6 +102,7 @@ const Variations = () => {
                 <CButton color="primary" className="me-md-2">Add Variations</CButton>
               </Link>
             </div>
+            {loading && <Loader/>}
             {loading && <p>Loading variations...</p>}
             {error && <p className="text-danger">{error}</p>}
             {!loading && !error && (
