@@ -106,7 +106,7 @@ const AddParentCategory = () => {
     Select Category Head
   </option>
   {categoryHeads.map((head) => (
-    <option key={head.id} value={head.hc_name}>
+    <option key={head.hc_name} value={head.hc_name}>
       {head.hc_name}
     </option>
   ))}

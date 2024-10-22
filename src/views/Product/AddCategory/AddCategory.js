@@ -40,26 +40,27 @@ const AddCategory = () => {
     };
 
     if (id) {
-      const fetchCategoryDetails = async () => {
-        try {
-          const response = await axios.get(`http://16.170.232.76/pos/products/action_category/${id}/`);
-          const category = response.data;
-          setCategoryName(category.category_name);
-          setSymbol(category.symbol);
-          setSubcategoryOption(category.subcategory_option)
-          setDescription(category.description);
-          setStatus(category.status);
-          setSelectedParentCategory(category.pc_name);
-        } catch (error) {
-          console.error('Failed to fetch category for editing:', error);
-          setErrorMessage('Failed to load category details.');
-        }
-      };
-      fetchCategoryDetails();
+      fetchCategoryDetails(id)
     }
 
     fetchParentCategories();
   }, [id]);
+
+  const fetchCategoryDetails = async () => {
+    try {
+      const response = await axios.get(`http://16.170.232.76/pos/products/action_category/${id}/`);
+      const category = response.data;
+      setCategoryName(category.category_name);
+      setSymbol(category.symbol);
+      setSubcategoryOption(category.subcategory_option)
+      setDescription(category.description);
+      setStatus(category.status);
+      setSelectedParentCategory(category.pc_name);
+    } catch (error) {
+      console.error('Failed to fetch category for editing:', error);
+      setErrorMessage('Failed to load category details.');
+    }
+  };
 
   // const handleSubmit = async (e) => {
   //   e.preventDefault();

@@ -50,11 +50,12 @@ const Category = () => {
       }
     };
 
-    fetchCategories();
-    fetchParentCategories();
+    // fetchCategories();
+    // fetchParentCategories();
 
 
     const handleDelete = async (id) => {
+      console.log({id})
       if (window.confirm('Are you sure you want to delete this Category?')) {
         try {
           await axios.delete(`http://16.170.232.76/pos/products/action_category/${id}/`);
@@ -115,8 +116,8 @@ const Category = () => {
                     <CTableDataCell>{category.description}</CTableDataCell>
                     <CTableDataCell>{category.status}</CTableDataCell>
                     <CTableDataCell>
-                        <CButton color="warning" size="sm" onClick={() => handleEdit(categories.id)}>Edit</CButton>
-                        <CButton color="danger" size="sm" onClick={() => handleDelete(categories.id)} className="ms-2">Delete</CButton>
+                        <CButton color="warning" size="sm" onClick={() => handleEdit(category.id)}>Edit</CButton>
+                        <CButton color="danger" size="sm" onClick={() => handleDelete(category.id)} className="ms-2">Delete</CButton>
                       </CTableDataCell>
                   </CTableRow>
                 ))}
