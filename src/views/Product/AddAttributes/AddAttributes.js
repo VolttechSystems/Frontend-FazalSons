@@ -1,6 +1,6 @@
 
 
-// import React, { useState } from 'react';
+// import React, { useState, useEffect } from 'react';
 // import {
 //   CButton,
 //   CCard,
@@ -12,158 +12,174 @@
 //   CFormInput,
 //   CFormLabel,
 //   CRow,
+//   CFormSelect,
 // } from '@coreui/react';
-// import { Link } from 'react-router-dom';
+// import { useNavigate, useParams, Link } from 'react-router-dom';
 // import axios from 'axios';
 
-// const AddAttributes = () => {
-//   // State for form inputs
-//   const [type, setAttributeType] = useState('color'); // Default to 'color'
-//   const [attribute_name, setAttributeName] = useState('');
-//   const [symbol, setShortForm] = useState('');
-//   const [description, setDescription] = useState('');
-//   const [status, setStatus] = useState('active'); // Default status
-//   const [errorMessage, setErrorMessage] = useState(''); // To handle error messages
+// const AddAttribute = () => {
+//   const [attributeTypes, setAttributeTypes] = useState([]);
+//   const [attribute, setAttribute] = useState({
+//     attribute_name: '',
+//     symbol: '',
+//     description: '',
+//     status: 'active',
+//     att_type: '',
+//   });
+//   const [errorMessage, setErrorMessage] = useState('');
+//   const navigate = useNavigate();
+//   const { id } = useParams();
+
+//   useEffect(() => {
+//     const fetchAttributeTypes = async () => {
+//       try {
+//         const response = await axios.get('http://16.170.232.76/pos/products/add_attribute_type');
+//         setAttributeTypes(response.data);
+//       } catch (error) {
+//         console.error('Error fetching attribute types:', error);
+//         setErrorMessage('Failed to fetch attribute types.');
+//       }
+//     };
+
+//     const fetchAttributeDetails = async () => {
+//       if (id) {
+//         try {
+//           const response = await axios.get(`http://16.170.232.76/pos/products/action_attributes/${id}/`);
+//           setAttribute(response.data);
+//         } catch (error) {
+//           console.error('Error fetching attribute details:', error);
+//           setErrorMessage('Failed to fetch attribute details.');
+//         }
+//       }
+//     };
+
+//     fetchAttributeTypes();
+//     fetchAttributeDetails();
+//   }, [id]);
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
-
-//     // Create an attribute object to send in the request
-//     const attributeData = {
-//         type: type,
-//         attribute_name: attribute_name,
-//         symbol: symbol,
-//       description: description,
-//       status: status,
-//     };
-
 //     try {
-//       // Send POST request to add attribute
-//       const response = await axios.post('http://16.170.232.76/pos/products/add_attribute', attributeData);
-//       console.log('Attribute added:', response.data);
-      
-//       // Clear form fields after successful submission
-//       setAttributeType('color');
-//       setAttributeName('');
-//       setShortForm('');
-//       setDescription('');
-//       setStatus('active'); 
-
-//       alert('Attribute added successfully!');
+//       if (id) {
+//         await axios.put(`http://16.170.232.76/pos/products/action_attributes/${id}/`, attribute);
+//         alert('Attribute updated successfully!');
+//       } else {
+//         await axios.post('http://16.170.232.76/pos/products/add_attribute', attribute);
+//         alert('Attribute added successfully!');
+//       }
+//       navigate('/Product/Attributes');
 //     } catch (error) {
-//       console.error('There was an error adding the attribute!', error);
-//       setErrorMessage('Error adding attribute. Please try again.'); // Set error message
+//       console.error('Error saving attribute:', error);
+//       setErrorMessage('Error saving attribute. Please try again.');
 //     }
+//   };
+
+//   const handleCreateAttributeType = () => {
+//     navigate('/Product/AddAttributeType');
 //   };
 
 //   return (
 //     <CRow>
-//       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-//         <Link to="/Product/Attributes">
-//           <CButton href="#" color="primary" className="me-md-2">Attributes</CButton>
-//         </Link>
-//       </div>
-
 //       <CCol xs={12}>
-//         <CCard className="mb-3">
+//         <CCard className="mb-4">
 //           <CCardHeader>
-//             <strong>Attribute Information</strong>
+//             <strong>{id ? 'Edit Attribute' : 'Add Attribute'}</strong>
+//             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+//               <Link to="/Product/Attributes">
+//                 <CButton color="primary">Attributes</CButton>
+//               </Link>
+//             </div>
 //           </CCardHeader>
 //           <CCardBody>
-//             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>} {/* Display error message if exists */}
+//             {errorMessage && <p className="text-danger">{errorMessage}</p>}
 //             <CForm onSubmit={handleSubmit}>
-//               <fieldset className="row mb-3">
-//                 <legend className="col-form-label col-sm-2 pt-0">Attribute Type</legend>
-//                 <CCol sm={8}>
-//                   <CFormCheck 
-//                     type="radio" 
-//                     name="type" 
-//                     id="color" 
-//                     value="color" 
-//                     label="Color" 
-//                     checked={type === 'color'} 
-//                     onChange={(e) => setAttributeType(e.target.value)} 
-//                   />
-//                   <CFormCheck 
-//                     type="radio" 
-//                     name="type" 
-//                     id="size" 
-//                     value="size" 
-//                     label="Size" 
-//                     checked={type === 'size'} 
-//                     onChange={(e) => setAttributeType(e.target.value)} 
-//                   />
-//                 </CCol>
-//               </fieldset>
-//               <CRow className="mb-3">
-//                 <CFormLabel htmlFor="attributeName" className="col-sm-2 col-form-label">Attribute *</CFormLabel>
-//                 <CCol sm={8}>
-//                   <CFormInput 
-//                     type="text" 
-//                     id="attribute_name" 
-//                     value={attribute_name} 
-//                     onChange={(e) => setAttributeName(e.target.value)} 
-//                     required 
-//                   />
-//                 </CCol>
-//               </CRow>
-//               <CRow className="mb-3">
-//                 <CFormLabel htmlFor="symbol" className="col-sm-2 col-form-label">Short Form/Symbol</CFormLabel>
-//                 <CCol sm={8}>
-//                   <CFormInput 
-//                     type="text" 
-//                     id="symbol" 
-//                     value={symbol} 
-//                     onChange={(e) => setShortForm(e.target.value)} 
-//                   />
-//                 </CCol>
-//               </CRow>
-//               <CRow className="mb-3">
-//                 <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
-//                 <CCol sm={8}>
-//                   <CFormInput 
-//                     type="text" 
-//                     id="description" 
-//                     value={description} 
-//                     onChange={(e) => setDescription(e.target.value)} 
-//                   />
-//                 </CCol>
-//               </CRow>
-//               <fieldset className="row mb-3">
-//                 <legend className="col-form-label col-sm-2 pt-0">Status</legend>
-//                 <CCol sm={8}>
-//                   <CFormCheck 
-//                     type="radio" 
-//                     name="status" 
-//                     id="active" 
-//                     value="active" 
-//                     label="Active" 
-//                     checked={status === 'active'} 
-//                     onChange={(e) => setStatus(e.target.value)} 
-//                   />
-//                   <CFormCheck 
-//                     type="radio" 
-//                     name="status" 
-//                     id="pending" 
-//                     value="pending" 
-//                     label="Pending" 
-//                     checked={status === 'pending'} 
-//                     onChange={(e) => setStatus(e.target.value)} 
-//                   />
-//                   <CFormCheck 
-//                     type="radio" 
-//                     name="status" 
-//                     id="inactive" 
-//                     value="inactive" 
-//                     label="Inactive" 
-//                     checked={status === 'inactive'} 
-//                     onChange={(e) => setStatus(e.target.value)} 
-//                   />
-//                 </CCol>
-//               </fieldset>
-//               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-//                 <CButton color="primary" type="submit">Save</CButton>
+//               <div className="mb-3">
+//                 <CFormLabel htmlFor="attribute_name">Attribute Name</CFormLabel>
+//                 <CFormInput
+//                   type="text"
+//                   id="attribute_name"
+//                   value={attribute.attribute_name}
+//                   onChange={(e) => setAttribute({ ...attribute, attribute_name: e.target.value })}
+//                   required
+//                 />
 //               </div>
+//               <div className="mb-3">
+//                 <CFormLabel htmlFor="symbol">Short Form/Symbol</CFormLabel>
+//                 <CFormInput
+//                   type="text"
+//                   id="symbol"
+//                   value={attribute.symbol}
+//                   onChange={(e) => setAttribute({ ...attribute, symbol: e.target.value })}
+//                   required
+//                 />
+//               </div>
+//               <div className="mb-3">
+//                 <CFormLabel htmlFor="description">Description</CFormLabel>
+//                 <CFormInput
+//                   type="text"
+//                   id="description"
+//                   value={attribute.description}
+//                   onChange={(e) => setAttribute({ ...attribute, description: e.target.value })}
+//                   required
+//                 />
+//               </div>
+//               <div className="mb-3">
+//                 <CFormLabel htmlFor="att_type">Attribute Type</CFormLabel>
+//                 <CFormSelect
+//                   id="att_type"
+//                   value={attribute.att_type}
+//                   onChange={(e) => setAttribute({ ...attribute, att_type: e.target.value })}
+//                   required
+//                 >
+//                   <option value="">Select Attribute Type</option>
+//                   {attributeTypes.map((type) => (
+//                     <option key={type.id} value={type.type_name}>
+//                       {type.type_name}
+//                     </option>
+//                   ))}
+//                 </CFormSelect>
+//                 <CButton color="info" className="ms-2" onClick={handleCreateAttributeType}>
+//                   +
+//                 </CButton>
+//               </div>
+//               <div className="mb-3">
+//                 <CFormLabel>Status</CFormLabel>
+//                 <div>
+//                   <CFormCheck
+//                     type="radio"
+//                     name="status"
+//                     id="status-active"
+//                     label="Active"
+//                     value="active"
+//                     checked={attribute.status === 'active'}
+//                     onChange={() => setAttribute({ ...attribute, status: 'active' })}
+//                   />
+//                   <CFormCheck
+//                     type="radio"
+//                     name="status"
+//                     id="status-inactive"
+//                     label="Inactive"
+//                     value="inactive"
+//                     checked={attribute.status === 'inactive'}
+//                     onChange={() => setAttribute({ ...attribute, status: 'inactive' })}
+//                   />
+//                   <CFormCheck
+//                     type="radio"
+//                     name="status"
+//                     id="status-pending"
+//                     label="Pending"
+//                     value="pending"
+//                     checked={attribute.status === 'pending'}
+//                     onChange={() => setAttribute({ ...attribute, status: 'pending' })}
+//                   />
+//                 </div>
+//               </div>
+//               <CButton type="submit" color="primary">
+//                 {id ? 'Update Attribute' : 'Add Attribute'}
+//               </CButton>
+//               <Link to="/Product/Attributes" className="btn btn-secondary ms-2">
+//                 Cancel
+//               </Link>
 //             </CForm>
 //           </CCardBody>
 //         </CCard>
@@ -172,10 +188,10 @@
 //   );
 // };
 
-// export default AddAttributes;
+// export default AddAttribute;
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CButton,
   CCard,
@@ -187,159 +203,201 @@ import {
   CFormInput,
   CFormLabel,
   CRow,
+  CFormSelect,
 } from '@coreui/react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+const Loader = () => {
+  return (
+    <div className="text-center my-5">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
+};
 
-const AddAttributes = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
-  const [type, setAttributeType] = useState('color');
-  const [attribute_name, setAttributeName] = useState('');
-  const [symbol, setShortForm] = useState('');
+const AddAttribute = () => {
+  const [attributeTypes, setAttributeTypes] = useState([]);
+  const [attributeName, setAttributeName] = useState('');
+  const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('active');
+  const [attType, setAttType] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchAttributeTypes = async () => {
+      try {
+        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute_type');
+        setAttributeTypes(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching attribute types:', error);
+        setErrorMessage('Failed to fetch attribute types.');
+        setLoading(false);
+      }
+    };
+
+    const fetchAttributeDetails = async () => {
+      if (id) {
+        try {
+          const response = await axios.get(`http://16.170.232.76/pos/products/action_attributes/${id}/`);
+          const data = response.data;
+          setAttributeName(data.attribute_name);
+          setSymbol(data.symbol);
+          setDescription(data.description);
+          setStatus(data.status);
+          setAttType(data.att_type);
+        } catch (error) {
+          console.error('Error fetching attribute details:', error);
+          setErrorMessage('Failed to fetch attribute details.');
+        }
+      }
+    };
+
+    fetchAttributeTypes();
+    fetchAttributeDetails();
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const attributeData = {
-      type: type,
-      attribute_name: attribute_name,
+      attribute_name: attributeName,
       symbol: symbol,
       description: description,
       status: status,
+      att_type: attType,
     };
 
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_attribute', attributeData);
-      console.log('Attribute added:', response.data);
-      setAttributeType('color');
-      setAttributeName('');
-      setShortForm('');
-      setDescription('');
-      setStatus('active');
-      alert('Attribute added successfully!');
+      if (id) {
+        await axios.put(`http://16.170.232.76/pos/products/action_attributes/${id}/`, attributeData);
+        alert('Attribute updated successfully!');
+      } else {
+        await axios.post('http://16.170.232.76/pos/products/add_attribute', attributeData);
+        alert('Attribute added successfully!');
+      }
+
+      navigate('/Product/Attributes');
     } catch (error) {
-      console.error('There was an error adding the attribute!', error);
-      setErrorMessage('Error adding attribute. Please try again.');
+      console.error('There was an error saving the attribute!', error);
+      setErrorMessage('Error saving attribute. Please try again.');
     }
   };
 
+
   const handleAddAttributeType = () => {
-    navigate('/Product/AddAttributeType'); 
+    navigate('/Product/AddAttributeType');
   };
+
 
   return (
     <CRow>
-      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Link to="/Product/Attributes">
-          <CButton color="primary" className="me-md-2">Attributes</CButton>
-        </Link>
-      </div>
-
       <CCol xs={12}>
-        <CCard className="mb-3">
+        <CCard className="mb-4">
           <CCardHeader>
-            <strong>Attribute Information</strong>
+            <strong>{id ? 'Edit Attribute' : 'Add Attribute'}</strong>
+            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+              <Link to="/Product/Attributes">
+                <CButton color="primary">Attributes</CButton>
+              </Link>
+            </div>
           </CCardHeader>
           <CCardBody>
-            {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+            {loading && <Loader/>}
+            {errorMessage && <p className="text-danger">{errorMessage}</p>}
             <CForm onSubmit={handleSubmit}>
-              <fieldset className="row mb-3">
-                <legend className="col-form-label col-sm-2 pt-0">Attribute Type</legend>
-                <CCol sm={8}>
-                  <CFormCheck 
-                    type="radio" 
-                    name="type" 
-                    id="color" 
-                    value="color" 
-                    label="Color" 
-                    checked={type === 'color'} 
-                    onChange={(e) => setAttributeType(e.target.value)} 
-                  />
-                  <CFormCheck 
-                    type="radio" 
-                    name="type" 
-                    id="size" 
-                    value="size" 
-                    label="Size" 
-                    checked={type === 'size'} 
-                    onChange={(e) => setAttributeType(e.target.value)}  
-                  />
-                  <CButton color="primary" onClick={handleAddAttributeType} className="ms-2">+</CButton>
-                  
-                </CCol>
-              </fieldset>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="attributeName" className="col-sm-2 col-form-label">Attribute *</CFormLabel>
-                <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="attribute_name" 
-                    value={attribute_name} 
-                    onChange={(e) => setAttributeName(e.target.value)} 
-                    required 
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="symbol" className="col-sm-2 col-form-label">Short Form/Symbol</CFormLabel>
-                <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="symbol" 
-                    value={symbol} 
-                    onChange={(e) => setShortForm(e.target.value)} 
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
-                <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="description" 
-                    value={description} 
-                    onChange={(e) => setDescription(e.target.value)} 
-                  />
-                </CCol>
-              </CRow>
-              <fieldset className="row mb-3">
-                <legend className="col-form-label col-sm-2 pt-0">Status</legend>
-                <CCol sm={8}>
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="active" 
-                    value="active" 
-                    label="Active" 
-                    checked={status === 'active'} 
-                    onChange={(e) => setStatus(e.target.value)} 
-                  />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="pending" 
-                    value="pending" 
-                    label="Pending" 
-                    checked={status === 'pending'} 
-                    onChange={(e) => setStatus(e.target.value)} 
-                  />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="inactive" 
-                    value="inactive" 
-                    label="Inactive" 
-                    checked={status === 'inactive'} 
-                    onChange={(e) => setStatus(e.target.value)} 
-                  />
-                </CCol>
-              </fieldset>
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">Save</CButton>
+              <div className="mb-3">
+                <CFormLabel htmlFor="attribute_name">Attribute Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="attribute_name"
+                  value={attributeName}
+                  onChange={(e) => setAttributeName(e.target.value)}
+                  required
+                />
               </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="symbol">Short Form/Symbol</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="symbol"
+                  value={symbol}
+                  onChange={(e) => setSymbol(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="description">Description</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="att_type">Attribute Type</CFormLabel>
+                <CFormSelect
+                  id="att_type"
+                  value={attType}
+                  onChange={(e) => setAttType(e.target.value)}
+                  required
+                >
+                  <option value="">Select Attribute Type</option>
+                  {attributeTypes.map((type) => (
+                    <option key={type.id} value={type.att_type}>
+                      {type.att_type}
+                    </option>
+                  ))}
+                </CFormSelect>
+                <CButton color="primary" onClick={handleAddAttributeType} className="ms-2"> + </CButton>
+              </div>
+              <div className="mb-3">
+                <CFormLabel>Status</CFormLabel>
+                <div>
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="status-active"
+                    label="Active"
+                    value="active"
+                    checked={status === 'active'}
+                    onChange={() => setStatus('active')}
+                  />
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="status-inactive"
+                    label="Inactive"
+                    value="inactive"
+                    checked={status === 'inactive'}
+                    onChange={() => setStatus('inactive')}
+                  />
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="status-pending"
+                    label="Pending"
+                    value="pending"
+                    checked={status === 'pending'}
+                    onChange={() => setStatus('pending')}
+                  />
+                </div>
+              </div>
+              <CButton type="submit" color="primary">
+                {id ? 'Update Attribute' : 'Add Attribute'}
+              </CButton>
+              <Link to="/Product/Attributes" className="btn btn-secondary ms-2">
+                Cancel
+              </Link>
             </CForm>
           </CCardBody>
         </CCard>
@@ -348,4 +406,4 @@ const AddAttributes = () => {
   );
 };
 
-export default AddAttributes;
+export default AddAttribute;

@@ -22,6 +22,17 @@ const SubCategory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const Loader = () => {
+    return (
+      <div className="text-center my-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  };
+  
+
   useEffect(() => {
     const fetchSubCategories = async () => {
       try {
@@ -81,6 +92,7 @@ const SubCategory = () => {
           <CCardHeader>
             <strong>Sub Category List</strong>
           </CCardHeader>
+          {loading && <Loader/>}
           <CCardBody>
             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
               <Link to="/Product/AddSubCategory">

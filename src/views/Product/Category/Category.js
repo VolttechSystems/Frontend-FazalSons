@@ -15,6 +15,17 @@ import {
 import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const Loader = () => {
+  return (
+    <div className="text-center my-5">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
+};
+
+
 const Category = () => {
   const [categories, setCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]); 
@@ -91,6 +102,7 @@ const Category = () => {
                 <CButton href="#" color="primary" className="me-md-2">Add Category</CButton>
               </Link>
             </div>
+            {loading && <Loader/>}
             {loading && <p>Loading variations...</p>}
             {error && <p className="text-danger">{error}</p>}
             {!loading && !error && (
