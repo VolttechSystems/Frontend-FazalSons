@@ -30,7 +30,7 @@ const AddVariations = () => {
   useEffect(() => {
     const fetchAttributes = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute'); // Replace with your API endpoint
+        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute'); 
         setAttributes(response.data); // Assuming response.data contains an array of attributes
       } catch (error) {
         console.error('Error fetching attributes:', error);

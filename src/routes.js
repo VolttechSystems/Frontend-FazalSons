@@ -12,6 +12,7 @@ const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Regi
 const AllProducts = React.lazy(() => import('./views/Product/AllProducts/AllProducts'))
 const Brands = React.lazy(() => import('./views/Product/Brands/Brands'))
 const AddBrands = React.lazy(() => import('./views/Product/AddBrands/AddBrands'))
+const AddProduct = React.lazy(() => import('./views/Product/AddProduct/AddProduct'))
 const ParentCategory = React.lazy(() => import('./views/Product/ParentCategory/ParentCategory'))
 const AddParentCategory = React.lazy(() => import('./views/Product/AddParentCategory/AddParentCategory'))
 const Attributes = React.lazy(() => import('./views/Product/Attributes/Attributes'))
@@ -41,6 +42,7 @@ const routes = [
   { path: '/Product/AllProducts', name: 'AllProducts', element: AllProducts }, //AllProducts
   { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
+  { path: '/Product/AddProduct', name: 'AddProduct', element: AddProduct }, //AddProduct
   { path: '/Product/AddBrands/:id', name: 'EditBrand', element: AddBrands }, // Edit Brand
   { path: '/Product/ParentCategory', name: 'ParentCategory', element: ParentCategory }, //ParentCategory
   { path: '/Product/AddParentCategory', name: 'AddParentCategory', element: AddParentCategory }, //AddParentCategory
