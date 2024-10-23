@@ -227,7 +227,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Add Product',
-        to: '/icons/flags',
+        to: '/Product/AddProduct',
       },
       {
         component: CNavItem,
