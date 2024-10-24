@@ -47,7 +47,7 @@ const AddSubCategory = () => {
       description,
       status,
       isSubcategory,
-      parentCategory: selectedParentCategory,
+      parentCategory: pc_name,
     };
 
     try {
@@ -91,8 +91,8 @@ const AddSubCategory = () => {
               >
                 <option value="">Select Parent Category</option>
                 {parentCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.attribute_name} {/* Adjust the field name according to API response */}
+                  <option key={category.pc_name} value={category.pc_name}>
+                    {category.pc_name} 
                   </option>
                 ))}
               </CFormSelect>
