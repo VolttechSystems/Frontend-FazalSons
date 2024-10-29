@@ -78,11 +78,13 @@ const AddProduct = () => {
           axios.get('http://16.170.232.76/pos/products/add_category'),
           axios.get('http://16.170.232.76/pos/products/add_brand')
         ]);
-
+        
+        const brandsData = brandResponse.data.results || [];
+        setBrands(Array.isArray(brandsData) ? brandsData : []); // Ensure you are setting the correct data
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
         setCategories(categoryResponse.data);
-        setBrands(brandResponse.data);
+       
       } catch (error) {
         console.error('Error fetching categories:', error);
       } finally {
@@ -226,17 +228,17 @@ const resetForm = () => {
 const handlePublish = async () => {
   console.log('Publishing with data:', formData);
  
-  const formDataToSend = {
-    ...formData,
-    product_name:formData.product_name,
-    season:formData.season,
-    color: formData.color.join(','), 
-    size: formData.size.join(','),   
-    used_for_inventory: formData.used_for_inventory ? 'true' : 'false', 
-  };
+  // const formDataToSend = {
+  //   ...formData,
+  //   product_name:formData.product_name,
+  //   season:formData.season,
+  //   color: formData.color.join(','), 
+  //   size: formData.size.join(','),   
+  //   used_for_inventory: formData.used_for_inventory ? 'true' : 'false', 
+  // };
 
   try {
-    const response = await axios.post('http://16.170.232.76/pos/products/add_product', formDataToSend);
+    const response = await axios.post('http://16.170.232.76/pos/products/add_product');
     if (response.status === 201 || response.status === 200) {
       alert('Product published successfully!');
       history.push('/Product/AllProducts'); 
@@ -343,6 +345,16 @@ const handlePublish = async () => {
                     <option key={item.category_name} value={item.category_name}>{item.category_name}</option>
                   ))}
                 </select>
+              </label>
+              <label>
+              Brands:
+              <select>
+    {brands.map(brand => (
+        <option key={brand.id} value={brand.id}>
+            {brand.brand_name} {/* Adjust according to your data structure */}
+        </option>
+    ))}
+</select>
               </label>
               <label>
                 Season:
