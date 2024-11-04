@@ -141,7 +141,7 @@ const handleAdd = () => {
   resetForm(); 
 };
 
-  // Function to handle editing, populates the form with the selected product's data.
+  
 const handleEdit = (id) => {
   const productToEdit = productList.find(product => product.id === id);
   if (productToEdit) {
@@ -154,8 +154,8 @@ const handleEdit = (id) => {
       category: productToEdit.category || '',
       season: productToEdit.season || '',
       description: productToEdit.description || '',
-      color: productToEdit.color ? productToEdit.color.split(',') : [], // Array of strings
-      size: productToEdit.size ? productToEdit.size.split(',') : [], // Array of strings
+      color: productToEdit.color ? productToEdit.color.split(',') : [], 
+      size: productToEdit.size ? productToEdit.size.split(',') : [], 
       used_for_inventory: productToEdit.used_for_inventory || false,
       cost_price: productToEdit.cost_price || '',
       selling_price: productToEdit.selling_price || '',
@@ -190,7 +190,7 @@ const handleUpdate = () => {
   }
 };
 
-  
+ 
   
   const handleDelete = async (id) => {
     try {
@@ -240,7 +240,7 @@ const handlePublish = async () => {
   // };
 
   try {
-    const response = await axios.post('http://16.171.145.107/pos/products/add_product');
+    const response = await axios.post('http:/16.171.145.107/pos/products/add_product');
     if (response.status === 201 || response.status === 200) {
       alert('Product published successfully!');
       history.push('/Product/AllProducts'); 
