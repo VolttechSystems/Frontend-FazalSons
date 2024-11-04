@@ -9,8 +9,8 @@ const AddCustomer = () => {
     dateTime: '',
     customerChannel: '',
     customerType: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     displayName: '',
     gender: '',
     companyName: '',
@@ -97,8 +97,8 @@ const AddCustomer = () => {
         dateTime: '',
         customerChannel: '',
         customerType: '',
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         displayName: '',
         gender: '',
         companyName: '',
@@ -179,11 +179,11 @@ const AddCustomer = () => {
         {/* Full Name */}
         <div>
           <label>First Name:</label>
-          <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} required />
+          <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} required />
         </div>
         <div>
           <label>Last Name:</label>
-          <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} required />
+          <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} required />
         </div>
 
         {/* Display Name */}
