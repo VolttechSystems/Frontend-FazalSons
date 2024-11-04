@@ -1,205 +1,3 @@
-// import React, { useState, } from 'react';
-// import { useNavigate } from 'react-router-dom'
-// import './AddCustomer.css';
-
-// const AddCustomer = () => {
-//   const [formData, setFormData] = useState({
-//     dateTime: '', // Auto-populated
-//     customerChannel: '',
-//     customerType: '',
-//     firstName: '',
-//     lastName: '',
-//     displayName: '',
-//     gender: '',
-//     companyName: '',
-//     email: '',
-//     mobileNumber: '',
-//     internationalNumber: '',
-//     landlineNumber: '',
-//     password: '',
-//     address: '',
-//     shippingAddressSameAsMain: false,
-//     shippingAddress: '',
-//     shippingCity: '',
-//     shippingZipCode: '',
-//     shippingState: '',
-//     shippingCountry: '',
-//     internalNote: '',
-//     avatar: null,
-//     onlineAccess: 'No',
-//     status: 'Active'
-//   });
-//   const navigate = useNavigate()
-
-//   // Update form field handler
-//   const handleChange = (e) => {
-//     const { name, value, type, checked, files } = e.target;
-//     setFormData({
-//       ...formData,
-//       [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
-//     });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log(formData); // For testing purposes
-//     // Add API call or data submission logic here
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       <h3>Customer Information</h3>
-
-//       {/* Date & Time */}
-//       <div>
-//         <label>Date & Time:</label>
-//         <input type="text" value={new Date().toLocaleString()} disabled />
-//       </div>
-
-//       {/* Customer Channel */}
-//       <div>
-//         <label>Customer Channel:</label>
-//         <select name="customerChannel" value={formData.customerChannel} onChange={handleChange}>
-//           <option value="walk-in">Walk-in</option>
-//           <option value="referral">Referral</option>
-//           <option value="online">Online</option>
-//         </select>
-//         <button type="button" onClick={() => navigate('/Customer/CustomerChannel')}>+</button>
-//       </div>
-
-//       {/* Customer Type */}
-//       <div>
-//         <label>Customer Type:</label>
-//         <select name="customerType" value={formData.customerType} onChange={handleChange}>
-//           <option value="retail">Retail</option>
-//           <option value="wholesale">Wholesale</option>
-//           <option value="other">Other</option>
-//         </select>
-//         <button type="button" onClick={() => navigate('/Customer/CustomerType')}>+</button>
-//       </div>
-
-//       {/* Additional fields */}
-//       {['firstName', 'lastName', 'displayName', 'companyName', 'email', 'mobileNumber', 'internationalNumber', 'landlineNumber', 'password', 'address'].map((field) => (
-//         <div key={field}>
-//           <label>{field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</label>
-//           <input
-//             type="text"
-//             name={field}
-//             value={formData[field]}
-//             onChange={handleChange}
-//             required={['firstName', 'lastName', 'email', 'mobileNumber', 'password'].includes(field)}
-//           />
-//         </div>
-//       ))}
-
-//       {/* Shipping Information */}
-//       <h3>Shipping Information</h3>
-
-//       {/* Checkbox for same as main address */}
-//       <div>
-//         <label>
-//           <input
-//             type="checkbox"
-//             name="shippingAddressSameAsMain"
-//             checked={formData.shippingAddressSameAsMain}
-//             onChange={handleChange}
-//           />
-//           Shipping Address same as main address
-//         </label>
-//       </div>
-
-//       {/* Shipping Address Fields */}
-//       {['shippingAddress', 'shippingCity', 'shippingZipCode', 'shippingState'].map((field) => (
-//         <div key={field}>
-//           <label>{field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</label>
-//           <input
-//             type="text"
-//             name={field}
-//             value={formData[field]}
-//             onChange={handleChange}
-//             disabled={formData.shippingAddressSameAsMain}
-//           />
-//         </div>
-//       ))}
-
-//       <div>
-//         <label>Country:</label>
-//         <input
-//           type="text"
-//           name="shippingCountry"
-//           value={formData.shippingCountry}
-//           onChange={handleChange}
-//           disabled={formData.shippingAddressSameAsMain}
-//         />
-//       </div>
-
-//       {/* Additional Information */}
-//       <h3>Additional Information</h3>
-
-//       <div>
-//         <label>Internal Note:</label>
-//         <textarea name="internalNote" value={formData.internalNote} onChange={handleChange}></textarea>
-//       </div>
-
-//       <div>
-//         <label>Avatar:</label>
-//         <input type="file" name="avatar" onChange={handleChange} />
-//       </div>
-
-//       <div>
-//         <label>Online Access:</label>
-//         <input
-//           type="radio"
-//           name="onlineAccess"
-//           value="Yes"
-//           checked={formData.onlineAccess === 'Yes'}
-//           onChange={handleChange}
-//         />{' '}
-//         Yes
-//         <input
-//           type="radio"
-//           name="onlineAccess"
-//           value="No"
-//           checked={formData.onlineAccess === 'No'}
-//           onChange={handleChange}
-//         />{' '}
-//         No
-//       </div>
-
-//       <div>
-//         <label>Status:</label>
-//         <input
-//           type="radio"
-//           name="status"
-//           value="Active"
-//           checked={formData.status === 'Active'}
-//           onChange={handleChange}
-//         />{' '}
-//         Active
-//         <input
-//           type="radio"
-//           name="status"
-//           value="Pending"
-//           checked={formData.status === 'Pending'}
-//           onChange={handleChange}
-//         />{' '}
-//         Pending
-//         <input
-//           type="radio"
-//           name="status"
-//           value="Inactive"
-//           checked={formData.status === 'Inactive'}
-//           onChange={handleChange}
-//         />{' '}
-//         Inactive
-//       </div>
-
-//       <button type="submit">Add Customer</button>
-//     </form>
-//   );
-// };
-
-// export default AddCustomer;
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -231,23 +29,48 @@ const AddCustomer = () => {
     internalNote: '',
     avatar: null,
     onlineAccess: 'No',
-    status: 'Active'
+    status: 'active'
   });
   const [customers, setCustomers] = useState([]);
+  const [customerChannels, setCustomerChannels] = useState([]);
+  const [customerTypes, setCustomerTypes] = useState([]);
   const [editingCustomerId, setEditingCustomerId] = useState(null);
   const navigate = useNavigate();
-  const apiUrl = 'http://url/pos/customer';
+  const apiUrl = 'http://16.171.145.107/pos/customer';
 
   useEffect(() => {
     fetchCustomers();
+    fetchCustomerChannels();
+    fetchCustomerTypes();
   }, []);
 
+  // Fetch all customers
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/get_customers`);
+      const response = await axios.get(`${apiUrl}/add_customer`);
       setCustomers(response.data);
     } catch (error) {
       console.error('Error fetching customers:', error);
+    }
+  };
+
+  // Fetch customer channels
+  const fetchCustomerChannels = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/add_customer_channel`); 
+      setCustomerChannels(response.data);
+    } catch (error) {
+      console.error('Error fetching customer channels:', error);
+    }
+  };
+
+  // Fetch customer types
+  const fetchCustomerTypes = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/add_customer_type`); 
+      setCustomerTypes(response.data);
+    } catch (error) {
+      console.error('Error fetching customer types:', error);
     }
   };
 
@@ -261,7 +84,6 @@ const AddCustomer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       if (editingCustomerId) {
         await axios.put(`${apiUrl}/action_customer/${editingCustomerId}/`, formData);
@@ -295,7 +117,7 @@ const AddCustomer = () => {
         internalNote: '',
         avatar: null,
         onlineAccess: 'No',
-        status: 'Active'
+        status: 'active'
       });
       setEditingCustomerId(null);
       fetchCustomers();
@@ -322,7 +144,7 @@ const AddCustomer = () => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <h3>{editingCustomerId ? 'Edit Customer' : 'Add Customer'}</h3>
+      <h3>{editingCustomerId ? 'Edit Customer' : 'Add Customer'}</h3>
 
         {/* Date & Time */}
         <div>
@@ -334,9 +156,10 @@ const AddCustomer = () => {
         <div>
           <label>Customer Channel:</label>
           <select name="customerChannel" value={formData.customerChannel} onChange={handleChange}>
-            <option value="walk-in">Walk-in</option>
-            <option value="referral">Referral</option>
-            <option value="online">Online</option>
+            <option value="">Select Channel</option>
+            {customerChannels.map((channel) => (
+              <option key={channel.id} value={channel.customer_channel}>{channel.customer_channel}</option>
+            ))}
           </select>
           <button type="button" onClick={() => navigate('/Customer/CustomerChannel')}>+</button>
         </div>
@@ -345,9 +168,10 @@ const AddCustomer = () => {
         <div>
           <label>Customer Type:</label>
           <select name="customerType" value={formData.customerType} onChange={handleChange}>
-            <option value="retail">Retail</option>
-            <option value="wholesale">Wholesale</option>
-            <option value="other">Other</option>
+            <option value="">Select Type</option>
+            {customerTypes.map((type) => (
+              <option key={type.id} value={type.customer_type}>{type.customer_type}</option>
+            ))}
           </select>
           <button type="button" onClick={() => navigate('/Customer/CustomerType')}>+</button>
         </div>
@@ -501,8 +325,8 @@ const AddCustomer = () => {
         <tbody>
           {customers.map((customer) => (
             <tr key={customer.id}>
-              <td>{customer.firstName}</td>
-              <td>{customer.lastName}</td>
+              <td>{customer.first_name}</td>
+              <td>{customer.last_name}</td>
               <td>{customer.email}</td>
               <td>
                 <button onClick={() => handleEdit(customer)}>Edit</button>
