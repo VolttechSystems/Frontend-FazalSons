@@ -25,9 +25,11 @@ const AddCategory = React.lazy(() => import('./views/Product/AddCategory/AddCate
 const SubCategory = React.lazy(() => import('./views/Product/SubCategory/SubCategory'))
 const AddSubCategory = React.lazy(() => import('./views/Product/AddSubCategory/AddSubCategory'))
 const AddHeadCategory = React.lazy(() => import('./views/Product/AddHeadCategory/AddHeadCategory'))
-
-
-
+const AddStock = React.lazy(() => import('./views/Stock/AddStock/AddStock'))
+const AddCustomer = React.lazy(() => import('./views/Customer/AddCustomer/AddCustomer'))
+const CustomerChannel = React.lazy(() => import('./views/Customer/CustomerChannel/CustomerChannel'))
+const CustomerType = React.lazy(() => import('./views/Customer/CustomerType/CustomerType'))
+const AddOutlet = React.lazy(() => import('./views/Outlet/AddOutlet/AddOutlet'))
 
 
 const routes = [
@@ -60,6 +62,12 @@ const routes = [
   { path: '/Product/SubCategory', name: 'SubCategory', element: SubCategory }, //SubCategory
   { path: '/Product/AddSubCategory', name: 'AddSubCategory', element: AddSubCategory }, //AddSubCategory
   { path: '/Product/AddHeadCategory', name: 'AddHeadCategory', element: AddHeadCategory }, //AddHeadCategory
+  { path: '/Stock/AddStock', name: 'AddStock', element: AddStock }, //AddStock
+  { path: '/Customer/AddCustomer', name: 'AddCustomer', element: AddCustomer }, //AddCustomer
+  { path: '/Customer/CustomerChannel', name: 'CustomerChannel', element: CustomerChannel }, // CustomerChannel
+  { path: '/Customer/CustomerType', name: 'CustomerType', element: CustomerType }, // CustomerType
+  { path: '/Outlet/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
+  
  
 ]
 

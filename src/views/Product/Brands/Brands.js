@@ -109,7 +109,6 @@
 // };
 
 // export default Brands;
-
 import React, { useEffect, useState } from 'react';
 import {
   CButton,
@@ -138,14 +137,15 @@ const Loader = () => {
   );
 };
 
-
 const Brands = () => {
   const [brands, setBrands] = useState([]);
+  const [originalBrands, setOriginalBrands] = useState([]); // Store original brands data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 5; // Number of items to display per page
+  const [searchInput, setSearchInput] = useState(''); // State for search input
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -154,9 +154,10 @@ const Brands = () => {
 
   const fetchBrands = async () => {
     try {
-      const response = await axios.get(`http://16.170.232.76/pos/products/add_brand?page=${currentPage}&limit=${itemsPerPage}`);
+      const response = await axios.get(`http://16.171.145.107/pos/products/add_brand?page=${currentPage}&limit=${itemsPerPage}`);
       const brandsData = response.data.results || [];
       setBrands(Array.isArray(brandsData) ? brandsData : []);
+      setOriginalBrands(Array.isArray(brandsData) ? brandsData : []); // Save original data
       setTotalCount(response.data.count); // Total number of brands for pagination
       setLoading(false);
     } catch (error) {
@@ -169,7 +170,7 @@ const Brands = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this brand?')) {
       try {
-        await axios.delete(`http://16.170.232.76/pos/products/action_brand/${id}/`);
+        await axios.delete(`http://16.171.145.107/pos/products/action_brand/${id}/`);
         alert('Brand deleted successfully!');
         fetchBrands(); // Refresh the brands list after deletion
       } catch (error) {
@@ -182,6 +183,18 @@ const Brands = () => {
   const handleEdit = (id) => {
     console.log("Editing brand with ID:", id);
     navigate(`/Product/AddBrands/${id}`);
+  };
+
+  // Handle search
+  const handleSearch = () => {
+    if (searchInput.trim() === '') {
+      setBrands(originalBrands); // Reset to original brands if input is empty
+    } else {
+      const filteredBrands = originalBrands.filter((brand) =>
+        brand.brand_name.toLowerCase().includes(searchInput.toLowerCase())
+      );
+      setBrands(filteredBrands); // Update brands to only include searched items
+    }
   };
 
   const totalPages = Math.ceil(totalCount / itemsPerPage); // Calculate total pages
@@ -208,6 +221,16 @@ const Brands = () => {
         <Link to="/Product/AddBrands">
           <CButton color="primary" className="me-md-2">Add Brand</CButton>
         </Link>
+        <div className="d-flex">
+          <input
+            type="text"
+            className="form-control me-2"
+            placeholder="Search..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)} // Update search input state
+          />
+          <CButton color="secondary" onClick={handleSearch}>Search</CButton> {/* Search button */}
+        </div>
       </div>
       <CCol>
         <CCard className="mb-4">
@@ -215,7 +238,7 @@ const Brands = () => {
             <strong>All Brands</strong>
           </CCardHeader>
           <CCardBody>
-          {loading && <Loader />}
+            {loading && <Loader />}
             {loading && <p>Loading brands...</p>}
             {error && <p className="text-danger">{error}</p>}
             {!loading && !error && (
@@ -248,13 +271,12 @@ const Brands = () => {
                   </CTableBody>
                 </CTable>
 
-                {/* Pagination with Previous and Next buttons aligned to the bottom right */}
                 <div className="d-flex justify-content-end mt-3">
                   <CButton 
                     color="secondary" 
                     onClick={handlePrevious} 
                     disabled={currentPage === 1}
-                    className="me-2" // Margin to the right
+                    className="me-2" 
                   >
                     Previous
                   </CButton>

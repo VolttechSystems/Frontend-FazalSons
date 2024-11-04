@@ -31,7 +31,7 @@ const AddCategory = () => {
   useEffect(() => {
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category'); // Replace with your API endpoint
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category'); // Replace with your API endpoint
         setParentCategories(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);
@@ -48,7 +48,7 @@ const AddCategory = () => {
 
   const fetchCategoryDetails = async () => {
     try {
-      const response = await axios.get(`http://16.170.232.76/pos/products/action_category/${id}/`);
+      const response = await axios.get(`http://16.171.145.107/pos/products/action_category/${id}/`);
       const category = response.data;
       setCategoryName(category.category_name);
       setSymbol(category.symbol);
@@ -112,11 +112,11 @@ const AddCategory = () => {
     try {
       if (id) {
         
-        await axios.put(`http://16.170.232.76/pos/products/action_category/${id}/`, categoryData);
+        await axios.put(`http://16.171.145.107/pos/products/action_category/${id}/`, categoryData);
         alert(' category updated successfully!');
       } else {
         
-        await axios.post('http://16.170.232.76/pos/products/add_category', categoryData);
+        await axios.post('http://16.171.145.107/pos/products/add_category', categoryData);
         alert(' category added successfully!');
       }
       navigate('/Product/Category'); 

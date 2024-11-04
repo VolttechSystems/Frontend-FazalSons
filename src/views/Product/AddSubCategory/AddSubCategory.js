@@ -28,7 +28,7 @@ const AddSubCategory = () => {
   useEffect(() => {
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category');
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
         // Assuming the response structure has an array of categories
         setParentCategories(response.data); 
       } catch (error) {
@@ -47,11 +47,11 @@ const AddSubCategory = () => {
       description,
       status,
       isSubcategory,
-      parentCategory: selectedParentCategory,
+      parentCategory: pc_name,
     };
 
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_subcategory', newSubcategory);
+      const response = await axios.post('http://16.171.145.107/pos/products/add_subcategory', newSubcategory);
       console.log('Subcategory added successfully:', response.data);
       // Reset form after successful submission
       setSubcategoryName('');
@@ -91,8 +91,8 @@ const AddSubCategory = () => {
               >
                 <option value="">Select Parent Category</option>
                 {parentCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.attribute_name} {/* Adjust the field name according to API response */}
+                  <option key={category.pc_name} value={category.pc_name}>
+                    {category.pc_name} 
                   </option>
                 ))}
               </CFormSelect>

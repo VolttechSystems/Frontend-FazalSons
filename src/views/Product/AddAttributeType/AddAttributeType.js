@@ -30,7 +30,7 @@ const AddAttributeType = () => {
   // Function to fetch attribute types from the API
   const fetchAttributeTypes = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_attribute_type');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_attribute_type');
       setTypes(response.data); // Assuming the response data is an array of attribute types
     } catch (error) {
       console.error('Error fetching attribute types:', error);
@@ -45,11 +45,11 @@ const AddAttributeType = () => {
     try {
       if (editingIndex !== null) {
         // Edit existing attribute type
-        await axios.put(`http://16.170.232.76/pos/products/action_attribute_type/${types[editingIndex].id}/`, requestData);
+        await axios.put(`http://16.171.145.107/pos/products/action_attribute_type/${types[editingIndex].id}/`, requestData);
         setEditingIndex(null); // Reset editing index
       } else {
         // Add new attribute type
-        await axios.post('http://16.170.232.76/pos/products/add_attribute_type', requestData);
+        await axios.post('http://16.171.145.107/pos/products/add_attribute_type', requestData);
       }
       // Reset the form
       setAttributeType('');
@@ -72,7 +72,7 @@ const AddAttributeType = () => {
   const handleDelete = async (index) => {
     const id = types[index].id; // Assuming each type has a unique `id`
     try {
-      await axios.delete(`http://16.170.232.76/pos/products/action_attribute_type/${id}/`);
+      await axios.delete(`http://16.171.145.107/pos/products/action_attribute_type/${id}/`);
       fetchAttributeTypes(); // Refetch attribute types after deletion
     } catch (error) {
       console.error('Error deleting attribute type:', error);

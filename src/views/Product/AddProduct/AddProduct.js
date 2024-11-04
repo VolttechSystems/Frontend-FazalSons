@@ -4,103 +4,261 @@ import Paper from "@mui/material/Paper";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import axios from 'axios';
+import Select from 'react-select';
+
+
 
 const AddProduct = () => {
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     product_name: '',
-    outlet_name: 'Fazal Sons', 
+    outlet_name: 'Fazal Sons',
     sku: '',
     head_category: '',
     parent_category: '',
     category: '',
-    brand_name: '',
     season: '',
     description: '',
-    color: '',
-    // used_for_inventory: false,
+    color: [],
+    size: [],
+    used_for_inventory: false,
     cost_price: '',
     selling_price: '',
     discount_price: '',
     wholesale_price: '',
     retail_price: '',
-    token_price: ''
-  });
+    token_price: '',
+    brand_name: ''
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
   const [activeTab, setActiveTab] = useState(0);
   const [headCategories, setHeadCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [categories, setCategories] = useState([]);
+  //const [loading, setLoading] = useState(true);
   const [brands, setBrands] = useState([]);
   const [productList, setProductList] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editProductId, setEditProductId] = useState(null);
 
-  // Fetching data from the API
+  const colorOptions = [
+    { value: 'Almond', label: 'Almond' },
+    { value: 'Angoori', label: 'Angoori' },
+    { value: 'Baby blue', label: 'Baby blue' },
+    { value: 'Baby pink', label: 'Baby pink' },
+    { value: 'Beige', label: 'Beige' },
+    { value: 'Biscuit', label: 'Biscuit' },
+    { value: 'Black', label: 'Black' },
+    { value: 'Bottle green', label: 'Bottle green' },
+    { value: 'Bronze brown', label: 'Bronze brown' },
+    { value: 'Burgundy', label: 'Burgundy' },
+    { value: 'Camel', label: 'Camel' },
+    { value: 'Caramel', label: 'Caramel' },
+    { value: 'Champagne', label: 'Champagne' },
+    { value: 'Violet', label: 'Violet' },
+    { value: 'White', label: 'White' },
+  ];
+
+  const sizeOptions = [
+    { value: 'S', label: 'S' },
+    { value: 'XS', label: 'XS' },
+    { value: 'M', label: 'M' },
+    { value: 'L', label: 'L' },
+    { value: 'XL', label: 'XL' },
+    { value: 'XXL', label: 'XXL' },
+  ];
+
+  const BASE_URL = 'http://16.171.145.107/pos';
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+       
         const [headResponse, parentResponse, categoryResponse, brandResponse] = await Promise.all([
-          axios.get('http://16.170.232.76/pos/products/add_head_category'),
-          axios.get('http://16.170.232.76/pos/products/add_parent_category/'),
-          axios.get('http://16.170.232.76/pos/products/add_category'),
-          axios.get('http://16.170.232.76/pos/products/add_brand')
+          axios.get('http://16.171.145.107/pos/products/add_head_category'),
+          axios.get('http://16.171.145.107/pos/products/add_parent_category/'),
+          axios.get('http://16.171.145.107/posproducts/add_category'),
+          axios.get('http://16.171.145.107/pos/products/add_brand')
         ]);
         
+        const brandsData = brandResponse.data.results || [];
+        setBrands(Array.isArray(brandsData) ? brandsData : []); // Ensure you are setting the correct data
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
         setCategories(categoryResponse.data);
-        setBrands(brandResponse.data);
+       
       } catch (error) {
         console.error('Error fetching categories:', error);
+      } finally {
+        
       }
     };
 
     fetchData();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-  };
-
-  const handleAdd = async () => {
+  useEffect(() => {
+    fetchProductList();
+  }, []);
+  
+  const fetchProductList = async () => {
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_product', formData);
-      console.log("Product added successfully:", response.data);
-
-     
-      setProductList([...productList, response.data]);
-
-      
-      setFormData({
-        product_name: '',
-        outlet_name: 'Fazal Sons', 
-        sku: '',
-        head_category: hc_name,
-        parent_category: pc_name ,
-        category: category_name,
-        brand_name: brand_name,
-        season: '',
-        description: '',
-        color: '',
-        // used_for_inventory: false,
-        cost_price: '',
-        selling_price: '',
-        discount_price: '',
-        wholesale_price: '',
-        retail_price: '',
-        token_price: ''
-      });
+      const response = await axios.get('http://16.171.145.107/pos/products/add_temp_product');
+      setProductList(response.data);
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error('Error fetching products:', error);
     }
   };
+  
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleMultiSelectChange = (selectedOptions, name) => {
+    const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: values,
+    }));
+  };
+  
+
+
+
+const handleAdd = () => {
+  const newProduct = {
+    id: new Date().getTime(), 
+    ...formData,
+    color: formData.color.join(','), 
+    size: formData.size.join(','), 
+  };
+
+  setProductList([...productList, newProduct]);
+  resetForm(); 
+};
+
+  // Function to handle editing, populates the form with the selected product's data.
+const handleEdit = (id) => {
+  const productToEdit = productList.find(product => product.id === id);
+  if (productToEdit) {
+    setFormData({
+      product_name: productToEdit.product_name || '',
+      outlet_name: productToEdit.outlet_name || 'Fazal Sons',
+      sku: productToEdit.sku || '',
+      head_category: productToEdit.head_category || '',
+      parent_category: productToEdit.parent_category || '',
+      category: productToEdit.category || '',
+      season: productToEdit.season || '',
+      description: productToEdit.description || '',
+      color: productToEdit.color ? productToEdit.color.split(',') : [], // Array of strings
+      size: productToEdit.size ? productToEdit.size.split(',') : [], // Array of strings
+      used_for_inventory: productToEdit.used_for_inventory || false,
+      cost_price: productToEdit.cost_price || '',
+      selling_price: productToEdit.selling_price || '',
+      discount_price: productToEdit.discount_price || '',
+      wholesale_price: productToEdit.wholesale_price || '',
+      retail_price: productToEdit.retail_price || '',
+      token_price: productToEdit.token_price || '',
+      brand_name: productToEdit.brand_name || '',
+    });
+    setEditMode(true);
+    setEditProductId(id); 
+  } else {
+    console.error("Product not found:", id);
+  }
+};
+
+const handleUpdate = () => {
+  if (editProductId) {
+    const updatedProductList = productList.map((product) =>
+      product.id === editProductId
+        ? {
+            ...product,
+            ...formData,
+            color: formData.color.join(','), 
+            size: formData.size.join(','), 
+          }
+        : product
+    );
+
+    setProductList(updatedProductList);
+    resetForm(); 
+  }
+};
+
+  
+  
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://16.171.145.107/pos/products/action_temp_product/${id}/`);
+      setProductList(prevList => prevList.filter((product) => product.id !== id));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
+  // Function to reset the form.
+const resetForm = () => {
+  setFormData({
+    product_name: '',
+    outlet_name: 'Fazal Sons',
+    sku: '',
+    head_category: '',
+    parent_category: '',
+    category: '',
+    season: '',
+    description: '',
+    color: [],
+    size: [],
+    used_for_inventory: false,
+    cost_price: '',
+    selling_price: '',
+    discount_price: '',
+    wholesale_price: '',
+    retail_price: '',
+    token_price: '',
+    brand_name: '',
+  });
+  setEditMode(false);
+  setEditProductId(null);
+};
+
+const handlePublish = async () => {
+  console.log('Publishing with data:', formData);
+ 
+  // const formDataToSend = {
+  //   ...formData,
+  //   product_name:formData.product_name,
+  //   season:formData.season,
+  //   color: formData.color.join(','), 
+  //   size: formData.size.join(','),   
+  //   used_for_inventory: formData.used_for_inventory ? 'true' : 'false', 
+  // };
+
+  try {
+    const response = await axios.post('http://16.171.145.107/pos/products/add_product');
+    if (response.status === 201 || response.status === 200) {
+      alert('Product published successfully!');
+      history.push('/Product/AllProducts'); 
+    } else {
+      alert('Failed to publish the product. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error publishing product:', error);
+    alert('An error occurred while publishing the product.');
+  }
+};
+
 
   return (
     <div className="add-product-form">
       <h2>Product Information</h2>
-      
+      <h2>{editMode ? 'Edit Product' : ''}</h2>
+    
       <Paper square>
         <Tabs
           value={activeTab}
@@ -137,7 +295,6 @@ const AddProduct = () => {
                   required
                 >
                   <option value="Fazal Sons">Fazal Sons</option>
-                 
                 </select>
               </label>
               <label>
@@ -192,18 +349,14 @@ const AddProduct = () => {
                 </select>
               </label>
               <label>
-                Brand Name:
-                <select
-                  name="brand_name"
-                  value={formData.brand_name}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Brand</option>
-                  {/* {brands.map((brand) => (
-                    <option key={brand.brand_name} value={brand.brand_name}>{brand.brand_name}</option>
-                  ))} */}
-                </select>
+              Brands:
+              <select>
+    {brands.map(brand => (
+        <option key={brand.id} value={brand.id}>
+            {brand.brand_name} {/* Adjust according to your data structure */}
+        </option>
+    ))}
+</select>
               </label>
               <label>
                 Season:
@@ -219,20 +372,50 @@ const AddProduct = () => {
                   <option value="Autumn">Autumn</option>
                 </select>
               </label>
+              <label>
+                Description:
+                <input
+                  type="text"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
             </div>
           )}
 
           {activeTab === 1 && (
             <div className="form-column">
+              {/* Color and Size Inputs */}
               <label>
-                Color:
+  Color:
+  <Select
+    isMulti
+    options={colorOptions}
+    value={formData.color.map(c => ({ value: c, label: c }))} // Pre-fill the select with the selected values
+    onChange={(selectedOptions) => handleMultiSelectChange(selectedOptions, 'color')}
+  />
+</label>
+<label>
+  Size:
+  <Select
+    isMulti
+    options={sizeOptions}
+    value={formData.size.map(s => ({ value: s, label: s }))} // Pre-fill the select with the selected values
+    onChange={(selectedOptions) => handleMultiSelectChange(selectedOptions, 'size')}
+  />
+</label>
+
+              <label className="checkbox-container">
                 <input
-                  type="text"
-                  name="color"
-                  value={formData.color}
+                  type="checkbox"
+                  name="used_for_inventory"
+                  checked={formData.used_for_inventory}
                   onChange={handleChange}
-                  required
+                  className="custom-checkbox"
                 />
+                <span>Used for Inventory</span>
               </label>
               <label>
                 Cost Price:
@@ -290,60 +473,63 @@ const AddProduct = () => {
                   onChange={handleChange}
                 />
               </label>
-              <button
-                type="button"
-                className="add-button"
-                onClick={handleAdd}
-                style={{ marginTop: '20px', alignSelf: 'flex-start' }}
-              >
-                Add
-              </button>
+              {/* <button type="button" onClick={handleAdd}>Add Product</button> */}
+              <button type="button" onClick={editMode ? handleUpdate : handleAdd}>
+    {editMode ? 'Update Product' : 'Add Product'}
+  </button>
+
+              {/* Product List Table */}
+              <table className="product-list-table">
+                <thead>
+                  <tr>
+                    <th>Sr.#</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                    <th>UF Invt.</th>
+                    <th>Cost</th>
+                    <th>Selling</th>
+                    <th>Discount</th>
+                    <th>Wholesale</th>
+                    <th>Retail</th>
+                    <th>Token</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productList.map((product,index) => (
+                    <tr key={product.id}>
+                      <td>{index + 1}</td>
+                      <td>{product.size}</td>
+                      <td>{product.color}</td>
+                      <td>{product.used_for_inventory}</td>
+                      <td>{product.cost_price}</td>
+                      <td>{product.selling_price}</td>
+                      <td>{product.discount_price}</td>
+                      <td>{product.wholesale_price}</td>
+                      <td>{product.retail_price}</td>
+                      <td>{product.token_price}</td>
+                      <td>
+                        <button onClick={() => handleEdit(product.id)}>Edit</button>
+                        <button onClick={() => handleDelete(product.id)}>Delete</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ textAlign: 'right', marginTop: '20px' }}>
+  <button type="button" onClick={handlePublish}>Publish</button>
+</div>
             </div>
           )}
         </form>
       </div>
+    
 
-      {productList.length > 0 && (
-        <div className="product-table">
-          <h3>Added Products</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Product Name</th>
-                <th>SKU</th>
-                <th>Color</th>
-                <th>Cost Price</th>
-                <th>Selling Price</th>
-                <th>Discount Price</th>
-                <th>Wholesale Price</th>
-                <th>Retail Price</th>
-                <th>Token Price</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productList.map((product, index) => (
-                <tr key={index}>
-                  <td>{product.product_name}</td>
-                  <td>{product.sku}</td>
-                  <td>{product.color}</td>
-                  <td>{product.cost_price}</td>
-                  <td>{product.selling_price}</td>
-                  <td>{product.discount_price}</td>
-                  <td>{product.wholesale_price}</td>
-                  <td>{product.retail_price}</td>
-                  <td>{product.token_price}</td>
-                  <td>
-                    {/* edit/delete  */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
+    
   );
+  
+
 };
 
 export default AddProduct;
