@@ -11,7 +11,7 @@ const AddOutlet = () => {
   });
 
   const [outlets, setOutlets] = useState([]);
-  const [editingOutlet, setEditingOutlet] = useState(null);
+  const [editingOutletId, setEditingOutlet] = useState(null);
 
   useEffect(() => {
     // Fetch existing outlets when the component mounts
@@ -35,10 +35,10 @@ const AddOutlet = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editingOutlet) {
+      if (editingOutletId) {
         // Update existing outlet
-        await axios.put(`http://16.171.145.107/pos/products/action_outlet/${editingOutlet.id}/`, formData);
-        setOutlets(outlets.map(outlet => (outlet.id === editingOutlet.id ? formData : outlet)));
+        await axios.put(`http://16.171.145.107/pos/products/action_outlet/${editingOutletId}/`, formData);
+        setOutlets(outlets.map(outlet => (outlet.id === editingOutletId ? formData : outlet)));
         setEditingOutlet(null);
       } else {
         // Add new outlet
@@ -58,7 +58,7 @@ const AddOutlet = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://16.171.145.107/pos/Outlet/action_outlet/${id}/`);
+      await axios.delete(`http://16.171.145.107/pos/products/action_outlet/${id}/`);
       setOutlets(outlets.filter(outlet => outlet.id !== id)); // Remove deleted outlet from the state
     } catch (error) {
       console.error('Error deleting outlet:', error);
@@ -68,7 +68,7 @@ const AddOutlet = () => {
   return (
     <div className="container">
       <form onSubmit={handleSubmit}>
-        <h2>{editingOutlet ? 'Edit Outlet' : 'Add New Outlet'}</h2>
+        <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
         <div>
           <label>Outlet Code:</label>
           <input
@@ -89,7 +89,7 @@ const AddOutlet = () => {
             required
           />
         </div>
-        <button type="submit">{editingOutlet ? 'Update Outlet' : 'Add Outlet'}</button>
+        <button type="submit">{editingOutletId ? 'Update Outlet' : 'Add Outlet'}</button>
       </form>
 
       {/* Outlet Table */}

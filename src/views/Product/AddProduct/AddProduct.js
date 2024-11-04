@@ -68,7 +68,7 @@ const AddProduct = () => {
     { value: 'XXL', label: 'XXL' },
   ];
 
-  const BASE_URL = 'http://16.171.145.107/pos';
+  // const BASE_URL = 'http://16.171.145.107/pos';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,7 +77,7 @@ const AddProduct = () => {
         const [headResponse, parentResponse, categoryResponse, brandResponse] = await Promise.all([
           axios.get('http://16.171.145.107/pos/products/add_head_category'),
           axios.get('http://16.171.145.107/pos/products/add_parent_category/'),
-          axios.get('http://16.171.145.107/posproducts/add_category'),
+          axios.get('http://16.171.145.107/pos/products/add_category'),
           axios.get('http://16.171.145.107/pos/products/add_brand')
         ]);
         
