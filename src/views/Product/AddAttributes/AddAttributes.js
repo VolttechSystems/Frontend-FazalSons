@@ -233,7 +233,7 @@ const AddAttribute = () => {
   useEffect(() => {
     const fetchAttributeTypes = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute_type');
+        const response = await axios.get('http://16.171.145.107/pos/products/add_attribute_type');
         setAttributeTypes(response.data);
         setLoading(false);
       } catch (error) {
@@ -246,7 +246,7 @@ const AddAttribute = () => {
     const fetchAttributeDetails = async () => {
       if (id) {
         try {
-          const response = await axios.get(`http://16.170.232.76/pos/products/action_attributes/${id}/`);
+          const response = await axios.get(`http://16.171.145.107/pos/products/action_attributes/${id}/`);
           const data = response.data;
           setAttributeName(data.attribute_name);
           setSymbol(data.symbol);
@@ -277,10 +277,10 @@ const AddAttribute = () => {
 
     try {
       if (id) {
-        await axios.put(`http://16.170.232.76/pos/products/action_attributes/${id}/`, attributeData);
+        await axios.put(`http://16.171.145.107/pos/products/action_attributes/${id}/`, attributeData);
         alert('Attribute updated successfully!');
       } else {
-        await axios.post('http://16.170.232.76/pos/products/add_attribute', attributeData);
+        await axios.post('http://16.171.145.107/pos/products/add_attribute', attributeData);
         alert('Attribute added successfully!');
       }
 

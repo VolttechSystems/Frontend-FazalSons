@@ -28,7 +28,7 @@ const AddSubCategory = () => {
   useEffect(() => {
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category');
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
         // Assuming the response structure has an array of categories
         setParentCategories(response.data); 
       } catch (error) {
@@ -51,7 +51,7 @@ const AddSubCategory = () => {
     };
 
     try {
-      const response = await axios.post('http://16.170.232.76/pos/products/add_subcategory', newSubcategory);
+      const response = await axios.post('http://16.171.145.107/pos/products/add_subcategory', newSubcategory);
       console.log('Subcategory added successfully:', response.data);
       // Reset form after successful submission
       setSubcategoryName('');

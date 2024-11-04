@@ -36,7 +36,7 @@ const SubCategory = () => {
   useEffect(() => {
     const fetchSubCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_subcategory'); 
+        const response = await axios.get('http://16.171.145.107/pos/products/add_subcategory'); 
         setSubCategories(response.data);
       } catch (error) {
         console.error('Error fetching subcategories:', error);
@@ -46,7 +46,7 @@ const SubCategory = () => {
 
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_category');
+        const response = await axios.get('http://16.171.145.107/pos/products/add_category');
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -56,7 +56,7 @@ const SubCategory = () => {
 
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category');
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
         setParentCategories(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);

@@ -41,7 +41,7 @@ const Category = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_category');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_category');
       setCategories(response.data);
       setLoading(false);
     } catch (error) {
@@ -53,7 +53,7 @@ const Category = () => {
 
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category'); // Replace with your API endpoint for parent categories
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category'); // Replace with your API endpoint for parent categories
         setParentCategories(response.data);
         console.log('Fetched Parent Categories:', response.data);
       } catch (error) {
@@ -69,7 +69,7 @@ const Category = () => {
       console.log({id})
       if (window.confirm('Are you sure you want to delete this Category?')) {
         try {
-          await axios.delete(`http://16.170.232.76/pos/products/action_category/${id}/`);
+          await axios.delete(`http://16.171.145.107/pos/products/action_category/${id}/`);
           alert('Category deleted successfully!');
           fetchCategories(); 
         } catch (error) {

@@ -9,7 +9,7 @@ const AddStock = () => {
     const fetchStockData = async () => {
       try {
         const response = await axios.get(
-          'http://16.170.232.76/pos/stock/add_stock/BW13%20GENTS%20KURTA%20SHLAWAR%20BAZOO%20GESIGN/'
+          'http://16.171.145.107/pos/stock/add_stock/BW13%20GENTS%20KURTA%20SHLAWAR%20BAZOO%20GESIGN/'
         );
         setStockData(response.data);
       } catch (error) {
@@ -43,7 +43,7 @@ const AddStock = () => {
 
         try {
           const response = await axios.put(
-            `http://16.170.232.76/pos/stock/add_stock/BW13%20GENTS%20KURTA%20SHLAWAR%20BAZOO%20GESIGN/`,
+            `http://16.171.145.107/pos/stock/add_stock/BW13%20GENTS%20KURTA%20SHLAWAR%20BAZOO%20GESIGN/`,
             productsToUpdate,
             {
               headers: {

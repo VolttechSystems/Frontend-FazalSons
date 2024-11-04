@@ -179,7 +179,7 @@ const AddBrands = () => {
     if (id) {
       const fetchBrandDetails = async () => {
         try {
-          const response = await axios.get(`http://16.170.232.76/pos/products/action_brand/${id}/`);
+          const response = await axios.get(`http://16.171.145.107/pos/products/action_brand/${id}/`);
           const brand = response.data;
           setBrandName(brand.brand_name);
           setSymbol(brand.symbol);
@@ -206,11 +206,11 @@ const AddBrands = () => {
     try {
       if (id) {
         
-        await axios.put(`http://16.170.232.76/pos/products/action_brand/${id}/`, brandData);
+        await axios.put(`http://16.171.145.107/pos/products/action_brand/${id}/`, brandData);
         alert('Brand updated successfully!');
       } else {
         
-        await axios.post('http://16.170.232.76/pos/products/add_brand', brandData);
+        await axios.post('http://16.171.145.107/pos/products/add_brand', brandData);
         alert('Brand added successfully!');
       }
       navigate('/Product/Brands'); 

@@ -21,7 +21,7 @@ const AllProducts = () => {
   // Define fetchProducts outside of useEffect so it can be reused
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_product');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_product');
       setProducts(response.data);
       setLoading(false);
     } catch (error) {
@@ -39,7 +39,7 @@ const AllProducts = () => {
     console.log({ id });
     if (window.confirm('Are you sure you want to delete this Product?')) {
       try {
-        await axios.delete(`http://16.170.232.76/pos/products/action_product/${id}/`);
+        await axios.delete(`http://16.171.145.107/pos/products/action_product/${id}/`);
         alert('Product deleted successfully!');
         fetchProducts(); // Call fetchProducts again to refresh the list after deletion
       } catch (error) {

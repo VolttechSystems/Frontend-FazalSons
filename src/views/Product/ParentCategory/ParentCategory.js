@@ -164,7 +164,7 @@ const ParentCategory = () => {
 
   const fetchParentcategory = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
       setParentcategory(response.data);
       setLoading(false);
     } catch (error) {
@@ -176,7 +176,7 @@ const ParentCategory = () => {
 
   const fetchHeadcategory = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_head_category');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
       setHeadcategory(response.data);
     } catch (error) {
       console.error('Error fetching head categories:', error);
@@ -186,7 +186,7 @@ const ParentCategory = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this Parent Category?')) {
       try {
-        await axios.delete(`http://16.170.232.76/pos/products/action_parent_category/${id}/`);
+        await axios.delete(`http://16.171.145.107/pos/products/action_parent_category/${id}/`);
         alert('Parent Category deleted successfully!');
         fetchParentcategory();
       } catch (error) {

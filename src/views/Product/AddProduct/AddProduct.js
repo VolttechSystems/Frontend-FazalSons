@@ -68,15 +68,17 @@ const AddProduct = () => {
     { value: 'XXL', label: 'XXL' },
   ];
 
+  const BASE_URL = 'http://16.171.145.107/pos';
+
   useEffect(() => {
     const fetchData = async () => {
       try {
        
         const [headResponse, parentResponse, categoryResponse, brandResponse] = await Promise.all([
-          axios.get('http://16.170.232.76/pos/products/add_head_category'),
-          axios.get('http://16.170.232.76/pos/products/add_parent_category/'),
-          axios.get('http://16.170.232.76/pos/products/add_category'),
-          axios.get('http://16.170.232.76/pos/products/add_brand')
+          axios.get('http://16.171.145.107/pos/products/add_head_category'),
+          axios.get('http://16.171.145.107/pos/products/add_parent_category/'),
+          axios.get('http://16.171.145.107/posproducts/add_category'),
+          axios.get('http://16.171.145.107/pos/products/add_brand')
         ]);
         
         const brandsData = brandResponse.data.results || [];
@@ -101,7 +103,7 @@ const AddProduct = () => {
   
   const fetchProductList = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_temp_product');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_temp_product');
       setProductList(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -192,7 +194,7 @@ const handleUpdate = () => {
   
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://16.170.232.76/pos/products/action_temp_product/${id}/`);
+      await axios.delete(`http://16.171.145.107/pos/products/action_temp_product/${id}/`);
       setProductList(prevList => prevList.filter((product) => product.id !== id));
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -238,7 +240,7 @@ const handlePublish = async () => {
   // };
 
   try {
-    const response = await axios.post('http://16.170.232.76/pos/products/add_product');
+    const response = await axios.post('http://16.171.145.107/pos/products/add_product');
     if (response.status === 201 || response.status === 200) {
       alert('Product published successfully!');
       history.push('/Product/AllProducts'); 

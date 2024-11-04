@@ -152,6 +152,20 @@ const _nav = [
       
     ],
   },
+
+  {
+    component: CNavGroup,
+    name: 'Outlet',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Add Outlet',
+        to: '/Outlet/AddOutlet',
+      },
+      
+    ],
+  },
   
   {
     component: CNavTitle,
