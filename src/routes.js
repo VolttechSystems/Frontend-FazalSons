@@ -30,6 +30,7 @@ const AddCustomer = React.lazy(() => import('./views/Customer/AddCustomer/AddCus
 const CustomerChannel = React.lazy(() => import('./views/Customer/CustomerChannel/CustomerChannel'))
 const CustomerType = React.lazy(() => import('./views/Customer/CustomerType/CustomerType'))
 const AddOutlet = React.lazy(() => import('./views/Outlet/AddOutlet/AddOutlet'))
+const FetchAttributes = React.lazy(() => import('./views/Product/FetchAttributes/FetchAttributes'))
 
 
 const routes = [
@@ -67,6 +68,7 @@ const routes = [
   { path: '/Customer/CustomerChannel', name: 'CustomerChannel', element: CustomerChannel }, // CustomerChannel
   { path: '/Customer/CustomerType', name: 'CustomerType', element: CustomerType }, // CustomerType
   { path: '/Outlet/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
+  { path: '/Product/FetchAttributes', name: 'FetchAttributes', element: FetchAttributes }, // FetchAttributes
   
  
 ]
