@@ -16,6 +16,7 @@ import {
   CTable,
   CTableBody,
   CTableHeaderCell,
+  CTableDataCell,
   CTableRow,
   CTableHead,
 } from '@coreui/react';
@@ -255,68 +256,64 @@ const AddCategory = () => {
                   />
                 </CCol>
               </fieldset>
-              {/* More form fields here */}
-
-              {subcategory_option === "No" && (
-                <CRow>
-                  <CCol sm={6}>
-                    <CFormSelect
-                      value={selectedAttributeType}
-                      onChange={handleAttributeTypeChange}
-                      required
-                    >
-                      <option value="">Select Attribute Type</option>
-                      {attributeTypes.map((type) => (
-                        <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                  <CCol sm={6}>
-                    <CFormSelect
-                      value={selectedAttribute}
-                      onChange={handleAttributeChange}
-                      required
-                    >
-                      <option value="">Select Attribute</option>
-                      {attributes.map((attr) => (
-                        <option key={attr.attribute_name} value={attr.attribute_name}>
-                          {attr.attribute_name}
-                        </option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                </CRow>
-              )}
-
-              {variations.length > 0 && (
-                <CRow className="mb-3 mt-3">
-                  <CCol sm={12}>
-                    <h5>Fixed Attributes</h5>
-                    <CTable>
+               {/* Conditionally render based on the checkbox */}
+               {subcategory_option === "No" && (
+                <>
+                  <CRow className="mb-3">
+                    <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">Attribute Type</CFormLabel>
+                    <CCol sm={8}>
+                      <CFormSelect
+                        id="attributeType"
+                        value={selectedAttributeType}
+                        onChange={handleAttributeTypeChange}
+                      >
+                        <option value="">Choose an attribute type</option>
+                        {attributeTypes.map((type) => (
+                          <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
+                        ))}
+                      </CFormSelect>
+                    </CCol>
+                  </CRow>
+                  <CRow className="mb-3">
+                    <CFormLabel htmlFor="attribute" className="col-sm-2 col-form-label">Attribute</CFormLabel>
+                    <CCol sm={8}>
+                      <CFormSelect 
+                        id="attribute" 
+                        value={selectedAttribute} 
+                        onChange={handleAttributeChange}
+                      >
+                        <option value="">Choose an attribute</option>
+                        {attributes.map((attr) => (
+                          <option key={attr.attribute_name} value={attr.attribute_name}>{attr.attribute_name}</option>
+                        ))}
+                      </CFormSelect>
+                    </CCol>
+                  </CRow>
+                  {/* Render Table if there are variations */}
+                  {variations.length > 0 && (
+                    <CTable hover responsive>
                       <CTableHead>
                         <CTableRow>
-                          <CTableHeaderCell>Sr#</CTableHeaderCell>
+                        <CTableHeaderCell>Sr#.</CTableHeaderCell>
                           <CTableHeaderCell>Size</CTableHeaderCell>
                           <CTableHeaderCell>Symbol</CTableHeaderCell>
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
-                        {variations.map((variation, index) => (
-                          <CTableRow key={variation.id || index}>
-                            <CTableHeaderCell>{index + 1}</CTableHeaderCell>
-                            <CTableHeaderCell>{variation.variation_name || 'N/A'}</CTableHeaderCell>
-                            <CTableHeaderCell>{variation.symbol || 'N/A'}</CTableHeaderCell>
+                        {variations.map((variation,index) => (
+                          <CTableRow key={variation.id}>
+                            <CTableDataCell>{index + 1}</CTableDataCell>
+                            <CTableDataCell>{variation.variation_name}</CTableDataCell>
+                            <CTableDataCell>{variation.symbol}</CTableDataCell>
                           </CTableRow>
                         ))}
                       </CTableBody>
                     </CTable>
-                  </CCol>
-                </CRow>
+                  )}
+                </>
               )}
 
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">Save Category</CButton>
-              </div>
+              <CButton type="submit" color="primary">{id ? 'Update Category' : 'Add Category'}</CButton>
             </CForm>
           </CCardBody>
         </CCard>
@@ -326,4 +323,3 @@ const AddCategory = () => {
 };
 
 export default AddCategory;
-
