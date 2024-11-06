@@ -209,19 +209,22 @@ const AddCategory = () => {
                   />
                 </CCol>
               </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="subcategoryOption" className="col-sm-2 col-form-label">Subcategory Option</CFormLabel>
-                <CCol sm={8}>
-                  <CFormCheck 
-                    type="checkbox" 
-                    id="subcategory_option" 
-                    checked={subcategory_option === "Yes"} 
-                    onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
-                  />
-                {/* <button type="button" onClick={() => navigate('/Product/FetchAttributes')}>+</button> */}
-
-                </CCol>                
-              </CRow> 
+              <CRow className="mb-3 align-items-center">
+  <CFormLabel htmlFor="subcategory_option" className="col-sm-2 col-form-label">
+   
+  </CFormLabel>
+  <CCol sm={8} className="d-flex align-items-center">
+    <CFormCheck 
+      type="checkbox" 
+      id="subcategory_option" 
+      checked={subcategory_option === "Yes"} 
+      onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
+      className="me-2"
+    />
+    <span className="ms-2">  If you want to add Sub Categories</span> 
+  </CCol>
+</CRow>
+  
               <CRow className="mb-3">
                 <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
                 <CCol sm={8}>
@@ -256,64 +259,72 @@ const AddCategory = () => {
                   />
                 </CCol>
               </fieldset>
-               {/* Conditionally render based on the checkbox */}
-               {subcategory_option === "No" && (
-                <>
-                  <CRow className="mb-3">
-                    <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">Attribute Type</CFormLabel>
-                    <CCol sm={8}>
-                      <CFormSelect
-                        id="attributeType"
-                        value={selectedAttributeType}
-                        onChange={handleAttributeTypeChange}
-                      >
-                        <option value="">Choose an attribute type</option>
-                        {attributeTypes.map((type) => (
-                          <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
-                        ))}
-                      </CFormSelect>
-                    </CCol>
-                  </CRow>
-                  <CRow className="mb-3">
-                    <CFormLabel htmlFor="attribute" className="col-sm-2 col-form-label">Attribute</CFormLabel>
-                    <CCol sm={8}>
-                      <CFormSelect 
-                        id="attribute" 
-                        value={selectedAttribute} 
-                        onChange={handleAttributeChange}
-                      >
-                        <option value="">Choose an attribute</option>
-                        {attributes.map((attr) => (
-                          <option key={attr.attribute_name} value={attr.attribute_name}>{attr.attribute_name}</option>
-                        ))}
-                      </CFormSelect>
-                    </CCol>
-                  </CRow>
-                  {/* Render Table if there are variations */}
-                  {variations.length > 0 && (
-                    <CTable hover responsive>
-                      <CTableHead>
-                        <CTableRow>
-                        <CTableHeaderCell>Sr#.</CTableHeaderCell>
-                          <CTableHeaderCell>Size</CTableHeaderCell>
-                          <CTableHeaderCell>Symbol</CTableHeaderCell>
-                        </CTableRow>
-                      </CTableHead>
-                      <CTableBody>
-                        {variations.map((variation,index) => (
-                          <CTableRow key={variation.id}>
-                            <CTableDataCell>{index + 1}</CTableDataCell>
-                            <CTableDataCell>{variation.variation_name}</CTableDataCell>
-                            <CTableDataCell>{variation.symbol}</CTableDataCell>
-                          </CTableRow>
-                        ))}
-                      </CTableBody>
-                    </CTable>
-                  )}
-                </>
-              )}
+             {/* Conditionally render based on the checkbox */}
+{subcategory_option === "No" && (
+  <>
+    <CRow className="mb-3">
+      <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">Attribute Type</CFormLabel>
+      <CCol sm={8}>
+        <CFormSelect
+          id="attributeType"
+          value={selectedAttributeType}
+          onChange={handleAttributeTypeChange}
+        >
+          <option value="">Choose an attribute type</option>
+          {attributeTypes.map((type) => (
+            <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
+          ))}
+        </CFormSelect>
+      </CCol>
+    </CRow>
+    
+    <CRow className="mb-3">
+      <CFormLabel htmlFor="attribute" className="col-sm-2 col-form-label">Attribute</CFormLabel>
+      <CCol sm={8}>
+        <CFormSelect 
+          id="attribute" 
+          value={selectedAttribute} 
+          onChange={handleAttributeChange}
+        >
+          <option value="">Choose an attribute</option>
+          {attributes.map((attr) => (
+            <option key={attr.attribute_name} value={attr.attribute_name}>{attr.attribute_name}</option>
+          ))}
+        </CFormSelect>
+      </CCol>
+    </CRow>
 
-              <CButton type="submit" color="primary">{id ? 'Update Category' : 'Add Category'}</CButton>
+    {/* Display "No record found" if selectedAttributeType is set and no variations are found */}
+    {selectedAttributeType && selectedAttribute && variations.length === 0 && (
+      <div className="text-center text-muted mt-3">No record found</div>
+    )}
+
+    {/* Render Table if there are variations */}
+    {variations.length > 0 && (
+      <CTable hover responsive>
+        <CTableHead>
+          <CTableRow>
+            <CTableHeaderCell>Sr#.</CTableHeaderCell>
+            <CTableHeaderCell>Size</CTableHeaderCell>
+            <CTableHeaderCell>Symbol</CTableHeaderCell>
+          </CTableRow>
+        </CTableHead>
+        <CTableBody>
+          {variations.map((variation, index) => (
+            <CTableRow key={variation.id}>
+              <CTableDataCell>{index + 1}</CTableDataCell>
+              <CTableDataCell>{variation.variation_name}</CTableDataCell>
+              <CTableDataCell>{variation.symbol}</CTableDataCell>
+            </CTableRow>
+          ))}
+        </CTableBody>
+      </CTable>
+    )}
+  </>
+)}
+
+<CButton type="submit" color="primary">{id ? 'Update Category' : 'Add Category'}</CButton>
+
             </CForm>
           </CCardBody>
         </CCard>
