@@ -209,19 +209,26 @@ const AddCategory = () => {
                   />
                 </CCol>
               </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="subcategoryOption" className="col-sm-2 col-form-label">Subcategory Option</CFormLabel>
-                <CCol sm={8}>
-                  <CFormCheck 
-                    type="checkbox" 
-                    id="subcategory_option" 
-                    checked={subcategory_option === "Yes"} 
-                    onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
-                  />
+              <CRow className="mb-3 align-items-center">
+  <CFormLabel htmlFor="subcategory_option" className="col-sm-2 col-form-label">
+   
+  </CFormLabel>
+  <CCol sm={8} className="d-flex align-items-center">
+    <CFormCheck 
+      type="checkbox" 
+      id="subcategory_option" 
+      checked={subcategory_option === "Yes"} 
+      onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
+      className="me-2"
+    />
+    <span className="ms-2">  If you want to add Sub Categories</span> 
+  </CCol>
+</CRow>
+
+
                 {/* <button type="button" onClick={() => navigate('/Product/FetchAttributes')}>+</button> */}
 
-                </CCol>                
-              </CRow> 
+                 
               <CRow className="mb-3">
                 <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
                 <CCol sm={8}>
