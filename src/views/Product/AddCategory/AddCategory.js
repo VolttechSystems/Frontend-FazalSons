@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from 'react';
 import {
   CButton,
@@ -32,20 +33,12 @@ const AddCategory = () => {
   const [selectedAttribute, setSelectedAttribute] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [attributeTypes, setAttributeTypes] = useState([]);
-  const [variations, setVariations] = useState([]);
+  const [variations, setVariations] = useState([]); // Variations for displaying in the table
   const [selectedAttributeType, setSelectedAttributeType] = useState('');
   const [attributes, setAttributes] = useState([]);
   const [addedAttributes, setAddedAttributes] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
-
-  // Fixed list of attributes for the dropdown
-  const fixedAttributes = [
-    { value: 'Size', label: 'Size' },
-    { value: 'Color', label: 'Color' },
-    { value: 'Material', label: 'Material' },
-    { value: 'Brand', label: 'Brand' },
-  ];
 
   useEffect(() => {
     const fetchParentCategories = async () => {
@@ -65,22 +58,12 @@ const AddCategory = () => {
         console.error('Error fetching attribute types:', error);
       }
     };
-    const fetchVariations = async () => {
-      try {
-        const response = await axios.get('http://16.171.145.107/pos/products/fetch_variation/attribute_name/');
-        setVariations(response.data);
-      } catch (error) {
-        console.error('Error fetching attribute types:', error);
-      }
-    };
-
-    if (id) {
-      fetchCategoryDetails(id);
-    }
 
     fetchParentCategories();
     fetchAttributeTypes();
-    fetchVariations();
+    if (id) {
+      fetchCategoryDetails(id);
+    }
   }, [id]);
 
   const handleAttributeTypeChange = async (e) => {
@@ -92,11 +75,24 @@ const AddCategory = () => {
     if (attributeTypeName) {
       try {
         const response = await axios.get(`http://16.171.145.107/pos/products/fetch_attribute/${attributeTypeName}/`);
-        console.log('Attributes response:', response.data); // Log the response
-        // Setting attributes based on the response
         setAttributes(response.data);
       } catch (error) {
         console.error('Error fetching attributes:', error);
+      }
+    }
+  };
+
+  const handleAttributeChange = async (e) => {
+    const attributeName = e.target.value;
+    setSelectedAttribute(attributeName);
+    setVariations([]); // Reset variations when a new attribute is selected
+
+    if (attributeName) {
+      try {
+        const response = await axios.get(`http://16.171.145.107/pos/products/fetch_variation/${encodeURIComponent(attributeName)}/`);
+        setVariations(response.data);  // Update variations with the response
+      } catch (error) {
+        console.error('Error fetching variations:', error);
       }
     }
   };
@@ -147,14 +143,14 @@ const AddCategory = () => {
   };
 
   const handleAddAttribute = () => {
-    if (selectedAttribute) {
-      setAddedAttributes((prev) => [
-        ...prev,
-        { type: selectedAttributeType, name: selectedAttribute },
-      ]);
-      setSelectedAttribute(''); // Reset the selected attribute after adding
-    }
-  };
+        if (selectedAttribute) {
+          setAddedAttributes((prev) => [
+            ...prev,
+            { type: selectedAttributeType, name: selectedAttribute },
+          ]);
+          setSelectedAttribute(''); // Reset the selected attribute after adding
+        }
+      };
 
   return (
     <CRow>
@@ -221,7 +217,7 @@ const AddCategory = () => {
                     checked={subcategory_option === "Yes"} 
                     onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
                   />
-                <button type="button" onClick={() => navigate('/Product/FetchAttributes')}>+</button>
+                {/* <button type="button" onClick={() => navigate('/Product/FetchAttributes')}>+</button> */}
 
                 </CCol>                
               </CRow> 
@@ -259,88 +255,67 @@ const AddCategory = () => {
                   />
                 </CCol>
               </fieldset>
-              
+              {/* More form fields here */}
 
-              {/* Fixed Attributes Section */}
-              <CRow>
-              <CCol sm={6}>
-                  <CFormSelect
-                    value={selectedAttributeType}
-                    onChange={handleAttributeTypeChange}
-                    required
-                  >
-                    <option value="">Select Attribute Type</option>
-                    {attributeTypes.map((type) => (
-                      <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
-                    ))}
-                  </CFormSelect>
-                </CCol>
-                <CCol sm={6}>
-                  <CFormSelect
-                    value={selectedAttribute}
-                    onChange={(e) => setSelectedAttribute(e.target.value)}
-                    required
-                  >
-                    <option value="">Select Attribute</option>
-                    {attributes.length > 0 ? (
-                      attributes.map((attr) => (
+              {subcategory_option === "No" && (
+                <CRow>
+                  <CCol sm={6}>
+                    <CFormSelect
+                      value={selectedAttributeType}
+                      onChange={handleAttributeTypeChange}
+                      required
+                    >
+                      <option value="">Select Attribute Type</option>
+                      {attributeTypes.map((type) => (
+                        <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                  <CCol sm={6}>
+                    <CFormSelect
+                      value={selectedAttribute}
+                      onChange={handleAttributeChange}
+                      required
+                    >
+                      <option value="">Select Attribute</option>
+                      {attributes.map((attr) => (
                         <option key={attr.attribute_name} value={attr.attribute_name}>
                           {attr.attribute_name}
                         </option>
-                      ))
-                    ) : (
-                      <option value=" " disabled>No attributes available</option>
-                    )}
-                  </CFormSelect>
-                </CCol>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
                 </CRow>
-
-              {subcategory_option === "No" && (
-                <>
-                  <hr />
-                  <h5><i className="cil-settings"></i> Fixed Attributes</h5>
-                  <CRow className="mb-3">
-                    <CFormLabel htmlFor="attribute" className="col-sm-2 col-form-label">Sizes</CFormLabel>
-                    <CCol sm={8}>
-                      <CFormSelect
-                        id="attribute"
-                        value={selectedAttribute}
-                        onChange={(e) => setSelectedAttribute(e.target.value)}
-                        required
-                      >
-                        <option value="">Select Size Group</option>
-                        {fixedAttributes.map((attr) => (
-                          <option key={attr.value} value={attr.value}>{attr.label}</option>
-                        ))}
-                      </CFormSelect>
-                    </CCol>
-                  </CRow>
-
-                  {/* Table for Fixed Attributes */}
-                  <CTable striped>
-                    <CTableHead>
-                      <CTableRow>
-                        <CTableHeaderCell>Sr. #</CTableHeaderCell>
-                        <CTableHeaderCell>Size</CTableHeaderCell>
-                        <CTableHeaderCell>Short Form / Symbol</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                      {/* Placeholder rows - populate with dynamic data if available */}
-                      <CTableRow>
-                        <CTableHeaderCell>1</CTableHeaderCell>
-                        <CTableHeaderCell>{selectedAttribute}</CTableHeaderCell>
-                        <CTableHeaderCell>{symbol}</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableBody>
-                  </CTable>
-                </>
               )}
 
-              
+              {variations.length > 0 && (
+                <CRow className="mb-3 mt-3">
+                  <CCol sm={12}>
+                    <h5>Fixed Attributes</h5>
+                    <CTable>
+                      <CTableHead>
+                        <CTableRow>
+                          <CTableHeaderCell>Sr#</CTableHeaderCell>
+                          <CTableHeaderCell>Size</CTableHeaderCell>
+                          <CTableHeaderCell>Symbol</CTableHeaderCell>
+                        </CTableRow>
+                      </CTableHead>
+                      <CTableBody>
+                        {variations.map((variation, index) => (
+                          <CTableRow key={variation.id || index}>
+                            <CTableHeaderCell>{index + 1}</CTableHeaderCell>
+                            <CTableHeaderCell>{variation.variation_name || 'N/A'}</CTableHeaderCell>
+                            <CTableHeaderCell>{variation.symbol || 'N/A'}</CTableHeaderCell>
+                          </CTableRow>
+                        ))}
+                      </CTableBody>
+                    </CTable>
+                  </CCol>
+                </CRow>
+              )}
 
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton type="submit" color="primary">{id ? 'Update Category' : 'Add Category'}</CButton>
+                <CButton color="primary" type="submit">Save Category</CButton>
               </div>
             </CForm>
           </CCardBody>
@@ -351,3 +326,4 @@ const AddCategory = () => {
 };
 
 export default AddCategory;
+
