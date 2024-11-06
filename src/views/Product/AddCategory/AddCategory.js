@@ -25,7 +25,7 @@ import axios from 'axios';
 const AddCategory = () => {
   const [category_name, setCategoryName] = useState('');
   const [symbol, setSymbol] = useState('');
-  const [subcategory_option, setSubcategoryOption] = useState("No");
+  const [subcategory_option, setSubcategoryOption] = useState("Yes");
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('active');
   const [parentCategories, setParentCategories] = useState([]);
