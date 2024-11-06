@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from 'react';
 import {
   CButton,
@@ -11,40 +13,89 @@ import {
   CFormLabel,
   CRow,
   CFormSelect,
+  CTable,
+  CTableBody,
+  CTableHeaderCell,
+  CTableRow,
+  CTableHead,
 } from '@coreui/react';
-import { useNavigate, useParams,Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const AddCategory = () => {
   const [category_name, setCategoryName] = useState('');
   const [symbol, setSymbol] = useState('');
-  const [subcategory_option, setSubcategoryOption] = useState('');
+  const [subcategory_option, setSubcategoryOption] = useState("No");
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('active');
   const [parentCategories, setParentCategories] = useState([]);
   const [selectedParentCategory, setSelectedParentCategory] = useState('');
+  const [selectedAttribute, setSelectedAttribute] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [attributeTypes, setAttributeTypes] = useState([]);
+  const [variations, setVariations] = useState([]); // Variations for displaying in the table
+  const [selectedAttributeType, setSelectedAttributeType] = useState('');
+  const [attributes, setAttributes] = useState([]);
+  const [addedAttributes, setAddedAttributes] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Fetch parent categories for the dropdown
   useEffect(() => {
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category'); // Replace with your API endpoint
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
         setParentCategories(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);
         setErrorMessage('Failed to fetch parent categories.');
       }
     };
-
-    if (id) {
-      fetchCategoryDetails(id)
-    }
+    const fetchAttributeTypes = async () => {
+      try {
+        const response = await axios.get('http://16.171.145.107/pos/products/fetch_all_attribute_type/');
+        setAttributeTypes(response.data);
+      } catch (error) {
+        console.error('Error fetching attribute types:', error);
+      }
+    };
 
     fetchParentCategories();
+    fetchAttributeTypes();
+    if (id) {
+      fetchCategoryDetails(id);
+    }
   }, [id]);
+
+  const handleAttributeTypeChange = async (e) => {
+    const attributeTypeName = e.target.value;
+    setSelectedAttributeType(attributeTypeName);
+    setAttributes([]); // Reset attributes when attribute type changes
+    setSelectedAttribute(''); // Reset selected attribute
+
+    if (attributeTypeName) {
+      try {
+        const response = await axios.get(`http://16.171.145.107/pos/products/fetch_attribute/${attributeTypeName}/`);
+        setAttributes(response.data);
+      } catch (error) {
+        console.error('Error fetching attributes:', error);
+      }
+    }
+  };
+
+  const handleAttributeChange = async (e) => {
+    const attributeName = e.target.value;
+    setSelectedAttribute(attributeName);
+    setVariations([]); // Reset variations when a new attribute is selected
+
+    if (attributeName) {
+      try {
+        const response = await axios.get(`http://16.171.145.107/pos/products/fetch_variation/${encodeURIComponent(attributeName)}/`);
+        setVariations(response.data);  // Update variations with the response
+      } catch (error) {
+        console.error('Error fetching variations:', error);
+      }
+    }
+  };
 
   const fetchCategoryDetails = async () => {
     try {
@@ -52,50 +103,16 @@ const AddCategory = () => {
       const category = response.data;
       setCategoryName(category.category_name);
       setSymbol(category.symbol);
-      setSubcategoryOption(category.subcategory_option)
+      setSubcategoryOption(category.subcategory_option);
       setDescription(category.description);
       setStatus(category.status);
       setSelectedParentCategory(category.pc_name);
+      setSelectedAttribute(category.attribute_name || ''); // Set the attribute if available
     } catch (error) {
       console.error('Failed to fetch category for editing:', error);
       setErrorMessage('Failed to load category details.');
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   if (!selectedParentCategory) {
-  //     setErrorMessage('Please select a parent category.');
-  //     return;
-  //   }
-
-  //   const categoryData = {
-  //     category_name: category_name,
-  //     symbol: symbol,
-  //     subcategory_option: subcategory_option,
-  //     description: description,
-  //     status: status,
-  //     pc_name: selectedParentCategory,
-  //   };
-
-  //   try {
-  //     const response = await axios.post('http://16.170.232.76/pos/products/add_category', categoryData);
-  //     console.log('Category added:', response.data);
-  //     setCategoryName('');
-  //     setSymbol('');
-  //     setSubcategoryOption('');
-  //     setDescription('');
-  //     setStatus('active');
-  //     setSelectedParentCategory('');
-  //     setErrorMessage('');
-  //     alert('Category added successfully!');
-  //   } catch (error) {
-  //     console.error('There was an error adding the category!', error);
-  //     setErrorMessage('Error adding category. Please try again.');
-  //   }
-  // };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,24 +124,33 @@ const AddCategory = () => {
       description: description,
       status: status,
       pc_name: selectedParentCategory,
+      attribute_name: selectedAttribute, // Added attribute field
     };
 
     try {
       if (id) {
-        
         await axios.put(`http://16.171.145.107/pos/products/action_category/${id}/`, categoryData);
-        alert(' category updated successfully!');
+        alert('Category updated successfully!');
       } else {
-        
         await axios.post('http://16.171.145.107/pos/products/add_category', categoryData);
-        alert(' category added successfully!');
+        alert('Category added successfully!');
       }
-      navigate('/Product/Category'); 
+      navigate('/Product/Category');
     } catch (error) {
-      console.error('Error saving the  category:', error);
-      setErrorMessage('Error saving the  category. Please try again.');
+      console.error('Error saving the category:', error);
+      setErrorMessage('Error saving the category. Please try again.');
     }
   };
+
+  const handleAddAttribute = () => {
+        if (selectedAttribute) {
+          setAddedAttributes((prev) => [
+            ...prev,
+            { type: selectedAttributeType, name: selectedAttribute },
+          ]);
+          setSelectedAttribute(''); // Reset the selected attribute after adding
+        }
+      };
 
   return (
     <CRow>
@@ -137,12 +163,28 @@ const AddCategory = () => {
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>
-            <strong>Category Information</strong>
-            <strong>{id ? 'Edit Variation' : 'Add Variation'}</strong>
+            <strong>{id ? 'Edit Category' : 'Add Category'}</strong>
           </CCardHeader>
           <CCardBody>
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
             <CForm onSubmit={handleSubmit}>
+              {/* Main Form Fields */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="parentCategory" className="col-sm-2 col-form-label">Select Parent Category</CFormLabel>
+                <CCol sm={8}>
+                  <CFormSelect
+                    id="parentCategory"
+                    value={selectedParentCategory}
+                    onChange={(e) => setSelectedParentCategory(e.target.value)}
+                    required
+                  >
+                    <option value="">Choose a parent category</option>
+                    {parentCategories.map((pc) => (
+                      <option key={pc.pc_name} value={pc.pc_name}>{pc.pc_name}</option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </CRow>
               <CRow className="mb-3">
                 <CFormLabel htmlFor="categoryName" className="col-sm-2 col-form-label">Category Name *</CFormLabel>
                 <CCol sm={8}>
@@ -169,14 +211,16 @@ const AddCategory = () => {
               <CRow className="mb-3">
                 <CFormLabel htmlFor="subcategoryOption" className="col-sm-2 col-form-label">Subcategory Option</CFormLabel>
                 <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
+                  <CFormCheck 
+                    type="checkbox" 
                     id="subcategory_option" 
-                    value={subcategory_option} 
-                    onChange={(e) => setSubcategoryOption(e.target.value)} 
+                    checked={subcategory_option === "Yes"} 
+                    onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
                   />
-                </CCol>
-              </CRow>
+                {/* <button type="button" onClick={() => navigate('/Product/FetchAttributes')}>+</button> */}
+
+                </CCol>                
+              </CRow> 
               <CRow className="mb-3">
                 <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
                 <CCol sm={8}>
@@ -186,22 +230,6 @@ const AddCategory = () => {
                     value={description} 
                     onChange={(e) => setDescription(e.target.value)} 
                   />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="parentCategory" className="col-sm-2 col-form-label">Select Parent Category</CFormLabel>
-                <CCol sm={8}>
-                  <CFormSelect
-                    id="parentCategory"
-                    value={selectedParentCategory}
-                    onChange={(e) => setSelectedParentCategory(e.target.value)}
-                    required
-                  >
-                    <option value="">Choose a parent category</option>
-                    {parentCategories.map((pc) => (
-                      <option key={pc.pc_name} value={pc.pc_name}>{pc.pc_name}</option>
-                    ))}
-                  </CFormSelect>
                 </CCol>
               </CRow>
               <fieldset className="row mb-3">
@@ -225,19 +253,69 @@ const AddCategory = () => {
                     checked={status === 'inactive'} 
                     onChange={(e) => setStatus(e.target.value)} 
                   />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="pending" 
-                    label="Pending" 
-                    value="pending" 
-                    checked={status === 'pending'} 
-                    onChange={(e) => setStatus(e.target.value)} 
-                  />
                 </CCol>
               </fieldset>
+              {/* More form fields here */}
+
+              {subcategory_option === "No" && (
+                <CRow>
+                  <CCol sm={6}>
+                    <CFormSelect
+                      value={selectedAttributeType}
+                      onChange={handleAttributeTypeChange}
+                      required
+                    >
+                      <option value="">Select Attribute Type</option>
+                      {attributeTypes.map((type) => (
+                        <option key={type.att_type} value={type.att_type}>{type.att_type}</option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                  <CCol sm={6}>
+                    <CFormSelect
+                      value={selectedAttribute}
+                      onChange={handleAttributeChange}
+                      required
+                    >
+                      <option value="">Select Attribute</option>
+                      {attributes.map((attr) => (
+                        <option key={attr.attribute_name} value={attr.attribute_name}>
+                          {attr.attribute_name}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+              )}
+
+              {variations.length > 0 && (
+                <CRow className="mb-3 mt-3">
+                  <CCol sm={12}>
+                    <h5>Fixed Attributes</h5>
+                    <CTable>
+                      <CTableHead>
+                        <CTableRow>
+                          <CTableHeaderCell>Sr#</CTableHeaderCell>
+                          <CTableHeaderCell>Size</CTableHeaderCell>
+                          <CTableHeaderCell>Symbol</CTableHeaderCell>
+                        </CTableRow>
+                      </CTableHead>
+                      <CTableBody>
+                        {variations.map((variation, index) => (
+                          <CTableRow key={variation.id || index}>
+                            <CTableHeaderCell>{index + 1}</CTableHeaderCell>
+                            <CTableHeaderCell>{variation.variation_name || 'N/A'}</CTableHeaderCell>
+                            <CTableHeaderCell>{variation.symbol || 'N/A'}</CTableHeaderCell>
+                          </CTableRow>
+                        ))}
+                      </CTableBody>
+                    </CTable>
+                  </CCol>
+                </CRow>
+              )}
+
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-              <CButton type="submit" color="primary">{id ? 'Update Category' : 'Add Category'}</CButton>
+                <CButton color="primary" type="submit">Save Category</CButton>
               </div>
             </CForm>
           </CCardBody>
@@ -248,3 +326,4 @@ const AddCategory = () => {
 };
 
 export default AddCategory;
+
