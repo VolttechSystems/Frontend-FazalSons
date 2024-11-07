@@ -160,7 +160,7 @@ const AddSubCategory = () => {
   return (
     <CCard>
       <CCardHeader>
-        <h5>{id ? 'Edit Subcategory' : 'Add Subcategory'}</h5>
+        <strong>{id ? 'Edit Subcategory' : 'Add Subcategory'}</strong>
       </CCardHeader>
       <CCardBody>
         <div className="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -347,16 +347,10 @@ const AddSubCategory = () => {
 
           <CRow>
             <CCol className="text-end">
-              <Link to="/Product/Category">
-                <CButton color="secondary" className="me-2">
-                  Cancel
-                </CButton>
-              </Link>
-              <CButton type="submit" color="primary">
-                Add Subcategory
-              </CButton>
+              
             </CCol>
           </CRow>
+          <CButton type="submit" color="primary">{id ? 'Update SubCategory' : 'Add SubCategory'}</CButton>
         </CForm>
       </CCardBody>
     </CCard>
