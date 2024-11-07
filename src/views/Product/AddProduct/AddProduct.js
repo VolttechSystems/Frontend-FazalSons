@@ -35,7 +35,7 @@ const AddProduct = () => {
   const [headCategories, setHeadCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [categories, setCategories] = useState([]);
-  //const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [brands, setBrands] = useState([]);
   const [productList, setProductList] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -142,7 +142,8 @@ const handleAdd = () => {
 };
 
   
-const handleEdit = (id) => {
+const handleEdit = async (id,e) => {
+ 
   const productToEdit = productList.find(product => product.id === id);
   if (productToEdit) {
     setFormData({
@@ -154,8 +155,8 @@ const handleEdit = (id) => {
       category: productToEdit.category || '',
       season: productToEdit.season || '',
       description: productToEdit.description || '',
-      color: productToEdit.color ? productToEdit.color.split(',') : [], 
-      size: productToEdit.size ? productToEdit.size.split(',') : [], 
+      color: productToEdit.color ? productToEdit.color.split(',') : [],
+      size: productToEdit.size ? productToEdit.size.split(',') : [],
       used_for_inventory: productToEdit.used_for_inventory || false,
       cost_price: productToEdit.cost_price || '',
       selling_price: productToEdit.selling_price || '',
@@ -165,12 +166,17 @@ const handleEdit = (id) => {
       token_price: productToEdit.token_price || '',
       brand_name: productToEdit.brand_name || '',
     });
+    
     setEditMode(true);
+    
     setEditProductId(id); 
+    e.preventDefault();
+    
   } else {
     console.error("Product not found:", id);
   }
 };
+
 
 const handleUpdate = () => {
   if (editProductId) {
@@ -186,7 +192,7 @@ const handleUpdate = () => {
     );
 
     setProductList(updatedProductList);
-    resetForm(); 
+    // resetForm(); 
   }
 };
 
@@ -240,7 +246,7 @@ const handlePublish = async () => {
   // };
 
   try {
-    const response = await axios.post('http:/16.171.145.107/pos/products/add_product');
+    const response = await axios.post('http://16.171.145.107/pos/products/add_product');
     if (response.status === 201 || response.status === 200) {
       alert('Product published successfully!');
       history.push('/Product/AllProducts'); 
