@@ -113,7 +113,7 @@ const SubCategory = () => {
               <CTableBody>
                 {subCategories.map(subCategory => (
                   <CTableRow key={subCategory.id}>
-                    <CTableDataCell>{getParentCategoryName(subCategory.parent_name)}</CTableDataCell>
+                    <CTableDataCell>{getParentCategoryName(subCategory.pc_name)}</CTableDataCell>
                     <CTableDataCell>{getCategoryName(subCategory.category_name)}</CTableDataCell>
                     <CTableDataCell>{subCategory.sub_category_name}</CTableDataCell>
                     <CTableDataCell>{subCategory.symbol}</CTableDataCell>
