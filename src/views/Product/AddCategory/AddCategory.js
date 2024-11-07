@@ -153,6 +153,20 @@ const AddCategory = () => {
         }
       };
 
+      const handleCheckboxChange = (e) => {
+        const isChecked = e.target.checked;
+        setSubcategoryOption(isChecked ? "Yes" : "No");
+      
+        if (!isChecked) {
+          // Reset the relevant states when the checkbox is unchecked
+          setSelectedAttributeType('');
+          setSelectedAttribute('');
+          setAttributes([]);
+          setVariations([]);
+        }
+      };
+      
+
   return (
     <CRow>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -211,19 +225,19 @@ const AddCategory = () => {
               </CRow>
               <CRow className="mb-3 align-items-center">
   <CFormLabel htmlFor="subcategory_option" className="col-sm-2 col-form-label">
-   
   </CFormLabel>
   <CCol sm={8} className="d-flex align-items-center">
     <CFormCheck 
       type="checkbox" 
       id="subcategory_option" 
       checked={subcategory_option === "Yes"} 
-      onChange={(e) => setSubcategoryOption(e.target.checked ? "Yes" : "No")} 
+      onChange={handleCheckboxChange}  // Use the new handler here
       className="me-2"
     />
     <span className="ms-2">  If you want to add Sub Categories</span> 
   </CCol>
 </CRow>
+
   
               <CRow className="mb-3">
                 <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
