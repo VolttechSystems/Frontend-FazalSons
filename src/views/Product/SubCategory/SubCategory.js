@@ -59,10 +59,10 @@ const SubCategory = () => {
     return category ? category.category_name : 'Category not found';
   };
 
-  const getParentCategoryName = (parentName) => {
-    const parentCategory = parentCategories.find((pc) => pc.pc_name === parentName);
-    return parentCategory ? parentCategory.pc_name : 'Parent Category not found';
-  };
+  // const getParentCategoryName = (parentName) => {
+  //   const parentCategory = parentCategories.find((pc) => pc.pc_name === parentName);
+  //   return parentCategory ? parentCategory.pc_name : 'Parent Category not found';
+  // };
 
   // const fetchSubcategoryById = async (id) => {
   //   try {
@@ -92,11 +92,13 @@ const SubCategory = () => {
 
   // Edit subcategory - Redirect to edit page or handle update
   const handleEdit = (id) => {
-    navigate(`/Product/AddSubCategory/${id}`);  // Directly navigate to the edit page
+    console.log("Editing Category with ID:", id);
+    navigate(`/Product/AddSubCategory/${id}`); 
   };
+  
 
-  if (loading) return <Loader />;
-  if (error) return <div className="alert alert-danger">{error}</div>;
+  // if (loading) return <Loader />;
+  // if (error) return <div className="alert alert-danger">{error}</div>;
 
   return (
     <CRow>

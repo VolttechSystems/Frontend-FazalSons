@@ -74,13 +74,13 @@ const AddSubCategory = () => {
     if (id) {
       const fetchSubcategory = async () => {
         try {
-          const response = await axios.get(`http://16.171.145.107/pos/products/add_subcategory/${id}`);
+          const response = await axios.get(`http://16.171.145.107/pos/products/action_subcategory/${id}/`);
           const data = response.data;
           setSubcategoryName(data.sub_category_name);
           setSymbol(data.symbol);
           setDescription(data.description);
           setStatus(data.status);
-          setSelectedParentCategory(data.parentCategory);
+          setSelectedParentCategory(data.pc_name);
           setSelectedCategory(data.category_name);
         } catch (error) {
           console.error('Error fetching subcategory data:', error);
@@ -129,16 +129,15 @@ const AddSubCategory = () => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newSubcategory = {
       parentCategories: selectedParentCategory,
       category_name: selectedCategory,
-      sub_category_name,
-      symbol,
-      description,
-      status,
+      sub_category_name: sub_category_name,
+      symbol: symbol,
+      description: description,
+      status: status,
       isSubcategory,
       parentCategory: selectedParentCategory,
     };
@@ -157,7 +156,6 @@ const AddSubCategory = () => {
       alert('Error saving the SubCategory. Please try again.');
     }
   };
-  
 
   return (
     <CCard>
