@@ -20,13 +20,14 @@ import {
   CTableRow,
   CTableHead,
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const AddSubCategory = () => {
   const [parentCategories, setParentCategories] = useState([]);
   const [category_name, setCategoryName] = useState('');
-  
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [Category, setCategory] = useState([]);
   const [sub_category_name, setSubcategoryName] = useState('');
   const [symbol, setSymbol] = useState('');
@@ -45,7 +46,7 @@ const AddSubCategory = () => {
     const fetchParentCategories = async () => {
       try {
         const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
-        setParentCategories(response.data); 
+        setParentCategories(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);
       }
@@ -54,7 +55,7 @@ const AddSubCategory = () => {
     const fetchCategory = async () => {
       try {
         const response = await axios.get('http://16.171.145.107/pos/products/add_category');
-        setCategory(response.data); 
+        setCategory(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -69,10 +70,31 @@ const AddSubCategory = () => {
       }
     };
 
+    // Fetch subcategory data for edit
+    if (id) {
+      const fetchSubcategory = async () => {
+        try {
+          const response = await axios.get(`http://16.171.145.107/pos/products/add_subcategory/${id}`);
+          const data = response.data;
+          setSubcategoryName(data.sub_category_name);
+          setSymbol(data.symbol);
+          setDescription(data.description);
+          setStatus(data.status);
+          setSelectedParentCategory(data.parentCategory);
+          setSelectedCategory(data.category_name);
+        } catch (error) {
+          console.error('Error fetching subcategory data:', error);
+        }
+      };
+
+      fetchSubcategory();
+    }
+
     fetchParentCategories();
     fetchCategory();
     fetchAttributeTypes();
-  }, []);
+  }, [id]); // Dependency array to re-run effect when 'id' changes
+
 
   const handleAttributeTypeChange = async (e) => {
     const attributeTypeName = e.target.value;
@@ -111,8 +133,8 @@ const AddSubCategory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newSubcategory = {
-      parentCategories: pc_name,
-      category_name : category_name,
+      parentCategories: selectedParentCategory,
+      category_name: selectedCategory,
       sub_category_name,
       symbol,
       description,
@@ -122,32 +144,35 @@ const AddSubCategory = () => {
     };
 
     try {
-      const response = await axios.post('http://16.171.145.107/pos/products/add_subcategory', newSubcategory);
-      console.log('Subcategory added successfully:', response.data);
-      setSubcategoryName('');
-      setSymbol('');
-      setDescription('');
-      setStatus('active');
-      setIsSubcategory(false);
-      setSelectedParentCategory('');
+      if (id) {
+        await axios.put(`http://16.171.145.107/pos/products/action_subcategory/${id}/`, newSubcategory);
+        alert('SubCategory updated successfully!');
+      } else {
+        await axios.post('http://16.171.145.107/pos/products/add_subcategory', newSubcategory);
+        alert('SubCategory added successfully!');
+      }
+      navigate('/Product/SubCategory');
     } catch (error) {
-      console.error('Error adding subcategory:', error);
+      console.error('Error saving the SubCategory:', error);
+      alert('Error saving the SubCategory. Please try again.');
     }
   };
+  
 
   return (
     <CCard>
       <CCardHeader>
-        <h5>Add Subcategory</h5>
+        <h5>{id ? 'Edit Subcategory' : 'Add Subcategory'}</h5>
       </CCardHeader>
       <CCardBody>
         <div className="d-grid gap-2 d-md-flex justify-content-md-end">
           <Link to="/Product/SubCategory">
             <CButton href="#" color="primary" className="me-md-2">
-              Category List
+              SubCategory List
             </CButton>
           </Link>
         </div>
+        
         <CForm onSubmit={handleSubmit}>
           <CRow className="mb-3">
             <CFormLabel htmlFor="parentCategory" className="col-sm-2 col-form-label">
