@@ -14,13 +14,16 @@ import {
 } from '@coreui/react';
 import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './Loader.css';
 
 const Loader = () => {
   return (
     <div className="text-center my-5">
       <div className="spinner-border text-primary" role="status">
+      <div className="loader-overlay">
         <span className="visually-hidden">Loading...</span>
       </div>
+    </div>
     </div>
   );
 };

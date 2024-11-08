@@ -140,6 +140,7 @@ const AddSubCategory = () => {
       status: status,
       isSubcategory,
       parentCategory: selectedParentCategory,
+      attribute_name: selectedAttribute,
     };
 
     try {

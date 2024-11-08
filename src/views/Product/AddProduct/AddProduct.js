@@ -15,6 +15,7 @@ const AddProduct = () => {
     sku: '',
     head_category: '',
     parent_category: '',
+    sub_category: '',  
     category: '',
     season: '',
     description: '',
@@ -35,6 +36,7 @@ const AddProduct = () => {
   const [headCategories, setHeadCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [brands, setBrands] = useState([]);
   const [productList, setProductList] = useState([]);
@@ -99,6 +101,7 @@ const AddProduct = () => {
 
   useEffect(() => {
     fetchProductList();
+    fetchSubCategories();
   }, []);
   
   const fetchProductList = async () => {
@@ -107,6 +110,15 @@ const AddProduct = () => {
       setProductList(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchSubCategories = async () => {
+    try {
+      const response = await axios.get('http://16.171.145.107/pos/products/add_subcategory');
+      setSubCategories(response.data || []);  
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
     }
   };
   
@@ -216,6 +228,7 @@ const resetForm = () => {
     head_category: '',
     parent_category: '',
     category: '',
+    sub_category: '',
     season: '',
     description: '',
     color: [],
@@ -339,7 +352,26 @@ const handlePublish = async () => {
                     <option key={item.pc_name} value={item.pc_name}>{item.pc_name}</option>
                   ))}
                 </select>
+            </label>
+
+             {/* Subcategory Dropdown */}
+             <label>
+                Sub Category:
+                <select
+                  name="sub_category"
+                  value={formData.sub_category}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Subcategory</option>
+                  {subcategories.map((item) => (
+                    <option key={item.sub_category_name} value={item.sub_category_name}>
+                      {item.sub_category_name}
+                    </option>
+                  ))}
+                </select>
               </label>
+
+
               <label>
                 Category:
                 <select
