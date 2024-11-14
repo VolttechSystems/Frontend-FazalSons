@@ -69,6 +69,7 @@ const routes = [
   { path: '/Customer/CustomerType', name: 'CustomerType', element: CustomerType }, // CustomerType
   { path: '/Outlet/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
   { path: '/Product/FetchAttributes', name: 'FetchAttributes', element: FetchAttributes }, // FetchAttributes
+  { path: '/Product/AddSubCategory/:id', name: 'EditCategory', element: AddSubCategory }, // Edit SubCategory
   
  
 ]

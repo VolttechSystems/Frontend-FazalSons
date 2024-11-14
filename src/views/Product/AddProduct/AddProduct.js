@@ -5,6 +5,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import axios from 'axios';
 import Select from 'react-select';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 
 
 
@@ -15,6 +16,7 @@ const AddProduct = () => {
     sku: '',
     head_category: '',
     parent_category: '',
+    sub_category: '',  
     category: '',
     season: '',
     description: '',
@@ -32,14 +34,97 @@ const AddProduct = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [activeTab, setActiveTab] = useState(0);
+  const { id } = useParams();
   const [headCategories, setHeadCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [categories, setCategories] = useState([]);
-  //const [loading, setLoading] = useState(true);
+  const [subcategories, setSubCategories] = useState([]);
+  const [loading, setIsLoading] = useState(true);
   const [brands, setBrands] = useState([]);
   const [productList, setProductList] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
+  const [selectedHeadCategory, setSelectedHeadCategory] = useState('');
+const [selectedParentCategory, setSelectedParentCategory] = useState('');
+const [selectedCategory, setSelectedCategory] = useState('');
+const [selectedsubCategory, setSelectedsubCategory] = useState('');
+
+useEffect(() => {
+  fetchHeadCategories();
+}, []);
+
+// Fetch Head Categories
+const fetchHeadCategories = async () => {
+  try {
+    const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
+    setHeadCategories(response.data);
+  } catch (error) {
+    console.error('Error fetching head categories:', error);
+    setError('Failed to load head categories. Please try again later.');
+  }
+};
+
+// Fetch Parent Categories based on selected Head Category
+const handleHeadCategoryChange = async (e) => {
+  const headCategoryId = e.target.value;
+  setSelectedHeadCategory(headCategoryId);
+  setParentCategories([]);
+  setCategories([]);
+  setSubCategories([]);
+  setSelectedCategory('');
+  setSelectedParentCategory('');
+  setSelectedsubCategory('');
+
+  if (headCategoryId) {
+    try {
+      const response = await axios.get(`http://16.171.145.107/pos/products/add_parent_category/${encodeURIComponent(headCategoryId)}/`);
+      setParentCategories(response.data); // Only relevant parent categories
+    } catch (error) {
+      console.error('Error fetching parent categories:', error);
+      setError('Failed to load parent categories. Please try again later.');
+    }
+  }
+};
+
+
+// Fetch Categories based on selected Parent Category
+const handleParentCategoryChange = async (e) => {
+  const parentCategoryId = e.target.value;
+  setSelectedParentCategory(parentCategoryId);
+  setCategories([]);
+  setSubCategories([]);
+  setSelectedCategory('');
+  setSelectedsubCategory('');
+
+  if (parentCategoryId) {
+    try {
+      const response = await axios.get(`http://16.171.145.107/pos/products/add_category/${encodeURIComponent(parentCategoryId)}/`);
+      setCategories(response.data); // Only relevant categories
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError('Failed to load categories. Please try again later.');
+    }
+  }
+};
+
+// Fetch Subcategories based on selected Category
+const handleCategoryChange = async (e) => {
+  const categoryId = e.target.value;
+  setSelectedCategory(categoryId);
+  setSubCategories([]);
+  setSelectedsubCategory('');
+
+  if (categoryId) {
+    try {
+      const response = await axios.get(`http://16.171.145.107/pos/products/add_sub_category/${encodeURIComponent(categoryId)}/`);
+      setSubCategories(response.data); // Only relevant subcategories
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      setError('Failed to load subcategories. Please try again later.');
+    }
+  }
+};
+
 
   const colorOptions = [
     { value: 'Almond', label: 'Almond' },
@@ -99,24 +184,22 @@ const AddProduct = () => {
 
   useEffect(() => {
     fetchProductList();
+    // fetchSubCategories();
+    // fetchParentCategories();
+    // fetchCategories();
+    
   }, []);
   
   const fetchProductList = async () => {
     try {
       const response = await axios.get('http://16.171.145.107/pos/products/add_temp_product');
-      setProductList(response.data);
+      setProductList(response.data);  
     } catch (error) {
       console.error('Error fetching products:', error);
     }
   };
   
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+
 
   const handleMultiSelectChange = (selectedOptions, name) => {
     const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
@@ -126,23 +209,48 @@ const AddProduct = () => {
     }));
   };
   
-
-
-
-const handleAdd = () => {
-  const newProduct = {
-    id: new Date().getTime(), 
-    ...formData,
-    color: formData.color.join(','), 
-    size: formData.size.join(','), 
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  
+   
   };
 
-  setProductList([...productList, newProduct]);
-  resetForm(); 
-};
+
+  const handleAdd = async () => {
+    const newProduct = {
+      ...formData,
+      size: JSON.stringify(formData.size),   
+      color: JSON.stringify(formData.color),    
+      used_for_inventory: formData.used_for_inventory ? "true" : "false", 
+      formData: formData 
+    };
+  
+    try {
+      const response = await axios.post('http://16.171.145.107/pos/products/add_temp_product', newProduct);
+  
+      if (response.status === 200 || response.status === 201) {
+        alert('Product added successfully!');
+        fetchProductList();  
+        resetForm();         
+      } else {
+        alert('Failed to add the product. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('An error occurred while adding the product.');
+    }
+  };
+  
+  
 
   
-const handleEdit = (id) => {
+const handleEdit = async (id,e) => {
+ 
   const productToEdit = productList.find(product => product.id === id);
   if (productToEdit) {
     setFormData({
@@ -154,8 +262,8 @@ const handleEdit = (id) => {
       category: productToEdit.category || '',
       season: productToEdit.season || '',
       description: productToEdit.description || '',
-      color: productToEdit.color ? productToEdit.color.split(',') : [], 
-      size: productToEdit.size ? productToEdit.size.split(',') : [], 
+      color: productToEdit.color ? productToEdit.color.split(',') : [],
+      size: productToEdit.size ? productToEdit.size.split(',') : [],
       used_for_inventory: productToEdit.used_for_inventory || false,
       cost_price: productToEdit.cost_price || '',
       selling_price: productToEdit.selling_price || '',
@@ -165,43 +273,71 @@ const handleEdit = (id) => {
       token_price: productToEdit.token_price || '',
       brand_name: productToEdit.brand_name || '',
     });
+    
     setEditMode(true);
+    
     setEditProductId(id); 
+    e.preventDefault();
+    
   } else {
     console.error("Product not found:", id);
   }
 };
 
-const handleUpdate = () => {
-  if (editProductId) {
-    const updatedProductList = productList.map((product) =>
-      product.id === editProductId
-        ? {
-            ...product,
-            ...formData,
-            color: formData.color.join(','), 
-            size: formData.size.join(','), 
-          }
-        : product
-    );
 
-    setProductList(updatedProductList);
-    resetForm(); 
+const handleUpdate = async () => {
+  if (editProductId) {
+   
+    const updatedProductData = {
+      ...formData,
+      color: formData.color.join(','), 
+      size: formData.size.join(','),   
+      used_for_inventory: formData.used_for_inventory ? "Yes" : "No",  
+    };
+
+    try {
+      const response = await axios.put(`http://16.171.145.107/pos/products/action_temp_product/${editProductId}/`, updatedProductData); 
+      if (response.status === 200 || response.status === 201) {
+       
+        const updatedProductList = productList.map((product) =>
+          product.id === editProductId
+            ? { ...product, ...updatedProductData }
+            : product
+        );
+        setProductList(updatedProductList);
+        alert('Product updated successfully!');
+        
+      } else {
+        alert('Failed to update the product. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating product:', error);
+      alert('An error occurred while updating the product.');
+    }
+    
   }
+  resetForm(); 
 };
+
 
  
   
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://16.171.145.107/pos/products/action_temp_product/${id}/`);
+const handleDelete = async (id) => {
+  try {
+    const response = await axios.delete(`http://16.171.145.107/pos/products/action_temp_product/${id}/`);
+    if (response.status === 200 || response.status === 204) {
       setProductList(prevList => prevList.filter((product) => product.id !== id));
-    } catch (error) {
-      console.error('Error deleting product:', error);
+      alert('Product deleted successfully!');
+    } else {
+      console.error('Failed to delete the product');
     }
-  };
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    alert('Error deleting the product. Please try again.');
+  }
+};
 
-  // Function to reset the form.
+
 const resetForm = () => {
   setFormData({
     product_name: '',
@@ -210,6 +346,7 @@ const resetForm = () => {
     head_category: '',
     parent_category: '',
     category: '',
+    sub_category: '',
     season: '',
     description: '',
     color: [],
@@ -230,17 +367,10 @@ const resetForm = () => {
 const handlePublish = async () => {
   console.log('Publishing with data:', formData);
  
-  // const formDataToSend = {
-  //   ...formData,
-  //   product_name:formData.product_name,
-  //   season:formData.season,
-  //   color: formData.color.join(','), 
-  //   size: formData.size.join(','),   
-  //   used_for_inventory: formData.used_for_inventory ? 'true' : 'false', 
-  // };
+ 
 
   try {
-    const response = await axios.post('http:/16.171.145.107/pos/products/add_product');
+    const response = await axios.post('http://16.171.145.107/pos/products/add_product');
     if (response.status === 201 || response.status === 200) {
       alert('Product published successfully!');
       history.push('/Product/AllProducts'); 
@@ -307,53 +437,65 @@ const handlePublish = async () => {
                   required
                 />
               </label>
-              <label>
-                Head Category:
-                <select
-                  name="head_category"
-                  value={formData.head_category}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Head Category</option>
-                  {headCategories.map((item) => (
-                    <option key={item.hc_name} value={item.hc_name}>{item.hc_name}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Parent Category:
-                <select
-                  name="parent_category"
-                  value={formData.parent_category}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Parent Category</option>
-                  {parentCategories.map((item) => (
-                    <option key={item.pc_name} value={item.pc_name}>{item.pc_name}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Category:
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map((item) => (
-                    <option key={item.category_name} value={item.category_name}>{item.category_name}</option>
-                  ))}
-                </select>
-              </label>
+             {/* Head Category Dropdown */}
+      <div >
+        <label>Head Category</label>
+        <select value={selectedHeadCategory} 
+        onChange={handleHeadCategoryChange}>
+          <option value="">Select Head Category</option>
+          {headCategories.map((headCategory) => (
+            <option key={headCategory.hc_name} value={headCategory.hc_name}>
+              {headCategory.hc_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Parent Category Dropdown */}
+      <div>
+        <label>Parent Category</label>
+        <select value={selectedParentCategory} 
+        onChange={handleParentCategoryChange} disabled={!selectedHeadCategory}>
+          <option value="">Select Parent Category</option>
+          {parentCategories.map((parentCategory) => (
+            <option key={parentCategory.pc_name} value={parentCategory.pc_name}>
+              {parentCategory.pc_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Category Dropdown */}
+      <div>
+        <label>Category</label>
+        <select value={selectedCategory} onChange={handleCategoryChange} disabled={!selectedParentCategory}>
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category.category_name} value={category.category_name}>
+              {category.category_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Subcategory Dropdown */}
+      <div>
+        <label>Subcategory</label>
+        <select value={selectedsubCategory} onChange={(e) => setSelectedsubCategory(e.target.value)} disabled={!selectedCategory}>
+          <option value="">Select Subcategory</option>
+          {subcategories.map((subCategory) => (
+            <option key={subCategory.sub_category_name} value={subCategory.sub_category_name}>
+              {subCategory.sub_category_name}
+            </option>
+          ))}
+        </select>
+      </div>
               <label>
               Brands:
               <select>
     {brands.map(brand => (
         <option key={brand.id} value={brand.id}>
-            {brand.brand_name} {/* Adjust according to your data structure */}
+            {brand.brand_name} 
         </option>
     ))}
 </select>
