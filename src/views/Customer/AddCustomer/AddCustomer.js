@@ -154,8 +154,8 @@ const AddCustomer = () => {
 
         {/* Customer Channel */}
         <div>
-          <label>Customer Channel:</label>
-          <select name="customerChannel" value={formData.customerChannel} onChange={handleChange}>
+          <label>Customer Channel: *</label>
+          <select name="customerChannel" value={formData.customerChannel} onChange={handleChange} required>
             <option value="">Select Channel</option>
             {customerChannels.map((channel) => (
               <option key={channel.id} value={channel.customer_channel}>{channel.customer_channel}</option>
@@ -166,8 +166,8 @@ const AddCustomer = () => {
 
         {/* Customer Type */}
         <div>
-          <label>Customer Type:</label>
-          <select name="customerType" value={formData.customerType} onChange={handleChange}>
+          <label>Customer Type: *</label>
+          <select name="customerType" value={formData.customerType} onChange={handleChange} required>
             <option value="">Select Type</option>
             {customerTypes.map((type) => (
               <option key={type.id} value={type.customer_type}>{type.customer_type}</option>
@@ -178,18 +178,18 @@ const AddCustomer = () => {
 
         {/* Full Name */}
         <div>
-          <label>First Name:</label>
+          <label>First Name: *</label>
           <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} required />
         </div>
         <div>
-          <label>Last Name:</label>
-          <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} required />
+          <label>Last Name: *</label>
+          <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} required/>
         </div>
 
         {/* Display Name */}
         <div>
           <label>Display Name:</label>
-          <input type="text" name="displayName" value={formData.displayName} onChange={handleChange} required />
+          <input type="text" name="displayName" value={formData.displayName} onChange={handleChange} />
         </div>
 
         {/* Gender */}
@@ -210,19 +210,19 @@ const AddCustomer = () => {
 
         {/* Email */}
         <div>
-          <label>Email:</label>
+          <label>Email: *</label>
           <input type="email" name="email" value={formData.email} onChange={handleChange} required />
         </div>
 
         {/* Mobile Number */}
         <div>
-          <label>Mobile Number:</label>
+          <label>Mobile #</label>
           <input type="text" name="mobileNumber" value={formData.mobileNumber} onChange={handleChange} required />
         </div>
 
         {/* International Number */}
         <div>
-          <label>International Number:</label>
+          <label>International #</label>
           <input type="text" name="internationalNumber" value={formData.internationalNumber} onChange={handleChange} />
         </div>
 

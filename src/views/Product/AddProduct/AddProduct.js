@@ -64,7 +64,7 @@ const fetchHeadCategories = async () => {
   }
 };
 
-// Fetch Parent Categories based on selected Head Category
+
 const handleHeadCategoryChange = async (e) => {
   const headCategoryId = e.target.value;
   setSelectedHeadCategory(headCategoryId);
@@ -77,8 +77,8 @@ const handleHeadCategoryChange = async (e) => {
 
   if (headCategoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/add_parent_category/${encodeURIComponent(headCategoryId)}/`);
-      setParentCategories(response.data); // Only relevant parent categories
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_head_to_parent_category/head_category_name/${headCategoryId}/`);
+      setParentCategories(response.data); 
     } catch (error) {
       console.error('Error fetching parent categories:', error);
       setError('Failed to load parent categories. Please try again later.');
@@ -98,7 +98,7 @@ const handleParentCategoryChange = async (e) => {
 
   if (parentCategoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/add_category/${encodeURIComponent(parentCategoryId)}/`);
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_parent_to_category/parent_category_name/${encodeURIComponent(parentCategoryId)}/`);
       setCategories(response.data); // Only relevant categories
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -116,8 +116,8 @@ const handleCategoryChange = async (e) => {
 
   if (categoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/add_sub_category/${encodeURIComponent(categoryId)}/`);
-      setSubCategories(response.data); // Only relevant subcategories
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_category_to_sub_category/category_name/${encodeURIComponent(categoryId)}/`);
+      setSubCategories(response.data); 
     } catch (error) {
       console.error('Error fetching subcategories:', error);
       setError('Failed to load subcategories. Please try again later.');
@@ -457,7 +457,7 @@ const handlePublish = async () => {
         <select value={selectedParentCategory} 
         onChange={handleParentCategoryChange} disabled={!selectedHeadCategory}>
           <option value="">Select Parent Category</option>
-          {parentCategories.map((parentCategory) => (
+          {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
             <option key={parentCategory.pc_name} value={parentCategory.pc_name}>
               {parentCategory.pc_name}
             </option>

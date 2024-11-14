@@ -310,7 +310,7 @@ const AddParentCategory = () => {
             {errorMessage && <p className="text-danger">{errorMessage}</p>}
             <CForm onSubmit={handleSubmit}>
               <div className="mb-3">
-                <CFormLabel htmlFor="categoryHead">Category Head</CFormLabel>
+                <CFormLabel htmlFor="categoryHead">Category Head *</CFormLabel>
                 <CFormSelect
                   id="categoryHead"
                   value={hc_name}
@@ -328,7 +328,7 @@ const AddParentCategory = () => {
                
               </div>
               <div className="mb-3">
-                <CFormLabel htmlFor="pc_name">Parent Category</CFormLabel>
+                <CFormLabel htmlFor="pc_name">Parent Category *</CFormLabel>
                 <CFormInput
                   type="text"
                   id="pc_name"
@@ -344,7 +344,7 @@ const AddParentCategory = () => {
                   id="symbol"
                   value={symbol}
                   onChange={(e) => setShortForm(e.target.value)}
-                  required
+                  
                 />
               </div>
               <div className="mb-3">
@@ -354,7 +354,7 @@ const AddParentCategory = () => {
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  required
+                  
                 />
               </div>
               <div className="mb-3">
