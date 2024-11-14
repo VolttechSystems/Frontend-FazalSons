@@ -237,7 +237,7 @@ const AddStock = () => {
         >
           <option value="">Select Product</option>
           {productList.map((product) => (
-            <option key={product.product_name} value={product.product_name}>
+            <option key={product.product_code} value={product.product_code}>
               {product.product_name}
             </option>
           ))}
