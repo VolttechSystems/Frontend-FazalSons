@@ -44,6 +44,26 @@ const _nav = [
         name: 'Register Systems',
         to: '/base/RegisterSystem',
       },
+      
+     
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Admin',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Salesman',
+        to: '/Admin/Salesman',
+      },
+      {
+        component: CNavItem,
+        name: 'Customer',
+        to: '/Admin/Customer',
+      },
+      
      
     ],
   },

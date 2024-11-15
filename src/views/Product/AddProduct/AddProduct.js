@@ -438,7 +438,7 @@ const handlePublish = async () => {
                 />
               </label>
              {/* Head Category Dropdown */}
-      <div >
+      
         <label>Head Category</label>
         <select value={selectedHeadCategory} 
         onChange={handleHeadCategoryChange}>
@@ -449,10 +449,10 @@ const handlePublish = async () => {
             </option>
           ))}
         </select>
-      </div>
+      
 
       {/* Parent Category Dropdown */}
-      <div>
+      
         <label>Parent Category</label>
         <select value={selectedParentCategory} 
         onChange={handleParentCategoryChange} disabled={!selectedHeadCategory}>
@@ -463,10 +463,10 @@ const handlePublish = async () => {
             </option>
           ))}
         </select>
-      </div>
+      
 
       {/* Category Dropdown */}
-      <div>
+      
         <label>Category</label>
         <select value={selectedCategory} onChange={handleCategoryChange} disabled={!selectedParentCategory}>
           <option value="">Select Category</option>
@@ -476,10 +476,10 @@ const handlePublish = async () => {
             </option>
           ))}
         </select>
-      </div>
+      
 
       {/* Subcategory Dropdown */}
-      <div>
+      
         <label>Subcategory</label>
         <select value={selectedsubCategory} onChange={(e) => setSelectedsubCategory(e.target.value)} disabled={!selectedCategory}>
           <option value="">Select Subcategory</option>
@@ -489,7 +489,7 @@ const handlePublish = async () => {
             </option>
           ))}
         </select>
-      </div>
+      
               <label>
               Brands:
               <select>

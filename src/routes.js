@@ -8,7 +8,9 @@ const Typography = React.lazy(() => import('./views/theme/typography/Typography'
 
 
 const POS = React.lazy(() => import('./views/base/POS/POSTable'))
+const Salesman = React.lazy(() => import('./views/Admin/Salesman/Salesman'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
+const Transections = React.lazy(() => import('./views/base/Transections/Transections'))
 const AllProducts = React.lazy(() => import('./views/Product/AllProducts/AllProducts'))
 const Brands = React.lazy(() => import('./views/Product/Brands/Brands'))
 const AddBrands = React.lazy(() => import('./views/Product/AddBrands/AddBrands'))
@@ -33,6 +35,7 @@ const AddOutlet = React.lazy(() => import('./views/Outlet/AddOutlet/AddOutlet'))
 const FetchAttributes = React.lazy(() => import('./views/Product/FetchAttributes/FetchAttributes'))
 
 
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
@@ -42,6 +45,7 @@ const routes = [
   
   { path: '/base/POS', name: 'POS', element: POS }, // POS
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
+  { path: '/Admin/Salesman', name: 'Salesman', element: Salesman }, // Salesman
   { path: '/Product/AllProducts', name: 'AllProducts', element: AllProducts }, //AllProducts
   { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
@@ -70,6 +74,7 @@ const routes = [
   { path: '/Outlet/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
   { path: '/Product/FetchAttributes', name: 'FetchAttributes', element: FetchAttributes }, // FetchAttributes
   { path: '/Product/AddSubCategory/:id', name: 'EditCategory', element: AddSubCategory }, // Edit SubCategory
+  { path: '/base/Transections', name: 'Transections', element: Transections }, // Transections
   
  
 ]
