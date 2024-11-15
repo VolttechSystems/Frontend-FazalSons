@@ -192,6 +192,8 @@
 // };
 
 // export default Salesman;
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Salesman.css';
