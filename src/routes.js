@@ -61,6 +61,7 @@ const routes = [
   { path: '/Product/AddVariations', name: 'AddVariations', element: AddVariations }, //AddAttributes
   { path: '/Product/AddVariations/:id', name: 'EditVariations', element: AddVariations }, // Edit Variations
   { path: '/Product/AddCategory/:id', name: 'EditCategory', element: AddCategory }, // Edit Category
+  { path: '/Product/AddProduct/:id', name: 'EditProduct', element: AddProduct }, // editProduct
   { path: '/Product/AddAttributeType', name: 'AddAttributeType', element: AddAttributeType }, // AddAttributeType
   { path: '/Product/Category', name: 'Category', element: Category }, //Category
   { path: '/Product/AddCategory', name: 'AddCategory', element: AddCategory }, //AddCategory

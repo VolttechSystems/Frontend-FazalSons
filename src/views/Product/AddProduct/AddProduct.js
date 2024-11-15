@@ -6,6 +6,9 @@ import Tabs from "@mui/material/Tabs";
 import axios from 'axios';
 import Select from 'react-select';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 
@@ -77,7 +80,7 @@ const handleHeadCategoryChange = async (e) => {
 
   if (headCategoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_head_to_parent_category/head_category_name/${headCategoryId}/`);
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`);
       setParentCategories(response.data); 
     } catch (error) {
       console.error('Error fetching parent categories:', error);
@@ -98,7 +101,7 @@ const handleParentCategoryChange = async (e) => {
 
   if (parentCategoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_parent_to_category/parent_category_name/${encodeURIComponent(parentCategoryId)}/`);
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`);
       setCategories(response.data); // Only relevant categories
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -116,7 +119,7 @@ const handleCategoryChange = async (e) => {
 
   if (categoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_category_to_sub_category/category_name/${encodeURIComponent(categoryId)}/`);
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`);
       setSubCategories(response.data); 
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -287,7 +290,6 @@ const handleEdit = async (id,e) => {
 
 const handleUpdate = async () => {
   if (editProductId) {
-   
     const updatedProductData = {
       ...formData,
       color: formData.color.join(','), 
@@ -298,29 +300,29 @@ const handleUpdate = async () => {
     try {
       const response = await axios.put(`http://16.171.145.107/pos/products/action_temp_product/${editProductId}/`, updatedProductData); 
       if (response.status === 200 || response.status === 201) {
-       
         const updatedProductList = productList.map((product) =>
           product.id === editProductId
             ? { ...product, ...updatedProductData }
             : product
         );
         setProductList(updatedProductList);
-        alert('Product updated successfully!');
         
+        // Success Toast
+        toast.success('Product updated successfully!');
       } else {
-        alert('Failed to update the product. Please try again.');
+        // Failure Toast
+        toast.error('Failed to update the product. Please try again.');
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('An error occurred while updating the product.');
+      
+      // Error Toast
+      toast.error('An error occurred while updating the product.');
     }
-    
   }
   resetForm(); 
 };
 
-
- 
   
 const handleDelete = async (id) => {
   try {
@@ -616,7 +618,7 @@ const handlePublish = async () => {
                 />
               </label>
               {/* <button type="button" onClick={handleAdd}>Add Product</button> */}
-              <button type="button" onClick={editMode ? handleUpdate : handleAdd}>
+              <button type="button" onClick={editMode ? handleUpdate : handleAdd}> 
     {editMode ? 'Update Product' : 'Add Product'}
   </button>
 

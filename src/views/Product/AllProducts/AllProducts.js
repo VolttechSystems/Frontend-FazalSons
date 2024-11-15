@@ -41,7 +41,7 @@ const AllProducts = () => {
       try {
         await axios.delete(`http://16.171.145.107/pos/products/action_product/${id}/`);
         alert('Product deleted successfully!');
-        fetchProducts(); // Call fetchProducts again to refresh the list after deletion
+        fetchProducts(); 
       } catch (error) {
         console.error('Error deleting Product:', error);
         alert('Failed to delete Product.');
@@ -51,8 +51,12 @@ const AllProducts = () => {
 
   const handleEdit = (id) => {
     console.log("Editing Product with ID:", id);
-    navigate(`/Product/AddProduct/${id}`); 
+    navigate(`/Product/AddProduct/${id}`); // Navigates to the AddProduct page with product ID
   };
+  
+
+ 
+
 
   return (
     <div>
@@ -96,6 +100,7 @@ const AllProducts = () => {
               <td>
                 <button onClick={() => handleEdit(product.id)} style={{ marginRight: '8px' }}>Edit</button>
                 <button onClick={() => handleDelete(product.id)} style={{ marginLeft: '8px' }}>Delete</button>
+                
               </td>
             </tr>
           ))}
