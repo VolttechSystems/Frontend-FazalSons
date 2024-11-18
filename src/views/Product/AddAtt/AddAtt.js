@@ -248,13 +248,13 @@ class AddAtt extends Component {
           <div key={attrIndex} style={{ marginBottom: "20px" }}>
             {/* Attribute Name */}
             <label htmlFor={`attributeName-${attrIndex}`} style={{ marginRight: "10px" }}>
-              Attribute {attrIndex + 1}
+              Attribute Group {attrIndex + 1}
             </label>
             <input
               type="text"
               name="attributeName"
               id={`attributeName-${attrIndex}`}
-              placeholder={`Attribute ${attrIndex + 1}`}
+              placeholder={`Attribute Group ${attrIndex + 1}`}
               value={attribute.attributeName}
               onChange={(e) => this.handleInputChange(e, attrIndex)}
               onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
@@ -271,12 +271,12 @@ class AddAtt extends Component {
               {attribute.variations.map((variation, varIndex) => (
                 <div key={varIndex} style={{ marginBottom: "10px" }}>
                   <label htmlFor={`variation-${attrIndex}-${varIndex}`} style={{ marginRight: "10px" }}>
-                    Variation {varIndex + 1}
+                    Attribute {varIndex + 1}
                   </label>
                   <input
                     type="text"
                     id={`variation-${attrIndex}-${varIndex}`}
-                    placeholder={`Variation ${varIndex + 1}`}
+                    placeholder={`Attribute ${varIndex + 1}`}
                     value={variation}
                     onChange={(e) =>
                       this.handleVariationChange(e, attrIndex, varIndex)
