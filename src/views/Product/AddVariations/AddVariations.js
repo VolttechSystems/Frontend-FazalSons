@@ -30,7 +30,7 @@ const AddVariations = () => {
   useEffect(() => {
     const fetchAttributes = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute'); // Replace with your API endpoint
+        const response = await axios.get('http://16.171.145.107/pos/products/add_attribute'); 
         setAttributes(response.data); // Assuming response.data contains an array of attributes
       } catch (error) {
         console.error('Error fetching attributes:', error);
@@ -41,7 +41,7 @@ const AddVariations = () => {
     if (id) {
       const fetchVariationDetails = async () => {
         try {
-          const response = await axios.get(`http://16.170.232.76/pos/products/action_variation/${id}/`);
+          const response = await axios.get(`http://16.171.145.107/pos/products/action_variation/${id}/`);
           const variation = response.data;
           setVariationName(variation.variation_name);
           setShortForm(variation.symbol);
@@ -78,11 +78,11 @@ const AddVariations = () => {
     try {
       if (id) {
         
-        await axios.put(`http://16.170.232.76/pos/products/action_variation/${id}/`, variationData);
+        await axios.put(`http://16.171.145.107/pos/products/action_variation/${id}/`, variationData);
         alert('Variation updated successfully!');
       } else {
         
-        await axios.post('http://16.170.232.76/pos/products/add_variation', variationData);
+        await axios.post('http://16.171.145.107/pos/products/add_variation', variationData);
         alert('Brand added successfully!');
       }
       navigate('/Product/Variations'); 

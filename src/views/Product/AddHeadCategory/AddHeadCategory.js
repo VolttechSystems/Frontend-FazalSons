@@ -32,7 +32,7 @@ const AddHeadCategory = () => {
   
   const fetchHeadCategory = async () => {
     try {
-      const response = await axios.get('http://16.170.232.76/pos/products/add_head_category');
+      const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
       setTypes(response.data); 
     } catch (error) {
       console.error('Error fetching category head:', error);
@@ -47,11 +47,11 @@ const AddHeadCategory = () => {
     try {
       if (editingIndex !== null) {
         
-        await axios.put(`http://16.170.232.76/pos/products/action_head_category/${types[editingIndex].id}/`, requestData);
+        await axios.put(`http://16.171.145.107/pos/products/action_head_category/${types[editingIndex].id}/`, requestData);
         setEditingIndex(null); 
       } else {
        
-        await axios.post('http://16.170.232.76/pos/products/add_head_category', requestData);
+        await axios.post('http://16.171.145.107/pos/products/add_head_category', requestData);
       }
       // Reset the form
       setHCname('');
@@ -79,7 +79,7 @@ const AddHeadCategory = () => {
   const handleDelete = async (index) => {
     const id = types[index].id; // Assuming each type has a unique `id`
     try {
-      await axios.delete(`http://16.170.232.76/pos/products/action_head_category/${id}/`);
+      await axios.delete(`http://16.171.145.107/pos/products/action_head_category/${id}/`);
       fetchHeadCategory(); 
     } catch (error) {
       console.error('Error deleting category head:', error);

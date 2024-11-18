@@ -1,6 +1,7 @@
-// import React from 'react'
+
+// import React, { useEffect, useState } from 'react';
 // import {
-//     CButton,
+//   CButton,
 //   CCard,
 //   CCardBody,
 //   CCardHeader,
@@ -8,74 +9,106 @@
 //   CRow,
 //   CTable,
 //   CTableBody,
-//   CTableCaption,
 //   CTableDataCell,
-//   CTableHead,
 //   CTableHeaderCell,
 //   CTableRow,
-// } from '@coreui/react'
-// import { Link } from 'react-router-dom'; // Import Link here
-// import { DocsExample } from 'src/components'
+// } from '@coreui/react';
+// import { Link, useNavigate } from 'react-router-dom';
+// import axios from 'axios';
 
 // const Attributes = () => {
+//   const [attributes, setAttributes] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState('');
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     fetchAttributes();
+//   }, []);
+
+//   const fetchAttributes = async () => {
+//     try {
+//       const response = await axios.get('http://16.170.232.76/pos/products/add_attributes');
+//       setAttributes(response.data);
+//       setLoading(false);
+//     } catch (error) {
+//       console.error('Error fetching attributes:', error);
+//       setError('Failed to fetch attributes.');
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleDelete = async (id) => {
+//     if (window.confirm('Are you sure you want to delete this attribute?')) {
+//       try {
+//         await axios.delete(`http://16.170.232.76/pos/products/action_attributes/${id}/`);
+//         alert('Attribute deleted successfully!');
+//         fetchAttributes();
+//       } catch (error) {
+//         console.error('Error deleting attribute:', error);
+//         alert('Failed to delete attribute.');
+//       }
+//     }
+//   };
+
+//   const handleEdit = (id) => {
+//     navigate(`/Product/AddAttributes/${id}`);
+//   };
+
 //   return (
 //     <CRow>
-//         <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-//         <Link to="/Product/AddAttributes">
-//       <CButton href="#" color="primary" className="me-md-2">Add Attributes</CButton>
-//       </Link>         
-//         </div>
-//       <CCol>
-      
-//         <CCard className="mb-4">
+//       <CCol xs={12}>
+//         <CCard className="mb-3">
 //           <CCardHeader>
-//             <strong>Attributes</strong> <small></small>
+//             <strong>All Attributes</strong>
 //           </CCardHeader>
 //           <CCardBody>
-//             {/* <DocsExample href="components/table#table-foot"> */}
-//               <CTable>
-//                 <CTableHead color="light">
+//             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+//               <Link to="/Product/AddAttributes">
+//                 <CButton color="primary" className="me-md-2">Add Attribute</CButton>
+//               </Link>
+//             </div>
+//             {loading && <p>Loading Attributes...</p>}
+//             {error && <p className="text-danger">{error}</p>}
+//             {!loading && !error && (
+//               <CTable striped>
+//                 <thead>
 //                   <CTableRow>
-//                     <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Proposal No.</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Proposal Name</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Client</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Power Company</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">View | DL</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+//                     <CTableHeaderCell>Sr.#</CTableHeaderCell>
+//                     <CTableHeaderCell>Attribute Name</CTableHeaderCell>
+//                     <CTableHeaderCell>Short Form/Symbol</CTableHeaderCell>
+//                     <CTableHeaderCell>Description</CTableHeaderCell>
+//                     <CTableHeaderCell>Status</CTableHeaderCell>
+//                     <CTableHeaderCell>Actions</CTableHeaderCell>
 //                   </CTableRow>
-//                   <CTableRow>
-//                     <CTableHeaderCell scope="row">  </CTableHeaderCell>
-//                     <CTableDataCell colSpan={2}>  </CTableDataCell>
-//                     <CTableDataCell>  </CTableDataCell>
-//                     <CTableDataCell>  </CTableDataCell>
-//                     <CTableDataCell>  </CTableDataCell>
-//                     <CTableDataCell>  </CTableDataCell>
-                    
-//                   </CTableRow>
-               
-//                   <CTableRow>
-                  
-//                   <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Proposal No.</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Proposal Name</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Client</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Power Company</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">View | DL</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-//                   </CTableRow>
-//                 </CTableHead>
-                
+//                 </thead>
+//                 <CTableBody>
+//                   {attributes.map((attr, index) => (
+//                     <CTableRow key={attr.id}>
+//                       <CTableDataCell>{index + 1}</CTableDataCell>
+//                       <CTableDataCell>{attr.attribute_name}</CTableDataCell>
+//                       <CTableDataCell>{attr.symbol}</CTableDataCell>
+//                       <CTableDataCell>{attr.description}</CTableDataCell>
+//                       <CTableDataCell>{attr.status}</CTableDataCell>
+//                       <CTableDataCell>
+//                         <CButton color="warning" onClick={() => handleEdit(attr.id)}>Edit</CButton>
+//                         <CButton color="danger" onClick={() => handleDelete(attr.id)} className="ms-2">Delete</CButton>
+//                       </CTableDataCell>
+//                     </CTableRow>
+//                   ))}
+//                 </CTableBody>
 //               </CTable>
-//             {/* </DocsExample> */}
+//             )}
 //           </CCardBody>
 //         </CCard>
 //       </CCol>
-//       </CRow>
-//     )
-// }
+//     </CRow>
+//   );
+// };
 
-// export default Attributes
+// export default Attributes;
+
+
 import React, { useEffect, useState } from 'react';
 import {
   CButton,
@@ -87,71 +120,103 @@ import {
   CTable,
   CTableBody,
   CTableDataCell,
-  CTableHead,
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const Loader = () => {
+  return (
+    <div className="text-center my-5">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
+};
+
 const Attributes = () => {
-  const [attributes, setAttributes] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(''); 
-  
+  const [attributes, setAttributes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAttributes = async () => {
-      try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_attribute'); // Replace with your API endpoint
-        setAttributes(response.data); // Assuming the response contains the list of attributes
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching attributes:', error);
-        setError('Failed to fetch attributes.');
-        setLoading(false);
-      }
-    };
-
     fetchAttributes();
   }, []);
 
+  const fetchAttributes = async () => {
+    try {
+      const response = await axios.get('http://16.171.145.107/pos/products/add_attributes');
+      setAttributes(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching attributes:', error);
+      setError('Failed to fetch attributes.');
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this attribute?')) {
+      try {
+        await axios.delete(`http://16.171.145.107/pos/products/action_attributes/${id}/`);
+        alert('Attribute deleted successfully!');
+        fetchAttributes();
+      } catch (error) {
+        console.error('Error deleting attribute:', error);
+        alert('Failed to delete attribute.');
+      }
+    }
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/Product/AddAttributes/${id}`);
+  };
+
   return (
     <CRow>
-      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Link to="/Product/AddAttributes">
-          <CButton color="primary" className="me-md-2">Add Attribute</CButton>
-        </Link>
-      </div>
-      <CCol>
-        <CCard className="mb-4">
+      <CCol xs={12}>
+        <CCard className="mb-3">
           <CCardHeader>
             <strong>All Attributes</strong>
           </CCardHeader>
           <CCardBody>
-            {loading && <p>Loading attributes...</p>}
+          {loading && <Loader />}
+            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+              <Link to="/Product/AddAttributes">
+                <CButton color="primary" className="me-md-2">Add Attribute</CButton>
+              </Link>
+            </div>
+            {loading && <p>Loading Attributes...</p>}
             {error && <p className="text-danger">{error}</p>}
             {!loading && !error && (
-              <CTable>
-                <CTableHead color="light">
+              <CTable striped>
+                <thead>
                   <CTableRow>
-                    <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Attribute Type</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Attribute</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Short Form/Symbol</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Description</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+                    <CTableHeaderCell>Sr.#</CTableHeaderCell>
+                    <CTableHeaderCell>Attribute Name</CTableHeaderCell>
+                    <CTableHeaderCell>Short Form/Symbol</CTableHeaderCell>
+                    <CTableHeaderCell>Description</CTableHeaderCell>
+                    <CTableHeaderCell>Attribute Type</CTableHeaderCell> {/* Added this line */}
+                    <CTableHeaderCell>Status</CTableHeaderCell>
+                    <CTableHeaderCell>Actions</CTableHeaderCell>
                   </CTableRow>
-                </CTableHead>
+                </thead>
                 <CTableBody>
-                  {attributes.map((attribute, index) => (
-                    <CTableRow key={attribute.id}>
+                  {attributes.map((attr, index) => (
+                    <CTableRow key={attr.id}>
                       <CTableDataCell>{index + 1}</CTableDataCell>
-                      <CTableDataCell>{attribute.type}</CTableDataCell> {/* Example: 'Color' or 'Size' */}
-                      <CTableDataCell>{attribute.attribute_name}</CTableDataCell> {/* Attribute name */}
-                      <CTableDataCell>{attribute.symbol}</CTableDataCell> {/* Short form or symbol */}
-                      <CTableDataCell>{attribute.description}</CTableDataCell> {/* Description */}
-                      <CTableDataCell>{attribute.status}</CTableDataCell> {/* Status: 'Active', 'Pending', 'Inactive' */}
+                      <CTableDataCell>{attr.attribute_name}</CTableDataCell>
+                      <CTableDataCell>{attr.symbol}</CTableDataCell>
+                      <CTableDataCell>{attr.description}</CTableDataCell>
+                      <CTableDataCell>{attr.att_type}</CTableDataCell> {/* Added this line */}
+                      <CTableDataCell>{attr.status}</CTableDataCell>
+                      <CTableDataCell>
+                        <CButton color="warning" onClick={() => handleEdit(attr.id)}>Edit</CButton>
+                        <CButton color="danger" onClick={() => handleDelete(attr.id)} className="ms-2">Delete</CButton>
+                      </CTableDataCell>
                     </CTableRow>
                   ))}
                 </CTableBody>

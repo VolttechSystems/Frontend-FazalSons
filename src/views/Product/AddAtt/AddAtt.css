@@ -1,0 +1,80 @@
+.add-att-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 30px;
+    text-align: left;
+    margin-bottom: 30px;
+  }
+  
+  /* Input fields */
+  input[type="text"] {
+    width: calc(100% - 20px); /* Full width minus padding */
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Label styling */
+  label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  
+  /* Attribute and Variation containers */
+  .attribute-container {
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Variations */
+  .variation-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Flex for input and button */
+  .input-button-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-button-container input {
+    width: calc(100% - 120px); /* Adjust width to leave space for the button */
+  }
+  
+  button {
+    padding: 8px 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 5px;
+  }
+  
+  /* Compact button size */
+  button.add-variation-button,
+  button + button {
+    width: auto;
+    margin-left: 10px;
+  }
+  
+  /* Button hover effects */
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  button:focus {
+    outline: none;
+  }
+  

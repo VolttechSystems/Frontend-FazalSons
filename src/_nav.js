@@ -21,27 +21,9 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    // badge: {
-    //   color: 'info',
-    //   text: 'NEW',
-    // },
+    
   },
-  // {
-  //   component: CNavTitle,
-  //   name: 'Components',
-  // },
-  // {
-  //   component: CNavItem,
-  //   name: 'Colors',
-  //   to: '/theme/colors',
-  //   icon: <CIcon icon={cilDrop} customClassName="nav-icon" />,
-  // },
-  // {
-  //   component: CNavItem,
-  //   name: 'Typography',
-  //   to: '/theme/typography',
-  //   icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
-  // },
+  
   {
     component: CNavTitle,
     name: 'Components',
@@ -62,71 +44,27 @@ const _nav = [
         name: 'Register Systems',
         to: '/base/RegisterSystem',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Cards',
-      //   to: '/base/cards',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Carousel',
-      //   to: '/base/carousels',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Collapse',
-      //   to: '/base/collapses',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'List group',
-      //   to: '/base/list-groups',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Navs & Tabs',
-      //   to: '/base/navs',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Pagination',
-      //   to: '/base/paginations',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Placeholders',
-      //   to: '/base/placeholders',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Popovers',
-      //   to: '/base/popovers',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Progress',
-      //   to: '/base/progress',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Spinners',
-      //   to: '/base/spinners',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Tables',
-      //   to: '/base/tables',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Tabs',
-      //   to: '/base/tabs',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Tooltips',
-      //   to: '/base/tooltips',
-      // },
+      
+     
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Admin',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Salesman',
+        to: '/Admin/Salesman',
+      },
+      {
+        component: CNavItem,
+        name: 'Outlet',
+        to: '/Admin/AddOutlet',
+      },
+      
+     
     ],
   },
   {
@@ -159,57 +97,18 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Customers',
-    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    name: 'Customer',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon"/>,
     items: [
       {
         component: CNavItem,
         name: 'Add Customer',
-        to: '/forms/form-control',
+        to: '/Customer/AddCustomer',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Select',
-      //   to: '/forms/select',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Checks & Radios',
-      //   to: '/forms/checks-radios',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Range',
-      //   to: '/forms/range',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Input Group',
-      //   to: '/forms/input-group',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Floating Labels',
-      //   to: '/forms/floating-labels',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Layout',
-      //   to: '/forms/layout',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Validation',
-      //   to: '/forms/validation',
-      // },
+     
     ],
   },
-  // {
-  //   component: CNavItem,
-  //   name: 'Charts',
-  //   to: '/charts',
-  //   icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
-  // },
+  
   {
     component: CNavGroup,
     name: 'Product',
@@ -219,15 +118,12 @@ const _nav = [
         component: CNavItem,
         name: 'All Product',
         to: '/Product/AllProducts',
-        // badge: {
-        //   color: 'success',
-        //   text: 'NEW',
-        // },
+        
       },
       {
         component: CNavItem,
         name: 'Add Product',
-        to: '/icons/flags',
+        to: '/Product/AddProduct',
       },
       {
         component: CNavItem,
@@ -249,11 +145,7 @@ const _nav = [
         name: 'Brands',
         to: '/Product/Brands',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'AddBrands',
-      //   to: '/Product/AddBrands',
-      // },
+      
       {
         component: CNavItem,
         name: 'Attributes',
@@ -264,6 +156,12 @@ const _nav = [
         name: 'Variations',
         to: '/Product/Variations',
       },
+      {
+        component: CNavItem,
+        name: 'Add Attribute',
+        to: '/Product/AddAtt',
+      },
+      
     ],
   },
   {
@@ -274,72 +172,46 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Add Stock',
-        to: '/notifications/alerts',
+        to: '/Stock/AddStock',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Badges',
-      //   to: '/notifications/badges',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Modal',
-      //   to: '/notifications/modals',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Toasts',
-      //   to: '/notifications/toasts',
-      // },
+      
     ],
   },
-  // {
-  //   component: CNavItem,
-  //   name: 'Widgets',
-  //   to: '/widgets',
-  //   icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
-  //   badge: {
-  //     color: 'info',
-  //     text: 'NEW',
-  //   },
-  // },
-  {
-    component: CNavTitle,
-    name: 'Extras',
-  },
-  {
-    component: CNavGroup,
-    name: 'Pages',
-    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Login',
-        to: '/login',
-      },
-      {
-        component: CNavItem,
-        name: 'Register',
-        to: '/register',
-      },
-      {
-        component: CNavItem,
-        name: 'Error 404',
-        to: '/404',
-      },
-      {
-        component: CNavItem,
-        name: 'Error 500',
-        to: '/500',
-      },
-    ],
-  },
-  // {
-  //   component: CNavItem,
-  //   name: 'Docs',
-  //   href: 'https://coreui.io/react/docs/templates/installation/',
-  //   icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
-  // },
+
+  
+  
+//   {
+//     component: CNavTitle,
+//     name: 'Extras',
+//   },
+//   {
+//     component: CNavGroup,
+//     name: 'Pages',
+//     icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
+//     items: [
+//       {
+//         component: CNavItem,
+//         name: 'Login',
+//         to: '/login',
+//       },
+//       {
+//         component: CNavItem,
+//         name: 'Register',
+//         to: '/register',
+//       },
+//       {
+//         component: CNavItem,
+//         name: 'Error 404',
+//         to: '/404',
+//       },
+//       {
+//         component: CNavItem,
+//         name: 'Error 500',
+//         to: '/500',
+//       },
+//     ],
+//   },
+  
 ]
 
 export default _nav

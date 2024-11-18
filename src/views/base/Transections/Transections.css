@@ -1,0 +1,271 @@
+/* Transections.css */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.transactions-page {
+    padding: 20px;
+    color: #333;
+    background-color: #f4f4f9;
+}
+
+/* Header Styling */
+.t-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #2c3e50;
+    color: #fff;
+}
+
+.t-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+.t-header-info {
+    display: flex;
+    gap: 15px;
+}
+
+.t-header-button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.t-header-button:hover {
+    background-color: #2980b9;
+}
+
+.t-date-time {
+    font-size: 12px;
+}
+
+.t-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.t-notification-badge {
+    background-color: #e74c3c;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+.t-profile-name {
+    font-weight: bold;
+}
+
+/* Customer Section */
+.customer-section {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.customer-select,
+.salesman-select,
+.barcode-input,
+.search-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.add-customer {
+    background-color: #27ae60;
+    color: #fff;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-customer:hover {
+    background-color: #2ecc71;
+}
+
+/* Product Table */
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+}
+
+.product-table th, 
+.product-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+}
+
+.product-table th {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.qty-input,
+.discount-input {
+    width: 50px;
+    text-align: center;
+}
+
+.remove-button {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remove-button:hover {
+    background-color: #c0392b;
+}
+
+
+
+
+/* Summary Section */
+.summary-section {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summary-details div {
+    font-size: 14px;
+}
+
+.invoice-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.invoice-summary div {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.payment-button {
+    background-color: #27ae60;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.payment-button:hover {
+    background-color: #2ecc71;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #2c3e50;
+    color: #fff;
+}
+/* Container for product stats and fee section */
+.sales-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+/* Styling for each statistic item (e.g., Products, Sale, Purchase, Profit) */
+.stats-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 120px; /* Adjust width as needed */
+    text-align: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stats-item h4 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.stats-item p {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3498db;
+}
+
+/* Fee section dropdowns, aligned side-by-side */
+.fee-select {
+    display: flex;
+    align-items: center;
+    width: 48%; /* Adjust width for side-by-side layout */
+    margin-bottom: 15px;
+    background-color: #fff;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fee-select label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 10px;
+    width: 150px;
+}
+
+.additional-fee-select, .delivery-fee-select {
+    padding: 8px 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    width: 100%;
+    max-width: 300px;
+}
