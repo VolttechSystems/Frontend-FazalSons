@@ -130,6 +130,8 @@
 
 // export default AddAtt;
 
+
+
 import React, { Component } from "react";
 import "./AddAtt.css";
 
@@ -137,15 +139,38 @@ class AddAtt extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      attType: "", 
-      attributes: [
+      attType: "", // Attribute Type input
+      attributes: [ // List of attributes with variations
         {
-          attributeName: "", 
-          variations: [], 
+          attributeName: "",
+          variations: [],
         },
       ],
+      tableData: [], // Data to be displayed in the table
     };
   }
+
+  // Fetch existing attribute variations on component mount
+  componentDidMount() {
+    this.handleGetData();
+  }
+
+  // Fetch data from API and update table
+  handleGetData = async () => {
+    try {
+      const response = await fetch('http://16.171.145.107/pos/products/variation_group/');
+      const result = await response.json();
+      if (response.ok) {
+        this.setState({ tableData: result });
+      } else {
+        alert("Failed to fetch data");
+        console.log(result);
+      }
+    } catch (error) {
+      alert("Error fetching data");
+      console.log(error);
+    }
+  };
 
   // Handle input change for Attribute Type or Attribute Name
   handleInputChange = (e, attrIndex = null) => {
@@ -159,6 +184,7 @@ class AddAtt extends Component {
     }
   };
 
+  // Handle pressing Enter to add new variations
   handleKeyPress = (e, attrIndex) => {
     if (e.key === "Enter") {
       const updatedAttributes = [...this.state.attributes];
@@ -174,6 +200,7 @@ class AddAtt extends Component {
     this.setState({ attributes: updatedAttributes });
   };
 
+  // Add new attribute to the list
   addAttribute = () => {
     this.setState((prevState) => ({
       attributes: [
@@ -191,16 +218,21 @@ class AddAtt extends Component {
     this.setState({ attributes: updatedAttributes });
   };
 
-  // Handle submit to send data to API
+  // Handle form submission to send data to API
   handleSubmit = async () => {
+    console.log("Submitting data...");  // Add this to verify if the method is triggered
     const { attType, attributes } = this.state;
-    
+
     // Prepare payload data for the API
-    const payload = attributes.map(attribute => ({
-      att_type: attType,
-      attribute_name: attribute.attributeName,
-      variation: attribute.variations,
-    }));
+    const payload = attributes.flatMap(attribute =>
+      attribute.variations.map(variation => ({
+        att_type: attType,
+        attribute_name: attribute.attributeName,
+        variation_name: variation,
+      }))
+    );
+
+    console.log(payload);  // Log the payload to ensure it's correctly prepared
 
     try {
       const response = await fetch('http://16.171.145.107/pos/products/variation_group/', {
@@ -214,6 +246,10 @@ class AddAtt extends Component {
       if (response.ok) {
         alert("Data successfully submitted!");
         console.log(result);
+
+        // Add the newly submitted data to the table
+        const updatedTableData = [...this.state.tableData, ...payload];
+        this.setState({ tableData: updatedTableData });
       } else {
         alert("Failed to submit data");
         console.log(result);
@@ -263,7 +299,7 @@ class AddAtt extends Component {
 
             {/* Add New Attribute Button */}
             {attrIndex === this.state.attributes.length - 1 && (
-              <button onClick={this.addAttribute}>+ Add Attribute</button>
+              <button onClick={this.addAttribute}>+ Add Attribute Group</button>
             )}
 
             {/* Variations */}
@@ -286,7 +322,7 @@ class AddAtt extends Component {
                   {/* Add Variation Button */}
                   {varIndex === attribute.variations.length - 1 && (
                     <button onClick={() => this.addVariation(attrIndex)}>
-                      + Add Variation
+                      + Add Attribute
                     </button>
                   )}
                 </div>
@@ -301,6 +337,30 @@ class AddAtt extends Component {
             Submit
           </button>
         </div>
+
+        {/* Table to display the data */}
+        <div style={{ marginTop: "30px" }}>
+          <h2>Attribute Variations</h2>
+          <table border="1" style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th>Attribute Type</th>
+                <th>Attribute Name</th>
+                <th>Variation Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.tableData.map((data, index) => (
+                <tr key={index}>
+                  <td>{data.att_type}</td>
+                  <td>{data.attribute_name}</td>
+                  <td>{data.variation_name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
       </div>
     );
   }
