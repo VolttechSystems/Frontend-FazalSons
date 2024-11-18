@@ -15,6 +15,8 @@ import {
 import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
+
 const Variations = () => {
   const [variations, setVariations] = useState([]);
   const [attributes, setAttributes] = useState([]);
