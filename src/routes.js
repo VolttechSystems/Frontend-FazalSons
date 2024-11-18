@@ -31,9 +31,9 @@ const AddStock = React.lazy(() => import('./views/Stock/AddStock/AddStock'))
 const AddCustomer = React.lazy(() => import('./views/Customer/AddCustomer/AddCustomer'))
 const CustomerChannel = React.lazy(() => import('./views/Customer/CustomerChannel/CustomerChannel'))
 const CustomerType = React.lazy(() => import('./views/Customer/CustomerType/CustomerType'))
-const AddOutlet = React.lazy(() => import('./views/Outlet/AddOutlet/AddOutlet'))
+const AddOutlet = React.lazy(() => import('./views/Admin/AddOutlet/AddOutlet'))
 const FetchAttributes = React.lazy(() => import('./views/Product/FetchAttributes/FetchAttributes'))
-
+const AddAtt = React.lazy(() => import('./views/Product/AddAtt/AddAtt'))
 
 
 const routes = [
@@ -56,6 +56,7 @@ const routes = [
   { path: '/Product/AddParentCategory/:id', name: 'EditParentCategory', element: AddParentCategory }, // Edit ParentCategory
   { path: '/Product/Attributes', name: 'Attributes', element: Attributes }, //Attributes
   { path: '/Product/AddAttributes', name: 'AddAttributes', element: AddAttributes }, //AddAttributes
+  { path: '/Product/AddAtt', name: 'AddAtt', element: AddAtt }, //AddAtt
   { path: '/Product/AddAttributes/:id', name: 'EditAttributes', element: AddAttributes }, // EditAttributes
   { path: '/Product/Variations', name: 'Variations', element: Variations }, //Variations
   { path: '/Product/AddVariations', name: 'AddVariations', element: AddVariations }, //AddAttributes
@@ -72,7 +73,7 @@ const routes = [
   { path: '/Customer/AddCustomer', name: 'AddCustomer', element: AddCustomer }, //AddCustomer
   { path: '/Customer/CustomerChannel', name: 'CustomerChannel', element: CustomerChannel }, // CustomerChannel
   { path: '/Customer/CustomerType', name: 'CustomerType', element: CustomerType }, // CustomerType
-  { path: '/Outlet/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
+  { path: '/Admin/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
   { path: '/Product/FetchAttributes', name: 'FetchAttributes', element: FetchAttributes }, // FetchAttributes
   { path: '/Product/AddSubCategory/:id', name: 'EditCategory', element: AddSubCategory }, // Edit SubCategory
   { path: '/base/Transections', name: 'Transections', element: Transections }, // Transections

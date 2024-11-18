@@ -1,16 +1,41 @@
+
 // import React, { useState, useEffect } from 'react';
 // import './Transections.css';
+// import { CAlert, CButton } from '@coreui/react'; 
 
+
+// // Helper function to group products by name
+// const groupByProductName = (products) => {
+//     return products.reduce((acc, product) => {
+//       const { product_name, sku, size, color } = product;
+      
+//       // Initialize the group for this product name if it doesn't exist
+//       if (!acc[product_name]) {
+//         acc[product_name] = [];
+//       }
+      
+//       // Add the product details to the group
+//       acc[product_name].push({ sku, size, color });
+//       return acc;
+//     }, {});
+//   };
+  
+  
+  
+  
 // function Transections() {
 //     const [products, setProducts] = useState([
 //         { sku: 'YF-P1-KS-24-L-MAR', name: 'MA1 GENTS KURTA PYJAMA COMPUTER EMBROIDERY', qty: 2, price: 2995, discount: 0 },
 //         { sku: 'YF-P1-KS-25-XL-MAR', name: 'MA1 GENTS KURTA PYJAMA COMPUTER EMBROIDERY', qty: 5, price: 2995, discount: 0 }
 //     ]);
-
 //     const [salesmen, setSalesmen] = useState([]);
 //     const [additionalFees, setAdditionalFees] = useState([]);
 //     const [deliveryFees, setDeliveryFees] = useState([]);
 //     const [currentDateTime, setCurrentDateTime] = useState(new Date());
+//     const [allProducts, setAllProducts] = useState([]);
+
+//     const [alertMessage, setAlertMessage] = useState('');
+//     const [visible, setVisible] = useState(false);
 
 //     useEffect(() => {
 //         const fetchSalesmen = async () => {
@@ -49,9 +74,27 @@
 //             }
 //         };
 
+//         const fetchAllProducts = async () => {
+//             try {
+//               const response = await fetch('http://16.171.145.107/pos/transaction/all_product');
+//               const data = await response.json();
+//               console.log("Raw API Response:", data);  // Log the raw API response
+          
+//               if (Array.isArray(data)) {
+//                 const groupedData = groupByProductName(data);
+//                 console.log("Grouped Data:", groupedData);  // Log grouped data
+//                 setAllProducts(groupedData);  // Update state with grouped data
+//               }
+//             } catch (error) {
+//               console.error('Error fetching all products:', error);
+//             }
+//           };
+        
+
 //         fetchSalesmen();
 //         fetchAdditionalFees();
 //         fetchDeliveryFees();
+//         fetchAllProducts();
 
 //         const interval = setInterval(() => {
 //             setCurrentDateTime(new Date());
@@ -75,15 +118,21 @@
 //         });
 //     };
 
+//     // Function to handle button click and show alert
+//     const handleButtonClick = (message) => {
+//         setAlertMessage(message);
+//         setVisible(true);
+//     };
+
 //     return (
 //         <div className="transactions-page">
 //             <header className="t-header">
 //                 <h1 className="t-logo">FAZAL SONS</h1>
 //                 <div className="t-header-info">
-//                     <button className="t-header-button">Today Sales</button>
-//                     <button className="t-header-button">Sales Return</button>
-//                     <button className="t-header-button">Due Receivable</button>
-//                     <button className="t-header-button">Close Till</button>
+//                     <button className="t-header-button" onClick={() => handleButtonClick("Today's Sales clicked!")}>Today Sales</button>
+//                     <button className="t-header-button" onClick={() => handleButtonClick("Sales Return clicked!")}>Sales Return</button>
+//                     <button className="t-header-button" onClick={() => handleButtonClick("Due Receivable clicked!")}>Due Receivable</button>
+//                     <button className="t-header-button" onClick={() => handleButtonClick("Close Till clicked!")}>Close Till</button>
 //                     <span className="t-date-time">{formatDateTime(currentDateTime)} | IP: 39.55.138.194</span>
 //                 </div>
 //                 <div className="t-profile">
@@ -91,6 +140,11 @@
 //                     <span className="t-profile-name">Ali Tehseen</span>
 //                 </div>
 //             </header>
+
+//             {/* Displaying the alert */}
+//             <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
+//                 {alertMessage}
+//             </CAlert>
 
 //             <section className="customer-section">
 //                 <select className="customer-select">
@@ -105,8 +159,22 @@
 //                         </option>
 //                     ))}
 //                 </select>
-//                 <input className="barcode-input" placeholder="Scan Barcode" />
-//                 <input className="search-input" placeholder="Search Products SKU or Name" />
+//                 <select className="product-dropdown">
+//   <option>Select Product</option>
+//   {Object.entries(allProducts).map(([productName, productDetails]) => (
+//     <optgroup key={productName} label={productName}>
+//       {productDetails.map((product) => (
+//         <option key={product.sku} value={product.sku}>
+//           {product.sku} - Size: {product.size} - Color: {product.color}
+//         </option>
+//       ))}
+//     </optgroup>
+//   ))}
+// </select>
+
+
+
+
 //             </section>
 
 //             <table className="product-table">
@@ -176,35 +244,45 @@
 //                     <div>Gross: {totalAmount}</div>
 //                     <div>Discount: {totalDiscount}</div>
 //                     <div>Net Total: {netTotal}</div>
-//                     <button className="payment-button">Payment</button>
 //                 </div>
 //             </section>
-
-//             <footer className="footer">
-//                 <span>© Fazal Sons. All Rights Reserved.</span>
-//             </footer>
 //         </div>
 //     );
 // }
 
 // export default Transections;
 
+
 import React, { useState, useEffect } from 'react';
 import './Transections.css';
 import { CAlert, CButton } from '@coreui/react'; 
+
+// Helper function to group products by name
+const groupByProductName = (products) => {
+    return products.reduce((acc, product) => {
+      const { product_name, sku, size, color } = product;
+      
+      // Initialize the group for this product name if it doesn't exist
+      if (!acc[product_name]) {
+        acc[product_name] = [];
+      }
+      
+      // Add the product details to the group
+      acc[product_name].push({ sku, size, color });
+      return acc;
+    }, {});
+};
+
 function Transections() {
-    const [products, setProducts] = useState([
-        { sku: 'YF-P1-KS-24-L-MAR', name: 'MA1 GENTS KURTA PYJAMA COMPUTER EMBROIDERY', qty: 2, price: 2995, discount: 0 },
-        { sku: 'YF-P1-KS-25-XL-MAR', name: 'MA1 GENTS KURTA PYJAMA COMPUTER EMBROIDERY', qty: 5, price: 2995, discount: 0 }
-    ]);
+    const [products, setProducts] = useState([]);  // List of products in the table
     const [salesmen, setSalesmen] = useState([]);
     const [additionalFees, setAdditionalFees] = useState([]);
     const [deliveryFees, setDeliveryFees] = useState([]);
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
-    const [allProducts, setAllProducts] = useState([]);
-
+    const [allProducts, setAllProducts] = useState({});
     const [alertMessage, setAlertMessage] = useState('');
     const [visible, setVisible] = useState(false);
+    const [productDetails, setProductDetails] = useState({});
 
     useEffect(() => {
         const fetchSalesmen = async () => {
@@ -245,15 +323,19 @@ function Transections() {
 
         const fetchAllProducts = async () => {
             try {
-                const response = await fetch('http://16.171.145.107/pos/transaction/all_product');
-                const data = await response.json();
-                if (data && Array.isArray(data)) {
-                    setAllProducts(data); 
-                }
+              const response = await fetch('http://16.171.145.107/pos/transaction/all_product');
+              const data = await response.json();
+              console.log("Raw API Response:", data);  // Log the raw API response
+          
+              if (Array.isArray(data)) {
+                const groupedData = groupByProductName(data);
+                console.log("Grouped Data:", groupedData);  // Log grouped data
+                setAllProducts(groupedData);  // Update state with grouped data
+              }
             } catch (error) {
-                console.error('Error fetching all products:', error);
+              console.error('Error fetching all products:', error);
             }
-        };
+          };
 
         fetchSalesmen();
         fetchAdditionalFees();
@@ -288,6 +370,23 @@ function Transections() {
         setVisible(true);
     };
 
+    // Function to handle product selection from dropdown
+    const handleProductSelect = async (event) => {
+        const selectedSku = event.target.value;
+        if (selectedSku) {
+            try {
+                const response = await fetch(`http://16.171.145.107/pos/transaction/products_detail/${selectedSku}`);
+                const data = await response.json();
+                console.log("Product Details:", data); 
+                if (data && Array.isArray(data) && data.length > 0) {
+                    setProductDetails(data[0]);  
+                }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+            }
+        }
+    };
+
     return (
         <div className="transactions-page">
             <header className="t-header">
@@ -305,7 +404,7 @@ function Transections() {
                 </div>
             </header>
 
-            {/* Displaying the alert */}
+            
             <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
                 {alertMessage}
             </CAlert>
@@ -323,12 +422,16 @@ function Transections() {
                         </option>
                     ))}
                 </select>
-                <select className="product-dropdown">
+                <select className="product-dropdown" onChange={handleProductSelect}>
                     <option>Select Product</option>
-                    {allProducts.map((product) => (
-                        <option key={product.id} value={product.sku}>
-                            {product.name} - {product.sku}
-                        </option>
+                    {Object.entries(allProducts).map(([productName, productDetails]) => (
+                        <optgroup key={productName} label={productName}>
+                            {productDetails.map((product) => (
+                                <option key={product.sku} value={product.sku}>
+                                    {product.sku} - Size: {product.size} - Color: {product.color}
+                                </option>
+                            ))}
+                        </optgroup>
                     ))}
                 </select>
             </section>
