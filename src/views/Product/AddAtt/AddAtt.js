@@ -600,12 +600,12 @@ class AddAtt extends Component {
       htmlFor={`variation-${attrIndex}-${varIndex}`}
       style={{ marginRight: "10px" }}
     >
-      Variation {varIndex + 1}
+      Attribute {varIndex + 1}
     </label>
     <input
       type="text"
       id={`variation-${attrIndex}-${varIndex}`}
-      placeholder={`Variation ${varIndex + 1}`}
+      placeholder={`Attribute ${varIndex + 1}`}
       value={variation}
       onChange={(e) => this.handleVariationChange(e, attrIndex, varIndex)}
       style={{ marginRight: "10px", width: "25%" }}
@@ -631,7 +631,7 @@ class AddAtt extends Component {
           onClick={() => this.addVariation(attrIndex)}
           style={{ marginLeft: "10px" }}
         >
-          + Add Variation
+          + Add Attribute
         </button>
       )}
     </div>

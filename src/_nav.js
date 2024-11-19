@@ -177,6 +177,19 @@ const _nav = [
       
     ],
   },
+  {
+    component: CNavGroup,
+    name: 'Category',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Add Category',
+        to: '/Category/AddCategories',
+      },
+      
+    ],
+  },
 
   
   
