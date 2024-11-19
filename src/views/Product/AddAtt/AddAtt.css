@@ -155,6 +155,13 @@ button + button {
 .table-container .actions button {
   margin-right: 10px;
 }
+/* Container for the variation input field, remove button, and add button */
+/* Red "x" button in a circle */
+/* Container for the input and buttons */
+.variation-actions-container {
+  display: flex;
+  align-items: center;
+}
 
 /* Red "x" button in a circle */
 .remove-variation-button {
@@ -169,9 +176,22 @@ button + button {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  margin-left: 10px;
 }
 
 .remove-variation-button:hover {
   background-color: darkred;
+}
+
+/* Add variation button */
+.add-variation-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.add-variation-button:hover {
+  background-color: #45a049;
 }

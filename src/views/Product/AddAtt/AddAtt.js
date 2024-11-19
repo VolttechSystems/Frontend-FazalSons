@@ -594,7 +594,8 @@ class AddAtt extends Component {
 
             <div style={{ marginLeft: "30px", marginTop: "10px" }}>
             {attribute.variations.map((variation, varIndex) => (
-  <div key={varIndex} style={{ marginBottom: "10px" }}>
+  <div key={varIndex} style={{ marginBottom: "10px", display: "flex", alignItems: "center" }}>
+    {/* Variation input field */}
     <label
       htmlFor={`variation-${attrIndex}-${varIndex}`}
       style={{ marginRight: "10px" }}
@@ -606,27 +607,38 @@ class AddAtt extends Component {
       id={`variation-${attrIndex}-${varIndex}`}
       placeholder={`Variation ${varIndex + 1}`}
       value={variation}
-      onChange={(e) =>
-        this.handleVariationChange(e, attrIndex, varIndex)
-      }
+      onChange={(e) => this.handleVariationChange(e, attrIndex, varIndex)}
       style={{ marginRight: "10px", width: "25%" }}
     />
-    {varIndex === attribute.variations.length - 1 && (
-      <button onClick={() => this.addVariation(attrIndex)}>
-        + Add Variation
-      </button>    
-    )}  {attribute.variations.length > 1 && (
-      <button
-        className="remove-variation-button"
-        onClick={() => this.removeVariation(attrIndex, varIndex)}
-      >
-        &times;
-      </button>
-    )}
-    {/* Red "x" button to remove variation */}
-    
+
+    {/* Container for the add and remove buttons */}
+    <div className="variation-actions-container" style={{ display: "flex", alignItems: "center" }}>
+      {/* Red "x" button to remove variation */}
+      {attribute.variations.length > 1 && (
+        <button
+          className="remove-variation-button"
+          onClick={() => this.removeVariation(attrIndex, varIndex)}
+          style={{ marginLeft: "10px" }}
+        >
+          &times;
+        </button>
+      )}
+
+      {/* Add Variation button */}
+      {varIndex === attribute.variations.length - 1 && (
+        <button
+          className="add-variation-button"
+          onClick={() => this.addVariation(attrIndex)}
+          style={{ marginLeft: "10px" }}
+        >
+          + Add Variation
+        </button>
+      )}
+    </div>
   </div>
 ))}
+
+
 
             </div>
           </div>
