@@ -155,3 +155,23 @@ button + button {
 .table-container .actions button {
   margin-right: 10px;
 }
+
+/* Red "x" button in a circle */
+.remove-variation-button {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.remove-variation-button:hover {
+  background-color: darkred;
+}
