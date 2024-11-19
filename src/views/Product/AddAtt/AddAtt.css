@@ -1,80 +1,157 @@
+/* AddAtt.css */
+
+/* Container for the whole Add Attribute form */
 .add-att-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 10px;
-  }
-  
-  h1 {
-    font-size: 30px;
-    text-align: left;
-    margin-bottom: 30px;
-  }
-  
-  /* Input fields */
-  input[type="text"] {
-    width: calc(100% - 20px); /* Full width minus padding */
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  /* Label styling */
-  label {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 5px;
-  }
-  
-  /* Attribute and Variation containers */
-  .attribute-container {
-    margin-bottom: 40px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Variations */
-  .variation-container {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Flex for input and button */
-  .input-button-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .input-button-container input {
-    width: calc(100% - 120px); /* Adjust width to leave space for the button */
-  }
-  
-  button {
-    padding: 8px 12px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 5px;
-  }
-  
-  /* Compact button size */
-  button.add-variation-button,
-  button + button {
-    width: auto;
-    margin-left: 10px;
-  }
-  
-  /* Button hover effects */
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  button:focus {
-    outline: none;
-  }
-  
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Main header styling */
+h1 {
+  font-size: 30px;
+  text-align: left;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Input field styles */
+input[type="text"] {
+  width: calc(100% - 20px); /* Full width minus padding */
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+/* Label styling for form elements */
+label {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+/* Styling for the attribute container */
+.attribute-container {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styling for variation containers */
+.variation-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container for input and button in variations */
+.input-button-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Adjust width of inputs inside input-button-container */
+.input-button-container input {
+  width: calc(100% - 120px); /* Adjust width to leave space for the button */
+}
+
+/* Button styling */
+button {
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 5px;
+  transition: background-color 0.3s;
+}
+
+/* Button hover effects */
+button:hover {
+  background-color: #45a049;
+}
+
+/* Button focus outline styling */
+button:focus {
+  outline: none;
+}
+
+/* Add variation button and other buttons alignment */
+button.add-variation-button,
+button + button {
+  width: auto;
+  margin-left: 10px;
+}
+
+/* Table Styling */
+.table-container {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+td {
+  background-color: #ffffff;
+}
+
+button {
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:active {
+  background-color: #004085;
+}
+
+button + button {
+  margin-left: 10px;
+}
+
+.table-container .actions {
+  display: flex;
+  align-items: center;
+}
+
+.table-container .actions button {
+  margin-right: 10px;
+}
