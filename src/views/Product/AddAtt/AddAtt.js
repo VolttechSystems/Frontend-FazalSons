@@ -673,7 +673,10 @@ class AddAtt extends Component {
                 <td>{item.att_id}</td>
                 <td>{item.att_type}</td>
                 <td>{item.attribute_name}</td>
-                <td>{item.variation_name.join(", ")}</td>
+                <td>
+  {Array.isArray(item.variation) ? item.variation.join(", ") : "No Variations"}
+</td>
+
                 <td>
                   <button onClick={() => this.handleEdit(item)}>Edit</button>
                   <button
