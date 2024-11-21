@@ -486,8 +486,17 @@ class AddAtt extends Component {
       return;
     }
 
+    // Find the ID of the attribute type from the attributeTypes array
+  const selectedAttributeType = this.state.attributeTypes.find(
+    (type) => type.att_type === item.att_type
+  );
+
+  const attTypeId = selectedAttributeType ? selectedAttributeType.id : "";
+
+
     this.setState({
       attType: item.att_type || "",
+      attType: attTypeId,
       attributes: [
         {
           attributeName: item.attribute_name || "",
@@ -502,21 +511,21 @@ class AddAtt extends Component {
 
   handleUpdate = async () => {
     const { editData, attType, attributes } = this.state;
-    
+  
     if (!editData || !editData.att_id) {
       alert("No valid item selected for update.");
       return;
     }
   
-    // Construct the payload to match API expectations
+    // Construct the payload with `att_id` for the attribute
     const payload = {
-      att_id: editData.att_id,  // The ID of the item to update
-      att_type: attType,  // Attribute type (e.g., "Clothes")
-      attribute_name: attributes[0].attributeName,  // Attribute name (e.g., "Mens Wear")
-      variations: attributes[0].variation  // List of variations (e.g., ["shirt", "Coat"])
+      att_id: editData.att_id, // The ID of the attribute group to update
+      att_type: attType,       // Attribute type (e.g., "Automobiles")
+      attribute_name: editData.att_id, // Use `att_id` for the attribute name
+      variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
     };
   
-    console.log("Update Payload:", payload);
+    console.log("Update Payload:", JSON.stringify(payload));
   
     try {
       const response = await fetch(
@@ -529,14 +538,16 @@ class AddAtt extends Component {
           body: JSON.stringify(payload),
         }
       );
-
-      
   
       const result = await response.json();
       if (response.ok) {
         alert("Data successfully updated!");
-        this.fetchData();  // Refresh the data after the update
-        this.setState({ editData: null, attType: "", attributes: [{ attributeName: "", variations: [] }] });
+        this.fetchData(); // Refresh data after the update
+        this.setState({
+          editData: null,
+          attType: "",
+          attributes: [{ attributeName: "", variations: [] }],
+        });
         console.log(result);
       } else {
         alert("Failed to update data");
@@ -547,6 +558,7 @@ class AddAtt extends Component {
       console.log(error);
     }
   };
+  
 
   handleDelete = async (attId) => {
     const confirmed = window.confirm("Are you sure you want to delete this item?");
