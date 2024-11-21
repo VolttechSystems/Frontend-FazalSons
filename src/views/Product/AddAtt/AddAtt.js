@@ -333,6 +333,10 @@
 
 import React, { Component } from "react";
 import "./AddAtt.css";
+import {
+  CButton,
+} from '@coreui/react';
+import { Link } from 'react-router-dom';
 
 class AddAtt extends Component {
   constructor(props) {
@@ -352,7 +356,27 @@ class AddAtt extends Component {
 
   componentDidMount() {
     this.fetchData();
+    this.fetchAttributeTypes(); // Fetch attribute types for the dropdown
   }
+  
+  fetchAttributeTypes = async () => {
+    try {
+      const response = await fetch(
+        "http://16.171.145.107/pos/products/add_attribute_type"
+      );
+      const result = await response.json();
+      if (response.ok) {
+        this.setState({ attributeTypes: result }); // Store the attribute types
+      } else {
+        alert("Failed to fetch attribute types");
+        console.log(result);
+      }
+    } catch (error) {
+      alert("Error fetching attribute types");
+      console.log(error);
+    }
+  };
+  
 
   fetchData = async () => {
     try {
@@ -474,6 +498,8 @@ class AddAtt extends Component {
     });
   };
 
+  
+
   handleUpdate = async () => {
     const { editData, attType, attributes } = this.state;
     
@@ -503,6 +529,8 @@ class AddAtt extends Component {
           body: JSON.stringify(payload),
         }
       );
+
+      
   
       const result = await response.json();
       if (response.ok) {
@@ -550,6 +578,12 @@ class AddAtt extends Component {
     }
   };
 
+  // handleAddAttributeType = () => {
+  //   navigate('/Product/AddAttributeType');
+  // };
+
+  
+
   render() {
     const { apiData, attributes, attType, editData } = this.state;
 
@@ -558,19 +592,29 @@ class AddAtt extends Component {
         <h1>{editData ? "Edit Attribute" : "Add Attributes"}</h1>
 
         <div style={{ marginBottom: "20px" }}>
-          <label htmlFor="attType" style={{ marginRight: "10px" }}>
-            Attribute Type
-          </label>
-          <input
-            type="text"
-            name="attType"
-            id="attType"
-            placeholder="Attribute Type (e.g., Groceries)"
-            value={attType}
-            onChange={this.handleInputChange}
-            style={{ marginRight: "10px", width: "30%" }}
-          />
-        </div>
+  <label htmlFor="attType" style={{ marginRight: "10px" }}>
+    Attribute Type
+  </label>
+  <select
+    name="attType"
+    id="attType"
+    value={attType}
+    onChange={(e) => this.setState({ attType: e.target.value })}
+    style={{ marginRight: "10px", width: "30%" }}
+  >
+    <option value="">Select Attribute Type</option>
+    {this.state.attributeTypes?.map((type) => (
+      <option key={type.id} value={type.id}>
+        {type.att_type}
+      </option>
+    ))}
+  </select>
+  
+  <Link to="/Product/AddAttributeType">
+        <button>+</button>
+      </Link>
+</div>
+
 
         {attributes.map((attribute, attrIndex) => (
           <div key={attrIndex} style={{ marginBottom: "20px" }}>
@@ -662,8 +706,8 @@ class AddAtt extends Component {
             <tr>
               <th>Attribute ID</th>
               <th>Attribute Type</th>
-              <th>Attribute Name</th>
-              <th>Variations</th>
+              <th>Attribute Group</th>
+              <th>Attribute</th>
               <th>Actions</th>
             </tr>
           </thead>
