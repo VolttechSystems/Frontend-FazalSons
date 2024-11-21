@@ -467,7 +467,7 @@ class AddAtt extends Component {
       attributes: [
         {
           attributeName: item.attribute_name || "",
-          variations: item.variation_name || [],
+          variations: item.variation || [],
         },
       ],
       editData: { ...item, att_id: attId },
@@ -487,7 +487,7 @@ class AddAtt extends Component {
       att_id: editData.att_id,  // The ID of the item to update
       att_type: attType,  // Attribute type (e.g., "Clothes")
       attribute_name: attributes[0].attributeName,  // Attribute name (e.g., "Mens Wear")
-      variation_name: attributes[0].variations  // List of variations (e.g., ["shirt", "Coat"])
+      variations: attributes[0].variation  // List of variations (e.g., ["shirt", "Coat"])
     };
   
     console.log("Update Payload:", payload);

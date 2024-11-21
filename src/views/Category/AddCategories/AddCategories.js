@@ -196,18 +196,49 @@ const AddCategories = () => {
           axios.get(API_HEAD_CATEGORIES),
           axios.get(API_PARENT_CATEGORIES),
           axios.get(API_ATT_TYPES),
-          axios.get(API_FETCH_CATEGORIES), // Fetch categories
+          axios.get(API_FETCH_CATEGORIES),
         ]);
-
+    
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
         setAttTypes(attTypesResponse.data);
-        setCategories(categoriesResponse.data); // Set categories from API
+        setCategories(categoriesResponse.data);
       } catch (error) {
-        console.error('Error fetching initial data:', error);
-        setMessage('Failed to load initial data. Please try again.');
+        console.error("Error in fetchInitialData:", error);
+    
+        // Log each endpoint individually
+        try {
+          const headResponse = await axios.get(API_HEAD_CATEGORIES);
+          setHeadCategories(headResponse.data);
+        } catch (headError) {
+          console.error("Error fetching Head Categories:", headError);
+        }
+    
+        try {
+          const parentResponse = await axios.get(API_PARENT_CATEGORIES);
+          setParentCategories(parentResponse.data);
+        } catch (parentError) {
+          console.error("Error fetching Parent Categories:", parentError);
+        }
+    
+        try {
+          const attTypesResponse = await axios.get(API_ATT_TYPES);
+          setAttTypes(attTypesResponse.data);
+        } catch (attError) {
+          console.error("Error fetching Attribute Types:", attError);
+        }
+    
+        try {
+          const categoriesResponse = await axios.get(API_FETCH_CATEGORIES);
+          setCategories(categoriesResponse.data);
+        } catch (categoriesError) {
+          console.error("Error fetching Categories:", categoriesError);
+        }
+    
+        
       }
     };
+    
 
     fetchInitialData();
   }, []);
