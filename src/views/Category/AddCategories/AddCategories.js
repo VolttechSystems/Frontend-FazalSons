@@ -157,6 +157,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './AddCategories.css';
+import Select from 'react-select';
 
 const AddCategories = () => {
   const [formData, setFormData] = useState({
@@ -167,8 +168,10 @@ const AddCategories = () => {
     description: '',
     addSubCategory: false,
     status: 'active',
-    attType: '',
-    attributeGroups: [],
+    // attType: '',
+    // attributeGroups: [],
+    attType: [], // Changed from string to an array for multiselect
+    // attributeGroups: [],
   });
 
   const [headCategories, setHeadCategories] = useState([]);
@@ -179,12 +182,16 @@ const AddCategories = () => {
   const [message, setMessage] = useState('');
   const [editMode, setEditMode] = useState(false); // To track if we are editing an existing category
   const [editCategoryId, setEditCategoryId] = useState(null); // Store category id being edited
+  
+  const [tableData, setTableData] = useState([]); // For table rows
+  const [id, setId] = useState(1); // Tracks the dynamic ID, default set to 1
 
   const API_ADD_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
   const API_HEAD_CATEGORIES = 'http://16.171.145.107/pos/products/add_head_category';
   const API_PARENT_CATEGORIES = 'http://16.171.145.107/pos/products/add_parent_category';
   const API_ATT_TYPES = 'http://16.171.145.107/pos/products/add_attribute_type';
-  const API_VARIATIONS_GROUP = 'http://16.171.145.107/pos/products/fetch_variations_group';
+  const API_FETCH_VARIATIONS_GROUP = 'http://16.171.145.107/pos/products/fetch_variations_group';
+
   const API_UPDATE_CATEGORY = 'http://16.171.145.107/pos/products/update_category';
   const API_FETCH_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
 
@@ -243,30 +250,61 @@ const AddCategories = () => {
     fetchInitialData();
   }, []);
 
-  // Fetch Variations Group when attType changes
+  // Fetch Attribute Types
   useEffect(() => {
-    if (formData.attType) {
-      const fetchVariationsGroup = async () => {
-        try {
-          const response = await axios.get(`${API_VARIATIONS_GROUP}/${formData.attType}`);
-          const data = response.data;
+    const fetchAttTypes = async () => {
+      try {
+        const response = await axios.get(API_ATT_TYPES);
+        setAttTypes(response.data);
+        console.log('Fetched Attribute Types:', response.data);
+      } catch (error) {
+        console.error('Error fetching Attribute Types:', error);
+      }
+    };
 
-          if (Array.isArray(data)) {
-            setVariationsGroup(data); // Update table with fetched data
-          } else {
-            setVariationsGroup([]);
-          }
-        } catch (error) {
-          console.error('Error fetching variations group:', error);
-          setMessage('Failed to load variations group.');
-        }
-      };
+    fetchAttTypes();
+  }, []);
 
-      fetchVariationsGroup();
-    } else {
-      setVariationsGroup([]);
-    }
-  }, [formData.attType]);
+  
+// Fetch Attributes based on selected Attribute Type
+useEffect(() => {
+  if (formData.attType.length > 0) {
+    const fetchAttributes = async () => {
+      try {
+        console.log('Selected Attribute Types:', formData.attType);
+
+        // Fetch data for each selected Attribute Type
+        const responses = await Promise.all(
+          formData.attType.map((typeId) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+          )
+        );
+
+        const attributes = responses.flatMap((res) => res.data);
+        console.log('Fetched Attributes for Table:', attributes);
+
+        setTableData(attributes); // Populate table rows
+      } catch (error) {
+        console.error('Error fetching Attributes:', error);
+      }
+    };
+
+    fetchAttributes();
+  } else {
+    setTableData([]); // Clear table when no Attribute Type is selected
+  }
+}, [formData.attType]);
+
+  // Handle Dropdown Change
+  const handleMultiSelectChange = (selectedOption) => {
+    const selectedIds = selectedOption ? selectedOption.map((option) => option.value) : [];
+    setFormData({
+      ...formData,
+      attType: selectedIds,
+    });
+    console.log('Updated Form Data:', selectedIds);
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -285,6 +323,9 @@ const AddCategories = () => {
     }
   };
 
+  
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -299,7 +340,8 @@ const AddCategories = () => {
       description: formData.description,
       status: formData.status,
       pc_name: selectedParentCategory ? selectedParentCategory.id : "",
-      att_type: formData.attType,
+      // att_type: formData.attType,
+      attType: formData.attType, // Include multiselect data
     };
 
     try {
@@ -368,6 +410,18 @@ const AddCategories = () => {
       console.error('Error deleting category:', error);
       setMessage('Failed to delete category.');
     }
+  };
+
+  const handleTypeChange = (event) => {
+    const selected = event.target.value;
+    setSelectedType(selected);
+    const filtered = data.filter((item) => item.att_type === selected);
+    setFilteredAttributes(filtered);
+  };
+
+  // Handle dynamic ID input
+  const handleIdChange = (event) => {
+    setId(event.target.value); // Update the ID
   };
 
   return (
@@ -484,7 +538,7 @@ const AddCategories = () => {
         </div>
 
         {/* Attribute Type Dropdown */}
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Attribute Type:</label>
           <select
             name="attType"
@@ -499,7 +553,65 @@ const AddCategories = () => {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
+
+{/* Attribute Type Dropdown */}
+
+      <div className="form-group">
+        <label>Attribute Type:</label>
+        <Select
+          isMulti
+          options={attTypes.map((type) => ({
+            value: type.id,
+            label: type.att_type,
+          }))}
+          onChange={handleMultiSelectChange}
+          placeholder="Select Attribute Types"
+        />
+      </div>
+
+
+        
+      {/* Display Table */}
+      {tableData.length > 0 && (
+  <table className="table">
+    <thead>
+      <tr>
+        <th>Attribute Type</th>
+        <th>Attribute Names</th>
+      </tr>
+    </thead>
+    <tbody>
+      {tableData.map((row) => (
+        <tr key={row.att_id}>
+          <td>{row.att_type}</td>
+          <td>
+            <div>
+              <input
+                type="radio"
+                id={`attribute-${row.att_id}`}
+                name="attribute-selection"
+                value={row.attribute_name}
+              />
+              <label htmlFor={`attribute-${row.att_id}`}>{row.attribute_name}</label>
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
+
+      {/* Display Message if Table is Empty */}
+      {tableData.length === 0 && formData.attType.length > 0 && (
+        <p>No attributes found for the selected type(s).</p>
+      )}
+    
+    
+  
+
+    
 
         {/* Submit Button */}
         <div className="form-group">
