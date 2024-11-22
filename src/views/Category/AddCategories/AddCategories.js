@@ -1,157 +1,3 @@
-// import React, { useState } from 'react';
-// import './AddCategories.css'; // Import CSS file for styling
-
-// const AddCategories = () => {
-//   const [formData, setFormData] = useState({
-//     headCategory: '',
-//     parentCategory: '',
-//     categoryName: '',
-//     showForm: '',
-//     description: '',
-//     addSubCategory: false,
-//     attributeGroups: [],
-//   });
-
-//   const [attributeGroup, setAttributeGroup] = useState('');
-//   const [attributeValues, setAttributeValues] = useState('');
-
-//   const handleInputChange = (e) => {
-//     const { name, value, type, checked } = e.target;
-//     setFormData({
-//       ...formData,
-//       [name]: type === 'checkbox' ? checked : value,
-//     });
-//   };
-
-//   const handleAddAttributeGroup = () => {
-//     if (attributeGroup && attributeValues) {
-//       setFormData({
-//         ...formData,
-//         attributeGroups: [
-//           ...formData.attributeGroups,
-//           { group: attributeGroup, values: attributeValues.split(',') },
-//         ],
-//       });
-//       setAttributeGroup('');
-//       setAttributeValues('');
-//     }
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log('Form Data:', formData);
-//     // Send formData to the backend
-//   };
-
-//   return (
-//     <div className="form-container">
-//       <h2 className="form-title">Add Categories</h2>
-//       <form className="form" onSubmit={handleSubmit}>
-//         <div className="form-group">
-//           <label>Head Category:</label>
-//           <select
-//             name="headCategory"
-//             value={formData.headCategory}
-//             onChange={handleInputChange}
-//             className="form-select"
-//           >
-//             <option value="">Select</option>
-//             {/* Add options dynamically */}
-//           </select>
-//         </div>
-
-//         <div className="form-group">
-//           <label>Parent Category:</label>
-//           <select
-//             name="parentCategory"
-//             value={formData.parentCategory}
-//             onChange={handleInputChange}
-//             className="form-select"
-//           >
-//             <option value="">Select</option>
-//             {/* Add options dynamically */}
-//           </select>
-//         </div>
-
-//         <div className="form-group">
-//           <label>Category Name:</label>
-//           <input
-//             type="text"
-//             name="categoryName"
-//             value={formData.categoryName}
-//             onChange={handleInputChange}
-//             className="form-input"
-//           />
-//         </div>
-
-//         <div className="form-group">
-//           <label>Show Form:</label>
-//           <input
-//             type="text"
-//             name="showForm"
-//             value={formData.showForm}
-//             onChange={handleInputChange}
-//             className="form-input"
-//           />
-//         </div>
-
-//         <div className="form-group">
-//           <label>Description:</label>
-//           <textarea
-//             name="description"
-//             value={formData.description}
-//             onChange={handleInputChange}
-//             className="form-textarea"
-//           />
-//         </div>
-
-//         <div className="form-group">
-//           <label>Add Sub Category:</label>
-//           <input
-//             type="checkbox"
-//             name="addSubCategory"
-//             checked={formData.addSubCategory}
-//             onChange={handleInputChange}
-//             className="form-checkbox"
-//           />
-//         </div>
-
-//         <div className="form-group">
-//           <label>Attribute Groups:</label>
-//           <input
-//             type="text"
-//             placeholder="Group Name"
-//             value={attributeGroup}
-//             onChange={(e) => setAttributeGroup(e.target.value)}
-//             className="form-input"
-//           />
-//           <input
-//             type="text"
-//             placeholder="Values (comma-separated)"
-//             value={attributeValues}
-//             onChange={(e) => setAttributeValues(e.target.value)}
-//             className="form-input"
-//           />
-//           <button
-//             type="button"
-//             onClick={handleAddAttributeGroup}
-//             className="add-button"
-//           >
-//             Add Group
-//           </button>
-//         </div>
-
-//         <div className="form-group">
-//           <button type="submit" className="submit-button">
-//             Submit
-//           </button>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default AddCategories;
 
 
 import React, { useState, useEffect } from 'react';
@@ -163,15 +9,15 @@ const AddCategories = () => {
   const [formData, setFormData] = useState({
     headCategory: '',
     parentCategory: '',
-    categoryName: '',
-    showForm: '',
+    category_name: '',
+    symbol: '',
     description: '',
     addSubCategory: false,
     status: 'active',
     // attType: '',
     // attributeGroups: [],
     attType: [], // Changed from string to an array for multiselect
-    // attributeGroups: [],
+    attributeGroups: [],
   });
 
   const [headCategories, setHeadCategories] = useState([]);
@@ -185,6 +31,7 @@ const AddCategories = () => {
   
   const [tableData, setTableData] = useState([]); // For table rows
   const [id, setId] = useState(1); // Tracks the dynamic ID, default set to 1
+  const [selectedGroup, setSelectedGroup] = useState("");
 
   const API_ADD_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
   const API_HEAD_CATEGORIES = 'http://16.171.145.107/pos/products/add_head_category';
@@ -266,14 +113,54 @@ const AddCategories = () => {
   }, []);
 
   
-// Fetch Attributes based on selected Attribute Type
+
+  // Fetch attributes and variations
 useEffect(() => {
   if (formData.attType.length > 0) {
     const fetchAttributes = async () => {
       try {
         console.log('Selected Attribute Types:', formData.attType);
 
-        // Fetch data for each selected Attribute Type
+        const responses = await Promise.all(
+          formData.attType.map((typeId) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+          )
+        );
+
+        const data = responses.flatMap((res) => res.data);
+
+        const groupedData = data.map((group) => ({
+          groupName: group.group_name,
+          attributes: group.attributes, // Exclude variations
+          variations: group.variations, // Include variations separately
+        }));
+
+        console.log('Fetched Attributes for Table:', groupedData);
+        setTableData(groupedData);
+      } catch (error) {
+        console.error('Error fetching Attributes:', error);
+      }
+    };
+    
+
+    fetchAttributes();
+  } else {
+    setTableData([]); // Clear table when no Attribute Type is selected
+  }
+}, [formData.attType]);
+
+
+const handleRadioChange = (groupName) => {
+  setSelectedGroup(groupName);
+  console.log("Selected Group:", groupName); // Debugging log
+};
+
+  
+// Fetch Attributes based on selected Attribute Type
+useEffect(() => {
+  if (formData.attType.length > 0) {
+    const fetchAttributes = async () => {
+      try {
         const responses = await Promise.all(
           formData.attType.map((typeId) =>
             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
@@ -281,9 +168,8 @@ useEffect(() => {
         );
 
         const attributes = responses.flatMap((res) => res.data);
-        console.log('Fetched Attributes for Table:', attributes);
-
-        setTableData(attributes); // Populate table rows
+        console.log('Fetched Attributes:', attributes); // Debugging log
+        setTableData(attributes);
       } catch (error) {
         console.error('Error fetching Attributes:', error);
       }
@@ -295,6 +181,7 @@ useEffect(() => {
   }
 }, [formData.attType]);
 
+
   // Handle Dropdown Change
   const handleMultiSelectChange = (selectedOption) => {
     const selectedIds = selectedOption ? selectedOption.map((option) => option.value) : [];
@@ -304,7 +191,7 @@ useEffect(() => {
     });
     console.log('Updated Form Data:', selectedIds);
   };
-
+  
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -327,79 +214,60 @@ useEffect(() => {
   
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const selectedParentCategory = parentCategories.find(
-      (category) => category.id === formData.parentCategory
-    );
+  const selectedParentCategory = parentCategories.find(
+    (category) => category.id === formData.parentCategory
+  );
 
-    const payload = {
-      category_name: formData.categoryName,
-      symbol: formData.showForm,
-      subcategory_option: formData.addSubCategory ? "yes" : "no",
-      description: formData.description,
-      status: formData.status,
-      pc_name: selectedParentCategory ? selectedParentCategory.id : "",
-      // att_type: formData.attType,
-      attType: formData.attType, // Include multiselect data
-    };
+  const payload = {
+    category_name: formData.category_name,
+    symbol: formData.symbol,
+    subcategory_option: formData.addSubCategory ? "yes" : "no",
+    description: formData.description,
+    status: formData.status,
+    pc_name: selectedParentCategory ? selectedParentCategory.id : "",
+    attType: formData.attType.join(","),
+    attribute_group: formData.attType.length > 0 ? formData.attType.join(",") : [],
+  };
 
-    try {
-      if (editMode) {
-        // Update existing category
-        console.log('Updating category:', payload); // Debugging log
-        const response = await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload, {
-          headers: { "Content-Type": "application/json" },
-        });
-        // Update the categories list with the updated category
-        const updatedCategories = categories.map((cat) =>
-          cat.id === editCategoryId ? response.data : cat
-        );
-        setCategories(updatedCategories);
-        setMessage("Category updated successfully.");
-      } else {
-        // Add new category
-        console.log('Adding new category:', payload); // Debugging log
-        const response = await axios.post(API_ADD_CATEGORIES, payload, {
-          headers: { "Content-Type": "application/json" },
-        });
-        setCategories([...categories, response.data]);
-        setMessage("Category added successfully.");
-      }
-      setFormData({
-        headCategory: '',
-        parentCategory: '',
-        categoryName: '',
-        showForm: '',
-        description: '',
-        addSubCategory: false,
-        status: 'active',
-        attType: '',
-      });
-      setEditMode(false);
-      setEditCategoryId(null);
-    } catch (error) {
-      console.error('Error submitting category:', error);
-      setMessage('Failed to submit category. Please try again.');
+  try {
+    if (editMode) {
+      const response = await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload);
+      const updatedCategories = categories.map((cat) =>
+        cat.id === editCategoryId ? response.data : cat
+      );
+      setCategories(updatedCategories);
+      setTableData(updatedCategories);  // Update table data with the updated category
+      setMessage("Category updated successfully.");
+    } else {
+      const response = await axios.post(API_ADD_CATEGORIES, payload);
+      const newCategory = response.data;
+      setCategories((prevCategories) => [...prevCategories, newCategory]);
+      setTableData((prevData) => [...prevData, newCategory]);  // Add the new category to table data
+      setMessage("Category added successfully.");
     }
-  };
 
-  const handleEdit = (category) => {
-    console.log('Editing category:', category); // Debugging log
+    // Reset form after submitting
     setFormData({
-      headCategory: category.headCategory || '',
-      parentCategory: category.parentCategory || '', // Ensure parent category is correctly set
-      categoryName: category.category_name || '', // Correct field mapping for category name
-      showForm: category.symbol || '', // Correct field mapping for short form
-      description: category.description || '',
-      addSubCategory: category.subcategory_option === 'yes', // Ensure correct handling of subcategory option
-      status: category.status || 'active', // Default status in case it's not set
-      attType: category.att_type || '', // Ensure the attribute type is correctly set
+      headCategory: '',
+      pc_name: '',
+      category_name: '',
+      symbol: '',
+      description: '',
+      subcategory_option: false,
+      status: 'active',
+      attType: [],
     });
-    setEditMode(true); // Mark as editing mode
-    setEditCategoryId(category.id); // Set the category ID being edited
-  };
-  
+    setEditMode(false);
+    setEditCategoryId(null);
+  } catch (error) {
+    console.error('Error submitting category:', error);
+    setMessage('Failed to submit category. Please try again.');
+  }
+};
+
+
 
   const handleDelete = async (categoryId) => {
     try {
@@ -423,6 +291,9 @@ useEffect(() => {
   const handleIdChange = (event) => {
     setId(event.target.value); // Update the ID
   };
+
+
+  
 
   return (
     <div className="form-container">
@@ -470,8 +341,8 @@ useEffect(() => {
           <label>Category Name:</label>
           <input
             type="text"
-            name="categoryName"
-            value={formData.categoryName}
+            name="category_name"
+            value={formData.category_name}
             onChange={handleInputChange}
             className="form-input"
           />
@@ -482,8 +353,8 @@ useEffect(() => {
           <label>Short Form:</label>
           <input
             type="text"
-            name="showForm"
-            value={formData.showForm}
+            name="symbol"
+            value={formData.symbol}
             onChange={handleInputChange}
             className="form-input"
           />
@@ -574,33 +445,48 @@ useEffect(() => {
         
       {/* Display Table */}
       {tableData.length > 0 && (
-  <table className="table">
-    <thead>
-      <tr>
-        <th>Attribute Type</th>
-        <th>Attribute Names</th>
+  <table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Attribute Type</th>
+      <th>Group Name</th>
+      <th>Variation</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    {tableData.map((row, index) => (
+      <tr key={index}>
+        <td>{index + 1}</td>
+        <td>{row.att_type || "N/A"}</td>
+        <td>
+          {/* Combine attribute name with radio button */}
+          <label>
+            <input
+              type="radio"
+              name="groupSelection" // All rows share the same name for one selection
+              value={row.attribute_name}
+              checked={selectedGroup === row.attribute_name} // Check if this row's attribute is selected
+              onChange={() => handleRadioChange(row.attribute_name)} // Update selected group when radio is clicked
+            />
+            {row.attribute_name || "N/A"} {/* Display attribute name */}
+          </label>
+        </td>
+        <td>
+          {Array.isArray(row.variation) && row.variation.length > 0
+            ? row.variation.join(", ")
+            : "No Variations"}
+        </td>
+        <td>
+          {/* Any other actions you might want to perform */}
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      {tableData.map((row) => (
-        <tr key={row.att_id}>
-          <td>{row.att_type}</td>
-          <td>
-            <div>
-              <input
-                type="radio"
-                id={`attribute-${row.att_id}`}
-                name="attribute-selection"
-                value={row.attribute_name}
-              />
-              <label htmlFor={`attribute-${row.att_id}`}>{row.attribute_name}</label>
-            </div>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+    ))}
+  </tbody>
+</table>
 )}
+ 
 
 
       {/* Display Message if Table is Empty */}
@@ -625,28 +511,29 @@ useEffect(() => {
       <div className="form-group">
         <h3>Categories List</h3>
         <table className="categories-table">
-          <thead>
-            <tr>
-              <th>Category Name</th>
-              <th>Short Form</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category.id}>
-                <td>{category.category_name}</td>
-                <td>{category.symbol}</td>
-                <td>{category.status}</td>
-                <td>
-                  <button onClick={() => handleEdit(category)}>Edit</button>
-                  <button onClick={() => handleDelete(category.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  <thead>
+    <tr>
+      <th>Category Name</th>
+      <th>Short Form</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {categories.map((category, index) => (
+      <tr key={category.id || index}>
+        <td>{category.category_name}</td>
+        <td>{category.symbol}</td>
+        <td>{category.status}</td>
+        <td>
+          <button onClick={() => handleEdit(category)}>Edit</button>
+          <button onClick={() => handleDelete(category.id)}>Delete</button>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
       </div>
     </div>
   );
