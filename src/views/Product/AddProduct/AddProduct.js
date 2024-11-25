@@ -62,9 +62,9 @@ const [attributes, setAttributes] = useState([]);
   }, []);
 
   // Fetch Attributes from API
-  const fetchAttributes = async () => {
+  const fetchAttributes = async (categoryId) => {
     try {
-      const response = await axios.get("http://16.171.145.107/pos/products/fetch_categories/115");
+      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_categories/${categoryId}`);
       const data = response.data;
 
       // Transform data for multi-select dropdown

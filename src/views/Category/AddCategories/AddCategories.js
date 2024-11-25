@@ -34,6 +34,8 @@ const AddCategories = () => {
   const [selectedAttributeType, setSelectedAttributeType] = useState(null);
   const [selectedAttributeId, setSelectedAttributeId] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [selectedParentCategory, setSelectedParentCategory] = useState('');
+  const [selectedHeadCategory, setSelectedHeadCategory] = useState('');
 
 
 
@@ -115,6 +117,53 @@ const AddCategories = () => {
     };
     fetchAttTypes();
   }, []);
+
+
+  
+useEffect(() => {
+  fetchHeadCategories();
+}, []);
+
+// Fetch Head Categories
+const fetchHeadCategories = async () => {
+  try {
+    const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
+    setHeadCategories(response.data);
+  } catch (error) {
+    console.error('Error fetching head categories:', error);
+    //setError('Failed to load head categories. Please try again later.');
+  }
+  
+}; 
+
+const handleHeadCategoryChange = async (e) => {
+  const headCategoryId = e.target.value; // This will now hold the numeric ID
+  console.log('Selected Head Category ID:', headCategoryId); // Logs the correct ID
+
+  setSelectedHeadCategory(headCategoryId); // Save selected head category
+
+  // Reset dependent dropdowns
+  setParentCategories([]);
+  setCategories([]);
+  setSelectedParentCategory('');
+
+
+  if (headCategoryId) {
+    try {
+      const response = await axios.get(
+        `http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
+      );
+      console.log('Parent Categories:', response.data);
+      setParentCategories(response.data); // Populate parent categories
+    } catch (error) {
+      console.error(
+        `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
+        error
+      );
+      // Optional: Display error message to user
+    }
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -399,12 +448,12 @@ const handleEdit = (category) => {
           <select
             name="headCategory"
             value={formData.headCategory}
-            onChange={handleInputChange}
+            onChange={handleHeadCategoryChange}
             className="form-select"
           >
             <option value="">Select</option>
             {headCategories.map((category) => (
-              <option key={category.id} value={category.hc_name}>
+              <option key={category.id} value={category.id}>
                 {category.hc_name}
               </option>
             ))}
@@ -416,7 +465,7 @@ const handleEdit = (category) => {
   <label>Parent Category:</label>
   <select
     name="pc_name"
-    value={formData.pc_name || ""}
+    value={selectedParentCategory}
     onChange={(e) => {
       const selectedOptionId = e.target.value; // Get the ID of the selected option
       console.log({selectedOptionId})
@@ -424,6 +473,8 @@ const handleEdit = (category) => {
         ...formData,
         pc_name: selectedOptionId,  // Store the selected ID instead of the name
       });
+
+      
     }}
     className="form-select"
   > 
@@ -437,6 +488,18 @@ const handleEdit = (category) => {
      
     ))}
   </select>
+
+{/* 
+  <select value={selectedParentCategory}
+  onChange={handleParentCategoryChange}
+  disabled={!selectedHeadCategory}>
+  <option value="">Select Parent Category</option>
+  {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
+    <option key={parentCategory.id} value={parentCategory.id}>
+      {parentCategory.pc_name}
+    </option>
+  ))}
+</select> */}
 </div>
 
 
