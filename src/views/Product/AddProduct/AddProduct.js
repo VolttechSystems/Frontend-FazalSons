@@ -108,12 +108,16 @@ const fetchHeadCategories = async () => {
     console.error('Error fetching head categories:', error);
     setError('Failed to load head categories. Please try again later.');
   }
-};
-
+  
+}; 
 
 const handleHeadCategoryChange = async (e) => {
-  const headCategoryId = e.target.value;
-  setSelectedHeadCategory(headCategoryId);
+  const headCategoryId = e.target.value; // This will now hold the numeric ID
+  console.log('Selected Head Category ID:', headCategoryId); // Logs the correct ID
+
+  setSelectedHeadCategory(headCategoryId); // Save selected head category
+
+  // Reset dependent dropdowns
   setParentCategories([]);
   setCategories([]);
   setSubCategories([]);
@@ -123,14 +127,22 @@ const handleHeadCategoryChange = async (e) => {
 
   if (headCategoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`);
-      setParentCategories(response.data); 
+      const response = await axios.get(
+        `http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
+      );
+      console.log('Parent Categories:', response.data);
+      setParentCategories(response.data); // Populate parent categories
     } catch (error) {
-      console.error('Error fetching parent categories:', error);
-      setError('Failed to load parent categories. Please try again later.');
+      console.error(
+        `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
+        error
+      );
+      // Optional: Display error message to user
     }
   }
 };
+
+
 
 
 // Fetch Categories based on selected Parent Category
@@ -270,19 +282,21 @@ const handleCategoryChange = async (e) => {
   const handleAdd = async () => {
     const newProduct = {
       ...formData,
-      size: JSON.stringify(formData.size),   
-      color: JSON.stringify(formData.color),    
-      used_for_inventory: formData.used_for_inventory ? "true" : "false", 
-      formData: formData 
+      head_category: selectedHeadCategory, // ID of head category
+      parent_category: selectedParentCategory, // ID of parent category
+      category: selectedCategory, // ID of category
+      sub_category: selectedsubCategory, // ID of sub-category
+      size: JSON.stringify(formData.size),
+      color: JSON.stringify(formData.color),
+      used_for_inventory: formData.used_for_inventory ? "true" : "false",
     };
   
     try {
       const response = await axios.post('http://16.171.145.107/pos/products/add_temp_product', newProduct);
-  
       if (response.status === 200 || response.status === 201) {
         alert('Product added successfully!');
-        fetchProductList();  
-        resetForm();         
+        fetchProductList();
+        resetForm();
       } else {
         alert('Failed to add the product. Please try again.');
       }
@@ -291,6 +305,7 @@ const handleCategoryChange = async (e) => {
       alert('An error occurred while adding the product.');
     }
   };
+  
   
   
 
@@ -484,16 +499,19 @@ const handlePublish = async () => {
               </label>
              {/* Head Category Dropdown */}
       
-        <label>Head Category</label>
-        <select value={selectedHeadCategory} 
-        onChange={handleHeadCategoryChange}>
-          <option value="">Select Head Category</option>
-          {headCategories.map((headCategory) => (
-            <option key={headCategory.hc_name} value={headCategory.hc_name}>
-              {headCategory.hc_name}
-            </option>
-          ))}
-        </select>
+        {/* Head Category Dropdown */}
+<label>Head Category</label>
+<select onChange={handleHeadCategoryChange}>
+  <option value="">Select Head Category</option>
+  {headCategories.map((headCategory) => (
+    <option key={headCategory.id} value={headCategory.id}>
+      {headCategory.hc_name} {/* Display the name but pass the ID */}
+    </option>
+  ))}
+</select>
+
+
+
       
 
       {/* Parent Category Dropdown */}
@@ -503,7 +521,7 @@ const handlePublish = async () => {
         onChange={handleParentCategoryChange} disabled={!selectedHeadCategory}>
           <option value="">Select Parent Category</option>
           {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
-            <option key={parentCategory.pc_name} value={parentCategory.pc_name}>
+            <option key={parentCategory.id} value={parentCategory.id}>
               {parentCategory.pc_name}
             </option>
           ))}
@@ -516,7 +534,7 @@ const handlePublish = async () => {
         <select value={selectedCategory} onChange={handleCategoryChange} disabled={!selectedParentCategory}>
           <option value="">Select Category</option>
           {categories.map((category) => (
-            <option key={category.category_name} value={category.category_name}>
+            <option key={category.id} value={category.id}>
               {category.category_name}
             </option>
           ))}
@@ -529,7 +547,7 @@ const handlePublish = async () => {
         <select value={selectedsubCategory} onChange={(e) => setSelectedsubCategory(e.target.value)} disabled={!selectedCategory}>
           <option value="">Select Subcategory</option>
           {subcategories.map((subCategory) => (
-            <option key={subCategory.sub_category_name} value={subCategory.sub_category_name}>
+            <option key={subCategory.id} value={subCategory.id}>
               {subCategory.sub_category_name}
             </option>
           ))}
