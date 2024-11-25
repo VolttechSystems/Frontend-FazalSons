@@ -51,6 +51,49 @@ const AddProduct = () => {
 const [selectedParentCategory, setSelectedParentCategory] = useState('');
 const [selectedCategory, setSelectedCategory] = useState('');
 const [selectedsubCategory, setSelectedsubCategory] = useState('');
+const [attributes, setAttributes] = useState([]);
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [variations, setVariations] = useState([]);
+
+
+  // Fetch attributes on component load
+  useEffect(() => {
+    fetchAttributes();
+  }, []);
+
+  // Fetch Attributes from API
+  const fetchAttributes = async () => {
+    try {
+      const response = await axios.get("http://16.171.145.107/pos/products/fetch_categories/84");
+      const data = response.data;
+
+      // Transform data for multi-select dropdown
+      const options = data.map((item) => ({
+        value: item.attribute,
+        label: item.attribute,
+        variations: item.variation,
+      }));
+
+      setAttributes(options);
+    } catch (error) {
+      console.error("Error fetching attributes:", error);
+    }
+  };
+
+  // Handle attribute selection
+  const handleAttributeChange = (selectedOptions) => {
+    setSelectedAttributes(selectedOptions || []);
+
+    // Extract variations for the selected attributes
+    const selectedVariations = selectedOptions
+      ? selectedOptions.map((option) => ({
+          attribute: option.label,
+          variations: option.variations,
+        }))
+      : [];
+
+    setVariations(selectedVariations);
+  };
 
 useEffect(() => {
   fetchHeadCategories();
@@ -541,26 +584,40 @@ const handlePublish = async () => {
     onChange={(selectedOptions) => handleMultiSelectChange(selectedOptions, 'color')}
   />
 </label>
-<label>
-  Size:
-  <Select
-    isMulti
-    options={sizeOptions}
-    value={formData.size.map(s => ({ value: s, label: s }))} // Pre-fill the select with the selected values
-    onChange={(selectedOptions) => handleMultiSelectChange(selectedOptions, 'size')}
-  />
-</label>
 
-              <label className="checkbox-container">
-                <input
-                  type="checkbox"
-                  name="used_for_inventory"
-                  checked={formData.used_for_inventory}
-                  onChange={handleChange}
-                  className="custom-checkbox"
-                />
-                <span>Used for Inventory</span>
-              </label>
+      <label>Select Attributes:</label>
+      <Select
+        isMulti
+        options={attributes}
+        onChange={handleAttributeChange}
+        placeholder="Select attributes..."
+      />
+
+      {/* Display Variations */}
+      {variations.length > 0 && (
+  <div>
+    <h3>Variations</h3>
+    {variations.map(({ attribute, variations }) => (
+      <div key={attribute} style={{ marginTop: '20px' }}>
+        <h5>{attribute}</h5>
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+          {variations.map(variation => (
+            <label key={variation} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="radio"
+                name={attribute} // Group radio buttons for each attribute
+                value={variation}
+              />
+              {variation}
+            </label>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+    
               <label>
                 Cost Price:
                 <input
