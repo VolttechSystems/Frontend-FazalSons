@@ -30,7 +30,7 @@ const AddCategories = () => {
   
   const [tableData, setTableData] = useState([]); // For table rows
   const [id, setId] = useState(1); // Tracks the dynamic ID, default set to 1
-  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState([]);
   const [selectedAttributeType, setSelectedAttributeType] = useState(null);
   const [selectedAttributeId, setSelectedAttributeId] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
@@ -251,13 +251,15 @@ useEffect(() => {
       ...prevState,
       attType: selectedIds,
     }));
-    setSelectedGroup({}); // Reset selected groups when attribute types change
+    setSelectedGroup([]); // Reset selected groups when attribute types change
   };
 
-  const handleGroupSelection = (attType, attributeName, attributeId, event) => {
+  const handleGroupSelection = (attType, attributeName, attributeId,event) => {
+// console.log({attributeId})
+// console.log({attType})
     setSelectedGroup((prevState) => ({
       ...prevState,
-      [attType]: attributeName,
+      [attType]: attributeId,
     }));
   
     // Update formData with the selected attribute_id and attribute_name
@@ -266,6 +268,8 @@ useEffect(() => {
       attribute_id: attributeId,
       attribute_name: attributeName,
     }));
+    console.log("selectedGroup");
+    console.log(selectedGroup);
 
     const { value, checked } = event.target;
     if (checked) {
@@ -684,10 +688,21 @@ const handleEdit = (category) => {
               type="radio"
               name={item.att_type}
               value={item.attribute_id}
-              checked={selectedGroup[item.att_type] === item.attribute_name}
-              onChange={() =>
-                handleGroupSelection(item.att_type, item.attribute_name, item.attribute_id)
-              }
+              checked={selectedGroup[item.att_type] === item.attribute_id}
+              onChange={(e) =>
+                handleGroupSelection(item.att_type, item.attribute_name, item.attribute_id, e)
+              } 
+              // onChange={(e) =>
+              //   handleAttributeChange(e)
+              // }  
+            //   const handleAttributeChange = (event) => {
+            //     const { value, checked } = event.target;
+            //     if (checked) {
+            //         setSelectedAttributes(prevState => [...prevState, value]);  // Add selected ID to array
+            //     } else {
+            //         setSelectedAttributes(prevState => prevState.filter(id => id !== value));  // Remove unselected ID
+            //     }
+            // };
             />
             {item.attribute_name}
           </label>
@@ -757,10 +772,10 @@ const handleEdit = (category) => {
               <td>{category.symbol}</td>
               <td>{category.status}</td>
               <td>
-  {Array.isArray(category.attribute_name)
-    ? category.attribute_name.join(', ')  // If it's an array, join with commas
-    : category.attribute_name && category.attribute_name.split
-    ? category.attribute_name.split(' ').join(', ')  // If it's a string, split and join
+  {Array.isArray(category.attribute_group)
+    ? category.attribute_group.join(', ')  // If it's an array, join with commas
+    : category.attribute_group && category.attribute_group.split
+    ? category.attribute_group.split(' ').join(', ')  // If it's a string, split and join
     : "No groups available"}  
 </td>
 

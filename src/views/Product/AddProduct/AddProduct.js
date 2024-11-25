@@ -158,7 +158,7 @@ const handleParentCategoryChange = async (e) => {
         `http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`
       );
       setCategories(response.data);  // Populate categories
-      setError('');  // Clear any previous error messages
+      //setError('');  // Clear any previous error messages
     } catch (error) {
       console.error('Error fetching categories:', error);
       //setError('Failed to load categories. Please try again later.');  // Display error message
@@ -179,7 +179,7 @@ const handleCategoryChange = async (e) => {
         `http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`
       );
       setSubCategories(response.data);  // Populate subcategories
-      setError('');  // Clear any previous error messages
+      //setError('');  // Clear any previous error messages
     } catch (error) {
       console.error('Error fetching subcategories:', error);
       //setError('Failed to load subcategories. Please try again later.');  // Display error message
