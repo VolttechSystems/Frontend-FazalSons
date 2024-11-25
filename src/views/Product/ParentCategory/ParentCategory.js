@@ -136,7 +136,7 @@ const ParentCategory = () => {
   useEffect(() => {
     const fetchParentcategory = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category');
+        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
         setParentcategory(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);
@@ -146,7 +146,7 @@ const ParentCategory = () => {
 
     const fetchHeadcategory = async () => {
       try {
-        const response = await axios.get('http://16.170.232.76/pos/products/add_head_category'); // Adjust to your actual API endpoint
+        const response = await axios.get('http://16.171.145.107/pos/products/add_head_category'); // Adjust to your actual API endpoint
         setHeadcategory(response.data);
       } catch (error) {
         console.error('Error fetching head categories:', error);

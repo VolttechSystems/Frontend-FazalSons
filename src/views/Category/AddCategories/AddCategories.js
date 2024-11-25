@@ -15,7 +15,7 @@ const AddCategories = () => {
     pc_name: "", // This stores the Parent Category ID
     status: 'active',
     attType: [],
-    attribute_name: [],
+    attribute_group: [],
     attribute_id : '',
   });
 
@@ -33,6 +33,8 @@ const AddCategories = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedAttributeType, setSelectedAttributeType] = useState(null);
   const [selectedAttributeId, setSelectedAttributeId] = useState(null);
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
+
 
 
   const API_ADD_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
@@ -203,7 +205,7 @@ useEffect(() => {
     setSelectedGroup({}); // Reset selected groups when attribute types change
   };
 
-  const handleGroupSelection = (attType, attributeName, attributeId) => {
+  const handleGroupSelection = (attType, attributeName, attributeId, event) => {
     setSelectedGroup((prevState) => ({
       ...prevState,
       [attType]: attributeName,
@@ -215,14 +217,26 @@ useEffect(() => {
       attribute_id: attributeId,
       attribute_name: attributeName,
     }));
+
+    const { value, checked } = event.target;
+    if (checked) {
+        setSelectedAttributes(prevState => [...prevState, value]);  // Add selected ID to array
+    } else {
+        setSelectedAttributes(prevState => prevState.filter(id => id !== value));  // Remove unselected ID
+    }
   };
   
   
 
-  const handleAttributeTypeSelection = (attType) => {
-    // Update the selected attribute type when one is clicked
-    setSelectedAttributeType(attType);
-  };
+  const handleAttributeChange = (event) => {
+    const { value, checked } = event.target;
+    if (checked) {
+        setSelectedAttributes(prevState => [...prevState, value]);  // Add selected ID to array
+    } else {
+        setSelectedAttributes(prevState => prevState.filter(id => id !== value));  // Remove unselected ID
+    }
+};
+
 
   
 
@@ -267,10 +281,9 @@ useEffect(() => {
     description: formData.description,
     status: formData.status,
     pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
-    //attribute_group: formData.attribute_group,
-    attribute_id: formData.attribute_id, // Ensure this is not null
-    attribute_name: formData.attribute_name, // Include attribute_name if needed
+    attribute_group: selectedAttributes // Use the selected attribute IDs here
     };
+    console.log(payload);
   
     try {
       if (editMode) {
@@ -304,8 +317,8 @@ useEffect(() => {
         addSubCategory: false,
         status: 'active',
         attType: [],
-        attribute_name: " ",
-         attribute_id : null,
+        // attribute_name: " ",
+        //  attribute_id : null,
       });
       setEditMode(false);
       setEditCategoryId(null);
@@ -607,7 +620,7 @@ const handleEdit = (category) => {
             <input
               type="radio"
               name={item.att_type}
-              value={item.attribute_name}
+              value={item.attribute_id}
               checked={selectedGroup[item.att_type] === item.attribute_name}
               onChange={() =>
                 handleGroupSelection(item.att_type, item.attribute_name, item.attribute_id)

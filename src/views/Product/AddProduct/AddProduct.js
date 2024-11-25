@@ -64,7 +64,7 @@ const [attributes, setAttributes] = useState([]);
   // Fetch Attributes from API
   const fetchAttributes = async () => {
     try {
-      const response = await axios.get("http://16.171.145.107/pos/products/fetch_categories/84");
+      const response = await axios.get("http://16.171.145.107/pos/products/fetch_categories/115");
       const data = response.data;
 
       // Transform data for multi-select dropdown
@@ -106,7 +106,7 @@ const fetchHeadCategories = async () => {
     setHeadCategories(response.data);
   } catch (error) {
     console.error('Error fetching head categories:', error);
-    setError('Failed to load head categories. Please try again later.');
+    //setError('Failed to load head categories. Please try again later.');
   }
   
 }; 
@@ -143,24 +143,25 @@ const handleHeadCategoryChange = async (e) => {
 };
 
 
-
-
 // Fetch Categories based on selected Parent Category
 const handleParentCategoryChange = async (e) => {
   const parentCategoryId = e.target.value;
-  setSelectedParentCategory(parentCategoryId);
-  setCategories([]);
+  setSelectedParentCategory(parentCategoryId);  // Save selected parent category
+  setCategories([]);  // Clear categories and subcategories
   setSubCategories([]);
   setSelectedCategory('');
   setSelectedsubCategory('');
 
   if (parentCategoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`);
-      setCategories(response.data); // Only relevant categories
+      const response = await axios.get(
+        `http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`
+      );
+      setCategories(response.data);  // Populate categories
+      setError('');  // Clear any previous error messages
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setError('Failed to load categories. Please try again later.');
+      //setError('Failed to load categories. Please try again later.');  // Display error message
     }
   }
 };
@@ -168,20 +169,34 @@ const handleParentCategoryChange = async (e) => {
 // Fetch Subcategories based on selected Category
 const handleCategoryChange = async (e) => {
   const categoryId = e.target.value;
-  setSelectedCategory(categoryId);
-  setSubCategories([]);
+  setSelectedCategory(categoryId);  // Save selected category
+  setSubCategories([]);  // Clear subcategories
   setSelectedsubCategory('');
 
   if (categoryId) {
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`);
-      setSubCategories(response.data); 
+      const response = await axios.get(
+        `http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`
+      );
+      setSubCategories(response.data);  // Populate subcategories
+      setError('');  // Clear any previous error messages
     } catch (error) {
       console.error('Error fetching subcategories:', error);
-      setError('Failed to load subcategories. Please try again later.');
+      //setError('Failed to load subcategories. Please try again later.');  // Display error message
     }
   }
 };
+
+// Helper Function to Reset Dependent Dropdowns
+const resetDependentDropdowns = () => {
+  setParentCategories([]);
+  setCategories([]);
+  setSubCategories([]);
+  setSelectedCategory('');
+  setSelectedParentCategory('');
+  setSelectedsubCategory('');
+};
+
 
 
   const colorOptions = [
@@ -509,49 +524,46 @@ const handlePublish = async () => {
     </option>
   ))}
 </select>
-
-
-
       
+{/* Parent Category Dropdown */}
+<label>Parent Category</label>
+<select value={selectedParentCategory}
+  onChange={handleParentCategoryChange}
+  disabled={!selectedHeadCategory}>
+  <option value="">Select Parent Category</option>
+  {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
+    <option key={parentCategory.id} value={parentCategory.id}>
+      {parentCategory.pc_name}
+    </option>
+  ))}
+</select>
 
-      {/* Parent Category Dropdown */}
-      
-        <label>Parent Category</label>
-        <select value={selectedParentCategory} 
-        onChange={handleParentCategoryChange} disabled={!selectedHeadCategory}>
-          <option value="">Select Parent Category</option>
-          {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
-            <option key={parentCategory.id} value={parentCategory.id}>
-              {parentCategory.pc_name}
-            </option>
-          ))}
-        </select>
-      
+{/* Category Dropdown */}
+<label>Category</label>
+<select value={selectedCategory}
+  onChange={handleCategoryChange}
+  disabled={!selectedParentCategory}>
+  <option value="">Select Category</option>
+  {Array.isArray(categories) && categories.map(category => (
+    <option key={category.id} value={category.id}>
+      {category.category_name}
+    </option>
+  ))}
+</select>
 
-      {/* Category Dropdown */}
-      
-        <label>Category</label>
-        <select value={selectedCategory} onChange={handleCategoryChange} disabled={!selectedParentCategory}>
-          <option value="">Select Category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.category_name}
-            </option>
-          ))}
-        </select>
-      
+{/* Subcategory Dropdown */}
+<label>Subcategory</label>
+<select value={selectedsubCategory}
+  onChange={(e) => setSelectedsubCategory(e.target.value)}
+  disabled={!selectedCategory}>
+  <option value="">Select Subcategory</option>
+  {Array.isArray(subcategories) && subcategories.map(subCategory => (
+    <option key={subCategory.id} value={subCategory.id}>
+      {subCategory.sub_category_name}
+    </option>
+  ))}
+</select>
 
-      {/* Subcategory Dropdown */}
-      
-        <label>Subcategory</label>
-        <select value={selectedsubCategory} onChange={(e) => setSelectedsubCategory(e.target.value)} disabled={!selectedCategory}>
-          <option value="">Select Subcategory</option>
-          {subcategories.map((subCategory) => (
-            <option key={subCategory.id} value={subCategory.id}>
-              {subCategory.sub_category_name}
-            </option>
-          ))}
-        </select>
       
               <label>
               Brands:
