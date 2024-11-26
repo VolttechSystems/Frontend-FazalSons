@@ -132,6 +132,8 @@ const [attributes, setAttributes] = useState([]);
       : [];
 
     setVariations(selectedVariations);
+    console.log("selectedVariations", selectedVariations);
+    console.log("selectedOptions", selectedOptions);
   };
 
   // Handle variation selection for each attribute
@@ -377,7 +379,7 @@ const resetDependentDropdowns = () => {
   const colorString = `[ '${formData.color.join("', '")}' ]`;
 
   const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
-    return [selectedVariations[attribute]]; // Wrap each selection in an array
+    return selectedVariations[attribute]; // Wrap each selection in an array
   });
 
 
