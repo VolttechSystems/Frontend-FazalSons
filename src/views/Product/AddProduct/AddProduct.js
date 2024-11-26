@@ -60,25 +60,31 @@ const [attributes, setAttributes] = useState([]);
   useEffect(() => {
     fetchAttributes();
   }, []);
-
-  // Fetch Attributes from API
   const fetchAttributes = async (categoryId) => {
+    if (!categoryId) {
+      console.error('Category ID is undefined or null');
+      return; // Prevent making the request if categoryId is invalid
+    }
+  
     try {
-      const response = await axios.get(`http://16.171.145.107/pos/products/fetch_categories/${categoryId}`);
+      const response = await axios.get(
+        `http://16.171.145.107/pos/products/fetch_categories/${categoryId}`
+      );
       const data = response.data;
-
+  
       // Transform data for multi-select dropdown
       const options = data.map((item) => ({
         value: item.attribute,
         label: item.attribute,
-        variations: item.variation,
+        variations: item.variation, // Optional: Handle variations if needed
       }));
-
-      setAttributes(options);
+  
+      setAttributes(options); // Populate attributes dropdown
     } catch (error) {
-      console.error("Error fetching attributes:", error);
+      console.error('Error fetching attributes:', error);
     }
   };
+  
 
   // Handle attribute selection
   const handleAttributeChange = (selectedOptions) => {
@@ -146,46 +152,59 @@ const handleHeadCategoryChange = async (e) => {
 // Fetch Categories based on selected Parent Category
 const handleParentCategoryChange = async (e) => {
   const parentCategoryId = e.target.value;
-  setSelectedParentCategory(parentCategoryId);  // Save selected parent category
-  setCategories([]);  // Clear categories and subcategories
-  setSubCategories([]);
+
+  if (!parentCategoryId) {
+    console.error('Parent Category ID is missing!');
+    return; // Prevent making the request if parentCategoryId is invalid
+  }
+
+  setSelectedParentCategory(parentCategoryId); // Save selected parent category
+  setCategories([]); // Reset categories and subcategories
+  setSubCategories([]); 
   setSelectedCategory('');
   setSelectedsubCategory('');
 
-  if (parentCategoryId) {
-    try {
-      const response = await axios.get(
-        `http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`
-      );
-      setCategories(response.data);  // Populate categories
-      //setError('');  // Clear any previous error messages
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      //setError('Failed to load categories. Please try again later.');  // Display error message
-    }
+  try {
+    const response = await axios.get(
+      `http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`
+    );
+    setCategories(response.data); // Populate categories
+  } catch (error) {
+    console.error('Error fetching categories:', error);
   }
+  
 };
 
 // Fetch Subcategories based on selected Category
 const handleCategoryChange = async (e) => {
   const categoryId = e.target.value;
-  setSelectedCategory(categoryId);  // Save selected category
-  setSubCategories([]);  // Clear subcategories
-  setSelectedsubCategory('');
-
-  if (categoryId) {
-    try {
-      const response = await axios.get(
-        `http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`
-      );
-      setSubCategories(response.data);  // Populate subcategories
-      //setError('');  // Clear any previous error messages
-    } catch (error) {
-      console.error('Error fetching subcategories:', error);
-      //setError('Failed to load subcategories. Please try again later.');  // Display error message
-    }
+  
+  // Check if categoryId is valid before proceeding
+  if (!categoryId) {
+    console.error('Category ID is missing!');
+    return;
   }
+
+  setSelectedCategory(categoryId); // Save selected category
+  setSubCategories([]); // Reset subcategories
+  setSelectedsubCategory('');
+  setAttributes([]); // Reset attributes
+
+  try {
+    const response = await axios.get(
+      `http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`
+    );
+    setSubCategories(response.data); // Populate subcategories
+
+    // Fetch related attributes dynamically
+    fetchAttributes(categoryId); // Ensure categoryId is passed correctly
+  } catch (error) {
+    console.error('Error fetching subcategories or attributes:', error);
+  }
+  console.log('Category ID:', categoryId);
+
 };
+
 
 // Helper Function to Reset Dependent Dropdowns
 const resetDependentDropdowns = () => {

@@ -142,6 +142,13 @@ const handleHeadCategoryChange = async (e) => {
 
   setSelectedHeadCategory(headCategoryId); // Save selected head category
 
+  // Update formData with selected head category ID
+  setFormData({
+    ...formData,
+    headCategory: headCategoryId,
+  });
+
+
   // Reset dependent dropdowns
   setParentCategories([]);
   setCategories([]);
@@ -165,18 +172,6 @@ const handleHeadCategoryChange = async (e) => {
   }
 };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value, // This will store the selected ID in pc_name
-    }));
-  };
-  const handleAttributeSelection = (attributeId) => {
-    setSelectedAttributeId(attributeId);
-    console.log("Selected Attribute ID:", attributeId); // For debugging
-  };
-  
   
   
 
@@ -185,7 +180,7 @@ useEffect(() => {
   if (formData.attType.length > 0) {
     const fetchAttributes = async () => {
       try {
-        console.log('Selected Attribute Types:', formData.attType);
+        console.log("Selected Attribute Types:", formData.attType);
 
         const responses = await Promise.all(
           formData.attType.map((typeId) =>
@@ -196,15 +191,15 @@ useEffect(() => {
         const data = responses.flatMap((res) => res.data);
 
         const groupedData = data.map((group) => ({
-          groupName: group.group_name,
-          attributes: group.attributes, // Exclude variations
-          variations: group.variations, // Include variations separately
+          groupName: group.group_name || "Unnamed Group", // Fallback for group name
+          attributes: Array.isArray(group.attributes) ? group.attributes : [], // Ensure attributes is an array
+          variations: Array.isArray(group.variations) ? group.variations : [], // Ensure variations is an array
         }));
 
-        console.log('Fetched Attributes for Table:', groupedData);
+        console.log("Fetched Attributes for Table:", groupedData);
         setTableData(groupedData);
       } catch (error) {
-        console.error('Error fetching Attributes:', error);
+        console.error("Error fetching Attributes:", error);
       }
     };
 
@@ -254,63 +249,59 @@ useEffect(() => {
     setSelectedGroup([]); // Reset selected groups when attribute types change
   };
 
-  const handleGroupSelection = (attType, attributeName, attributeId,event) => {
-// console.log({attributeId})
-// console.log({attType})
-    setSelectedGroup((prevState) => ({
-      ...prevState,
-      [attType]: attributeId,
-    }));
-  
-    // Update formData with the selected attribute_id and attribute_name
-    setFormData((prevState) => ({
-      ...prevState,
-      attribute_id: attributeId,
-      attribute_name: attributeName,
-    }));
-    console.log("selectedGroup");
-    console.log(selectedGroup);
+const handleGroupSelection = (attType, attributeName, attributeId, event) => {
+  const { value, checked } = event.target;
 
-    const { value, checked } = event.target;
-    if (checked) {
-        setSelectedAttributes(prevState => [...prevState, value]);  // Add selected ID to array
-    } else {
-        setSelectedAttributes(prevState => prevState.filter(id => id !== value));  // Remove unselected ID
-    }
-  };
-  
-  
+  // Update selectedGroup for the current att_type
+  setSelectedGroup((prevState) => ({
+    ...prevState,
+    [attType]: attributeId,
+  }));
 
-  const handleAttributeChange = (event) => {
-    const { value, checked } = event.target;
+  // Update formData with the selected attribute_id and attribute_name
+  setFormData((prevState) => ({
+    ...prevState,
+    attribute_id: attributeId,
+    attribute_name: attributeName,
+  }));
+
+  // Manage selectedAttributes array
+  setSelectedAttributes((prevState) => {
+    // Filter out previous entries with the same att_type
+    const filteredAttributes = prevState.filter(
+      (attr) => !attr.startsWith(attType)
+    );
+
     if (checked) {
-        setSelectedAttributes(prevState => [...prevState, value]);  // Add selected ID to array
-    } else {
-        setSelectedAttributes(prevState => prevState.filter(id => id !== value));  // Remove unselected ID
+      // Add the new selection for the current att_type
+      return [...filteredAttributes, `${attType}:${value}`];
     }
+    return filteredAttributes; // If unchecked, just return filtered array
+  });
+
+  console.log("selectedGroup", selectedGroup);
+  console.log("selectedAttributes", selectedAttributes);
 };
 
-
-  
-
   
   
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(name,value)
-    if (name === "pc_name") {
-      setFormData({
-        ...formData,
-        pc_name: value ? value : null,  // Ensure it stores null if no value is selected
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
+const handleInputChange = (e) => {
+  const { name, value, type, checked } = e.target;
+
+  console.log(name, value, type);
+
+  setFormData((prevFormData) => ({
+    ...prevFormData,
+    [name]:
+      type === "checkbox"   // If it's a checkbox, set the value based on its checked state
+        ? checked
+        : name === "pc_name" // Handle the special case for `pc_name`
+        ? value || null      // Store `null` if no value is provided
+        : value,             // Default behavior for other inputs
+  }));
+};
+
   
   
   
@@ -334,7 +325,7 @@ useEffect(() => {
     description: formData.description,
     status: formData.status,
     pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
-    attribute_group: selectedAttributes // Use the selected attribute IDs here
+    attribute_group: selectedAttributes.map((attr) => attr.split(":")[1]), // Extract only the attribute_id
     };
     console.log(payload);
   
@@ -381,40 +372,40 @@ useEffect(() => {
     }
   };
   
- 
-
-const handleEdit = (category) => {
- 
-
-  const attributeGroup = Array.isArray(formData.attribute_group)
-  ? formData.attribute_group
-  : formData.attribute_group
-      .split(',')
-      .map((item) => item.trim());
-
-  // Prepare data as key-value pairs
-  const updatedData = {
-    category_name: category.category_name || "",
-    symbol: category.symbol || "",
-    subcategory_option: category.subcategory_option || "false",
-    description: category.description || "",
-    status: category.status || "active",
-    pc_name: category.pc_name || null, // Set the parent category ID
-    attribute_group: category.attribute_group || [],
-    attribute_id : category.attribute_id || "",
+  const handleEdit = async (category) => {
+    try {
+      // Fetch category details from API
+      const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`);
+      const categoryData = response.data;
+  
+      // Pre-fill form fields
+      setFormData({
+        headCategory: '', // Update if necessary
+        category_name: categoryData.category_name || '',
+        symbol: categoryData.symbol || '',
+        addSubCategory: categoryData.subcategory_option === "True",
+        description: categoryData.description || '',
+        status: categoryData.status || 'active',
+        pc_name: categoryData.pc_name ? categoryData.pc_name.toString() : '',
+        attribute_group: categoryData.attribute_group || [], // Array of selected attributes
+      });
+  
+      // Pre-fill table's selected attributes
+      const initialSelectedGroup = {};
+      categoryData.attribute_group.forEach((group) => {
+        initialSelectedGroup[group] = group; // Populate based on `group` logic
+      });
+      setSelectedGroup(initialSelectedGroup);
+  
+      setEditMode(true);
+      setEditCategoryId(categoryData.id); // Store the ID for updating
+    } catch (error) {
+      console.error('Error fetching category for edit:', error);
+      setMessage('Failed to fetch category details.');
+    }
   };
-
-  console.log('Data to be sent:', updatedData);
-
-  
-};
-
   
   
-  
-  
-
-
   const handleDelete = async (categoryId) => {
     try {
       await axios.delete(`${API_UPDATE_CATEGORY}/${categoryId}`);
@@ -426,17 +417,7 @@ const handleEdit = (category) => {
     }
   };
 
-  const handleTypeChange = (event) => {
-    const selected = event.target.value;
-    setSelectedType(selected);
-    const filtered = data.filter((item) => item.att_type === selected);
-    setFilteredAttributes(filtered);
-  };
-
-  // Handle dynamic ID input
-  const handleIdChange = (event) => {
-    setId(event.target.value); // Update the ID
-  };
+ 
 
 
   
@@ -469,7 +450,7 @@ const handleEdit = (category) => {
   <label>Parent Category:</label>
   <select
     name="pc_name"
-    value={selectedParentCategory}
+    value={formData.selectedParentCategory}
     onChange={(e) => {
       const selectedOptionId = e.target.value; // Get the ID of the selected option
       console.log({selectedOptionId})
@@ -592,9 +573,9 @@ const handleEdit = (category) => {
             </label>
           </div>
         </div>
-
-      
-
+        {/* Conditional Rendering for Attribute Types and Table */}
+{!formData.addSubCategory && (
+  <>
 <div>
           <label>Attribute Types</label>
           <Select
@@ -603,9 +584,6 @@ const handleEdit = (category) => {
             onChange={handleMultiSelectChange}
           />
         </div>
-        
-
-
 <div>
       {/* Table for Attributes */}
       <table
@@ -630,7 +608,7 @@ const handleEdit = (category) => {
             </tr>
           )}
         </thead>
-
+       
         <tbody>
   {Object.values(
     tableData.reduce((acc, item) => {
@@ -692,17 +670,7 @@ const handleEdit = (category) => {
               onChange={(e) =>
                 handleGroupSelection(item.att_type, item.attribute_name, item.attribute_id, e)
               } 
-              // onChange={(e) =>
-              //   handleAttributeChange(e)
-              // }  
-            //   const handleAttributeChange = (event) => {
-            //     const { value, checked } = event.target;
-            //     if (checked) {
-            //         setSelectedAttributes(prevState => [...prevState, value]);  // Add selected ID to array
-            //     } else {
-            //         setSelectedAttributes(prevState => prevState.filter(id => id !== value));  // Remove unselected ID
-            //     }
-            // };
+            
             />
             {item.attribute_name}
           </label>
@@ -732,8 +700,13 @@ const handleEdit = (category) => {
   )}
 </tbody>
 
+
+
+
       </table>
     </div>
+    </>
+)}
 
  
 
@@ -747,7 +720,7 @@ const handleEdit = (category) => {
         {/* Submit Button */}
         <div className="form-group">
           <button type="submit" className="submit-button">
-            {editMode ? 'Update Category' : 'Add Category'}
+            {editMode ? "Update Category" : "Add Category"}
           </button>
         </div>
       </form>
