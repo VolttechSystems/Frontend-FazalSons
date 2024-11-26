@@ -15,24 +15,22 @@ import 'react-toastify/dist/ReactToastify.css';
 const AddProduct = () => {
   const initialFormData = {
     product_name: '',
-    outlet_name: 'Fazal Sons',
     sku: '',
-    head_category: '',
-    parent_category: '',
-    sub_category: '',  
-    category: '',
     season: '',
     description: '',
     color: [],
     size: [],
-    used_for_inventory: false,
+    attribute: [],
+    variations: [],
     cost_price: '',
     selling_price: '',
     discount_price: '',
     wholesale_price: '',
     retail_price: '',
     token_price: '',
-    brand_name: ''
+    outlet: 1,
+    category: '',
+    brand: '',
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -54,6 +52,8 @@ const [selectedsubCategory, setSelectedsubCategory] = useState('');
 const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [variations, setVariations] = useState([]);
+  const [selectedVariations, setSelectedVariations] = useState({})
+  
 
 
   // Fetch attributes on component load
@@ -86,6 +86,39 @@ const [attributes, setAttributes] = useState([]);
   };
   
 
+  // // Handle attribute selection
+  // const handleAttributeChange = (selectedOptions) => {
+  //   setSelectedAttributes(selectedOptions || []);
+
+  //   // Extract variations for the selected attributes
+  //   const selectedVariations = selectedOptions
+  //     ? selectedOptions.map((option) => ({
+  //         attribute: option.label,
+  //         variations: option.variations,
+  //       }))
+  //     : [];
+
+  //   setVariations(selectedVariations);
+  // };
+
+
+  // const handleVariationChange = (e, attribute) => {
+  //   const { value, checked } = e.target;
+  //   setSelectedVariations(prevState => {
+  //     const updatedVariations = prevState[attribute] || [];
+  //     if (checked) {
+  //       // Add selected variation
+  //       updatedVariations.push(value);
+  //     } else {
+  //       // Remove unselected variation
+  //       const index = updatedVariations.indexOf(value);
+  //       if (index > -1) updatedVariations.splice(index, 1);
+  //     }
+  //     return { ...prevState, [attribute]: updatedVariations };
+  //   });
+  // };
+
+
   // Handle attribute selection
   const handleAttributeChange = (selectedOptions) => {
     setSelectedAttributes(selectedOptions || []);
@@ -99,6 +132,26 @@ const [attributes, setAttributes] = useState([]);
       : [];
 
     setVariations(selectedVariations);
+  };
+
+  // Handle variation selection for each attribute
+  const handleVariationChange = (e, attribute) => {
+    const { value, checked } = e.target;
+
+    setSelectedVariations((prevState) => {
+      const updatedVariations = prevState[attribute] || [];
+
+      if (checked) {
+        // Add selected variation
+        updatedVariations.push(value);
+      } else {
+        // Remove unselected variation
+        const index = updatedVariations.indexOf(value);
+        if (index > -1) updatedVariations.splice(index, 1);
+      }
+
+      return { ...prevState, [attribute]: updatedVariations };
+    });
   };
 
 useEffect(() => {
@@ -291,6 +344,10 @@ const resetDependentDropdowns = () => {
     }
   };
   
+  ;
+
+  
+  
 
 
   const handleMultiSelectChange = (selectedOptions, name) => {
@@ -313,18 +370,35 @@ const resetDependentDropdowns = () => {
   };
 
 
-  const handleAdd = async () => {
-    const newProduct = {
-      ...formData,
-      head_category: selectedHeadCategory, // ID of head category
-      parent_category: selectedParentCategory, // ID of parent category
-      category: selectedCategory, // ID of category
-      sub_category: selectedsubCategory, // ID of sub-category
-      size: JSON.stringify(formData.size),
-      color: JSON.stringify(formData.color),
-      used_for_inventory: formData.used_for_inventory ? "true" : "false",
-    };
-  
+  const handleAdd = async (e) => {
+  e.preventDefault();
+
+  // Manually format color as a string (e.g., "[ 'Baby pink' ]")
+  const colorString = `[ '${formData.color.join("', '")}' ]`;
+
+  const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
+    return [selectedVariations[attribute]]; // Wrap each selection in an array
+  });
+
+
+  const newProduct = {
+    product_name: formData.product_name,
+    sku: formData.sku,
+    season: formData.season,
+    description: formData.description,
+    color: colorString,  // color as a string (e.g., "[ 'Baby blue', 'Baby pink' ]")
+    attribute: formData.attribute,  // Selected attributes
+    variations: JSON.stringify(variationsFormatted), // Variations formatted as array of arrays
+    cost_price: formData.cost_price,
+    selling_price: formData.selling_price,
+    discount_price: formData.discount_price,
+    wholesale_price: formData.wholesale_price,
+    retail_price: formData.retail_price,
+    token_price: formData.token_price,
+    outlet: formData.outlet,
+    category: formData.category,
+    brand: formData.brand,
+  };
     try {
       const response = await axios.post('http://16.171.145.107/pos/products/add_temp_product', newProduct);
       if (response.status === 200 || response.status === 201) {
@@ -358,8 +432,6 @@ const handleEdit = async (id,e) => {
       season: productToEdit.season || '',
       description: productToEdit.description || '',
       color: productToEdit.color ? productToEdit.color.split(',') : [],
-      size: productToEdit.size ? productToEdit.size.split(',') : [],
-      used_for_inventory: productToEdit.used_for_inventory || false,
       cost_price: productToEdit.cost_price || '',
       selling_price: productToEdit.selling_price || '',
       discount_price: productToEdit.discount_price || '',
@@ -632,18 +704,20 @@ const handlePublish = async () => {
     value={formData.color.map(c => ({ value: c, label: c }))} // Pre-fill the select with the selected values
     onChange={(selectedOptions) => handleMultiSelectChange(selectedOptions, 'color')}
   />
+
+
 </label>
 
-      <label>Select Attributes:</label>
-      <Select
-        isMulti
-        options={attributes}
-        onChange={handleAttributeChange}
-        placeholder="Select attributes..."
-      />
+     <label>Select Attributes:</label>
+<Select
+  isMulti
+  options={attributes}
+  onChange={handleAttributeChange}
+  placeholder="Select attributes..."
+/>
 
-      {/* Display Variations */}
-      {variations.length > 0 && (
+{/* Display Variations */}
+{variations.length > 0 && (
   <div>
     <h3>Variations</h3>
     {variations.map(({ attribute, variations }) => (
@@ -653,9 +727,10 @@ const handlePublish = async () => {
           {variations.map(variation => (
             <label key={variation} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input
-                type="radio"
-                name={attribute} // Group radio buttons for each attribute
+                type="checkbox"
+                name={attribute} // Group checkboxes for each attribute
                 value={variation}
+                onChange={(e) => handleVariationChange(e, attribute)} // Handle variation change
               />
               {variation}
             </label>
@@ -665,6 +740,7 @@ const handlePublish = async () => {
     ))}
   </div>
 )}
+
 
     
               <label>
@@ -733,9 +809,7 @@ const handlePublish = async () => {
                 <thead>
                   <tr>
                     <th>Sr.#</th>
-                    <th>Size</th>
                     <th>Color</th>
-                    <th>UF Invt.</th>
                     <th>Cost</th>
                     <th>Selling</th>
                     <th>Discount</th>
@@ -749,9 +823,9 @@ const handlePublish = async () => {
                   {productList.map((product,index) => (
                     <tr key={product.id}>
                       <td>{index + 1}</td>
-                      <td>{product.size}</td>
+                      
                       <td>{product.color}</td>
-                      <td>{product.used_for_inventory}</td>
+                      
                       <td>{product.cost_price}</td>
                       <td>{product.selling_price}</td>
                       <td>{product.discount_price}</td>

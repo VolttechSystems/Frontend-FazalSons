@@ -11,7 +11,7 @@ const AddCategories = () => {
     category_name: '',
     symbol: '',
     description: '',
-    addSubCategory: false,
+    addSubCategory: true,
     pc_name: "", // This stores the Parent Category ID
     status: 'active',
     attType: [],
