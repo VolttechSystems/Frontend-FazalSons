@@ -187,6 +187,11 @@ const _nav = [
         name: 'Add Category',
         to: '/Category/AddCategories',
       },
+      {
+        component: CNavItem,
+        name: 'Add Sub Category',
+        to: '/SubCat/AddSubCat',
+      },
       
     ],
   },

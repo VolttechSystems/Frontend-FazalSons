@@ -235,7 +235,7 @@ class AddAtt extends Component {
 
     try {
       const response = await fetch(
-        `http://16.171.145.107/pos/products/action_variations_group/${attId}/`,
+        `http://16.171.145.107/pos/products/action_variations_group/${attId}`,
         {
           method: "DELETE",
         }

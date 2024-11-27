@@ -35,6 +35,7 @@ const AddOutlet = React.lazy(() => import('./views/Admin/AddOutlet/AddOutlet'))
 const FetchAttributes = React.lazy(() => import('./views/Product/FetchAttributes/FetchAttributes'))
 const AddAtt = React.lazy(() => import('./views/Product/AddAtt/AddAtt'))
 const AddCategories = React.lazy(() => import('./views/Category/AddCategories/AddCategories'))
+const AddSubCat = React.lazy(() => import('./views/SubCat/AddSubCat/AddSubCat'))
 
 
 
@@ -81,6 +82,7 @@ const routes = [
   { path: '/base/Transections', name: 'Transections', element: Transections }, // Transections
   { path: '/Product/AddAtt', name: 'AddAtt', element: AddAtt }, //AddAtt
   { path: '/Category/AddCategories', name: 'AddCategories', element: AddCategories }, //AddCategories
+  { path: '/SubCat/AddSubCat', name: 'AddSubCat', element: AddSubCat}, //AddSubCat
  
 ]
 

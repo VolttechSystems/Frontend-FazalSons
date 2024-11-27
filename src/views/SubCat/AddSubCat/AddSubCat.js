@@ -2,17 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './AddCategories.css';
+import './AddSubCat.css';
 import Select from 'react-select';
 
-const AddCategories = () => {
+const AddSubCat = () => {
   const [formData, setFormData] = useState({
     headCategory: '',
-    category_name: '',
+    parentCategory: '',
+    category: "",
+    sub_category_name: '',
     symbol: '',
     description: '',
-    addSubCategory: true,
-    pc_name: "", // This stores the Parent Category ID
+    //pc_name: "", // This stores the Parent Category ID
     status: 'active',
     attType: [],
     attribute_group: [],
@@ -24,6 +25,7 @@ const AddCategories = () => {
   const [attTypes, setAttTypes] = useState([]);
   const [variationsGroup, setVariationsGroup] = useState([]);
   const [categories, setCategories] = useState([]); // To store added categories
+  const [subcategories, setsubCategories] = useState([]); // To store added categories
   const [message, setMessage] = useState('');
   const [editMode, setEditMode] = useState(false); // To track if we are editing an existing category
   const [editCategoryId, setEditCategoryId] = useState(null); // Store category id being edited
@@ -36,16 +38,17 @@ const AddCategories = () => {
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [selectedParentCategory, setSelectedParentCategory] = useState('');
   const [selectedHeadCategory, setSelectedHeadCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
 
 
-  const API_ADD_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
+  const API_ADD_SUBCATEGORIES = 'http://16.171.145.107/pos/products/add_subcategories';
   const API_HEAD_CATEGORIES = 'http://16.171.145.107/pos/products/add_head_category';
   const API_PARENT_CATEGORIES = 'http://16.171.145.107/pos/products/add_parent_category';
   const API_ATT_TYPES = 'http://16.171.145.107/pos/products/add_attribute_type';
   const API_FETCH_VARIATIONS_GROUP = 'http://16.171.145.107/pos/products/fetch_variations_group';
 
-  const API_UPDATE_CATEGORY = 'http://16.171.145.107/pos/products/faction_categories';
+  const API_UPDATE_SUBCATEGORY = 'http://16.171.145.107/pos/products/action_subcategories';
   const API_FETCH_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
 
   // Fetch initial data and categories list
@@ -172,6 +175,46 @@ const handleHeadCategoryChange = async (e) => {
   }
 };
 
+
+
+const handleParentCategoryChange = async (e) => { 
+    const parentCategoryId = e.target.value; // Get the selected parent category ID
+    console.log('Selected Parent Category ID:', parentCategoryId); // Log for debugging
+  
+    setSelectedParentCategory(parentCategoryId); // Save the selected parent category in state
+  
+    // Update formData with the selected parent category ID
+    setFormData({
+      ...formData,
+      parentCategory: parentCategoryId,
+    });
+  
+    // Reset dependent dropdowns
+    
+    
+    setSelectedParentCategory('');
+    setCategories([]);
+    
+    setSelectedCategory(''); // Reset any previously selected category
+  
+    if (parentCategoryId) {
+      try {
+        // Fetch categories based on parent category
+        const response = await axios.get(
+          `http://16.171.145.107/pos/products/fetch_parent_to_category/${parentCategoryId}/`
+        );
+        console.log('Categories:', response.data); // Log fetched categories
+        setCategories(response.data); // Populate the categories dropdown
+      } catch (error) {
+        console.error(
+          `Error fetching categories for Parent Category ID: ${parentCategoryId}`,
+          error
+        );
+        // Optional: Display an error message to the user
+      }
+    }
+  };
+  
   
   
 
@@ -321,12 +364,13 @@ const handleInputChange = (e) => {
           .map((item) => item.trim());
   
     const payload = {
-      category_name: formData.category_name,
+      //category_name: formData.category_name,
+    sub_category_name: formData.sub_category_name,
     symbol: formData.symbol,
-    subcategory_option: formData.addSubCategory ? "True" : "false",
     description: formData.description,
     status: formData.status,
-    pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
+    //pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
+    category: formData.category ? parseInt(formData.category, 10) : null,
     attribute_group: selectedAttributes.map((attr) => attr.split(":")[1]), // Extract only the attribute_id
     };
     console.log(payload);
@@ -334,21 +378,21 @@ const handleInputChange = (e) => {
     try {
       if (editMode) {
         // PUT request to update category
-        const response = await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload);
+        const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editCategoryId}`, payload);
   
         // Update the category list with the new data
         const updatedCategories = categories.map((cat) =>
           cat.id === editCategoryId ? response.data : cat
         );
-        setCategories(updatedCategories);
+        setsubCategories(updatedCategories);
         setTableData(updatedCategories);
   
         setMessage("Category updated successfully.");
       } else {
-        // POST request to add new category
-        const response = await axios.post(API_ADD_CATEGORIES, payload);
+        // POST request to add new subcategory
+        const response = await axios.post(API_ADD_SUBCATEGORIES, payload);
         const newCategory = response.data;
-        setCategories((prevCategories) => [...prevCategories, newCategory]);
+        setsubCategories((prevCategories) => [...prevCategories, newCategory]);
         setTableData((prevData) => [...prevData, newCategory]);
         setMessage("Category added successfully.");
       }
@@ -356,8 +400,10 @@ const handleInputChange = (e) => {
       // Reset form and exit edit mode
       setFormData({
         headCategory: '',
+        parentCategory: '',
         pc_name: "",
-        category_name: '',
+        category: "",
+        sub_category_name: '',
         symbol: '',
         description: '',
         addSubCategory: false,
@@ -377,7 +423,7 @@ const handleInputChange = (e) => {
   const handleEdit = async (category) => {
     try {
       // Fetch category details from API
-      const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`);
+      const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${category.id}`);
       const categoryData = response.data;
   console.log(categoryData)
       // Pre-fill form fields
@@ -410,8 +456,8 @@ const handleInputChange = (e) => {
   
   const handleDelete = async (categoryId) => {
     try {
-      await axios.delete(`${API_UPDATE_CATEGORY}/${categoryId}`);
-      setCategories(categories.filter((category) => category.id !== categoryId));
+      await axios.delete(`${API_UPDATE_SUBCATEGORY}/${categoryId}`);
+      setsubCategories(categories.filter((category) => category.id !== categoryId));
       setMessage("Category deleted successfully.");
     } catch (error) {
       console.error('Error deleting category:', error);
@@ -426,7 +472,7 @@ const handleInputChange = (e) => {
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Add Categories</h2>
+      <h2 className="form-title">Add Sub-Categories</h2>
       {message && <p className="form-message">{message}</p>}
       <form className="form" onSubmit={handleSubmit}>
         {/* Head Category Dropdown */}
@@ -453,16 +499,7 @@ const handleInputChange = (e) => {
   <select
     name="pc_name"
     value={formData.selectedParentCategory}
-    onChange={(e) => {
-      const selectedOptionId = e.target.value; // Get the ID of the selected option
-      console.log({selectedOptionId})
-      setFormData({
-        ...formData,
-        pc_name: selectedOptionId,  // Store the selected ID instead of the name
-      });
-
-      
-    }}
+    onChange={handleParentCategoryChange}
     className="form-select"
   > 
 
@@ -476,28 +513,47 @@ const handleInputChange = (e) => {
     ))}
   </select>
 
-{/* 
-  <select value={selectedParentCategory}
-  onChange={handleParentCategoryChange}
-  disabled={!selectedHeadCategory}>
-  <option value="">Select Parent Category</option>
-  {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
-    <option key={parentCategory.id} value={parentCategory.id}>
-      {parentCategory.pc_name}
-    </option>
-  ))}
-</select> */}
 </div>
 
+<div className="form-group">
+  <label>Category:</label>
+  <select
+    name="category_name"
+    value={formData.selectedCategory}
+    onChange={(e) => {
+      const selectedOptionId = e.target.value; // Get the ID of the selected option
+      console.log({selectedOptionId})
+      setFormData({
+        ...formData,
+        category_name: selectedOptionId,  // Store the selected ID instead of the name
+      });
+
+      
+    }}
+    className="form-select"
+  > 
+
+    <option value="">Select Category</option>  {/* Default option */}
+    {categories.map((category) => (
+      
+      <option key={category.id} value={category.id}>
+        {category.category_name}
+      </option>
+     
+    ))}
+  </select>
+  </div>
 
 
-        {/* Category Name */}
+
+
+        {/* SubCategory Name */}
         <div className="form-group">
-          <label>Category Name:</label>
+          <label>Sub Category Name:</label>
           <input
             type="text"
-            name="category_name"
-            value={formData.category_name}
+            name="sub_category_name"
+            value={formData.sub_category_name}
             onChange={handleInputChange}
             className="form-input"
           />
@@ -526,18 +582,6 @@ const handleInputChange = (e) => {
           />
         </div>
 
-        {/* Subcategory Checkbox */}
-<div className="form-group">
-  <label>
-    <input
-      type="checkbox"
-      name="addSubCategory"
-      checked={formData.addSubCategory}
-      onChange={handleInputChange}
-    />
-    Add Subcategory
-  </label>
-</div>
 
         {/* Status Radio Buttons */}
         <div className="form-group">
@@ -576,8 +620,7 @@ const handleInputChange = (e) => {
           </div>
         </div>
         {/* Conditional Rendering for Attribute Types and Table */}
-{!formData.addSubCategory && (
-  <>
+
 <div>
           <label>Attribute Types</label>
           <Select
@@ -701,28 +744,16 @@ const handleInputChange = (e) => {
     ))
   )}
 </tbody>
-
-
-
-
       </table>
     </div>
-    </>
-)}
-
- 
-
-
-      
     
-  
 
     
 
         {/* Submit Button */}
         <div className="form-group">
           <button type="submit" className="submit-button">
-            {editMode ? "Update Category" : "Add Category"}
+            {editMode ? "Update SubCategory" : "Add SubCategory"}
           </button>
         </div>
       </form>
@@ -733,7 +764,7 @@ const handleInputChange = (e) => {
         <table className="categories-table">
         <thead>
           <tr>
-            <th>Category Name</th>
+            <th>SubCategory Name</th>
             <th>Short Form</th>
             <th>Status</th>
             <th>Attribute Group</th>
@@ -741,13 +772,13 @@ const handleInputChange = (e) => {
           </tr>
         </thead>
         <tbody>
-          {categories.map((category, index) => (
-            <tr key={category.id || index}>
-              <td>{category.category_name}</td>
-              <td>{category.symbol}</td>
-              <td>{category.status}</td>
+          {subcategories.map((subcategory, index) => (
+            <tr key={subcategory.id || index}>
+              <td>{subcategory.sub_category_name}</td>
+              <td>{subcategory.symbol}</td>
+              <td>{subcategory.status}</td>
               <td>
-  {Array.isArray(category.attribute_group)
+  {Array.isArray(subcategory.attribute_group)
     ? category.attribute_group.join(', ')  // If it's an array, join with commas
     : category.attribute_group && category.attribute_group.split
     ? category.attribute_group.split(' ').join(', ')  // If it's a string, split and join
@@ -777,4 +808,4 @@ const handleInputChange = (e) => {
   );
 };
 
-export default AddCategories;
+export default AddSubCat;
