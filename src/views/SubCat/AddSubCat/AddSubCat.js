@@ -9,7 +9,7 @@ const AddSubCat = () => {
   const [formData, setFormData] = useState({
     headCategory: '',
     parentCategory: '',
-    category: "",
+    category_name: "",
     sub_category_name: '',
     symbol: '',
     description: '',
@@ -341,7 +341,7 @@ const handleInputChange = (e) => {
     [name]:
       type === "checkbox"   // If it's a checkbox, set the value based on its checked state
         ? checked
-        : name === "pc_name" // Handle the special case for `pc_name`
+        : name === "category_name" // Handle the special case for `pc_name`
         ? value || null      // Store `null` if no value is provided
         : value,             // Default behavior for other inputs
   }));
@@ -370,7 +370,7 @@ const handleInputChange = (e) => {
     description: formData.description,
     status: formData.status,
     //pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
-    category: formData.category ? parseInt(formData.category, 10) : null,
+    category: formData.category_name ? parseInt(formData.category_name, 10) : null,
     attribute_group: selectedAttributes.map((attr) => attr.split(":")[1]), // Extract only the attribute_id
     };
     console.log(payload);
@@ -387,7 +387,7 @@ const handleInputChange = (e) => {
         setsubCategories(updatedCategories);
         setTableData(updatedCategories);
   
-        setMessage("Category updated successfully.");
+        setMessage("Sub Category updated successfully.");
       } else {
         // POST request to add new subcategory
         const response = await axios.post(API_ADD_SUBCATEGORIES, payload);
@@ -401,8 +401,7 @@ const handleInputChange = (e) => {
       setFormData({
         headCategory: '',
         parentCategory: '',
-        pc_name: "",
-        category: "",
+        category_name: "",
         sub_category_name: '',
         symbol: '',
         description: '',
@@ -420,33 +419,33 @@ const handleInputChange = (e) => {
     }
   };
   
-  const handleEdit = async (category) => {
+  const handleEdit = async (subcategory) => {
     try {
       // Fetch category details from API
-      const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${category.id}`);
-      const categoryData = response.data;
-  console.log(categoryData)
+      const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${subcategory.id}`);
+      const subcategoryData = response.data;
+  console.log(subcategoryData)
       // Pre-fill form fields
       setFormData({
         headCategory: '', // Update if necessary
-        category_name: categoryData.category_name || '',
-        symbol: categoryData.symbol || '',
-        addSubCategory: categoryData.subcategory_option === "True",
-        description: categoryData.description || '',
-        status: categoryData.status || 'active',
-        pc_name: categoryData.pc_name ? categoryData.pc_name.toString() : '',
-        attribute_group: categoryData.attribute_group || [], // Array of selected attributes
+        category: subcategoryData.category ? subcategoryData.category.toString() : '',
+        symbol: subcategoryData.symbol || '',
+        addSubCategory: subcategoryData.subcategory_option === "True",
+        description: subcategoryData.description || '',
+        status: subcategoryData.status || 'active',
+        //pc_name: categoryData.pc_name ? categoryData.pc_name.toString() : '',
+        attribute_group: subcategoryData.attribute_group || [], // Array of selected attributes
       });
   
       // Pre-fill table's selected attributes
       const initialSelectedGroup = {};
-      categoryData.attribute_group.forEach((group) => {
+      subcategoryData.attribute_group.forEach((group) => {
         initialSelectedGroup[group] = group; // Populate based on `group` logic
       });
       setSelectedGroup(initialSelectedGroup);
   
       setEditMode(true);
-      setEditCategoryId(categoryData.id); // Store the ID for updating
+      setEditCategoryId(subcategoryData.id); // Store the ID for updating
     } catch (error) {
       console.error('Error fetching category for edit:', error);
       setMessage('Failed to fetch category details.');
@@ -457,7 +456,7 @@ const handleInputChange = (e) => {
   const handleDelete = async (categoryId) => {
     try {
       await axios.delete(`${API_UPDATE_SUBCATEGORY}/${categoryId}`);
-      setsubCategories(categories.filter((category) => category.id !== categoryId));
+      setsubCategories(categories.filter((subcategory) => subcategory.id !== categoryId));
       setMessage("Category deleted successfully.");
     } catch (error) {
       console.error('Error deleting category:', error);
@@ -527,6 +526,7 @@ const handleInputChange = (e) => {
         ...formData,
         category_name: selectedOptionId,  // Store the selected ID instead of the name
       });
+      //console.log(category_name)
 
       
     }}
@@ -760,7 +760,7 @@ const handleInputChange = (e) => {
 
       {/* Categories Table */}
       <div className="form-group">
-        <h3>Categories List</h3>
+        <h3>Sub Categories List</h3>
         <table className="categories-table">
         <thead>
           <tr>
@@ -779,9 +779,9 @@ const handleInputChange = (e) => {
               <td>{subcategory.status}</td>
               <td>
   {Array.isArray(subcategory.attribute_group)
-    ? category.attribute_group.join(', ')  // If it's an array, join with commas
-    : category.attribute_group && category.attribute_group.split
-    ? category.attribute_group.split(' ').join(', ')  // If it's a string, split and join
+    ? subcategory.attribute_group.join(', ')  // If it's an array, join with commas
+    : subcategory.attribute_group && subcategory.attribute_group.split
+    ? subcategory.attribute_group.split(' ').join(', ')  // If it's a string, split and join
     : "No groups available"}  
 </td>
 
@@ -789,12 +789,12 @@ const handleInputChange = (e) => {
                 <button 
                   type="button" 
                   className="btn-edit"
-                  onClick={() => handleEdit(category)}>
+                  onClick={() => handleEdit(subcategory)}>
                   Edit 
                 </button>
                 <button 
                   className="btn-delete"
-                  onClick={() => handleDelete(category.id)}>
+                  onClick={() => handleDelete(subcategory.id)}>
                   Delete
                 </button>
               </td>
