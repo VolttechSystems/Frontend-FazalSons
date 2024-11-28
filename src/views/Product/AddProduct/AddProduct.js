@@ -31,6 +31,7 @@ const AddProduct = () => {
     token_price: '',
     outlet: 1,
     category: '',
+    sub_category : '',
     brand: '',
   };
 
@@ -58,38 +59,6 @@ const [attributes, setAttributes] = useState([]);
   
   
 
-
-  // // Fetch attributes on component load
-  // useEffect(() => {
-  //   fetchAttributes();
-  // }, []);
-  // const fetchAttributes = async (categoryId) => {
-  //   if (!categoryId) {
-  //     console.error('Category ID is undefined or null');
-  //     return; // Prevent making the request if categoryId is invalid
-  //   }
-  
-  //   try {
-  //     const response = await axios.get(
-  //       `http://16.171.145.107/pos/products/fetch_categories/${categoryId}`
-  //     );
-  //     const data = response.data;
-  
-  //     // Transform data for multi-select dropdown
-  //     const options = data.map((item) => ({
-  //       value: item.attribute,
-  //       label: item.attribute,
-  //       variations: item.variation, // Optional: Handle variations if needed
-  //     }));
-  
-  //     setAttributes(options); // Populate attributes dropdown
-  //   } catch (error) {
-  //     console.error('Error fetching attributes:', error);
-  //   }
-  // };
-
-  // Fetch attributes on component load or when categoryId changes
-// Fetch attributes on component load or when categoryId changes
 useEffect(() => {
   if (selectedCategory) {
     fetchAttributes(selectedCategory, selectedsubCategory); // Fetch attributes when category or subcategory is selected
@@ -125,16 +94,16 @@ const fetchAttributes = async (categoryId, subCategoryId) => {
 };
 
 const handleTabChange = (tabIndex) => {
-  // Check if we are switching to the "Color, Sizes & Pricing" tab (tabIndex === 1)
+  
   if (tabIndex === 1) {
-    // Check if both category and subcategory are selected
+    
     if (!selectedCategory ) {
       console.log('Please select a category and subcategory before switching to the Color, Sizes & Pricing tab!');
       return; // Prevent switching to Color tab if category or subcategory is not selected
     }
-    console.log('Switching to Color, Sizes & Pricing tab'); // Log if tab switch is allowed
+    console.log('Switching to Color, Sizes & Pricing tab'); 
   } else {
-    console.log(`Tab changed to: ${tabIndex}`); // Log tab change for other tabs
+    console.log(`Tab changed to: ${tabIndex}`); 
   }
 
   // Proceed with tab change if valid
@@ -142,40 +111,6 @@ const handleTabChange = (tabIndex) => {
 };
 
   
-  
-  
-
-  // // Handle attribute selection
-  // const handleAttributeChange = (selectedOptions) => {
-  //   setSelectedAttributes(selectedOptions || []);
-
-  //   // Extract variations for the selected attributes
-  //   const selectedVariations = selectedOptions
-  //     ? selectedOptions.map((option) => ({
-  //         attribute: option.label,
-  //         variations: option.variations,
-  //       }))
-  //     : [];
-
-  //   setVariations(selectedVariations);
-  // };
-
-
-  // const handleVariationChange = (e, attribute) => {
-  //   const { value, checked } = e.target;
-  //   setSelectedVariations(prevState => {
-  //     const updatedVariations = prevState[attribute] || [];
-  //     if (checked) {
-  //       // Add selected variation
-  //       updatedVariations.push(value);
-  //     } else {
-  //       // Remove unselected variation
-  //       const index = updatedVariations.indexOf(value);
-  //       if (index > -1) updatedVariations.splice(index, 1);
-  //     }
-  //     return { ...prevState, [attribute]: updatedVariations };
-  //   });
-  // };
 
 // Handle attribute selection
 const handleAttributeChange = (selectedOptions) => {
@@ -296,6 +231,13 @@ const handleParentCategoryChange = async (e) => {
 // Fetch Subcategories based on selected Category
 const handleCategoryChange = async (e) => {
   const categoryId = e.target.value;
+  console.log({categoryId})
+  setFormData((prev) => ({
+    ...prev,
+    category: categoryId, // Update category in formData
+  }));
+  console.log("W",formData )
+  console.log("W")
   
   if (!categoryId) {
     console.error('Category ID is missing!');
@@ -329,9 +271,16 @@ const handleSubCategoryChange = async (e) => {
   }
 
   setSelectedsubCategory(subCategoryId); // Save selected subcategory
+  console.log()
+  setFormData(prevData => ({
+    ...prevData,
+    sub_category : subCategoryId
+
+  }));
   setAttributes([]); // Reset attributes
 
   // Fetch attributes related to the selected subcategory
+  console.log(formData)
   fetchAttributes('', subCategoryId); // Pass empty categoryId and selected subcategoryId to fetch subcategory-specific attributes
 };
 
@@ -473,7 +422,8 @@ const resetDependentDropdowns = () => {
     retail_price: formData.retail_price,
     token_price: formData.token_price,
     outlet: formData.outlet,
-    category: formData.category,
+    category: selectedCategory,
+    sub_category: selectedsubCategory,
     brand: formData.brand,
   };
     try {
