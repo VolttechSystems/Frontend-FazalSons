@@ -8,6 +8,7 @@ import Select from 'react-select';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Modal, Button } from '@mui/material'; // You can use any modal component or create your own.
 
 
 
@@ -53,37 +54,95 @@ const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [variations, setVariations] = useState([]);
   const [selectedVariations, setSelectedVariations] = useState({})
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+  
   
 
 
-  // Fetch attributes on component load
-  useEffect(() => {
-    fetchAttributes();
-  }, []);
-  const fetchAttributes = async (categoryId) => {
-    if (!categoryId) {
-      console.error('Category ID is undefined or null');
-      return; // Prevent making the request if categoryId is invalid
+  // // Fetch attributes on component load
+  // useEffect(() => {
+  //   fetchAttributes();
+  // }, []);
+  // const fetchAttributes = async (categoryId) => {
+  //   if (!categoryId) {
+  //     console.error('Category ID is undefined or null');
+  //     return; // Prevent making the request if categoryId is invalid
+  //   }
+  
+  //   try {
+  //     const response = await axios.get(
+  //       `http://16.171.145.107/pos/products/fetch_categories/${categoryId}`
+  //     );
+  //     const data = response.data;
+  
+  //     // Transform data for multi-select dropdown
+  //     const options = data.map((item) => ({
+  //       value: item.attribute,
+  //       label: item.attribute,
+  //       variations: item.variation, // Optional: Handle variations if needed
+  //     }));
+  
+  //     setAttributes(options); // Populate attributes dropdown
+  //   } catch (error) {
+  //     console.error('Error fetching attributes:', error);
+  //   }
+  // };
+
+  // Fetch attributes on component load or when categoryId changes
+// Fetch attributes on component load or when categoryId changes
+useEffect(() => {
+  if (selectedCategory) {
+    fetchAttributes(selectedCategory, selectedsubCategory); // Fetch attributes when category or subcategory is selected
+  }
+}, [selectedCategory, selectedsubCategory]); // Re-fetch when either category or subcategory changes
+
+const fetchAttributes = async (categoryId, subCategoryId) => {
+  if (!categoryId) {
+    console.error('Category ID is undefined or null');
+    return; // Prevent making the request if categoryId is invalid
+  }
+
+  // Use the appropriate URL based on whether subCategoryId is provided
+  const url = subCategoryId
+    ? `http://16.171.145.107/pos/products/fetch_subcategories/${encodeURIComponent(subCategoryId)}`
+    : `http://16.171.145.107/pos/products/fetch_categories/${encodeURIComponent(categoryId)}`;
+
+  try {
+    const response = await axios.get(url);
+    const data = response.data;
+
+    // Transform data for multi-select dropdown
+    const options = data.map((item) => ({
+      value: item.attribute,
+      label: item.attribute,
+      variations: item.variation, // Optional: Handle variations if needed
+    }));
+
+    setAttributes(options); // Populate attributes dropdown
+  } catch (error) {
+    console.error('Error fetching attributes:', error);
+  }
+};
+
+const handleTabChange = (tabIndex) => {
+  // Check if we are switching to the "Color, Sizes & Pricing" tab (tabIndex === 1)
+  if (tabIndex === 1) {
+    // Check if both category and subcategory are selected
+    if (!selectedCategory ) {
+      console.log('Please select a category and subcategory before switching to the Color, Sizes & Pricing tab!');
+      return; // Prevent switching to Color tab if category or subcategory is not selected
     }
+    console.log('Switching to Color, Sizes & Pricing tab'); // Log if tab switch is allowed
+  } else {
+    console.log(`Tab changed to: ${tabIndex}`); // Log tab change for other tabs
+  }
+
+  // Proceed with tab change if valid
+  setActiveTab(tabIndex);
+};
+
   
-    try {
-      const response = await axios.get(
-        `http://16.171.145.107/pos/products/fetch_categories/${categoryId}`
-      );
-      const data = response.data;
   
-      // Transform data for multi-select dropdown
-      const options = data.map((item) => ({
-        value: item.attribute,
-        label: item.attribute,
-        variations: item.variation, // Optional: Handle variations if needed
-      }));
-  
-      setAttributes(options); // Populate attributes dropdown
-    } catch (error) {
-      console.error('Error fetching attributes:', error);
-    }
-  };
   
 
   // // Handle attribute selection
@@ -118,43 +177,48 @@ const [attributes, setAttributes] = useState([]);
   //   });
   // };
 
+// Handle attribute selection
+const handleAttributeChange = (selectedOptions) => {
+  // Set selected attributes (multi-select options)
+  setSelectedAttributes(selectedOptions || []);
 
-  // Handle attribute selection
-  const handleAttributeChange = (selectedOptions) => {
-    setSelectedAttributes(selectedOptions || []);
+  // Extract variations for the selected attributes (assumes `variations` is an array in each option)
+  const selectedVariations = selectedOptions
+    ? selectedOptions.map((option) => ({
+        attribute: option.label,  // Store the attribute name
+        variations: option.variations,  // Store the variations for this attribute
+      }))
+    : [];
 
-    // Extract variations for the selected attributes
-    const selectedVariations = selectedOptions
-      ? selectedOptions.map((option) => ({
-          attribute: option.label,
-          variations: option.variations,
-        }))
-      : [];
+  // Update variations state based on the selected attributes
+  setVariations(selectedVariations);
+  console.log("selectedVariations", selectedVariations);
+  console.log("selectedOptions", selectedOptions);
+};
 
-    setVariations(selectedVariations);
-    console.log("selectedVariations", selectedVariations);
-    console.log("selectedOptions", selectedOptions);
-  };
+// Handle variation selection for each attribute
+const handleVariationChange = (e, attribute) => {
+  const { value, checked } = e.target;  // Extract variation and checked state
 
-  // Handle variation selection for each attribute
-  const handleVariationChange = (e, attribute) => {
-    const { value, checked } = e.target;
+  // Update selected variations for the corresponding attribute
+  setSelectedVariations((prevState) => {
+    // Initialize variations for this attribute if not already present
+    const updatedVariations = prevState[attribute] || [];
 
-    setSelectedVariations((prevState) => {
-      const updatedVariations = prevState[attribute] || [];
+    if (checked) {
+      // Add variation if it's checked
+      updatedVariations.push(value);
+    } else {
+      // Remove variation if it's unchecked
+      const index = updatedVariations.indexOf(value);
+      if (index > -1) updatedVariations.splice(index, 1); // Remove from array
+    }
 
-      if (checked) {
-        // Add selected variation
-        updatedVariations.push(value);
-      } else {
-        // Remove unselected variation
-        const index = updatedVariations.indexOf(value);
-        if (index > -1) updatedVariations.splice(index, 1);
-      }
+    // Return the updated state with variations for this attribute
+    return { ...prevState, [attribute]: updatedVariations };
+  });
+};
 
-      return { ...prevState, [attribute]: updatedVariations };
-    });
-  };
 
 useEffect(() => {
   fetchHeadCategories();
@@ -203,7 +267,6 @@ const handleHeadCategoryChange = async (e) => {
   }
 };
 
-
 // Fetch Categories based on selected Parent Category
 const handleParentCategoryChange = async (e) => {
   const parentCategoryId = e.target.value;
@@ -218,6 +281,7 @@ const handleParentCategoryChange = async (e) => {
   setSubCategories([]); 
   setSelectedCategory('');
   setSelectedsubCategory('');
+  setAttributes([]); // Reset attributes
 
   try {
     const response = await axios.get(
@@ -227,14 +291,12 @@ const handleParentCategoryChange = async (e) => {
   } catch (error) {
     console.error('Error fetching categories:', error);
   }
-  
 };
 
 // Fetch Subcategories based on selected Category
 const handleCategoryChange = async (e) => {
   const categoryId = e.target.value;
   
-  // Check if categoryId is valid before proceeding
   if (!categoryId) {
     console.error('Category ID is missing!');
     return;
@@ -251,13 +313,26 @@ const handleCategoryChange = async (e) => {
     );
     setSubCategories(response.data); // Populate subcategories
 
-    // Fetch related attributes dynamically
-    fetchAttributes(categoryId); // Ensure categoryId is passed correctly
+    // Fetch related attributes dynamically for the selected category
+    fetchAttributes(categoryId, ''); // Pass categoryId and empty subcategoryId to fetch category-specific attributes
   } catch (error) {
     console.error('Error fetching subcategories or attributes:', error);
   }
-  console.log('Category ID:', categoryId);
+};
 
+const handleSubCategoryChange = async (e) => {
+  const subCategoryId = e.target.value;
+  
+  if (!subCategoryId) {
+    console.error('Subcategory ID is missing!');
+    return;
+  }
+
+  setSelectedsubCategory(subCategoryId); // Save selected subcategory
+  setAttributes([]); // Reset attributes
+
+  // Fetch attributes related to the selected subcategory
+  fetchAttributes('', subCategoryId); // Pass empty categoryId and selected subcategoryId to fetch subcategory-specific attributes
 };
 
 
@@ -554,21 +629,21 @@ const handlePublish = async () => {
 
   return (
     <div className="add-product-form">
-      <h2>Product Information</h2>
-      <h2>{editMode ? 'Edit Product' : ''}</h2>
-    
-      <Paper square>
-        <Tabs
-          value={activeTab}
-          textColor="primary"
-          indicatorColor="primary"
-          onChange={(event, newValue) => setActiveTab(newValue)}
-          centered
-        >
-          <Tab label="General" />
-          <Tab label="Color, Sizes & Pricing" />
-        </Tabs>
-      </Paper>
+    <h2>Product Information</h2>
+
+    <Paper square>
+      <Tabs
+        value={activeTab}
+        textColor="primary"
+        indicatorColor="primary"
+        onChange={(event, newValue) => handleTabChange(newValue)}
+        centered
+      >
+        <Tab label="General" />
+        <Tab label="Color, Sizes & Pricing" />
+        
+      </Tabs>
+    </Paper>
 
       <div className="form-container">
         <form>
@@ -645,9 +720,10 @@ const handlePublish = async () => {
 </select>
 
 {/* Subcategory Dropdown */}
+
 <label>Subcategory</label>
 <select value={selectedsubCategory}
-  onChange={(e) => setSelectedsubCategory(e.target.value)}
+  onChange={handleSubCategoryChange}
   disabled={!selectedCategory}>
   <option value="">Select Subcategory</option>
   {Array.isArray(subcategories) && subcategories.map(subCategory => (
@@ -722,24 +798,26 @@ const handlePublish = async () => {
 {variations.length > 0 && (
   <div>
     <h3>Variations</h3>
-    {variations.map(({ attribute, variations }) => (
-      <div key={attribute} style={{ marginTop: '20px' }}>
-        <h5>{attribute}</h5>
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          {variations.map(variation => (
-            <label key={variation} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input
-                type="checkbox"
-                name={attribute} // Group checkboxes for each attribute
-                value={variation}
-                onChange={(e) => handleVariationChange(e, attribute)} // Handle variation change
-              />
-              {variation}
-            </label>
-          ))}
-        </div>
-      </div>
-    ))}
+    {variations?.map(({ attribute, variations }) => (
+  <div key={attribute} style={{ marginTop: '20px' }}>
+    <h5>{attribute}</h5>
+    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+      {variations?.map((variations) => (
+        <label key={variations} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            name={attribute}
+            value={variations}
+            onChange={(e) => handleVariationChange(e, attribute)} 
+          />
+          {variations}
+        </label>
+      ))}
+    </div>
+  </div>
+))}
+
+
   </div>
 )}
 

@@ -217,42 +217,28 @@ const handleParentCategoryChange = async (e) => {
   
   
   
+// Fetch Groups Based on Selected Attribute Types
+// useEffect(() => {
+//   if (formData.attType.length > 0) {
+//     const fetchGroups = async () => {
+//       try {
+//         const responses = await Promise.all(
+//           formData.attType.map((typeId) =>
+//             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+//           )
+//         );
 
-  // Fetch attributes and variations
-useEffect(() => {
-  console.log(formData.attType.length)
-  if (formData.attType.length > 0) {
-    const fetchAttributes = async () => {
-      try {
-        console.log("Selected Attribute Types:", formData.attType);
-
-        const responses = await Promise.all(
-          formData.attType.map((typeId) =>
-            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
-          )
-        );
-
-        const data = responses.flatMap((res) => res.data);
-
-        const groupedData = data.map((group) => ({
-          groupName: group.group_name || "Unnamed Group", // Fallback for group name
-          attributes: Array.isArray(group.attributes) ? group.attributes : [], // Ensure attributes is an array
-          variations: Array.isArray(group.variations) ? group.variations : [], // Ensure variations is an array
-        }));
-
-        console.log("Fetched Attributes for Table:", groupedData);
-        setTableData(groupedData);
-      } catch (error) {
-        console.error("Error fetching Attributes:", error);
-      }
-    };
-
-    fetchAttributes();
-  } else {
-    console.log("Wasfa")
-    setTableData([]); // Clear table when no Attribute Type is selected
-  }
-}, [formData.attType]);
+//         const data = responses.flatMap((res) => res.data);
+//         setTableData(data);
+//       } catch (error) {
+//         console.error('Error fetching groups:', error);
+//       }
+//     };
+//     fetchGroups();
+//   } else {
+//     setTableData([]);
+//   }
+// }, [formData.attType]);
 
 
 const handleRadioChange = (groupName) => {
