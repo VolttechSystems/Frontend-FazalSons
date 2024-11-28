@@ -453,10 +453,10 @@ const handleInputChange = (e) => {
   };
   
   
-  const handleDelete = async (categoryId) => {
+  const handleDelete = async (subcategoryId) => {
     try {
-      await axios.delete(`${API_UPDATE_SUBCATEGORY}/${categoryId}`);
-      setsubCategories(categories.filter((subcategory) => subcategory.id !== categoryId));
+      await axios.delete(`${API_UPDATE_SUBCATEGORY}/${subcategoryId}`);
+      setsubCategories(subcategories.filter((subcategory) => subcategory.id !== subcategoryId));
       setMessage("Category deleted successfully.");
     } catch (error) {
       console.error('Error deleting category:', error);
