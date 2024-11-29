@@ -32,8 +32,9 @@ const AddProduct = () => {
     outlet: 1,
     category: '',
     sub_category : '',
-    brand: '',
+    brand: '', 
   };
+  
 
   const [formData, setFormData] = useState(initialFormData);
   const [activeTab, setActiveTab] = useState(0);
@@ -103,6 +104,7 @@ const handleTabChange = (tabIndex) => {
       return; // Prevent switching to Color tab if category or subcategory is not selected
     }
     console.log('Switching to Color, Sizes & Pricing tab'); 
+
   } else {
     console.log(`Tab changed to: ${tabIndex}`); 
   }
@@ -202,6 +204,22 @@ const handleHeadCategoryChange = async (e) => {
     }
   }
 };
+
+
+useEffect(() => {
+  const fetchBrands = async () => {
+    try {
+      const response = await axios.get('http://16.171.145.107/pos/products/add_brand');
+      const brandsData = response.data.results || [];
+      setBrands(Array.isArray(brandsData) ? brandsData : []);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    }
+  };
+
+  fetchBrands();
+}, []);
+
 
 // Fetch Categories based on selected Parent Category
 const handleParentCategoryChange = async (e) => {
@@ -408,6 +426,7 @@ const resetDependentDropdowns = () => {
       ...prevData,
       brand: selectedBrandId, // Store brand ID in formData
     }));
+    console.log(selectedBrandId)
   };
 
 
@@ -701,17 +720,17 @@ const handlePublish = async () => {
       
 
 <label>Brands:</label>
-    <select value={selectedBrand} onChange={handleBrandChange}>
+    <select value={selectedBrand} 
+    onChange={handleBrandChange}>
       <option value="">Select a Brand</option>
-      {brands.map((branddata) => (
+      {/* {brands.map((branddata) => ( */}
+        {Array.isArray(brands) && brands.map(branddata => (
         <option key={branddata.id} value={branddata.id}>
           {branddata.brand_name}
+          
         </option>
       ))}
     </select>
-
-    {/* Display selected brand name for debugging or display */}
-    {selectedBrand && <p>Selected Brand: {getBrandNameById(selectedBrand)}</p>}
 
               <label>
                 Season:
