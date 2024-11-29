@@ -55,7 +55,8 @@ const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [variations, setVariations] = useState([]);
   const [selectedVariations, setSelectedVariations] = useState({})
-  const [showModal, setShowModal] = useState(false); // State for modal visibility
+  //const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [selectedBrand, setSelectedBrand] = useState("");
   
   
 
@@ -236,8 +237,8 @@ const handleCategoryChange = async (e) => {
     ...prev,
     category: categoryId, // Update category in formData
   }));
-  console.log("W",formData )
-  console.log("W")
+  // console.log("W",formData )
+  // console.log("W")
   
   if (!categoryId) {
     console.error('Category ID is missing!');
@@ -337,8 +338,13 @@ const resetDependentDropdowns = () => {
           axios.get('http://16.171.145.107/pos/products/add_brand')
         ]);
         
-        const brandsData = brandResponse.data.results || [];
-        setBrands(Array.isArray(brandsData) ? brandsData : []); // Ensure you are setting the correct data
+        //const brandsData = brandResponse.data.results || [];
+        // Set states with fetched data
+        setBrands(
+          Array.isArray(brandResponse.data.results)
+            ? brandResponse.data.results
+            : []
+        );
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
         setCategories(categoryResponse.data);
@@ -395,6 +401,15 @@ const resetDependentDropdowns = () => {
    
   };
 
+  const handleBrandChange = (e) => {
+    const selectedBrandId = e.target.value; // Get selected brand ID
+    setSelectedBrand(selectedBrandId); // Update selectedBrand state
+    setFormData((prevData) => ({
+      ...prevData,
+      brand: selectedBrandId, // Store brand ID in formData
+    }));
+  };
+
 
   const handleAdd = async (e) => {
   e.preventDefault();
@@ -424,7 +439,7 @@ const resetDependentDropdowns = () => {
     outlet: formData.outlet,
     category: selectedCategory,
     sub_category: selectedsubCategory,
-    brand: formData.brand,
+    brand: selectedBrand, // This will send the brand id as "3", "4", etc.
   };
     try {
       const response = await axios.post('http://16.171.145.107/pos/products/add_temp_product', newProduct);
@@ -684,16 +699,20 @@ const handlePublish = async () => {
 </select>
 
       
-              <label>
-              Brands:
-              <select>
-    {brands.map(brand => (
-        <option key={brand.id} value={brand.id}>
-            {brand.brand_name} 
+
+<label>Brands:</label>
+    <select value={selectedBrand} onChange={handleBrandChange}>
+      <option value="">Select a Brand</option>
+      {brands.map((branddata) => (
+        <option key={branddata.id} value={branddata.id}>
+          {branddata.brand_name}
         </option>
-    ))}
-</select>
-              </label>
+      ))}
+    </select>
+
+    {/* Display selected brand name for debugging or display */}
+    {selectedBrand && <p>Selected Brand: {getBrandNameById(selectedBrand)}</p>}
+
               <label>
                 Season:
                 <select

@@ -96,6 +96,12 @@ class AddAtt extends Component {
     this.setState({ attributes: updatedAttributes });
   };
   
+  removeAttribute = (attrIndex) => {
+    this.setState((prevState) => ({
+      attributes: prevState.attributes.filter((_, index) => index !== attrIndex),
+    }));
+  };
+  
 
   addAttribute = () => {
     this.setState((prevState) => ({
@@ -190,7 +196,7 @@ class AddAtt extends Component {
     const payload = {
       att_id: editData.att_id, // The ID of the attribute group to update
       att_type: attType,       // Attribute type (e.g., "Automobiles")
-      attribute_name: editData.att_id, // Use `att_id` for the attribute name
+      attribute_name: editData.attribute_name, // Use `att_id` for the attribute name
       variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
     };
   
@@ -198,7 +204,7 @@ class AddAtt extends Component {
   
     try {
       const response = await fetch(
-        `http://16.171.145.107/pos/products/action_variations_group/${editData.att_id}/`,
+        `http://16.171.145.107/pos/products/action_variations_group/${editData.att_id}`,
         {
           method: "PUT",
           headers: {
@@ -297,77 +303,119 @@ class AddAtt extends Component {
 </div>
 
 
-        {attributes.map((attribute, attrIndex) => (
-          <div key={attrIndex} style={{ marginBottom: "20px" }}>
-            <label htmlFor={`attributeName-${attrIndex}`} style={{ marginRight: "10px" }}>
-              Attribute Group {attrIndex + 1}
-            </label>
-            <input
-              type="text"
-              name="attributeName"
-              id={`attributeName-${attrIndex}`}
-              placeholder={`Attribute Group ${attrIndex + 1}`}
-              value={attribute.attributeName}
-              onChange={(e) => this.handleInputChange(e, attrIndex)}
-              onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
-              style={{ marginRight: "10px", width: "30%" }}
-            />
-
-            {attrIndex === attributes.length - 1 && !editData && (
-              <button onClick={this.addAttribute}>+ Add Attribute</button>
-            )}
-
-            <div style={{ marginLeft: "30px", marginTop: "10px" }}>
-            {attribute.variations.map((variation, varIndex) => (
-  <div key={varIndex} style={{ marginBottom: "10px", display: "flex", alignItems: "center" }}>
-    {/* Variation input field */}
+{attributes.map((attribute, attrIndex) => (
+  <div key={attrIndex} style={{ marginBottom: "20px" }}>
+    {/* Attribute Group Label and Input */}
     <label
-      htmlFor={`variation-${attrIndex}-${varIndex}`}
+      htmlFor={`attributeName-${attrIndex}`}
       style={{ marginRight: "10px" }}
     >
-      Attribute {varIndex + 1}
+      Attribute Group {attrIndex + 1}
     </label>
     <input
       type="text"
-      id={`variation-${attrIndex}-${varIndex}`}
-      placeholder={`Attribute ${varIndex + 1}`}
-      value={variation}
-      onChange={(e) => this.handleVariationChange(e, attrIndex, varIndex)}
-      style={{ marginRight: "10px", width: "25%" }}
+      name="attributeName"
+      id={`attributeName-${attrIndex}`}
+      placeholder={`Attribute Group ${attrIndex + 1}`}
+      value={attribute.attributeName}
+      onChange={(e) => this.handleInputChange(e, attrIndex)}
+      onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
+      style={{ marginRight: "10px", width: "30%" }}
     />
 
-    {/* Container for the add and remove buttons */}
-    <div className="variation-actions-container" style={{ display: "flex", alignItems: "center" }}>
-      {/* Red "x" button to remove variation */}
-      {attribute.variations.length > 1 && (
+    {/* Buttons for adding and removing attribute groups */}
+    <div style={{ display: "inline-block", marginLeft: "10px" }}>
+      {attrIndex === attributes.length - 1 && !editData && (
         <button
-          className="remove-variation-button"
-          onClick={() => this.removeVariation(attrIndex, varIndex)}
-          style={{ marginLeft: "10px" }}
-        >
-          &times;
-        </button>
-      )}
-
-      {/* Add Variation button */}
-      {varIndex === attribute.variations.length - 1 && (
-        <button
-          className="add-variation-button"
-          onClick={() => this.addVariation(attrIndex)}
-          style={{ marginLeft: "10px" }}
+          className="add-attribute-button"
+          onClick={this.addAttribute}
+          style={{ marginRight: "5px" }}
         >
           + Add Attribute
         </button>
       )}
+
+      {/* Red Cross Button to Remove Attribute */}
+      {attributes.length > 1 && (
+        <button
+          className="remove-attribute-button"
+          onClick={() => this.removeAttribute(attrIndex)}
+          style={{
+            color: "red",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            fontSize: "18px",
+          }}
+        >
+          &times;
+        </button>
+      )}
+    </div>
+
+    {/* Attribute Variations */}
+    <div style={{ marginLeft: "30px", marginTop: "10px" }}>
+      {attribute.variations.map((variation, varIndex) => (
+        <div
+          key={varIndex}
+          style={{
+            marginBottom: "10px",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {/* Variation Input */}
+          <label
+            htmlFor={`variation-${attrIndex}-${varIndex}`}
+            style={{ marginRight: "10px" }}
+          >
+            Attribute {varIndex + 1}
+          </label>
+          <input
+            type="text"
+            id={`variation-${attrIndex}-${varIndex}`}
+            placeholder={`Attribute ${varIndex + 1}`}
+            value={variation}
+            onChange={(e) =>
+              this.handleVariationChange(e, attrIndex, varIndex)
+            }
+            style={{ marginRight: "10px", width: "25%" }}
+          />
+
+          {/* Buttons to Add/Remove Variations */}
+          <div
+            className="variation-actions-container"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            {/* Remove Variation Button */}
+            {attribute.variations.length > 1 && (
+              <button
+                className="remove-variation-button"
+                onClick={() => this.removeVariation(attrIndex, varIndex)}
+                style={{ marginLeft: "10px" }}
+              >
+                &times;
+              </button>
+            )}
+
+            {/* Add Variation Button */}
+            {varIndex === attribute.variations.length - 1 && (
+              <button
+                className="add-variation-button"
+                onClick={() => this.addVariation(attrIndex)}
+                style={{ marginLeft: "10px" }}
+              >
+                + Add Attribute
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 ))}
 
-
-
-            </div>
-          </div>
-        ))}
+          
 
         <div>
           {editData ? (
