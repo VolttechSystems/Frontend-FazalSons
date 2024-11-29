@@ -69,23 +69,23 @@
   }
   
   /* Table Styling */
-.categories-table {
+.subcategories-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
-.categories-table th, .categories-table td {
+.subcategories-table th, .subcategories-table td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
 
-.categories-table th {
+.subcategories-table th {
   background-color: #f4f4f4;
 }
 
-.categories-table tr:hover {
+.subcategories-table tr:hover {
   background-color: #f1f1f1;
 }
 

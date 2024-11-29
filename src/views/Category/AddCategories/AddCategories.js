@@ -740,22 +740,10 @@ const handleInputChange = (e) => {
   )}
 </tbody>
 
-
-
-
       </table>
     </div>
     </>
 )}
-
- 
-
-
-      
-    
-  
-
-    
 
         {/* Submit Button */}
         <div className="form-group">

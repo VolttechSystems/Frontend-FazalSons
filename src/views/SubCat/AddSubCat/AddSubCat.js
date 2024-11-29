@@ -28,7 +28,7 @@ const AddSubCat = () => {
   const [subcategories, setsubCategories] = useState([]); // To store added categories
   const [message, setMessage] = useState('');
   const [editMode, setEditMode] = useState(false); // To track if we are editing an existing category
-  const [editCategoryId, setEditCategoryId] = useState(null); // Store category id being edited
+  const [editsubCategoryId, setEditsubCategoryId] = useState(null); // Store category id being edited
   
   const [tableData, setTableData] = useState([]); // For table rows
   const [id, setId] = useState(1); // Tracks the dynamic ID, default set to 1
@@ -50,22 +50,25 @@ const AddSubCat = () => {
 
   const API_UPDATE_SUBCATEGORY = 'http://16.171.145.107/pos/products/action_subcategories';
   const API_FETCH_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
+  const API_FETCH_SUBCATEGORIES = 'http://16.171.145.107/pos/products/add_subcategories';
 
   // Fetch initial data and categories list
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [headResponse, parentResponse, attTypesResponse, categoriesResponse] = await Promise.all([
+        const [headResponse, parentResponse, attTypesResponse, categoriesResponse,subcategoriesResponse ] = await Promise.all([
           axios.get(API_HEAD_CATEGORIES),
           axios.get(API_PARENT_CATEGORIES),
           axios.get(API_ATT_TYPES),
           axios.get(API_FETCH_CATEGORIES),
+          axios.get(API_FETCH_SUBCATEGORIES),
         ]);
     
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
         setAttTypes(attTypesResponse.data);
         setCategories(categoriesResponse.data);
+        setsubCategories(subcategoriesResponse.data);
       } catch (error) {
         console.error("Error in fetchInitialData:", error);
     
@@ -96,6 +99,13 @@ const AddSubCat = () => {
           setCategories(categoriesResponse.data);
         } catch (categoriesError) {
           console.error("Error fetching Categories:", categoriesError);
+        }
+
+        try {
+          const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES);
+          setsubCategories(subcategoriesResponse.data);
+        } catch (subcategoriesError) {
+          console.error("Error fetching Categories:", subcategoriesError);
         }
 
         
@@ -364,23 +374,23 @@ const handleInputChange = (e) => {
     try {
       if (editMode) {
         // PUT request to update category
-        const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editCategoryId}`, payload);
+        const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editsubCategoryId}`, payload);
   
         // Update the category list with the new data
-        const updatedCategories = categories.map((cat) =>
-          cat.id === editCategoryId ? response.data : cat
+        const updatedsubCategories = subcategories.map((cat) =>
+          cat.id === editsubCategoryId ? response.data : cat
         );
-        setsubCategories(updatedCategories);
-        setTableData(updatedCategories);
+        setsubCategories(updatedsubCategories);
+        setTableData(updatedsubCategories);
   
         setMessage("Sub Category updated successfully.");
       } else {
         // POST request to add new subcategory
         const response = await axios.post(API_ADD_SUBCATEGORIES, payload);
-        const newCategory = response.data;
-        setsubCategories((prevCategories) => [...prevCategories, newCategory]);
-        setTableData((prevData) => [...prevData, newCategory]);
-        setMessage("Category added successfully.");
+        const newsubCategory = response.data;
+        setsubCategories((prevsubCategories) => [...prevsubCategories, newsubCategory]);
+        setTableData((prevData) => [...prevData, newsubCategory]);
+        setMessage("subcategory added successfully.");
       }
 
       // Reset form and exit edit mode
@@ -398,10 +408,10 @@ const handleInputChange = (e) => {
         //  attribute_id : null,
       });
       setEditMode(false);
-      setEditCategoryId(null);
+      setEditsubCategoryId(null);
     } catch (error) {
-      console.error('Error submitting category:', error);
-      setMessage('Failed to submit category. Please try again.');
+      console.error('Error submitting subcategory:', error);
+      setMessage('Failed to submit subcategory. Please try again.');
     }
   };
   
@@ -431,10 +441,10 @@ const handleInputChange = (e) => {
       setSelectedGroup(initialSelectedGroup);
   
       setEditMode(true);
-      setEditCategoryId(subcategoryData.id); // Store the ID for updating
+      setEditsubCategoryId(subcategoryData.id); // Store the ID for updating
     } catch (error) {
-      console.error('Error fetching category for edit:', error);
-      setMessage('Failed to fetch category details.');
+      console.error('Error fetching subcategory for edit:', error);
+      setMessage('Failed to fetch subcategory details.');
     }
   };
   
@@ -443,10 +453,10 @@ const handleInputChange = (e) => {
     try {
       await axios.delete(`${API_UPDATE_SUBCATEGORY}/${subcategoryId}`);
       setsubCategories(subcategories.filter((subcategory) => subcategory.id !== subcategoryId));
-      setMessage("Category deleted successfully.");
+      setMessage("subcategory deleted successfully.");
     } catch (error) {
-      console.error('Error deleting category:', error);
-      setMessage('Failed to delete category.');
+      console.error('Error deleting subcategory:', error);
+      setMessage('Failed to delete subcategory.');
     }
   };
 
@@ -733,6 +743,7 @@ const handleInputChange = (e) => {
       </table>
     </div>
     
+    
 
     
 
@@ -747,7 +758,7 @@ const handleInputChange = (e) => {
       {/* Categories Table */}
       <div className="form-group">
         <h3>Sub Categories List</h3>
-        <table className="categories-table">
+        <table className="subcategories-table">
         <thead>
           <tr>
             <th>SubCategory Name</th>
@@ -765,9 +776,9 @@ const handleInputChange = (e) => {
               <td>{subcategory.status}</td>
               <td>
   {Array.isArray(subcategory.attribute_group)
-    ? subcategory.attribute_group.join(', ')  // If it's an array, join with commas
+    ? subcategory.attribute_group.join(', ')  
     : subcategory.attribute_group && subcategory.attribute_group.split
-    ? subcategory.attribute_group.split(' ').join(', ')  // If it's a string, split and join
+    ? subcategory.attribute_group.split(' ').join(', ')  
     : "No groups available"}  
 </td>
 
