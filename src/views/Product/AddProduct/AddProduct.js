@@ -349,10 +349,10 @@ const resetDependentDropdowns = () => {
     const fetchData = async () => {
       try {
        
-        const [headResponse, parentResponse, categoryResponse, brandResponse] = await Promise.all([
+        const [headResponse, parentResponse, brandResponse] = await Promise.all([
           axios.get('http://16.171.145.107/pos/products/add_head_category'),
           axios.get('http://16.171.145.107/pos/products/add_parent_category/'),
-          axios.get('http://16.171.145.107/pos/products/add_category'),
+          
           axios.get('http://16.171.145.107/pos/products/add_brand')
         ]);
         
@@ -365,7 +365,7 @@ const resetDependentDropdowns = () => {
         );
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
-        setCategories(categoryResponse.data);
+        
        
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -634,7 +634,7 @@ const handlePublish = async () => {
           {activeTab === 0 && (
             <div className="form-column">
               <label>
-                Product Name:
+                Product Name: *
                 <input
                   type="text"
                   name="product_name"
@@ -655,19 +655,21 @@ const handlePublish = async () => {
                 </select>
               </label>
               <label>
-                SKU:
-                <input
-                  type="text"
-                  name="sku"
-                  value={formData.sku}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+  {/* SKU: */}
+  <input
+    type="text"
+    name="sku"
+    value={formData.sku}
+    onChange={handleChange}
+    required
+    style={{ display: 'none' }} // Corrected style syntax
+  />
+</label>
+
              {/* Head Category Dropdown */}
       
         {/* Head Category Dropdown */}
-<label>Head Category</label>
+<label>Head Category *</label>
 <select onChange={handleHeadCategoryChange}>
   <option value="">Select Head Category</option>
   {headCategories.map((headCategory) => (
@@ -678,7 +680,7 @@ const handlePublish = async () => {
 </select>
       
 {/* Parent Category Dropdown */}
-<label>Parent Category</label>
+<label>Parent Category *</label>
 <select value={selectedParentCategory}
   onChange={handleParentCategoryChange}
   disabled={!selectedHeadCategory}>
@@ -691,7 +693,7 @@ const handlePublish = async () => {
 </select>
 
 {/* Category Dropdown */}
-<label>Category</label>
+<label>Category *</label>
 <select value={selectedCategory}
   onChange={handleCategoryChange}
   disabled={!selectedParentCategory}>
@@ -719,7 +721,7 @@ const handlePublish = async () => {
 
       
 
-<label>Brands:</label>
+<label>Brands (optional):</label>
     <select value={selectedBrand} 
     onChange={handleBrandChange}>
       <option value="">Select a Brand</option>
@@ -733,7 +735,7 @@ const handlePublish = async () => {
     </select>
 
               <label>
-                Season:
+                Season (optional):
                 <select
                   name="season"
                   value={formData.season}
@@ -747,7 +749,7 @@ const handlePublish = async () => {
                 </select>
               </label>
               <label>
-                Description:
+                Description (optional)::
                 <input
                   type="text"
                   name="description"
@@ -763,7 +765,7 @@ const handlePublish = async () => {
             <div className="form-column">
               {/* Color and Size Inputs */}
               <label>
-  Color:
+  Color (optional):
   <Select
     isMulti
     options={colorOptions}
@@ -774,7 +776,7 @@ const handlePublish = async () => {
 
 </label>
 
-     <label>Select Attributes:</label>
+     <label>Select Attributes * :</label>
 <Select
   isMulti
   options={attributes}
@@ -812,7 +814,7 @@ const handlePublish = async () => {
 
     
               <label>
-                Cost Price:
+                Cost Price * :
                 <input
                   type="number"
                   name="cost_price"
@@ -822,7 +824,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Selling Price:
+                Selling Price * :
                 <input
                   type="number"
                   name="selling_price"

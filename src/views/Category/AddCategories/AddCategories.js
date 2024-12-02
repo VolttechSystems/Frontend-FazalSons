@@ -12,7 +12,7 @@ const AddCategories = () => {
     symbol: '',
     description: '',
     addSubCategory: true,
-    pc_name: "", // This stores the Parent Category ID
+    pc_name: '', // This stores the Parent Category ID
     status: 'active',
     attType: [],
     attribute_group: [],
@@ -175,41 +175,41 @@ const handleHeadCategoryChange = async (e) => {
   
   
 
-  // Fetch attributes and variations
-// useEffect(() => {
-//   console.log(formData.attType.length)
-//   if (formData.attType.length > 0) {
-//     const fetchAttributes = async () => {
-//       try {
-//         console.log("Selected Attribute Types:", formData.attType);
+  //Fetch attributes and variations
+useEffect(() => {
+  console.log(formData.attType.length)
+  if (formData.attType.length > 0) {
+    const fetchAttributes = async () => {
+      try {
+        console.log("Selected Attribute Types:", formData.attType);
 
-//         const responses = await Promise.all(
-//           formData.attType.map((typeId) =>
-//             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
-//           )
-//         );
+        const responses = await Promise.all(
+          formData.attType.map((typeId) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+          )
+        );
 
-//         const data = responses.flatMap((res) => res.data);
+        const data = responses.flatMap((res) => res.data);
 
-//         const groupedData = data.map((group) => ({
-//           att_type: group.att_type || "Unnamed Group", 
-//           attribute_id: Array.isArray(group.attribute_name) ? group.attribute_name : [], 
-//             variation: Array.isArray(group.variation) ? group.variation : [], 
-//         }));
+        const groupedData = data.map((group) => ({
+          att_type: group.att_type || "Unnamed Group", 
+          attribute_id: Array.isArray(group.attribute_name) ? group.attribute_name : [], 
+            variation: Array.isArray(group.variation) ? group.variation : [], 
+        }));
 
-//         console.log("Fetched Attributes for Table:", groupedData);
-//         setTableData(groupedData);
-//       } catch (error) {
-//         console.error("Error fetching Attributes:", error);
-//       }
-//     };
+        console.log("Fetched Attributes for Table:", groupedData);
+        setTableData(groupedData);
+      } catch (error) {
+        console.error("Error fetching Attributes:", error);
+      }
+    };
 
-//     fetchAttributes();
-//   } else {
-//     console.log("Wasfa")
-//     setTableData([]); // Clear table when no Attribute Type is selected
-//   }
-// }, [formData.attType]);
+    fetchAttributes();
+  } else {
+    console.log("Wasfa")
+    setTableData([]); // Clear table when no Attribute Type is selected
+  }
+}, [formData.attType]);
 
 
 
@@ -402,37 +402,42 @@ const handleInputChange = (e) => {
         // attribute_name: " ",
         //  attribute_id : null,
       });
+      
       setEditMode(false);
       setEditCategoryId(null);
     } catch (error) {
       console.error('Error submitting category:', error);
       setMessage('Failed to submit category. Please try again.');
     }
+   
   };
+  
   
   const handleEdit = async (category) => { 
     try {
         // Fetch category details from API
         const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`);
         const categoryData = response.data;
-        console.log(categoryData);
+        //console.log(categoryData[0].category_name, 'bb');
+        console.log(categoryData,'tt')
+        
 
         // Pre-fill form fields, including `att_type`
         setFormData({
-            headCategory: '', // Update if necessary
+            headCategory: categoryData?.head_id, // Update if necessary
             category_name: categoryData.category_name || '',
             symbol: categoryData.symbol || '',
             addSubCategory: categoryData.subcategory_option === "True",
-            description: categoryData.description || '',
+            description: formData.description || '',
             status: categoryData.status || 'active',
-            pc_name: categoryData.pc_name ? categoryData.pc_name.toString() : '',
+            pc_name: categoryData?.parent_id, // Update if necessary
             attribute_group: categoryData.attribute_group || [], // Array of selected attributes
             attType: categoryData.att_type || [], // Pre-fill `att_type`
         });
 
-        // Pre-fill table's selected attributes
+        //Pre-fill table's selected attributes
         const initialSelectedGroup = {};
-        categoryData.attribute_group.forEach((group) => {
+        formData.attribute_group.forEach((group) => {
             initialSelectedGroup[group] = group; // Populate based on `group` logic
         });
         setSelectedGroup(initialSelectedGroup);
@@ -444,6 +449,7 @@ const handleInputChange = (e) => {
         setMessage('Failed to fetch category details.');
     }
 };
+console.log(formData,'aa')
 
   
   const handleDelete = async (categoryId) => {

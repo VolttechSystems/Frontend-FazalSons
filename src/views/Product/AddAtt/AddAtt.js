@@ -2,12 +2,16 @@
 
 import React, { Component } from "react";
 import "./AddAtt.css";
+import axios from 'axios';
 import {
   CButton,
 } from '@coreui/react';
 import { Link } from 'react-router-dom';
 
+
+
 class AddAtt extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -20,13 +24,29 @@ class AddAtt extends Component {
       ],
       apiData: [],
       editData: null, // Holds data for editing
+      attribute: [],  // This is where the attributes are stored
+      
     };
+   
   }
+
+  addAttribute = () => {
+    this.setState((prevState) => ({
+      attributes: [
+        ...prevState.attributes,
+        { attributeName: "", variations: [] },  // Add a new attribute object
+      ],
+    }));
+  };
+  
 
   componentDidMount() {
     this.fetchData();
     this.fetchAttributeTypes(); // Fetch attribute types for the dropdown
   }
+   
+
+ 
   
   fetchAttributeTypes = async () => {
     try {
@@ -196,7 +216,7 @@ class AddAtt extends Component {
     const payload = {
       att_id: editData.att_id, // The ID of the attribute group to update
       att_type: attType,       // Attribute type (e.g., "Automobiles")
-      attribute_name: editData.attribute_name, // Use `att_id` for the attribute name
+      attribute_name: editData.att_id, // Use `att_id` for the attribute name
       variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
     };
   
@@ -233,37 +253,58 @@ class AddAtt extends Component {
       console.log(error);
     }
   };
+
   
-
   handleDelete = async (attId) => {
-    const confirmed = window.confirm("Are you sure you want to delete this item?");
-    if (!confirmed) return;
-
     try {
-      const response = await fetch(
-        `http://16.171.145.107/pos/products/action_variations_group/${attId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      // Make the API call to delete the variation group
+      await axios.delete(`http://16.171.145.107/pos/products/action_variations_group/${attId}`);
+      
+      // Update the state by filtering out the deleted attribute
+      this.setState((prevState) => ({
+        attribute: prevState.attributes.filter((attr) => attr.att_id !== attId),
+        //apiData: prevState.apiData.filter(item => item.att_id !== attId),
+        message: "Attribute deleted successfully.",
+      }));
 
-      const result = await response.json();
-      if (response.ok) {
-        alert("Data successfully deleted!");
-        // Remove the deleted item from the apiData state
-        this.setState((prevState) => ({
-          apiData: prevState.apiData.filter(item => item.att_id !== attId)
-        }));
-        console.log(result);
-      } else {
-        alert("Failed to delete data");
-        console.log(result);
-      }
     } catch (error) {
-      alert("Error deleting data");
-      console.log(error);
+      console.error('Error deleting category:', error);
+      // Set the failure message
+      this.setState({ message: 'Failed to delete category.' });
     }
+
+    
   };
+
+  // handleDelete = async (attId) => {
+  //   const confirmed = window.confirm("Are you sure you want to delete this item?");
+  //   if (!confirmed) return;
+
+  //   try {
+  //     const response = await fetch(
+  //       `http://16.171.145.107/pos/products/action_variations_group/${attId}`,
+  //       {
+  //         method: "DELETE",
+  //       }
+  //     );
+
+  //     const result = await response.json();
+  //     if (response.ok) {
+  //       alert("Data successfully deleted!");
+  //       // Remove the deleted item from the apiData state
+  //       this.setState((prevState) => ({
+  //         apiData: prevState.apiData.filter(item => item.att_id !== attId)
+  //       }));
+  //       console.log(result);
+  //     } else {
+  //       alert("Failed to delete data");
+  //       console.log(result);
+  //     }
+  //   } catch (error) {
+  //     alert("Error deleting data");
+  //     console.log(error);
+  //   }
+  // };
 
   // handleAddAttributeType = () => {
   //   navigate('/Product/AddAttributeType');
@@ -452,12 +493,8 @@ class AddAtt extends Component {
 
                 <td>
                   <button onClick={() => this.handleEdit(item)}>Edit</button>
-                  <button
-                    onClick={() => this.handleDelete(item.att_id)}
-                    style={{ marginLeft: "10px" }}
-                  >
-                    Delete
-                  </button>
+                  <button onClick={() => this.handleDelete(item.att_id)}>Delete</button>
+                   
                 </td>
               </tr>
             ))}

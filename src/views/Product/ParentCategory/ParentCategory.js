@@ -170,6 +170,11 @@ const ParentCategory = () => {
 
   return (
     <CRow>
+       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+         <Link to="/Product/AddParentCategory">
+           <CButton color="primary" className="me-md-2">Add Parent Category</CButton>
+         </Link>
+       </div>
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>
@@ -195,7 +200,7 @@ const ParentCategory = () => {
                   {pc.map((parent, index) => (
                     <CTableRow key={parent.id}>
                       <CTableDataCell>{index + 1}</CTableDataCell>
-                      <CTableDataCell>{getCategoryHead(parent.hc_name_id)}</CTableDataCell>
+                      <CTableDataCell>{parent.hc_name}</CTableDataCell>
                       <CTableDataCell>{parent.pc_name}</CTableDataCell>
                       <CTableDataCell>{parent.symbol}</CTableDataCell>
                       <CTableDataCell>{parent.description}</CTableDataCell>
