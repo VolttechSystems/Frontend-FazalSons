@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './AddSubCat.css';
 import Select from 'react-select';
+import { Link } from 'react-router-dom';
 
 const AddSubCat = () => {
   const [formData, setFormData] = useState({
@@ -486,6 +487,9 @@ const handleInputChange = (e) => {
               </option>
             ))}
           </select>
+          <Link to="/Product/AddHeadCategory">
+        <button>+</button>
+      </Link>
         </div>
 
         {/* Parent Category Dropdown */}
@@ -507,6 +511,10 @@ const handleInputChange = (e) => {
      
     ))}
   </select>
+  <Link to="/Product/AddParentCategory">
+        <button>+</button>
+      </Link>
+
 
 </div>
 
@@ -538,6 +546,9 @@ const handleInputChange = (e) => {
      
     ))}
   </select>
+  <Link to="/Category/AddCategories">
+        <button>+</button>
+      </Link>
   </div>
 
 

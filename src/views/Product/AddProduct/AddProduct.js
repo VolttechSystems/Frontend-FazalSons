@@ -411,10 +411,11 @@ const resetDependentDropdowns = () => {
   const handleChange = async (e) => {
     const { name, value } = e.target;
     
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData({
+      ...formData,
       [name]: value,
-    }));
+    });
+  
   
    
   };
@@ -707,7 +708,7 @@ const handlePublish = async () => {
 
 {/* Subcategory Dropdown */}
 
-<label>Subcategory</label>
+<label>Subcategory *</label>
 <select value={selectedsubCategory}
   onChange={handleSubCategoryChange}
   disabled={!selectedCategory}>
@@ -749,7 +750,7 @@ const handlePublish = async () => {
                 </select>
               </label>
               <label>
-                Description (optional)::
+                Description (optional):
                 <input
                   type="text"
                   name="description"
@@ -834,7 +835,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Discount Price:
+                Discount Price (Optional):
                 <input
                   type="number"
                   name="discount_price"
@@ -843,7 +844,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Wholesale Price:
+                Wholesale Price (Optional):
                 <input
                   type="number"
                   name="wholesale_price"
@@ -852,7 +853,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Retail Price:
+                Retail Price (Optional):
                 <input
                   type="number"
                   name="retail_price"
@@ -861,7 +862,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Token Price:
+                Token Price (Optional):
                 <input
                   type="number"
                   name="token_price"

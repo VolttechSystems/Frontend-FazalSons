@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './AddCategories.css';
 import Select from 'react-select';
+import { Link } from 'react-router-dom';
 
 const AddCategories = () => {
   const [formData, setFormData] = useState({
@@ -489,6 +490,9 @@ console.log(formData,'aa')
               </option>
             ))}
           </select>
+          <Link to="/Product/AddHeadCategory">
+        <button>+</button>
+      </Link>
         </div>
 
         {/* Parent Category Dropdown */}
@@ -519,6 +523,9 @@ console.log(formData,'aa')
      
     ))}
   </select>
+  <Link to="/Product/AddParentCategory">
+        <button>+</button>
+      </Link>
 
 {/* 
   <select value={selectedParentCategory}
