@@ -58,6 +58,7 @@ const [attributes, setAttributes] = useState([]);
   const [selectedVariations, setSelectedVariations] = useState({})
   //const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [selectedBrand, setSelectedBrand] = useState("");
+  const [outlets, setOutlets] = useState([]);
   
   
 
@@ -393,9 +394,20 @@ const resetDependentDropdowns = () => {
       console.error('Error fetching products:', error);
     }
   };
-  
-  ;
 
+  // Function to fetch outlets from API
+  useEffect(() => {
+    const fetchOutlets = async () => {
+      try {
+        const response = await axios.get("http://16.171.145.107/pos/products/fetch_all_outlet/");
+        setOutlets(response.data); // Assuming the response data is an array
+      } catch (error) {
+        console.error("Error fetching outlets:", error);
+      }
+    };
+
+    fetchOutlets();
+  }, []);
   
   
 
@@ -635,7 +647,7 @@ const handlePublish = async () => {
           {activeTab === 0 && (
             <div className="form-column">
               <label>
-                Product Name: *
+                Product Name *
                 <input
                   type="text"
                   name="product_name"
@@ -645,16 +657,23 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Outlet Name:
-                <select
-                  name="outlet_name"
-                  value={formData.outlet_name}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="Fazal Sons">Fazal Sons</option>
-                </select>
-              </label>
+      Outlet Name:
+      <select
+        name="outlet_name"
+        value={formData.outlet_name}
+        onChange={handleChange}
+        required
+      >
+        <option value="" disabled>
+          Select Outlet
+        </option>
+        {outlets.map((outlet, index) => (
+          <option key={index} value={outlet.outlet_name}>
+            {outlet.outlet_name}
+          </option>
+        ))}
+      </select>
+    </label>
               <label>
   {/* SKU: */}
   <input
@@ -722,7 +741,7 @@ const handlePublish = async () => {
 
       
 
-<label>Brands (optional):</label>
+<label>Brands (optional)</label>
     <select value={selectedBrand} 
     onChange={handleBrandChange}>
       <option value="">Select a Brand</option>
@@ -736,7 +755,7 @@ const handlePublish = async () => {
     </select>
 
               <label>
-                Season (optional):
+                Season (optional)
                 <select
                   name="season"
                   value={formData.season}
@@ -750,7 +769,7 @@ const handlePublish = async () => {
                 </select>
               </label>
               <label>
-                Description (optional):
+                Description (optional)
                 <input
                   type="text"
                   name="description"
@@ -766,7 +785,7 @@ const handlePublish = async () => {
             <div className="form-column">
               {/* Color and Size Inputs */}
               <label>
-  Color (optional):
+  Color (optional)
   <Select
     isMulti
     options={colorOptions}
@@ -777,7 +796,7 @@ const handlePublish = async () => {
 
 </label>
 
-     <label>Select Attributes * :</label>
+     <label>Select Attributes * </label>
 <Select
   isMulti
   options={attributes}
@@ -815,7 +834,7 @@ const handlePublish = async () => {
 
     
               <label>
-                Cost Price * :
+                Cost Price * 
                 <input
                   type="number"
                   name="cost_price"
@@ -825,7 +844,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Selling Price * :
+                Selling Price * 
                 <input
                   type="number"
                   name="selling_price"
@@ -835,7 +854,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Discount Price (Optional):
+                Discount Price (Optional)
                 <input
                   type="number"
                   name="discount_price"
@@ -844,7 +863,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Wholesale Price (Optional):
+                Wholesale Price (Optional)
                 <input
                   type="number"
                   name="wholesale_price"
@@ -853,7 +872,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Retail Price (Optional):
+                Retail Price (Optional)
                 <input
                   type="number"
                   name="retail_price"
@@ -862,7 +881,7 @@ const handlePublish = async () => {
                 />
               </label>
               <label>
-                Token Price (Optional):
+                Token Price (Optional)
                 <input
                   type="number"
                   name="token_price"

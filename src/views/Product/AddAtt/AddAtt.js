@@ -216,7 +216,7 @@ class AddAtt extends Component {
     const payload = {
       att_id: editData.att_id, // The ID of the attribute group to update
       att_type: attType,       // Attribute type (e.g., "Automobiles")
-      attribute_name: editData.att_id, // Use `att_id` for the attribute name
+      attribute_name: editData.attribute_name      , // Use `att_id` for the attribute name
       variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
     };
   
@@ -317,82 +317,98 @@ class AddAtt extends Component {
 
     return (
       <div style={{ padding: "20px" }}>
-        <h1>{editData ? "Edit Attribute" : "Add Attributes"}</h1>
-
-        <div style={{ marginBottom: "20px" }}>
-  <label htmlFor="attType" style={{ marginRight: "10px" }}>
-    Attribute Type
-  </label>
-  <select
-    name="attType"
-    id="attType"
-    value={attType}
-    onChange={(e) => this.setState({ attType: e.target.value })}
-    style={{ marginRight: "10px", width: "30%" }}
-  >
-    <option value="">Select Attribute Type</option>
-    {this.state.attributeTypes?.map((type) => (
-      <option key={type.id} value={type.id}>
-        {type.att_type}
-      </option>
-    ))}
-  </select>
-  
-  <Link to="/Product/AddAttributeType">
-        <button>+</button>
-      </Link>
-</div>
-
-
-{attributes.map((attribute, attrIndex) => (
-  <div key={attrIndex} style={{ marginBottom: "20px" }}>
-    {/* Attribute Group Label and Input */}
-    <label
-      htmlFor={`attributeName-${attrIndex}`}
-      style={{ marginRight: "10px" }}
-    >
-      Attribute Group {attrIndex + 1}
-    </label>
-    <input
-      type="text"
-      name="attributeName"
-      id={`attributeName-${attrIndex}`}
-      placeholder={`Attribute Group ${attrIndex + 1}`}
-      value={attribute.attributeName}
-      onChange={(e) => this.handleInputChange(e, attrIndex)}
-      onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
-      style={{ marginRight: "10px", width: "30%" }}
-    />
-
-    {/* Buttons for adding and removing attribute groups */}
-    <div style={{ display: "inline-block", marginLeft: "10px" }}>
-      {attrIndex === attributes.length - 1 && !editData && (
-        <button
-          className="add-attribute-button"
-          onClick={this.addAttribute}
-          style={{ marginRight: "5px" }}
-        >
-          + Add Attribute
-        </button>
-      )}
-
-      {/* Red Cross Button to Remove Attribute */}
-      {attributes.length > 1 && (
-        <button
-          className="remove-attribute-button"
-          onClick={() => this.removeAttribute(attrIndex)}
+      <h1>{editData ? "Edit Attribute" : "Add Attributes"}</h1>
+    
+      {/* Attribute Type Dropdown */}
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="attType" style={{ marginRight: "10px" }}>
+          Attribute Type
+        </label>
+        <select
+          name="attType"
+          id="attType"
+          value={attType}
+          onChange={(e) => this.setState({ attType: e.target.value })}
           style={{
-            color: "red",
-            border: "none",
-            background: "none",
-            cursor: "pointer",
-            fontSize: "18px",
+            marginRight: "10px",
+            width: "30%",
+            padding: "5px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
           }}
         >
-          &times;
-        </button>
-      )}
-    </div>
+          <option value="">Select Attribute Type</option>
+          {this.state.attributeTypes?.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.att_type}
+            </option>
+          ))}
+        </select>
+    
+        <Link to="/Product/AddAttributeType">
+          <button style={{ padding: "5px 10px", cursor: "pointer" }}>+</button>
+        </Link>
+      </div>
+    
+      {/* Attribute Groups */}
+      {attributes.map((attribute, attrIndex) => (
+        <div key={attrIndex} style={{ marginBottom: "20px" }}>
+          {/* Attribute Group Label and Input */}
+          <label
+            htmlFor={`attributeName-${attrIndex}`}
+            style={{ marginRight: "10px" }}
+          >
+            Attribute Group {attrIndex + 1}
+          </label>
+          <input
+            type="text"
+            name="attributeName"
+            id={`attributeName-${attrIndex}`}
+            placeholder={`Attribute Group ${attrIndex + 1}`}
+            value={attribute.attributeName}
+            onChange={(e) => this.handleInputChange(e, attrIndex)}
+            onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
+            style={{
+              marginRight: "10px",
+              width: "30%",
+              padding: "5px",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+            }}
+          />
+    
+          {/* Buttons for adding and removing attribute groups */}
+          <div style={{ display: "inline-block", marginLeft: "10px" }}>
+            {attrIndex === attributes.length - 1 && !editData && (
+              <button
+                className="add-attribute-button"
+                onClick={this.addAttribute}
+                
+              >
+                + Add Attribute
+              </button>
+            )}
+    
+            {/* Red Cross Button to Remove Attribute */}
+            {attributes.length > 1 && (
+              <button
+                className="remove-attribute-button"
+                onClick={() => this.removeAttribute(attrIndex)}
+                style={{
+                  color: "red",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                  fontSize: "18px",
+                }}
+              >
+                &times;
+              </button>
+            )}
+          </div>
+        
+      
+    
 
     {/* Attribute Variations */}
     <div style={{ marginLeft: "30px", marginTop: "10px" }}>
