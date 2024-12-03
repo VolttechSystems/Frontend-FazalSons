@@ -8,7 +8,7 @@ import Select from 'react-select';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Modal, Button } from '@mui/material'; // You can use any modal component or create your own.
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 
 
 
@@ -59,6 +59,8 @@ const [attributes, setAttributes] = useState([]);
   //const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [selectedBrand, setSelectedBrand] = useState("");
   const [outlets, setOutlets] = useState([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [nextTab, setNextTab] = useState(null);
   
   
 
@@ -95,25 +97,28 @@ const fetchAttributes = async (categoryId, subCategoryId) => {
     console.error('Error fetching attributes:', error);
   }
 };
-
 const handleTabChange = (tabIndex) => {
-  
-  if (tabIndex === 1) {
-    
-    if (!selectedCategory ) {
-      console.log('Please select a category and subcategory before switching to the Color, Sizes & Pricing tab!');
-      return; // Prevent switching to Color tab if category or subcategory is not selected
-    }
-    console.log('Switching to Color, Sizes & Pricing tab'); 
-
-  } else {
-    console.log(`Tab changed to: ${tabIndex}`); 
+  if (tabIndex === 1 && !selectedCategory) {
+    console.log('Please select a category before switching to the Color, Sizes & Pricing tab!');
+    return;
   }
 
-  // Proceed with tab change if valid
-  setActiveTab(tabIndex);
+  if (tabIndex === 0 && activeTab === 1) {
+    // Open confirmation dialog when going back from "Color" tab to "General"
+    setNextTab(tabIndex);
+    setIsDialogOpen(true);
+  } else {
+    // Directly change the tab if no confirmation is needed
+    setActiveTab(tabIndex);
+  }
 };
 
+const handleDialogClose = (confirm) => {
+  setIsDialogOpen(false);
+  if (confirm) {
+    setActiveTab(nextTab); // Switch to the previously saved tab index
+  }
+};
   
 
 // Handle attribute selection
@@ -628,19 +633,37 @@ const handlePublish = async () => {
     <div className="add-product-form">
     <h2>Product Information</h2>
 
+    {/* Tabs */}
     <Paper square>
-      <Tabs
-        value={activeTab}
-        textColor="primary"
-        indicatorColor="primary"
-        onChange={(event, newValue) => handleTabChange(newValue)}
-        centered
-      >
-        <Tab label="General" />
-        <Tab label="Color, Sizes & Pricing" />
-        
-      </Tabs>
-    </Paper>
+        <Tabs
+          value={activeTab}
+          textColor="primary"
+          indicatorColor="primary"
+          onChange={(event, newValue) => handleTabChange(newValue)}
+          centered
+        >
+          <Tab label="General" />
+          <Tab label="Color, Sizes & Pricing" />
+        </Tabs>
+      </Paper>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={isDialogOpen} onClose={() => handleDialogClose(false)}>
+        <DialogTitle>Confirmation</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to go back to the "General" tab? Unsaved changes might be lost.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDialogClose(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={() => handleDialogClose(true)} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <div className="form-container">
         <form>
