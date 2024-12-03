@@ -28,6 +28,9 @@
     "@coreui/utils": "^2.0.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.1",
+    "@fortawesome/free-solid-svg-icons": "^6.7.1",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/material": "^6.1.4",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.7.7",
@@ -55,7 +58,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "postcss": "^8.4.47",
     "prettier": "3.3.3",
-    "sass": "^1.79.3",
+    "sass": "^1.81.1",
     "vite": "^5.4.8"
   }
 }

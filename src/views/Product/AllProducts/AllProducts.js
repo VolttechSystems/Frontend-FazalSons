@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const Loader = () => {
   return (
@@ -63,22 +65,17 @@ const AllProducts = () => {
       {loading && <Loader />}
       {loading && <p>Loading products...</p>}
       {error && <p className="text-danger">{error}</p>}
-      <h2>All Products</h2>
+      <h2>ALL PRODUCTS</h2>
       <table>
         <thead>
           <tr>
             <th>ID</th>
             <th>Product Name</th>
             <th>SKU</th>
-            <th>Season</th>
+            <th>Item</th>
             <th>Color</th>
-            <th>Size</th>
-            <th>Selling Price</th>
             <th>Cost Price</th>
-            <th>Discount Price</th>
-            <th>Wholesale Price</th>
-            <th>Retail Price</th>
-            <th>Token Price</th>
+            <th>Selling Price</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -88,19 +85,14 @@ const AllProducts = () => {
               <td>{product.id}</td>
               <td>{product.product_name}</td>
               <td>{product.sku}</td>
-              <td>{product.season}</td>
-              <td>{product.color}</td>
-              <td>{product.size}</td>
-              <td>{product.selling_price}</td>
+              <td>{product.description}</td>
+              <td>{product.color || "-"}</td>
               <td>{product.cost_price}</td>
-              <td>{product.discount_price}</td>
-              <td>{product.wholesale_price}</td>
-              <td>{product.retail_price}</td>
-              <td>{product.token_price}</td>
+              <td>{product.selling_price}</td>
+             
               <td>
-                <button onClick={() => handleEdit(product.id)} style={{ marginRight: '8px' }}>Edit</button>
-                <button onClick={() => handleDelete(product.id)} style={{ marginLeft: '8px' }}>Delete</button>
-                
+                <button onClick={() => handleEdit(product.id)} style={{ marginRight: '8px', backgroundColor: "#6ac267" }}>  <FontAwesomeIcon icon={faEdit} /> </button>
+                <button onClick={() => handleDelete(product.id)} style={{ marginLeft: '8px' , backgroundColor:"#ee4262"}}><FontAwesomeIcon icon={faTrash} /> </button>
               </td>
             </tr>
           ))}
