@@ -62,7 +62,9 @@ const [attributes, setAttributes] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [nextTab, setNextTab] = useState(null);
   const [isCategoryDialogOpen, setCategoryDialogOpen] = React.useState(false);
+  const [addedVariations, setAddedVariations] = useState([]);
   
+
   
 
 useEffect(() => {
@@ -141,29 +143,60 @@ const handleAttributeChange = (selectedOptions) => {
   console.log("selectedOptions", selectedOptions);
 };
 
-// Handle variation selection for each attribute
-const handleVariationChange = (e, attribute) => {
-  const { value, checked } = e.target;  // Extract variation and checked state
 
-  // Update selected variations for the corresponding attribute
+
+const handleAddVariation = (selectedVariation) => {
+  // Simulate adding to database
+  setAddedVariations((prev) => [...prev, selectedVariation]);
+
+  // Additional logic to save in database
+  // Example:
+  // await fetch("API_URL", {
+  //   method: "POST",
+  //   body: JSON.stringify({ variation: selectedVariation }),
+  // });
+};
+ 
+// Handle variation selection for each attribute
+// const handleVariationChange = (e, attribute) => {
+//   const { value, checked } = e.target;  // Extract variation and checked state
+
+//   // Update selected variations for the corresponding attribute
+//   setSelectedVariations((prevState) => {
+//     // Initialize variations for this attribute if not already present
+//     const updatedVariations = prevState[attribute] || [];
+
+//     if (checked) {
+//       // Add variation if it's checked
+//       updatedVariations.push(value);
+//     } else {
+//       // Remove variation if it's unchecked
+//       const index = updatedVariations.indexOf(value);
+//       if (index > -1) updatedVariations.splice(index, 1); // Remove from array
+//     }
+
+//     // Return the updated state with variations for this attribute
+//     return { ...prevState, [attribute]: updatedVariations };
+//   });
+// };
+
+
+const handleVariationChange = (e, attribute) => {
+  const { value, checked } = e.target;
+
   setSelectedVariations((prevState) => {
-    // Initialize variations for this attribute if not already present
     const updatedVariations = prevState[attribute] || [];
 
     if (checked) {
-      // Add variation if it's checked
       updatedVariations.push(value);
     } else {
-      // Remove variation if it's unchecked
       const index = updatedVariations.indexOf(value);
-      if (index > -1) updatedVariations.splice(index, 1); // Remove from array
+      if (index > -1) updatedVariations.splice(index, 1);
     }
 
-    // Return the updated state with variations for this attribute
     return { ...prevState, [attribute]: updatedVariations };
   });
 };
-
 
 useEffect(() => {
   fetchHeadCategories();
@@ -226,6 +259,22 @@ useEffect(() => {
 
   fetchBrands();
 }, []);
+
+
+// useEffect(() => {
+//   // Fetch variations already added in the database
+//   const fetchAddedVariations = async () => {
+//     try {
+//       const response = await fetch("API_ENDPOINT");
+//       const data = await response.json();
+//       setAddedVariations(data.variations); // Assume API returns an array of variations
+//     } catch (error) {
+//       console.error("Error fetching added variations:", error);
+//     }
+//   };
+
+//   fetchAddedVariations();
+// }, []);
 
 
 // Fetch Categories based on selected Parent Category
@@ -586,18 +635,7 @@ const handleDelete = async (id) => {
 
 const resetForm = () => {
   setFormData({
-    
-    outlet_name: 'Fazal Sons',
-    sku: '',
-    head_category: '',
-    parent_category: '',
-    category: '',
-    sub_category: '',
-    season: '',
-    description: '',
     color: [],
-    size: [],
-    used_for_inventory: false,
     cost_price: '',
     selling_price: '',
     discount_price: '',
@@ -870,31 +908,30 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
 />
 
 {/* Display Variations */}
-{variations.length > 0 && (
-  <div>
-    <h3>Variations</h3>
-    {variations?.map(({ attribute, variations }) => (
-  <div key={attribute} style={{ marginTop: '20px' }}>
-    <h5>{attribute}</h5>
-    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-      {variations?.map((variations) => (
-        <label key={variations} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            name={attribute}
-            value={variations}
-            onChange={(e) => handleVariationChange(e, attribute)} 
-          />
-          {variations}
-        </label>
-      ))}
-    </div>
+<div>
+    {variations.map(({ attribute, variations }) => (
+      <div key={attribute} style={{ marginTop: "20px" }}>
+        <h5>{attribute}</h5>
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          {variations.map((variation) => (
+            <label
+              key={variation}
+              style={{ display: "flex", alignItems: "center", gap: "8px" }}
+            >
+              <input
+                type="checkbox"
+                name={attribute}
+                value={variation}
+                onChange={(e) => handleVariationChange(e, attribute)}
+                disabled={addedVariations.includes(variation)} // Disable if already added
+              />
+              {variation}
+            </label>
+          ))}
+        </div>
+      </div>
+    ))}
   </div>
-))}
-
-
-  </div>
-)}
 
 
     
