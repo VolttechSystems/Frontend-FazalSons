@@ -586,7 +586,7 @@ const handleDelete = async (id) => {
 
 const resetForm = () => {
   setFormData({
-    product_name: '',
+    
     outlet_name: 'Fazal Sons',
     sku: '',
     head_category: '',
@@ -698,8 +698,7 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
 {isCategoryDialogOpen && (
   <Dialog open={isCategoryDialogOpen} onClose={closeCategoryDialog}>
     <DialogTitle>Category Required</DialogTitle>
-    <DialogContent>
-      <DialogContentText>Please select a category or subcategory before proceeding.</DialogContentText>
+    <DialogContent>      <DialogContentText>Please select a category or subcategory before proceeding.</DialogContentText>
     </DialogContent>
     <DialogActions>
       <Button onClick={closeCategoryDialog} color="primary">OK</Button>
