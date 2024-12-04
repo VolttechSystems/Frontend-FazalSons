@@ -61,6 +61,7 @@ const [attributes, setAttributes] = useState([]);
   const [outlets, setOutlets] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [nextTab, setNextTab] = useState(null);
+  const [isCategoryDialogOpen, setCategoryDialogOpen] = React.useState(false);
   
   
 
@@ -99,7 +100,7 @@ const fetchAttributes = async (categoryId, subCategoryId) => {
 };
 const handleTabChange = (tabIndex) => {
   if (tabIndex === 1 && !selectedCategory) {
-    console.log('Please select a category before switching to the Color, Sizes & Pricing tab!');
+    openCategoryDialog();
     return;
   }
 
@@ -629,9 +630,36 @@ const handlePublish = async () => {
 };
 
 
+const openCategoryDialog = () => setCategoryDialogOpen(true);
+const closeCategoryDialog = () => setCategoryDialogOpen(false);
+
+
+
+
   return (
     <div className="add-product-form">
     <h2>Product Information</h2>
+
+    <div style={{ marginBottom: "16px" }}> {/* Add space below the label and input */}
+  <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>
+    Product Name *
+  </label>
+  <input
+    type="text"
+    name="product_name"
+    value={formData.product_name}
+    onChange={handleChange}
+    required
+    style={{
+      width: "100%",       // Make input full width (optional)
+      padding: "8px",      // Add padding for better UX
+      fontSize: "16px",    // Adjust font size
+      border: "1px solid #ccc", // Add a border
+      borderRadius: "4px", // Add slight rounding to corners
+    }}
+  />
+</div>
+
 
     {/* Tabs */}
     <Paper square>
@@ -665,11 +693,26 @@ const handlePublish = async () => {
         </DialogActions>
       </Dialog>
 
+
+      {/* Category Dialog */}
+{isCategoryDialogOpen && (
+  <Dialog open={isCategoryDialogOpen} onClose={closeCategoryDialog}>
+    <DialogTitle>Category Required</DialogTitle>
+    <DialogContent>
+      <DialogContentText>Please select a category or subcategory before proceeding.</DialogContentText>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={closeCategoryDialog} color="primary">OK</Button>
+    </DialogActions>
+  </Dialog>
+)}
+
+
       <div className="form-container">
         <form>
           {activeTab === 0 && (
             <div className="form-column">
-              <label>
+               {/* <label style={{ fontWeight: "bold" }}>
                 Product Name *
                 <input
                   type="text"
@@ -678,8 +721,8 @@ const handlePublish = async () => {
                   onChange={handleChange}
                   required
                 />
-              </label>
-              <label>
+              </label> */}
+              <label style={{ fontWeight: "bold" }}>
       Outlet Name:
       <select
         name="outlet_name"
@@ -712,7 +755,7 @@ const handlePublish = async () => {
              {/* Head Category Dropdown */}
       
         {/* Head Category Dropdown */}
-<label>Head Category *</label>
+        <label style={{ fontWeight: "bold" }}> Head Category *</label>
 <select onChange={handleHeadCategoryChange}>
   <option value="">Select Head Category</option>
   {headCategories.map((headCategory) => (
@@ -723,7 +766,7 @@ const handlePublish = async () => {
 </select>
       
 {/* Parent Category Dropdown */}
-<label>Parent Category *</label>
+<label style={{ fontWeight: "bold" }}> Parent Category *</label>
 <select value={selectedParentCategory}
   onChange={handleParentCategoryChange}
   disabled={!selectedHeadCategory}>
@@ -736,7 +779,7 @@ const handlePublish = async () => {
 </select>
 
 {/* Category Dropdown */}
-<label>Category *</label>
+<label style={{ fontWeight: "bold" }}> Category *</label>
 <select value={selectedCategory}
   onChange={handleCategoryChange}
   disabled={!selectedParentCategory}>
@@ -750,7 +793,7 @@ const handlePublish = async () => {
 
 {/* Subcategory Dropdown */}
 
-<label>Subcategory *</label>
+<label style={{ fontWeight: "bold" }}> Subcategory *</label>
 <select value={selectedsubCategory}
   onChange={handleSubCategoryChange}
   disabled={!selectedCategory}>
@@ -764,7 +807,7 @@ const handlePublish = async () => {
 
       
 
-<label>Brands (optional)</label>
+<label style={{ fontWeight: "bold" }}> Brands (optional)</label>
     <select value={selectedBrand} 
     onChange={handleBrandChange}>
       <option value="">Select a Brand</option>
@@ -777,7 +820,7 @@ const handlePublish = async () => {
       ))}
     </select>
 
-              <label>
+    <label style={{ fontWeight: "bold" }}>
                 Season (optional)
                 <select
                   name="season"
@@ -791,7 +834,7 @@ const handlePublish = async () => {
                   <option value="Autumn">Autumn</option>
                 </select>
               </label>
-              <label>
+              <label style={{ fontWeight: "bold" }}>
                 Description (optional)
                 <input
                   type="text"
@@ -807,7 +850,7 @@ const handlePublish = async () => {
           {activeTab === 1 && (
             <div className="form-column">
               {/* Color and Size Inputs */}
-              <label>
+              <label style={{ fontWeight: "bold" }}>
   Color (optional)
   <Select
     isMulti
@@ -819,7 +862,7 @@ const handlePublish = async () => {
 
 </label>
 
-     <label>Select Attributes * </label>
+<label style={{ fontWeight: "bold" }}>Select Attributes * </label>
 <Select
   isMulti
   options={attributes}
@@ -856,7 +899,7 @@ const handlePublish = async () => {
 
 
     
-              <label>
+<label style={{ fontWeight: "bold" }}>
                 Cost Price * 
                 <input
                   type="number"
@@ -866,7 +909,7 @@ const handlePublish = async () => {
                   required
                 />
               </label>
-              <label>
+              <label style={{ fontWeight: "bold" }}>
                 Selling Price * 
                 <input
                   type="number"
@@ -876,7 +919,7 @@ const handlePublish = async () => {
                   required
                 />
               </label>
-              <label>
+              <label style={{ fontWeight: "bold" }}>
                 Discount Price (Optional)
                 <input
                   type="number"
@@ -885,7 +928,7 @@ const handlePublish = async () => {
                   onChange={handleChange}
                 />
               </label>
-              <label>
+              <label style={{ fontWeight: "bold" }}>
                 Wholesale Price (Optional)
                 <input
                   type="number"
@@ -894,7 +937,7 @@ const handlePublish = async () => {
                   onChange={handleChange}
                 />
               </label>
-              <label>
+              <label style={{ fontWeight: "bold" }}>
                 Retail Price (Optional)
                 <input
                   type="number"
@@ -903,7 +946,7 @@ const handlePublish = async () => {
                   onChange={handleChange}
                 />
               </label>
-              <label>
+              <label style={{ fontWeight: "bold" }}>
                 Token Price (Optional)
                 <input
                   type="number"
