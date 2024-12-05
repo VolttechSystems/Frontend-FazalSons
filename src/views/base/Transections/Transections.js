@@ -1,258 +1,4 @@
 
-// import React, { useState, useEffect } from 'react';
-// import './Transections.css';
-// import { CAlert, CButton } from '@coreui/react'; 
-
-
-// // Helper function to group products by name
-// const groupByProductName = (products) => {
-//     return products.reduce((acc, product) => {
-//       const { product_name, sku, size, color } = product;
-      
-//       // Initialize the group for this product name if it doesn't exist
-//       if (!acc[product_name]) {
-//         acc[product_name] = [];
-//       }
-      
-//       // Add the product details to the group
-//       acc[product_name].push({ sku, size, color });
-//       return acc;
-//     }, {});
-//   };
-  
-  
-  
-  
-// function Transections() {
-//     const [products, setProducts] = useState([
-//         { sku: 'YF-P1-KS-24-L-MAR', name: 'MA1 GENTS KURTA PYJAMA COMPUTER EMBROIDERY', qty: 2, price: 2995, discount: 0 },
-//         { sku: 'YF-P1-KS-25-XL-MAR', name: 'MA1 GENTS KURTA PYJAMA COMPUTER EMBROIDERY', qty: 5, price: 2995, discount: 0 }
-//     ]);
-//     const [salesmen, setSalesmen] = useState([]);
-//     const [additionalFees, setAdditionalFees] = useState([]);
-//     const [deliveryFees, setDeliveryFees] = useState([]);
-//     const [currentDateTime, setCurrentDateTime] = useState(new Date());
-//     const [allProducts, setAllProducts] = useState([]);
-
-//     const [alertMessage, setAlertMessage] = useState('');
-//     const [visible, setVisible] = useState(false);
-
-//     useEffect(() => {
-//         const fetchSalesmen = async () => {
-//             try {
-//                 const response = await fetch('http://16.171.145.107/pos/transaction/add_salesman');
-//                 const data = await response.json();
-//                 if (data && Array.isArray(data)) {
-//                     setSalesmen(data);
-//                 }
-//             } catch (error) {
-//                 console.error('Error fetching salesmen:', error);
-//             }
-//         };
-
-//         const fetchAdditionalFees = async () => {
-//             try {
-//                 const response = await fetch('http://16.171.145.107/pos/transaction/add_additional_fee');
-//                 const data = await response.json();
-//                 if (data && Array.isArray(data)) {
-//                     setAdditionalFees(data);
-//                 }
-//             } catch (error) {
-//                 console.error('Error fetching additional fees:', error);
-//             }
-//         };
-
-//         const fetchDeliveryFees = async () => {
-//             try {
-//                 const response = await fetch('http://16.171.145.107/pos/transaction/action_additional_fee/id/');
-//                 const data = await response.json();
-//                 if (data && Array.isArray(data)) {
-//                     setDeliveryFees(data);
-//                 }
-//             } catch (error) {
-//                 console.error('Error fetching delivery fees:', error);
-//             }
-//         };
-
-//         const fetchAllProducts = async () => {
-//             try {
-//               const response = await fetch('http://16.171.145.107/pos/transaction/all_product');
-//               const data = await response.json();
-//               console.log("Raw API Response:", data);  // Log the raw API response
-          
-//               if (Array.isArray(data)) {
-//                 const groupedData = groupByProductName(data);
-//                 console.log("Grouped Data:", groupedData);  // Log grouped data
-//                 setAllProducts(groupedData);  // Update state with grouped data
-//               }
-//             } catch (error) {
-//               console.error('Error fetching all products:', error);
-//             }
-//           };
-        
-
-//         fetchSalesmen();
-//         fetchAdditionalFees();
-//         fetchDeliveryFees();
-//         fetchAllProducts();
-
-//         const interval = setInterval(() => {
-//             setCurrentDateTime(new Date());
-//         }, 1000);
-
-//         return () => clearInterval(interval);
-//     }, []);
-
-//     const calculateTotal = () => {
-//         let totalAmount = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
-//         let totalDiscount = products.reduce((sum, p) => sum + ((p.qty * p.price) * (p.discount / 100)), 0);
-//         let netTotal = totalAmount - totalDiscount;
-//         return { totalAmount, totalDiscount, netTotal };
-//     };
-
-//     const { totalAmount, totalDiscount, netTotal } = calculateTotal();
-
-//     const formatDateTime = (date) => {
-//         return date.toLocaleTimeString() + ' | ' + date.toLocaleDateString(undefined, {
-//             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-//         });
-//     };
-
-//     // Function to handle button click and show alert
-//     const handleButtonClick = (message) => {
-//         setAlertMessage(message);
-//         setVisible(true);
-//     };
-
-//     return (
-//         <div className="transactions-page">
-//             <header className="t-header">
-//                 <h1 className="t-logo">FAZAL SONS</h1>
-//                 <div className="t-header-info">
-//                     <button className="t-header-button" onClick={() => handleButtonClick("Today's Sales clicked!")}>Today Sales</button>
-//                     <button className="t-header-button" onClick={() => handleButtonClick("Sales Return clicked!")}>Sales Return</button>
-//                     <button className="t-header-button" onClick={() => handleButtonClick("Due Receivable clicked!")}>Due Receivable</button>
-//                     <button className="t-header-button" onClick={() => handleButtonClick("Close Till clicked!")}>Close Till</button>
-//                     <span className="t-date-time">{formatDateTime(currentDateTime)} | IP: 39.55.138.194</span>
-//                 </div>
-//                 <div className="t-profile">
-//                     <span className="t-notification-badge">5</span>
-//                     <span className="t-profile-name">Ali Tehseen</span>
-//                 </div>
-//             </header>
-
-//             {/* Displaying the alert */}
-//             <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
-//                 {alertMessage}
-//             </CAlert>
-
-//             <section className="customer-section">
-//                 <select className="customer-select">
-//                     <option>Walk-In Customer</option>
-//                 </select>
-//                 <button className="add-customer">+</button>
-//                 <select className="salesman-select">
-//                     <option>Select Salesman</option>
-//                     {salesmen.map((salesman) => (
-//                         <option key={salesman.id} value={salesman.id}>
-//                             {salesman.salesman_name}
-//                         </option>
-//                     ))}
-//                 </select>
-//                 <select className="product-dropdown">
-//   <option>Select Product</option>
-//   {Object.entries(allProducts).map(([productName, productDetails]) => (
-//     <optgroup key={productName} label={productName}>
-//       {productDetails.map((product) => (
-//         <option key={product.sku} value={product.sku}>
-//           {product.sku} - Size: {product.size} - Color: {product.color}
-//         </option>
-//       ))}
-//     </optgroup>
-//   ))}
-// </select>
-
-
-
-
-//             </section>
-
-//             <table className="product-table">
-//                 <thead>
-//                     <tr>
-//                         <th>SKU</th>
-//                         <th>Product Name</th>
-//                         <th>Qty</th>
-//                         <th>Price</th>
-//                         <th>Amount</th>
-//                         <th>Disc. %</th>
-//                         <th>Disc. Value</th>
-//                         <th>Net Amount</th>
-//                         <th>Action</th>
-//                     </tr>
-//                 </thead>
-//                 <tbody>
-//                     {products.map((product, index) => (
-//                         <tr key={index}>
-//                             <td>{product.sku}</td>
-//                             <td>{product.name}</td>
-//                             <td><input type="number" value={product.qty} className="qty-input" readOnly /></td>
-//                             <td>{product.price}</td>
-//                             <td>{product.qty * product.price}</td>
-//                             <td><input type="number" value={product.discount} className="discount-input" readOnly /></td>
-//                             <td>{(product.qty * product.price) * (product.discount / 100)}</td>
-//                             <td>{product.qty * product.price - ((product.qty * product.price) * (product.discount / 100))}</td>
-//                             <td><button className="remove-button">✖</button></td>
-//                         </tr>
-//                     ))}
-//                 </tbody>
-//             </table>
-
-//             <section className="sales-box">
-//                 <div className="fee-select">
-//                     <label>Additional Fee:</label>
-//                     <select className="additional-fee-select">
-//                         <option>Select Additional Fee</option>
-//                         {additionalFees.map((fee) => (
-//                             <option key={fee.id} value={fee.id}>
-//                                 {fee.name} - {fee.amount}
-//                             </option>
-//                         ))}
-//                     </select>
-//                 </div>
-//                 <div className="fee-select">
-//                     <label>Delivery Fee:</label>
-//                     <select className="delivery-fee-select">
-//                         <option>Select Delivery Fee</option>
-//                         {deliveryFees.map((fee) => (
-//                             <option key={fee.id} value={fee.id}>
-//                                 {fee.name} - {fee.amount}
-//                             </option>
-//                         ))}
-//                     </select>
-//                 </div>
-//             </section>
-
-//             <section className="summary-section">
-//                 <div className="summary-details">
-//                     <div>Products: {products.length}</div>
-//                     <div>Sale: {totalAmount}</div>
-//                     <div>Purchase: 9100</div>
-//                     <div>Profit: {totalAmount - 9100}</div>
-//                 </div>
-//                 <div className="invoice-summary">
-//                     <div>Gross: {totalAmount}</div>
-//                     <div>Discount: {totalDiscount}</div>
-//                     <div>Net Total: {netTotal}</div>
-//                 </div>
-//             </section>
-//         </div>
-//     );
-// }
-
-// export default Transections;
-
-
 import React, { useState, useEffect } from 'react';
 import './Transections.css';
 import { CAlert, CButton } from '@coreui/react'; 
@@ -260,29 +6,30 @@ import { CAlert, CButton } from '@coreui/react';
 // Helper function to group products by name
 const groupByProductName = (products) => {
     return products.reduce((acc, product) => {
-      const { product_name, sku, size, color } = product;
-      
-      // Initialize the group for this product name if it doesn't exist
-      if (!acc[product_name]) {
-        acc[product_name] = [];
+      const { sku, product_name, item_name, color } = product;
+      const groupName = product_name || "Uncategorized"; // Handle null product_name
+      if (!acc[groupName]) {
+        acc[groupName] = [];
       }
-      
-      // Add the product details to the group
-      acc[product_name].push({ sku, size, color });
+      acc[groupName].push({ sku, item_name, color });
       return acc;
     }, {});
-};
+  };
 
-function Transections() {
-    const [products, setProducts] = useState([]);  // List of products in the table
+
+  function Transections() {
+    const [products, setProducts] = useState([]); // List of products in the table
     const [salesmen, setSalesmen] = useState([]);
     const [additionalFees, setAdditionalFees] = useState([]);
     const [deliveryFees, setDeliveryFees] = useState([]);
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [allProducts, setAllProducts] = useState({});
-    const [alertMessage, setAlertMessage] = useState('');
+    const [alertMessage, setAlertMessage] = useState("");
     const [visible, setVisible] = useState(false);
     const [productDetails, setProductDetails] = useState({});
+    const [selectedSKU, setSelectedSKU] = useState("");
+    const [tableData, setTableData] = useState([]);
+   
 
     useEffect(() => {
         const fetchSalesmen = async () => {
@@ -321,21 +68,22 @@ function Transections() {
             }
         };
 
-        const fetchAllProducts = async () => {
-            try {
-              const response = await fetch('http://16.171.145.107/pos/transaction/all_product');
-              const data = await response.json();
-              console.log("Raw API Response:", data);  // Log the raw API response
-          
-              if (Array.isArray(data)) {
-                const groupedData = groupByProductName(data);
-                console.log("Grouped Data:", groupedData);  // Log grouped data
-                setAllProducts(groupedData);  // Update state with grouped data
-              }
-            } catch (error) {
-              console.error('Error fetching all products:', error);
-            }
-          };
+         const fetchAllProducts = async () => {
+      try {
+        const response = await fetch(
+          "http://16.171.145.107/pos/transaction/all_product"
+        );
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          const groupedData = groupByProductName(data);
+          setAllProducts(groupedData);
+        }
+      } catch (error) {
+        console.error("Error fetching all products:", error);
+      }
+    };
+
+   
 
         fetchSalesmen();
         fetchAdditionalFees();
@@ -348,6 +96,70 @@ function Transections() {
 
         return () => clearInterval(interval);
     }, []);
+
+
+   // Fetch product details by SKU and add to the table
+   const fetchProductDetails = async (sku) => {
+    console.log("Fetching product details for SKU:", sku); // Debug log
+    try {
+      const response = await fetch(
+        `http://16.171.145.107/pos/transaction/products_detail/${sku}/`
+      );
+      if (!response.ok) {
+        console.error("API Error:", response.status, response.statusText);
+        return;
+      }
+      const product = await response.json();
+      console.log("Product Details Fetched:", product); // Debug log
+      setTableData((prevTableData) => [
+        ...prevTableData,
+        {
+          sku: product.sku || "N/A",
+          product_name: product.product_name || "Unknown Product",
+          quantity: 1,
+          discount: 0,
+          selling_price: product.selling_price || 0,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
+  };
+  
+  
+  useEffect(() => {
+    console.log("Updated Table Data:", tableData);
+  }, [tableData]);
+
+  
+  const groupByProductName = (products) => {
+    return products.reduce((acc, product) => {
+      const { sku, product_name, item_name, color } = product;
+      const groupName = product_name || "Uncategorized"; // Fallback for null names
+      if (!acc[groupName]) {
+        acc[groupName] = [];
+      }
+      acc[groupName].push({
+        sku,
+        item_name: item_name || "Unnamed Item",
+        color: color || "",
+      });
+      return acc;
+    }, {});
+  };
+  
+
+  
+    // Handle SKU selection
+    const handleProductSelect = (e) => {
+        const sku = e.target.value;
+        console.log("Selected SKU:", sku); // Debug log
+        if (sku && sku !== "Select Product") {
+          fetchProductDetails(sku);
+        }
+      };
+      
+      
 
     const calculateTotal = () => {
         let totalAmount = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
@@ -364,32 +176,31 @@ function Transections() {
         });
     };
 
+    const toggleFullScreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    };
+
+
     // Function to handle button click and show alert
     const handleButtonClick = (message) => {
         setAlertMessage(message);
         setVisible(true);
     };
 
-    // Function to handle product selection from dropdown
-    const handleProductSelect = async (event) => {
-        const selectedSku = event.target.value;
-        if (selectedSku) {
-            try {
-                const response = await fetch(`http://16.171.145.107/pos/transaction/products_detail/${selectedSku}`);
-                const data = await response.json();
-                console.log("Product Details:", data); 
-                if (data && Array.isArray(data) && data.length > 0) {
-                    setProductDetails(data[0]);  
-                }
-            } catch (error) {
-                console.error('Error fetching product details:', error);
-            }
-        }
-    };
+  
+
+
 
     return (
         <div className="transactions-page">
             <header className="t-header">
+                {/* Fullscreen Toggle Button */}
+                
+
                 <h1 className="t-logo">FAZAL SONS</h1>
                 <div className="t-header-info">
                     <button className="t-header-button" onClick={() => handleButtonClick("Today's Sales clicked!")}>Today Sales</button>
@@ -402,6 +213,12 @@ function Transections() {
                     <span className="t-notification-badge">5</span>
                     <span className="t-profile-name">Ali Tehseen</span>
                 </div>
+                <button 
+                    className="fullscreen-toggle" 
+                    onClick={toggleFullScreen}
+                >
+                    Fullscreen
+                </button>
             </header>
 
             
@@ -423,51 +240,102 @@ function Transections() {
                     ))}
                 </select>
                 <select className="product-dropdown" onChange={handleProductSelect}>
-                    <option>Select Product</option>
-                    {Object.entries(allProducts).map(([productName, productDetails]) => (
-                        <optgroup key={productName} label={productName}>
-                            {productDetails.map((product) => (
-                                <option key={product.sku} value={product.sku}>
-                                    {product.sku} - Size: {product.size} - Color: {product.color}
-                                </option>
-                            ))}
-                        </optgroup>
-                    ))}
-                </select>
+                console.log("All Products:", allProducts);
+          <option>Select Product</option>
+          {Object.entries(allProducts).map(([productName, productDetails]) => (
+            <optgroup key={productName} label={productName}>
+              {productDetails.map((product) => (
+                <option key={product.sku} value={product.sku}>
+                  {product.sku} - {product.item_name} {product.color && `- ${product.color}`}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
             </section>
 
-            <table className="product-table">
-                <thead>
-                    <tr>
-                        <th>SKU</th>
-                        <th>Product Name</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Amount</th>
-                        <th>Disc. %</th>
-                        <th>Disc. Value</th>
-                        <th>Net Amount</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.map((product, index) => (
-                        <tr key={index}>
-                            <td>{product.sku}</td>
-                            <td>{product.name}</td>
-                            <td><input type="number" value={product.qty} className="qty-input" readOnly /></td>
-                            <td>{product.price}</td>
-                            <td>{product.qty * product.price}</td>
-                            <td><input type="number" value={product.discount} className="discount-input" readOnly /></td>
-                            <td>{(product.qty * product.price) * (product.discount / 100)}</td>
-                            <td>{product.qty * product.price - ((product.qty * product.price) * (product.discount / 100))}</td>
-                            <td><button className="remove-button">✖</button></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* Display Table if a product is selected */}
+            {tableData.length > 0 ? (
+  <table border="1" width="100%" cellPadding="10" style={{ marginTop: "20px" }}>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Amount</th>
+        <th>Disc. %</th>
+        <th>Disc. Value</th>
+        <th>Net Amount</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {tableData.map((product, index) => (
+        <tr key={index}>
+          <td>{product.sku}</td>
+          <td>{product.product_name}</td>
+          <td>
+            <input
+              type="number"
+              value={product.quantity}
+              onChange={(e) => {
+                const qty = e.target.value;
+                setTableData((prevData) => {
+                  const updatedData = [...prevData];
+                  updatedData[index].quantity = parseInt(qty) || 1;
+                  return updatedData;
+                });
+              }}
+            />
+          </td>
+          <td>{product.selling_price}</td>
+          <td>{(product.selling_price * product.quantity).toFixed(2)}</td>
+          <td>
+            <input
+              type="number"
+              value={product.discount}
+              onChange={(e) => {
+                const discount = e.target.value;
+                setTableData((prevData) => {
+                  const updatedData = [...prevData];
+                  updatedData[index].discount = parseFloat(discount) || 0;
+                  return updatedData;
+                });
+              }}
+            />
+          </td>
+          <td>
+            {(
+              (product.selling_price * product.quantity * product.discount) /
+              100
+            ).toFixed(2)}
+          </td>
+          <td>
+            {(
+              product.selling_price * product.quantity -
+              (product.selling_price * product.quantity * product.discount) / 100
+            ).toFixed(2)}
+          </td>
+          <td>
+            <button
+              onClick={() =>
+                setTableData((prevData) => prevData.filter((_, i) => i !== index))
+              }
+            >
+              ❌
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+) : (
+  <p>No products selected yet.</p>
+)}
 
-            <section className="sales-box">
+
+            {/* <section className="sales-box">
                 <div className="fee-select">
                     <label>Additional Fee:</label>
                     <select className="additional-fee-select">
@@ -490,21 +358,136 @@ function Transections() {
                         ))}
                     </select>
                 </div>
-            </section>
+            </section> */}
 
-            <section className="summary-section">
-                <div className="summary-details">
-                    <div>Products: {products.length}</div>
-                    <div>Sale: {totalAmount}</div>
-                    <div>Purchase: 9100</div>
-                    <div>Profit: {totalAmount - 9100}</div>
-                </div>
-                <div className="invoice-summary">
-                    <div>Gross: {totalAmount}</div>
-                    <div>Discount: {totalDiscount}</div>
-                    <div>Net Total: {netTotal}</div>
-                </div>
-            </section>
+<section className="sales-summary">
+  <table className="summary-table">
+    <tbody>
+      <tr>
+        <td className="summary-label">PRODUCTS</td>
+        <td className="summary-value">{tableData.length}</td>
+        <td className="summary-label">INVOICE</td>
+        <td className="summary-value">
+          {(
+            tableData.reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+          ).toFixed(2)}
+        </td>
+        <td className="summary-label">GROSS</td>
+        <td className="summary-value">
+          {(
+            tableData.reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+          ).toFixed(2)}
+        </td>
+        <td className="summary-label">ADVANCE</td>
+        <td>
+          <input
+            type="number"
+            className="fee-input"
+            placeholder="0"
+            onChange={(e) => setAdvance(parseFloat(e.target.value) || 0)}
+          />
+        </td>
+      </tr>
+      <tr>
+        <td className="summary-label">SALE</td>
+        <td className="summary-value">
+          {tableData
+            .reduce(
+              (acc, item) =>
+                acc +
+                item.selling_price * item.quantity - 
+                (item.selling_price * item.quantity * item.discount) / 100,
+              0
+            )
+            .toFixed(2)}
+        </td>
+        <td className="summary-label">PURCHASE</td>
+        <td className="summary-value">1300</td>
+        <td className="summary-label">DISCOUNT</td>
+        <td className="summary-value">
+          {tableData
+            .reduce(
+              (acc, item) =>
+                acc + (item.selling_price * item.quantity * item.discount) / 100,
+              0
+            )
+            .toFixed(2)}
+        </td>
+        <td className="summary-label">DUE</td>
+        <td className="summary-value">0</td>
+      </tr>
+    </tbody>
+  </table>
+
+  {/* Fee Select Dropdowns */}
+  <div className="fee-dropdowns">
+    <div className="fee-dropdown">
+      <label htmlFor="additional-fee">Additional Fee:</label>
+      <select
+        id="additional-fee"
+        className="additional-fee-select"
+        onChange={(e) => setAltFee(parseFloat(e.target.value) || 0)}
+      >
+        <option value="0">Select Additional Fee</option>
+        {additionalFees.map((fee) => (
+          <option key={fee.id} value={fee.amount}>
+            {fee.name} - {fee.amount}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="fee-dropdown">
+      <label htmlFor="delivery-fee">Delivery Fee:</label>
+      <select
+        id="delivery-fee"
+        className="delivery-fee-select"
+        onChange={(e) => setDlvrFee(parseFloat(e.target.value) || 0)}
+      >
+        <option value="0">Select Delivery Fee</option>
+        {deliveryFees.map((fee) => (
+          <option key={fee.id} value={fee.amount}>
+            {fee.name} - {fee.amount}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+
+  <div className="payment-summary">
+    <div className="payment-row">
+      <label className="payment-label">
+        CARD:
+        <input type="number" className="payment-input" placeholder="0" />
+      </label>
+      <label className="payment-label">
+        CASH:
+        <input type="number" className="payment-input" placeholder="0" />
+      </label>
+      <label className="payment-label">
+        CHANGE:
+        <input type="number" className="payment-input" placeholder="0" />
+      </label>
+    </div>
+    <div className="payment-total">
+      <span className="total-amount">
+        {(
+          tableData.reduce(
+            (acc, item) =>
+              acc +
+              item.selling_price * item.quantity - 
+              (item.selling_price * item.quantity * item.discount) / 100,
+            0
+          )
+        ).toFixed(2)}
+      </span>
+      <button className="payment-button">Payment</button>
+    </div>
+  </div>
+</section>
+
+
+
         </div>
     );
 }

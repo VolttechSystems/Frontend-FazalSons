@@ -9,7 +9,8 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -29,7 +30,7 @@ const AddProduct = () => {
     wholesale_price: '',
     retail_price: '',
     token_price: '',
-    outlet: 1,
+    outlet: '',
     category: '',
     sub_category : '',
     brand: '', 
@@ -474,7 +475,7 @@ const resetDependentDropdowns = () => {
     wholesale_price: formData.wholesale_price,
     retail_price: formData.retail_price,
     token_price: formData.token_price,
-    outlet: formData.outlet,
+    outlet: formData.outlet,  // Use the ID here, not the outlet_name
     category: selectedCategory,
     sub_category: selectedsubCategory,
     brand: selectedBrand, // This will send the brand id as "3", "4", etc.
@@ -715,23 +716,22 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                 />
               </label> */}
               <label style={{ fontWeight: "bold" }}>
-      Outlet Name:
-      <select
-        name="outlet_name"
-        value={formData.outlet_name}
-        onChange={handleChange}
-        required
-      >
-        <option value="" disabled>
-          Select Outlet
-        </option>
-        {outlets.map((outlet, index) => (
-          <option key={index} value={outlet.outlet_name}>
-            {outlet.outlet_name}
-          </option>
-        ))}
-      </select>
-    </label>
+  Outlet Name:
+  <select
+    name="outlet"
+    value={formData.outlet}  // Make sure this matches the ID
+    onChange={handleChange}
+    required
+  >
+    <option value="" disabled>Select Outlet</option>
+    {outlets.map((outlet) => (
+      <option key={outlet.id} value={outlet.id}>  {/* Use the outlet ID here */}
+        {outlet.outlet_name} {/* Display the outlet name */}
+      </option>
+    ))}
+  </select>
+</label>
+
               <label>
   {/* SKU: */}
   <input
@@ -958,13 +958,14 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                 <thead>
                   <tr>
                     <th>Sr.#</th>
+                    <th>Item</th>
                     <th>Color</th>
                     <th>Cost</th>
                     <th>Selling</th>
-                    <th>Discount</th>
-                    <th>Wholesale</th>
-                    <th>Retail</th>
-                    <th>Token</th>
+                    {/* <th>Discount</th> */}
+                    {/* <th>Wholesale</th> */}
+                    {/* <th>Retail</th> */}
+                    {/* <th>Token</th> */}
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -972,18 +973,17 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                   {productList.map((product,index) => (
                     <tr key={product.id}>
                       <td>{index + 1}</td>
-                      
-                      <td>{product.color}</td>
-                      
+                      <td>{product.description}</td>
+                      <td>{product.color || "-"}</td>
                       <td>{product.cost_price}</td>
                       <td>{product.selling_price}</td>
-                      <td>{product.discount_price}</td>
-                      <td>{product.wholesale_price}</td>
-                      <td>{product.retail_price}</td>
-                      <td>{product.token_price}</td>
+                      {/* <td>{product.discount_price}</td> */}
+                      {/* <td>{product.wholesale_price}</td> */}
+                      {/* <td>{product.retail_price}</td> */}
+                      {/* <td>{product.token_price}</td> */}
                       <td>
-                        <button onClick={() => handleEdit(product.id)}>Edit</button>
-                        <button onClick={() => handleDelete(product.id)}>Delete</button>
+                        <button onClick={() => handleEdit(product.id)}   style={{ marginRight: "8px" }}> <FontAwesomeIcon icon={faEdit} /></button>
+                        <button onClick={() => handleDelete(product.id)}   style={{ marginRight: "8px" }}> <FontAwesomeIcon icon={faTrash} /></button>
                       </td>
                     </tr>
                   ))}

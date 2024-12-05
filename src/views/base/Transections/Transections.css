@@ -269,3 +269,316 @@ body {
     width: 100%;
     max-width: 300px;
 }
+.fullscreen-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.fullscreen-toggle:hover {
+    background-color: #0056b3;
+}
+
+/* Dropdown Style */
+.product-dropdown {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .product-dropdown:hover {
+    background-color: #e0e0e0;
+  }
+  
+  /* Table Style */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  input[type="number"]:focus {
+    border-color: #6c757d;
+    outline: none;
+  }
+  
+  /* Button Style */
+  button {
+    background-color: #ff4c4c;
+    color: white;
+    padding: 6px 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #ff0000;
+  }
+  
+  button:focus {
+    outline: none;
+  }
+  
+  /* Responsive */
+  @media screen and (max-width: 768px) {
+    table {
+      font-size: 14px;
+    }
+  
+    th, td {
+      padding: 8px;
+    }
+  
+    input[type="number"] {
+      width: 60px;
+    }
+  
+    button {
+      padding: 4px 8px;
+    }
+  }
+
+  .sales-summary {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+    background-color: #f8f8fc;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #e6e6e6;
+  }
+  
+  .summary-table {
+    width: 100%;
+    border-spacing: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .summary-table td {
+    font-size: 14px;
+    color: #272626;
+    text-align: left;
+    padding: 5px 10px;
+  }
+  
+  .summary-label {
+    font-weight: bold;
+    color: #666;
+  }
+  
+  .summary-value {
+    font-weight: bold;
+    text-align: right;
+  }
+  
+  .fee-input {
+    width: 60px;
+    padding: 4px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .payment-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+  }
+  
+  .payment-row {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .payment-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .payment-input {
+    width: 60px;
+    padding: 4px;
+    margin-left: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .payment-total {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .total-amount {
+    font-size: 22px;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .payment-button {
+    background-color: #5a5a9e;
+    color: white;
+    padding: 8px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .payment-button:hover {
+    background-color: #49497b;
+  }
+  .fee-input {
+    width: 60px;
+    padding: 4px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .summary-table td {
+    font-size: 14px;
+    color: #555;
+    text-align: left;
+    padding: 5px 10px;
+  }
+  
+  .summary-label {
+    font-weight: bold;
+    color: #666;
+  }
+  
+  .summary-value {
+    font-weight: bold;
+    text-align: right;
+  }
+    /* Fee Dropdown Section */
+.fee-dropdowns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 5px 0;
+}
+
+.fee-dropdown {
+  width: 30%;  /* Adjust dropdown widths */
+}
+
+.fee-dropdown label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.fee-dropdown select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.fee-dropdown select:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #e9f7fe;
+}
+
+/* Payment Summary Section */
+.payment-summary {
+  margin-top: 5px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.payment-label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.payment-input {
+  width: 30%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.payment-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.total-amount {
+  font-size: 24px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.payment-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.payment-button:hover {
+  background-color: #0056b3;
+}
