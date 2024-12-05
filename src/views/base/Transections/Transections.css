@@ -52,6 +52,8 @@ body {
 
 .t-date-time {
     font-size: 12px;
+    padding-top: 15px;
+    padding-left: 280px;
 }
 
 .t-profile {
@@ -86,7 +88,7 @@ body {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    width: 200px;
+    width: 300px;
 }
 
 .add-customer {
@@ -581,4 +583,38 @@ body {
 
 .payment-button:hover {
   background-color: #0056b3;
+}
+.product-dropdown-container {
+  position: relative; /* This is required to control the positioning of the dropdown */
+}
+
+.product-dropdown { 
+  width: 100%; /* Makes the dropdown take full width */
+  max-width: 500px; /* Adds a limit to the width */
+  padding: 10px; /* Adds some padding for a cleaner look */
+  border: 1px solid #ccc; /* Gives a light border */
+  border-radius: 5px; /* Rounds the corners */
+  background-color: #fff; /* Sets the background color */
+  font-size: 16px; /* Adjusts font size */
+  color: #333; /* Sets the text color */
+ 
+  cursor: pointer; /* Changes the cursor to pointer on hover */
+  position: relative; /* Ensures the dropdown shows below */
+}
+
+.product-dropdown optgroup {
+  font-weight: bold; /* Highlights the group label */
+  color: #555; /* Sets a slightly darker text color */
+  background-color: #f7f7f7; /* Adds a subtle background */
+}
+
+.product-dropdown option {
+  padding: 8px; /* Adds space within each option */
+  background-color: #fff; /* Sets a white background */
+  color: #333; /* Ensures readable text color */
+}
+
+.product-dropdown option:hover {
+  background-color: #f0f0f0; /* Adds a hover effect */
+  color: #000; /* Makes text bold when hovering */
 }

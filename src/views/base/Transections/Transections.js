@@ -20,6 +20,7 @@ const groupByProductName = (products) => {
   function Transections() {
     const [products, setProducts] = useState([]); // List of products in the table
     const [salesmen, setSalesmen] = useState([]);
+    const [customer, setCustomer] = useState([]);
     const [additionalFees, setAdditionalFees] = useState([]);
     const [deliveryFees, setDeliveryFees] = useState([]);
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -28,7 +29,10 @@ const groupByProductName = (products) => {
     const [visible, setVisible] = useState(false);
     const [productDetails, setProductDetails] = useState({});
     const [selectedSKU, setSelectedSKU] = useState("");
-    const [tableData, setTableData] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedSalesman, setSelectedSalesman] = useState("");
+  const [tableData, setTableData] = useState([]);
+  
    
 
     useEffect(() => {
@@ -83,12 +87,25 @@ const groupByProductName = (products) => {
       }
     };
 
+    const fetchCustomer = async () => {
+      try {
+          const response = await fetch('http://16.171.145.107/pos/customer/add_customer');
+          const data = await response.json();
+          if (data && Array.isArray(data)) {
+              setCustomer(data);
+          }
+      } catch (error) {
+          console.error('Error fetching salesmen:', error);
+      }
+  };
+
    
 
         fetchSalesmen();
         fetchAdditionalFees();
         fetchDeliveryFees();
         fetchAllProducts();
+        fetchCustomer();
 
         const interval = setInterval(() => {
             setCurrentDateTime(new Date());
@@ -148,6 +165,42 @@ const groupByProductName = (products) => {
     }, {});
   };
   
+  const handlePayment = async () => {
+    const payload = {
+      sku: tableData.map((item) => item.sku),
+      quantity: tableData.map((item) => item.quantity),
+      rate: tableData.map((item) => item.selling_price),
+      item_discount: tableData.map((item) => item.discount),
+      cust_code: selectedCustomer,
+      overall_discount: "0", // Adjust if you have an overall discount field
+      outlet_code: "1", // Replace with dynamic outlet code if applicable
+      saleman_code: selectedSalesman,
+      advanced_payment: "0",
+      additional_fee_code: "",
+      additional_fee: "",
+    };
+  
+    try {
+      const response = await fetch("http://16.171.145.107/pos/transaction/add_transaction", {
+        method: "POST", // Changed to POST
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload), // Send payload as body
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        setAlertMessage("Transaction added successfully!");
+        setVisible(true);
+      } else {
+        setAlertMessage("Failed to add transaction!");
+        setVisible(true);
+      }
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      setAlertMessage("An error occurred while processing the payment.");
+      setVisible(true);
+    }
+  };
 
   
     // Handle SKU selection
@@ -191,8 +244,18 @@ const groupByProductName = (products) => {
         setVisible(true);
     };
 
-  
-
+    const handleCustomerChange = (e) => {
+      const value = e.target.value;
+      setSelectedCustomer(value);
+      console.log("Selected Customer:", value); // Debugging log
+    };
+    
+    const handleSalesmanChange = (e) => {
+      const value = e.target.value;
+      setSelectedSalesman(value);
+      console.log("Selected Salesman:", value); // Debugging log
+    };
+    
 
 
     return (
@@ -201,7 +264,7 @@ const groupByProductName = (products) => {
                 {/* Fullscreen Toggle Button */}
                 
 
-                <h1 className="t-logo">FAZAL SONS</h1>
+                {/* <h1 className="t-logo">FAZAL SONS</h1> */}
                 <div className="t-header-info">
                     <button className="t-header-button" onClick={() => handleButtonClick("Today's Sales clicked!")}>Today Sales</button>
                     <button className="t-header-button" onClick={() => handleButtonClick("Sales Return clicked!")}>Sales Return</button>
@@ -209,10 +272,10 @@ const groupByProductName = (products) => {
                     <button className="t-header-button" onClick={() => handleButtonClick("Close Till clicked!")}>Close Till</button>
                     <span className="t-date-time">{formatDateTime(currentDateTime)} | IP: 39.55.138.194</span>
                 </div>
-                <div className="t-profile">
+                {/* <div className="t-profile">
                     <span className="t-notification-badge">5</span>
                     <span className="t-profile-name">Ali Tehseen</span>
-                </div>
+                </div> */}
                 <button 
                     className="fullscreen-toggle" 
                     onClick={toggleFullScreen}
@@ -227,18 +290,30 @@ const groupByProductName = (products) => {
             </CAlert>
 
             <section className="customer-section">
-                <select className="customer-select">
-                    <option>Walk-In Customer</option>
-                </select>
+               
+            <select
+  className="customer-select"
+  onChange={handleCustomerChange}
+        >
+          <option>Select Customer</option>
+          {customer.map((cust) => (
+            <option key={cust.id} value={cust.cust_code}>
+              {cust.first_name}
+            </option>
+          ))}
+        </select>
                 <button className="add-customer">+</button>
-                <select className="salesman-select">
-                    <option>Select Salesman</option>
-                    {salesmen.map((salesman) => (
-                        <option key={salesman.id} value={salesman.id}>
-                            {salesman.salesman_name}
-                        </option>
-                    ))}
-                </select>
+                <select
+  className="salesman-select"
+  onChange={handleSalesmanChange}
+        >
+          <option>Select Salesman</option>
+          {salesmen.map((salesman) => (
+            <option key={salesman.id} value={salesman.salesman_code}>
+              {salesman.salesman_name}
+            </option>
+          ))}
+        </select>
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
           <option>Select Product</option>
@@ -335,31 +410,6 @@ const groupByProductName = (products) => {
 )}
 
 
-            {/* <section className="sales-box">
-                <div className="fee-select">
-                    <label>Additional Fee:</label>
-                    <select className="additional-fee-select">
-                        <option>Select Additional Fee</option>
-                        {additionalFees.map((fee) => (
-                            <option key={fee.id} value={fee.id}>
-                                {fee.name} - {fee.amount}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="fee-select">
-                    <label>Delivery Fee:</label>
-                    <select className="delivery-fee-select">
-                        <option>Select Delivery Fee</option>
-                        {deliveryFees.map((fee) => (
-                            <option key={fee.id} value={fee.id}>
-                                {fee.name} - {fee.amount}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </section> */}
-
 <section className="sales-summary">
   <table className="summary-table">
     <tbody>
@@ -436,22 +486,6 @@ const groupByProductName = (products) => {
         ))}
       </select>
     </div>
-
-    <div className="fee-dropdown">
-      <label htmlFor="delivery-fee">Delivery Fee:</label>
-      <select
-        id="delivery-fee"
-        className="delivery-fee-select"
-        onChange={(e) => setDlvrFee(parseFloat(e.target.value) || 0)}
-      >
-        <option value="0">Select Delivery Fee</option>
-        {deliveryFees.map((fee) => (
-          <option key={fee.id} value={fee.amount}>
-            {fee.name} - {fee.amount}
-          </option>
-        ))}
-      </select>
-    </div>
   </div>
 
   <div className="payment-summary">
@@ -481,7 +515,13 @@ const groupByProductName = (products) => {
           )
         ).toFixed(2)}
       </span>
-      <button className="payment-button">Payment</button>
+      <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
+        {alertMessage}
+      </CAlert>
+
+      <CButton color="primary" onClick={handlePayment}>
+        Payment
+      </CButton>
     </div>
   </div>
 </section>
