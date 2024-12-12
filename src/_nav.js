@@ -63,6 +63,11 @@ const _nav = [
         name: 'Outlet',
         to: '/Admin/AddOutlet',
       },
+      {
+        component: CNavItem,
+        name: 'Additional Fee',
+        to: '/Admin/AdditionalFee',
+      },
       
      
     ],

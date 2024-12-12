@@ -46,7 +46,7 @@ const AddCategories = () => {
   const API_ATT_TYPES = 'http://16.171.145.107/pos/products/add_attribute_type';
   const API_FETCH_VARIATIONS_GROUP = 'http://16.171.145.107/pos/products/fetch_variations_group';
 
-  const API_UPDATE_CATEGORY = 'http://16.171.145.107/pos/products/faction_categories';
+  const API_UPDATE_CATEGORY = 'http://16.171.145.107/pos/products/action_categories';
   const API_FETCH_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
 
   // Fetch initial data and categories list
@@ -95,9 +95,6 @@ const AddCategories = () => {
         } catch (categoriesError) {
           console.error("Error fetching Categories:", categoriesError);
         }
-
-        
-    
         
       }
     };
@@ -105,6 +102,8 @@ const AddCategories = () => {
 
     fetchInitialData();
   }, []);
+
+
 
   // Fetch Attribute Types
   useEffect(() => {
@@ -139,7 +138,6 @@ const fetchHeadCategories = async () => {
 
 const handleHeadCategoryChange = async (e) => {
   const headCategoryId = e.target.value; // This will now hold the numeric ID
-  console.log('Selected Head Category ID:', headCategoryId); // Logs the correct ID
 
   setSelectedHeadCategory(headCategoryId); // Save selected head category
 
@@ -152,7 +150,7 @@ const handleHeadCategoryChange = async (e) => {
 
   // Reset dependent dropdowns
   setParentCategories([]);
-  setCategories([]);
+  // setCategories([]);
   setSelectedParentCategory('');
 
 
@@ -161,7 +159,6 @@ const handleHeadCategoryChange = async (e) => {
       const response = await axios.get(
         `http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
       );
-      console.log('Parent Categories:', response.data);
       setParentCategories(response.data); // Populate parent categories
     } catch (error) {
       console.error(
@@ -178,7 +175,6 @@ const handleHeadCategoryChange = async (e) => {
 
   //Fetch attributes and variations
 useEffect(() => {
-  console.log(formData.attType.length)
   if (formData.attType.length > 0) {
     const fetchAttributes = async () => {
       try {
@@ -207,8 +203,7 @@ useEffect(() => {
 
     fetchAttributes();
   } else {
-    console.log("Wasfa")
-    setTableData([]); // Clear table when no Attribute Type is selected
+    // setTableData([]); // Clear table when no Attribute Type is selected
   }
 }, [formData.attType]);
 
@@ -372,22 +367,27 @@ const handleInputChange = (e) => {
       if (editMode) {
         // PUT request to update category
         const response = await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload);
-  
         // Update the category list with the new data
         const updatedCategories = categories.map((cat) =>
           cat.id === editCategoryId ? response.data : cat
         );
-        setCategories(updatedCategories);
-        setTableData(updatedCategories);
+        if(response){
+          setCategories((prev)=> prev,...response.data);
+          setTableData((prev)=> prev,...response.data);
+        }
+        
   
         setMessage("Category updated successfully.");
       } else {
         // POST request to add new category
         const response = await axios.post(API_ADD_CATEGORIES, payload);
         const newCategory = response.data;
-        setCategories((prevCategories) => [...prevCategories, newCategory]);
-        setTableData((prevData) => [...prevData, newCategory]);
-        setMessage("Category added successfully.");
+        if(newCategory){
+          setCategories((prev) => [...prev, ...response.data]);
+          setTableData((prev) => [...prev, ...response.data]);
+          setMessage("Category added successfully.");
+        }
+       
       }
 
       // Reset form and exit edit mode
@@ -420,8 +420,7 @@ const handleInputChange = (e) => {
         const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`);
         const categoryData = response.data;
         //console.log(categoryData[0].category_name, 'bb');
-        console.log(categoryData,'tt')
-        
+        console.log({categoryData})
 
         // Pre-fill form fields, including `att_type`
         setFormData({
@@ -432,17 +431,28 @@ const handleInputChange = (e) => {
             description: formData.description || '',
             status: categoryData.status || 'active',
             pc_name: categoryData?.parent_id, // Update if necessary
-            attribute_group: categoryData.attribute_group || [], // Array of selected attributes
+            attribute_group: categoryData.attribute_group , // Array of selected attributes
             attType: categoryData.att_type || [], // Pre-fill `att_type`
         });
 
         //Pre-fill table's selected attributes
+        
         const initialSelectedGroup = {};
-        formData.attribute_group.forEach((group) => {
-            initialSelectedGroup[group] = group; // Populate based on `group` logic
+ 
+        // Assuming `formData.attribute_group` is an array of objects like:
+        // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
+        categoryData.attribute_group.map((group,index) => {
+            console.log("Processing group:", group);
+            if (group.att_type && group.attribute_id) {
+              console.log("inside")
+                initialSelectedGroup[group.att_type] = group.attribute_id; // Map `att_type` to `attribute_id`
+            }
         });
+        console.log("after")
+        
+        console.log("Initial Selected Group:", initialSelectedGroup);
         setSelectedGroup(initialSelectedGroup);
-
+        
         setEditMode(true);
         setEditCategoryId(categoryData.id); // Store the ID for updating
     } catch (error) {
@@ -450,7 +460,6 @@ const handleInputChange = (e) => {
         setMessage('Failed to fetch category details.');
     }
 };
-console.log(formData,'aa')
 
   
   const handleDelete = async (categoryId) => {
@@ -500,10 +509,9 @@ console.log(formData,'aa')
   <label>Parent Category:</label>
   <select
     name="pc_name"
-    value={formData.selectedParentCategory}
+    value={formData.pc_name}
     onChange={(e) => {
       const selectedOptionId = e.target.value; // Get the ID of the selected option
-      console.log({selectedOptionId})
       setFormData({
         ...formData,
         pc_name: selectedOptionId,  // Store the selected ID instead of the name

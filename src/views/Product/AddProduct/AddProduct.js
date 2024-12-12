@@ -9,7 +9,8 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -29,7 +30,7 @@ const AddProduct = () => {
     wholesale_price: '',
     retail_price: '',
     token_price: '',
-    outlet: 1,
+    outlet: '',
     category: '',
     sub_category : '',
     brand: '', 
@@ -63,7 +64,32 @@ const [attributes, setAttributes] = useState([]);
   const [nextTab, setNextTab] = useState(null);
   const [isCategoryDialogOpen, setCategoryDialogOpen] = React.useState(false);
   
-  
+   // Function to handle button click and open the dialog
+   const handleButtonClick = () => {
+    setIsDialogOpen(true);
+  };
+
+  // Function to handle dialog close (Delete all products on "OK")
+  const handleDialogClose = (confirmDelete) => {
+   
+    if (confirmDelete) {
+      // API call to delete all products
+      axios
+        .delete("http://16.171.145.107/pos/products/all-temp-product-delete")
+        .then((response) => {
+          console.log("All products deleted successfully");
+          // Clear the product list (update the state to empty)
+          setProductList([]);
+          setActiveTab(nextTab);
+          
+        })
+        .catch((error) => {
+          console.error("There was an error deleting the products:", error);
+        });
+    }
+    setIsDialogOpen(false); // Close the dialog
+   
+  };
 
 useEffect(() => {
   if (selectedCategory) {
@@ -114,12 +140,7 @@ const handleTabChange = (tabIndex) => {
   }
 };
 
-const handleDialogClose = (confirm) => {
-  setIsDialogOpen(false);
-  if (confirm) {
-    setActiveTab(nextTab); // Switch to the previously saved tab index
-  }
-};
+
   
 
 // Handle attribute selection
@@ -474,7 +495,7 @@ const resetDependentDropdowns = () => {
     wholesale_price: formData.wholesale_price,
     retail_price: formData.retail_price,
     token_price: formData.token_price,
-    outlet: formData.outlet,
+    outlet: formData.outlet,  // Use the ID here, not the outlet_name
     category: selectedCategory,
     sub_category: selectedsubCategory,
     brand: selectedBrand, // This will send the brand id as "3", "4", etc.
@@ -583,10 +604,9 @@ const handleDelete = async (id) => {
   }
 };
 
-
 const resetForm = () => {
-  setFormData({
-    
+  setFormData((prevData) => ({
+    ...prevData, // Retain existing product_name and outlet
     color: [],
     cost_price: '',
     selling_price: '',
@@ -595,13 +615,13 @@ const resetForm = () => {
     retail_price: '',
     token_price: '',
     brand_name: '',
-    variations : '',
-    
-  });
-  setSelectedVariations({}); // Reset variations checkboxes
+    variations: '',
+  }));
+  setSelectedVariations({});
   setEditMode(false);
   setEditProductId(null);
 };
+
 
 const handlePublish = async () => {
   console.log('Publishing with data:', formData);
@@ -668,12 +688,12 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
         </Tabs>
       </Paper>
 
-      {/* Confirmation Dialog */}
+     {/* Confirmation Dialog */}
+      {/* Dialog Box */}
       <Dialog open={isDialogOpen} onClose={() => handleDialogClose(false)}>
-        <DialogTitle>Confirmation</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to go back to the "General" tab? Unsaved changes might be lost.
+            Are you sure you want to delete all products? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -684,7 +704,7 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
             OK
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog>
 
 
       {/* Category Dialog */}
@@ -715,23 +735,22 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                 />
               </label> */}
               <label style={{ fontWeight: "bold" }}>
-      Outlet Name:
-      <select
-        name="outlet_name"
-        value={formData.outlet_name}
-        onChange={handleChange}
-        required
-      >
-        <option value="" disabled>
-          Select Outlet
-        </option>
-        {outlets.map((outlet, index) => (
-          <option key={index} value={outlet.outlet_name}>
-            {outlet.outlet_name}
-          </option>
-        ))}
-      </select>
-    </label>
+  Outlet Name:
+  <select
+    name="outlet"
+    value={formData.outlet}  // Make sure this matches the ID
+    onChange={handleChange}
+    required
+  >
+    <option value="" disabled>Select Outlet</option>
+    {outlets.map((outlet) => (
+      <option key={outlet.id} value={outlet.id}>  {/* Use the outlet ID here */}
+        {outlet.outlet_name} {/* Display the outlet name */}
+      </option>
+    ))}
+  </select>
+</label>
+
               <label>
   {/* SKU: */}
   <input
@@ -958,13 +977,14 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                 <thead>
                   <tr>
                     <th>Sr.#</th>
+                    <th>Item</th>
                     <th>Color</th>
                     <th>Cost</th>
                     <th>Selling</th>
-                    <th>Discount</th>
-                    <th>Wholesale</th>
-                    <th>Retail</th>
-                    <th>Token</th>
+                    {/* <th>Discount</th> */}
+                    {/* <th>Wholesale</th> */}
+                    {/* <th>Retail</th> */}
+                    {/* <th>Token</th> */}
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -972,18 +992,17 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                   {productList.map((product,index) => (
                     <tr key={product.id}>
                       <td>{index + 1}</td>
-                      
-                      <td>{product.color}</td>
-                      
+                      <td>{product.description}</td>
+                      <td>{product.color || "-"}</td>
                       <td>{product.cost_price}</td>
                       <td>{product.selling_price}</td>
-                      <td>{product.discount_price}</td>
-                      <td>{product.wholesale_price}</td>
-                      <td>{product.retail_price}</td>
-                      <td>{product.token_price}</td>
+                      {/* <td>{product.discount_price}</td> */}
+                      {/* <td>{product.wholesale_price}</td> */}
+                      {/* <td>{product.retail_price}</td> */}
+                      {/* <td>{product.token_price}</td> */}
                       <td>
-                        <button onClick={() => handleEdit(product.id)}>Edit</button>
-                        <button onClick={() => handleDelete(product.id)}>Delete</button>
+                        <button onClick={() => handleEdit(product.id)}   style={{ marginRight: "8px" }}> <FontAwesomeIcon icon={faEdit} /></button>
+                        <button onClick={() => handleDelete(product.id)}   style={{ marginRight: "8px" }}> <FontAwesomeIcon icon={faTrash} /></button>
                       </td>
                     </tr>
                   ))}

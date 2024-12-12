@@ -125,7 +125,7 @@ const AddStock = () => {
   useEffect(() => {
     const fetchProductList = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/get_all_product/');
+        const response = await axios.get('http://16.171.145.107/pos/products/get_product/');
         console.log('Product list fetched:', response.data); // Log the product list
         setProductList(response.data);
       } catch (error) {

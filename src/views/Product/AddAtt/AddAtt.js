@@ -92,8 +92,11 @@ class AddAtt extends Component {
     if (name === "attType") {
       this.setState({ attType: value });
     } else if (name === "attributeName") {
+      console.log(e.target.value);
       const updatedAttributes = [...this.state.attributes];
+      console.log(updatedAttributes);
       updatedAttributes[attrIndex].attributeName = value;
+      console.log({updatedAttributes})
       this.setState({ attributes: updatedAttributes });
     }
   };
@@ -218,10 +221,10 @@ class AddAtt extends Component {
     const payload = {
       att_id: editData.att_id, // The ID of the attribute group to update
       att_type: attType,       // Attribute type (e.g., "Automobiles")
-      attribute_name: editData.attribute_name      , // Use `att_id` for the attribute name
+      attribute_name: attributes[0].attributeName     , // Use `att_id` for the attribute name
       variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
     };
-  
+    //console.log("Update Payload:", [attribute_name]);
     console.log("Update Payload:", JSON.stringify(payload));
   
     try {

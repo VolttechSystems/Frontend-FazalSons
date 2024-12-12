@@ -1,0 +1,146 @@
+/* Container styling */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Form styling */
+  form {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  form h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 20px;
+  }
+  
+  form div {
+    margin-bottom: 15px;
+  }
+  
+  form label {
+    display: block;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  form input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+  }
+  
+  form input:focus {
+    outline: none;
+    border-color: #6aac85;
+  }
+  
+  form button {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #fff;
+    background:  #6aac85;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  form button:hover {
+    background: #6aac85;
+  }
+  
+  /* Table styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  table thead {
+    background: #6aac85;
+    color: #fff;
+  }
+  
+  table thead th {
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  table tbody tr {
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table tbody tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  
+  table tbody td {
+    padding: 10px;
+  }
+  
+  table tbody td button {
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #fff;
+    background: #6aac85;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  table tbody td button:hover {
+    background: #6aac85;
+  }
+  
+  table tbody td button:nth-child(2) {
+    background: #dc3545;
+  }
+  
+  table tbody td button:nth-child(2):hover {
+    background: #a71d2a;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .container {
+      padding: 10px;
+    }
+  
+    form h2 {
+      font-size: 18px;
+    }
+  
+    form button {
+      width: 100%;
+    }
+  
+    table thead th, table tbody td {
+      font-size: 12px;
+    }
+  
+    table tbody td button {
+      padding: 5px;
+      font-size: 10px;
+    }
+  }
+  

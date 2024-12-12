@@ -36,6 +36,7 @@ const FetchAttributes = React.lazy(() => import('./views/Product/FetchAttributes
 const AddAtt = React.lazy(() => import('./views/Product/AddAtt/AddAtt'))
 const AddCategories = React.lazy(() => import('./views/Category/AddCategories/AddCategories'))
 const AddSubCat = React.lazy(() => import('./views/SubCat/AddSubCat/AddSubCat'))
+const AdditionalFee = React.lazy(() => import('./views/Admin/AdditionalFee/AdditionalFee'))
 
 
 
@@ -83,7 +84,7 @@ const routes = [
   { path: '/Product/AddAtt', name: 'AddAtt', element: AddAtt }, //AddAtt
   { path: '/Category/AddCategories', name: 'AddCategories', element: AddCategories }, //AddCategories
   { path: '/SubCat/AddSubCat', name: 'AddSubCat', element: AddSubCat}, //AddSubCat
- 
+  { path: '/Admin/AdditionalFee', name: 'AdditionalFee', element: AdditionalFee }, // AdditionalFee
 ]
 
 export default routes
