@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Barcode from 'react-barcode';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const Loader = () => {
   return (
@@ -72,6 +75,7 @@ const AllProducts = () => {
             <th>ID</th>
             <th>Product Name</th>
             <th>SKU</th>
+            {/* <th>Barcode</th> */}
             <th>Item</th>
             <th>Color</th>
             <th>Cost Price</th>
@@ -84,7 +88,39 @@ const AllProducts = () => {
             <tr key={product.id}>
               <td>{product.id}</td>
               <td>{product.product_name}</td>
-              <td>{product.sku}</td>
+              <td>
+                
+  <Link to={`/Product/AllProducts/Barcodes/${product.sku}}`}>
+  <Barcode
+    value={product.sku} // Use only SKU as the barcode value
+    format="CODE128"
+    width={0.1}
+    height={10}
+    displayValue={false} // Hide the SKU text in the barcode
+    fontSize={8}
+    margin={5}
+  />
+</Link>
+
+
+
+
+                {product.sku}</td>
+              {/* <td>
+              <Barcode
+                value={product.sku}
+                format="CODE128"
+                width={1}          // Adjust bar width
+                height={20}        // Adjust barcode height
+                displayValue={true} // Show SKU text below barcode
+                fontSize={8}       // Adjust text size
+                margin={5}         // Add margin around the barcode
+              />
+            </td> */}
+
+
+          
+              
               <td>{product.description}</td>
               <td>{product.color || "-"}</td>
               <td>{product.cost_price}</td>

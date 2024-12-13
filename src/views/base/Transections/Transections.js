@@ -256,7 +256,7 @@ const fetchNewProductDetails = async () => {
     return; // Exit if no product or invoice is selected
   }
 
-  console.log("Fetching product details for:", selectedProduct, selectedInvoice); // Log selected values
+  console.log("Fetching product details for:", selectedProduct, selectedInvoice);
 
   try {
     const response = await fetch(
@@ -269,27 +269,71 @@ const fetchNewProductDetails = async () => {
     }
 
     const data = await response.json();
-    console.log("Fetched Product Details:", data); // Log API response
+    console.log("Fetched Product Details:", data);
 
-    // Assuming the API response contains fields like rate, quantity, and gross_total
-    const price = data.rate || 0; // Set price (rate) from API response
-    const returnQty = data.quantity || 0; // Set return quantity from API response
-    const returnAmount = price * returnQty; // Calculate return amount
+    if (data.length > 0) {
+      const product = data[0]; // Assuming the API returns an array with one object
 
-    // Update state with the fetched details
-    setPrice(price); // Set price
-    setReturnQty(returnQty); // Set return quantity
-    setReturnAmount(returnAmount); // Calculate and set return amount
+      // Map API fields to your state variables
+      setPrice(product.rate || 0); // Backend field 'rate' sets Price
+      setReturnQty(product.quantity || 0); // Backend field 'quantity' sets Return Qty
+      setReturnAmount(product.rate || 0); // Backend field 'rate' sets Return Amount
+    }
   } catch (error) {
     console.error("Error fetching product details:", error);
   }
 };
 
-// Fetch product details when the selectedProduct or selectedInvoice changes
+const handleSalesReturn = async () => {
+  if (!selectedProduct || !selectedInvoice) { // Check for selected product and invoice code
+    console.error("Invalid return: Product not selected or invoice code is missing.");
+    return;
+  }
+
+  // Prepare the data as lists for the API
+  const requestData = {
+    sku: [selectedProduct],  // SKU as a list
+    rate: [price],           // Price (Rate) as a list
+    quantity: [returnQty],   // Quantity as a list
+    invoice_code: selectedInvoice // Add invoice code instead of quantity
+  };
+
+  console.log("Submitting return data:", requestData);
+
+  try {
+    const response = await fetch("http://16.171.145.107/pos/transaction/transactions_return", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData), // Send the data as JSON
+    });
+
+    if (!response.ok) {
+      console.error("Error in return API:", response.status, response.statusText);
+      throw new Error("Failed to process return");
+    }
+
+    const responseData = await response.json();
+    console.log("Return processed successfully:", responseData);
+
+    // Optional: Show a success message or reset fields
+    alert("Return processed successfully!");
+    setIsDialogOpen(false); // Close the dialog
+  } catch (error) {
+    console.error("Error processing return:", error);
+    alert("An error occurred while processing the return. Please try again.");
+  }
+};
+
+
+
+// Fetch data when selectedProduct or selectedInvoice changes
 useEffect(() => {
-  console.log("useEffect triggered for selectedProduct:", selectedProduct, "selectedInvoice:", selectedInvoice); // Log when useEffect is triggered
-  fetchNewProductDetails();
-}, [selectedProduct, selectedInvoice]); // Dependency array includes selectedProduct and selectedInvoice
+  if (selectedProduct) {
+    fetchNewProductDetails();
+  }
+}, [selectedProduct]);
 
 
 
@@ -686,7 +730,7 @@ const handleReturn = async () => {
           <option value="">Select Product</option>
           {newproducts.length > 0 ? (
             newproducts.map((product) => (
-              <option key={product.id} value={product.id}>
+              <option key={product.id} value={product.sku}>
                {product.sku} - {product.product_name} - {product.items}
               </option>
             ))
@@ -699,56 +743,77 @@ const handleReturn = async () => {
 
          
 
+      <div style={{ marginBottom: "20px" }}>
+  {/* Price Field */}
+  <div style={{ marginBottom: "10px" }}>
+    <label htmlFor="price" style={{ display: "block", marginBottom: "5px" }}>Price</label>
+    <input
+      type="number"
+      id="price"
+      value={price} // Auto-updated by API
+      readOnly
+      style={{
+        width: "100%",
+        padding: "8px",
+        borderRadius: "4px",
+        border: "1px solid #ccc",
+      }}
+    />
+  </div>
 
-          {/* Styled Fields */}
-          <Box sx={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-  <TextField
-    label="Price"
-    type="number"
-    value={price}
-    InputProps={{ readOnly: true }}
-    fullWidth
-    margin="dense"
-  />
-  <TextField
-    label="Return Qty."
-    type="number"
-    value={returnQty}
-    onChange={(e) => {
-      const qty = parseFloat(e.target.value) || 0;
-      setReturnQty(qty);
-      setReturnAmount(qty * price);
-    }}
-    fullWidth
-    margin="dense"
-    disabled={!selectedProduct}
-  />
-</Box>
-<TextField
-  label="Return Amount"
-  type="number"
-  value={returnAmount}
-  InputProps={{ readOnly: true }}
-  fullWidth
-  margin="dense"
-/>
+  {/* Return Quantity Field */}
+  <div style={{ marginBottom: "10px" }}>
+    <label htmlFor="returnQty" style={{ display: "block", marginBottom: "5px" }}>Return Qty</label>
+    <input
+      type="number"
+      id="returnQty"
+      value={returnQty} // Auto-updated by API
+      readOnly
+      style={{
+        width: "100%",
+        padding: "8px",
+        borderRadius: "4px",
+        border: "1px solid #ccc",
+      }}
+    />
+  </div>
+
+  {/* Return Amount Field */}
+  <div>
+    <label htmlFor="returnAmount" style={{ display: "block", marginBottom: "5px" }}>Return Amount</label>
+    <input
+      type="number"
+      id="returnAmount"
+      value={returnAmount} // Auto-updated by API
+      readOnly
+      style={{
+        width: "100%",
+        padding: "8px",
+        borderRadius: "4px",
+        border: "1px solid #ccc",
+      }}
+    />
+  </div>
+</div>
+
 
 
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setIsDialogOpen(false)} color="secondary" variant="outlined">
-            Close
-          </Button>
-          <Button
-            onClick={handleReturn}
-            color="primary"
-            variant="contained"
-            disabled={!selectedProduct || returnQty <= 0}
-          >
-            Return
-          </Button>
-        </DialogActions>
+  <Button onClick={() => setIsDialogOpen(false)} color="secondary" variant="outlined">
+    Close
+  </Button>
+  <Button
+    onClick={handleSalesReturn} // Trigger the API call
+    color="primary"
+    variant="contained"
+    disabled={!selectedProduct || returnQty <= 0} // Disable if invalid
+  >
+    Return
+  </Button>
+</DialogActions>
+
       </Dialog>
                     {/* <button className="t-header-button" onClick={() => handleButtonClick("Due Receivable clicked!")}>Due Receivable</button> */}
                     <Button variant="contained" onClick={handleOpenDialog}>

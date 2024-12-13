@@ -37,15 +37,19 @@ const AddAtt = React.lazy(() => import('./views/Product/AddAtt/AddAtt'))
 const AddCategories = React.lazy(() => import('./views/Category/AddCategories/AddCategories'))
 const AddSubCat = React.lazy(() => import('./views/SubCat/AddSubCat/AddSubCat'))
 const AdditionalFee = React.lazy(() => import('./views/Admin/AdditionalFee/AdditionalFee'))
+const Barcodes = React.lazy(() => import('./views/Product/AllProducts/Barcodes'))
 
 
 
 const routes = [
+
+
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
+  { path: '/Product/AllProducts/Barcodes/:sku', name: 'Barcodes', element: Barcodes }, // SKU added here
   
   { path: '/base/POS', name: 'POS', element: POS }, // POS
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register

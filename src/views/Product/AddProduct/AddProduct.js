@@ -20,6 +20,7 @@ const AddProduct = () => {
     sku: '',
     season: '',
     description: '',
+    notes: '',
     color: [],
     size: [],
     attribute: [],
@@ -344,23 +345,78 @@ const resetDependentDropdowns = () => {
 
 
 
-  const colorOptions = [
-    { value: 'Almond', label: 'Almond' },
-    { value: 'Angoori', label: 'Angoori' },
-    { value: 'Baby blue', label: 'Baby blue' },
-    { value: 'Baby pink', label: 'Baby pink' },
-    { value: 'Beige', label: 'Beige' },
-    { value: 'Biscuit', label: 'Biscuit' },
-    { value: 'Black', label: 'Black' },
-    { value: 'Bottle green', label: 'Bottle green' },
-    { value: 'Bronze brown', label: 'Bronze brown' },
-    { value: 'Burgundy', label: 'Burgundy' },
-    { value: 'Camel', label: 'Camel' },
-    { value: 'Caramel', label: 'Caramel' },
-    { value: 'Champagne', label: 'Champagne' },
-    { value: 'Violet', label: 'Violet' },
-    { value: 'White', label: 'White' },
-  ];
+const colorOptions = [
+  { value: 'Almond', label: 'Almond' },
+  { value: 'Angoori', label: 'Angoori' },
+  { value: 'Baby blue', label: 'Baby blue' },
+  { value: 'Baby pink', label: 'Baby pink' },
+  { value: 'Beige', label: 'Beige' },
+  { value: 'Biscuit', label: 'Biscuit' },
+  { value: 'Black', label: 'Black' },
+  { value: 'Bottle green', label: 'Bottle green' },
+  { value: 'Bronze brown', label: 'Bronze brown' },
+  { value: 'Burgundy', label: 'Burgundy' },
+  { value: 'Camel', label: 'Camel' },
+  { value: 'Caramel', label: 'Caramel' },
+  { value: 'Champagne', label: 'Champagne' },
+  { value: 'Violet', label: 'Violet' },
+  { value: 'White', label: 'White' },
+  { value: 'Emerald green', label: 'Emerald green' },
+  { value: 'Fuchsia', label: 'Fuchsia' },
+  { value: 'Gold', label: 'Gold' },
+  { value: 'Gray', label: 'Gray' },
+  { value: 'Indigo', label: 'Indigo' },
+  { value: 'Ivory', label: 'Ivory' },
+  { value: 'Lavender', label: 'Lavender' },
+  { value: 'Lime', label: 'Lime' },
+  { value: 'Magenta', label: 'Magenta' },
+  { value: 'Maroon', label: 'Maroon' },
+  { value: 'Mint green', label: 'Mint green' },
+  { value: 'Navy blue', label: 'Navy blue' },
+  { value: 'Olive green', label: 'Olive green' },
+  { value: 'Orange', label: 'Orange' },
+  { value: 'Peach', label: 'Peach' },
+  { value: 'Pink', label: 'Pink' },
+  { value: 'Plum', label: 'Plum' },
+  { value: 'Purple', label: 'Purple' },
+  { value: 'Red', label: 'Red' },
+  { value: 'Rose', label: 'Rose' },
+  { value: 'Silver', label: 'Silver' },
+  { value: 'Sky blue', label: 'Sky blue' },
+  { value: 'Teal', label: 'Teal' },
+  { value: 'Turquoise', label: 'Turquoise' },
+  { value: 'Yellow', label: 'Yellow' },
+  { value: 'Zinc', label: 'Zinc' },
+  { value: 'Aqua', label: 'Aqua' },
+  { value: 'Beetroot', label: 'Beetroot' },
+  { value: 'Cyan', label: 'Cyan' },
+  { value: 'Dark green', label: 'Dark green' },
+  { value: 'Dark purple', label: 'Dark purple' },
+  { value: 'Fawn', label: 'Fawn' },
+  { value: 'Forest green', label: 'Forest green' },
+  { value: 'Grape', label: 'Grape' },
+  { value: 'Honey', label: 'Honey' },
+  { value: 'Ivory', label: 'Ivory' },
+  { value: 'Lime green', label: 'Lime green' },
+  { value: 'Mauve', label: 'Mauve' },
+  { value: 'Midnight blue', label: 'Midnight blue' },
+  { value: 'Neon green', label: 'Neon green' },
+  { value: 'Olive', label: 'Olive' },
+  { value: 'Peach puff', label: 'Peach puff' },
+  { value: 'Periwinkle', label: 'Periwinkle' },
+  { value: 'Pumpkin', label: 'Pumpkin' },
+  { value: 'Salmon', label: 'Salmon' },
+  { value: 'Sapphire', label: 'Sapphire' },
+  { value: 'Slate gray', label: 'Slate gray' },
+  { value: 'Snow', label: 'Snow' },
+  { value: 'Steel blue', label: 'Steel blue' },
+  { value: 'Tangerine', label: 'Tangerine' },
+  { value: 'Thistle', label: 'Thistle' },
+  { value: 'Topaz', label: 'Topaz' },
+  { value: 'Turquoise blue', label: 'Turquoise blue' },
+  { value: 'Wisteria', label: 'Wisteria' }
+];
+
 
   const sizeOptions = [
     { value: 'S', label: 'S' },
@@ -486,6 +542,7 @@ const resetDependentDropdowns = () => {
     sku: formData.sku,
     season: formData.season,
     description: formData.description,
+    notes: formData.notes,
     color: colorString,  // color as a string (e.g., "[ 'Baby blue', 'Baby pink' ]")
     attribute: formData.attribute,  // Selected attributes
     variations: JSON.stringify(variationsFormatted), // Variations formatted as array of arrays
@@ -734,22 +791,31 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                   required
                 />
               </label> */}
-              <label style={{ fontWeight: "bold" }}>
-  Outlet Name:
-  <select
-    name="outlet"
-    value={formData.outlet}  // Make sure this matches the ID
-    onChange={handleChange}
-    required
-  >
-    <option value="" disabled>Select Outlet</option>
-    {outlets.map((outlet) => (
-      <option key={outlet.id} value={outlet.id}>  {/* Use the outlet ID here */}
-        {outlet.outlet_name} {/* Display the outlet name */}
+             <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+  <label style={{ flex: 1, fontWeight: "bold" }}>
+    Outlet Name:
+    <select
+      name="outlet"
+      value={formData.outlet}
+      onChange={handleChange}
+      required
+      style={{ width: "100%", padding: "8px" }} // Full width and some padding
+    >
+      <option value="" disabled>
+        Select Outlet
       </option>
-    ))}
-  </select>
-</label>
+      {outlets.map((outlet) => (
+        <option key={outlet.id} value={outlet.id}>
+          {outlet.outlet_name}
+        </option>
+      ))}
+    </select>
+  </label>
+  <Link to="/Admin/AddOutlet">
+    <button style={{ height: "100%", padding: "8px" }}>+</button> {/* Matches dropdown height */}
+  </Link>
+</div>
+
 
               <label>
   {/* SKU: */}
@@ -765,71 +831,121 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
 
              {/* Head Category Dropdown */}
       
-        {/* Head Category Dropdown */}
-        <label style={{ fontWeight: "bold" }}> Head Category *</label>
-<select onChange={handleHeadCategoryChange}>
-  <option value="">Select Head Category</option>
-  {headCategories.map((headCategory) => (
-    <option key={headCategory.id} value={headCategory.id}>
-      {headCategory.hc_name} {/* Display the name but pass the ID */}
-    </option>
-  ))}
-</select>
-      
-{/* Parent Category Dropdown */}
-<label style={{ fontWeight: "bold" }}> Parent Category *</label>
-<select value={selectedParentCategory}
-  onChange={handleParentCategoryChange}
-  disabled={!selectedHeadCategory}>
-  <option value="">Select Parent Category</option>
-  {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
-    <option key={parentCategory.id} value={parentCategory.id}>
-      {parentCategory.pc_name}
-    </option>
-  ))}
-</select>
-
-{/* Category Dropdown */}
-<label style={{ fontWeight: "bold" }}> Category *</label>
-<select value={selectedCategory}
-  onChange={handleCategoryChange}
-  disabled={!selectedParentCategory}>
-  <option value="">Select Category</option>
-  {Array.isArray(categories) && categories.map(category => (
-    <option key={category.id} value={category.id}>
-      {category.category_name}
-    </option>
-  ))}
-</select>
-
-{/* Subcategory Dropdown */}
-
-<label style={{ fontWeight: "bold" }}> Subcategory *</label>
-<select value={selectedsubCategory}
-  onChange={handleSubCategoryChange}
-  disabled={!selectedCategory}>
-  <option value="">Select Subcategory</option>
-  {Array.isArray(subcategories) && subcategories.map(subCategory => (
-    <option key={subCategory.id} value={subCategory.id}>
-      {subCategory.sub_category_name}
-    </option>
-  ))}
-</select>
-
-      
-
-<label style={{ fontWeight: "bold" }}> Brands (optional)</label>
-    <select value={selectedBrand} 
-    onChange={handleBrandChange}>
-      <option value="">Select a Brand</option>
-      {/* {brands.map((branddata) => ( */}
-        {Array.isArray(brands) && brands.map(branddata => (
-        <option key={branddata.id} value={branddata.id}>
-          {branddata.brand_name}
-          
+             <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+  <label style={{ flex: 1, fontWeight: "bold" }}>
+    Head Category *
+    <select
+      onChange={handleHeadCategoryChange}
+      style={{ width: "100%", padding: "8px" }} // Full width for dropdown
+    >
+      <option value="">Select Head Category</option>
+      {headCategories.map((headCategory) => (
+        <option key={headCategory.id} value={headCategory.id}>
+          {headCategory.hc_name} {/* Display the name but pass the ID */}
         </option>
       ))}
     </select>
+  </label>
+  <Link to="/Product/AddHeadCategory">
+    <button style={{ height: "100%", padding: "8px" }}>+</button> {/* Matches dropdown height */}
+  </Link>
+</div>
+
+ {/* Parent Category Dropdown */}
+<div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+  <label style={{ flex: 1, fontWeight: "bold" }}>
+    Parent Category *
+    <select
+      value={selectedParentCategory}
+      onChange={handleParentCategoryChange}
+      disabled={!selectedHeadCategory}
+      style={{ width: "100%", padding: "8px" }} // Full width and padding
+    >
+      <option value="">Select Parent Category</option>
+      {Array.isArray(parentCategories) &&
+        parentCategories.map((parentCategory) => (
+          <option key={parentCategory.id} value={parentCategory.id}>
+            {parentCategory.pc_name}
+          </option>
+        ))}
+    </select>
+  </label>
+  <Link to="/Product/AddParentCategory">
+    <button style={{ height: "100%", padding: "8px" }}>+</button>
+  </Link>
+</div>
+
+{/* Category Dropdown */}
+<div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+  <label style={{ flex: 1, fontWeight: "bold" }}>
+    Category *
+    <select
+      value={selectedCategory}
+      onChange={handleCategoryChange}
+      disabled={!selectedParentCategory}
+      style={{ width: "100%", padding: "8px" }}
+    >
+      <option value="">Select Category</option>
+      {Array.isArray(categories) &&
+        categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.category_name}
+          </option>
+        ))}
+    </select>
+  </label>
+  <Link to="/Category/AddCategories">
+    <button style={{ height: "100%", padding: "8px" }}>+</button>
+  </Link>
+</div>
+
+{/* Subcategory Dropdown */}
+<div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+  <label style={{ flex: 1, fontWeight: "bold" }}>
+    Subcategory *
+    <select
+      value={selectedsubCategory}
+      onChange={handleSubCategoryChange}
+      disabled={!selectedCategory}
+      style={{ width: "100%", padding: "8px" }}
+    >
+      <option value="">Select Subcategory</option>
+      {Array.isArray(subcategories) &&
+        subcategories.map((subCategory) => (
+          <option key={subCategory.id} value={subCategory.id}>
+            {subCategory.sub_category_name}
+          </option>
+        ))}
+    </select>
+  </label>
+  <Link to="/SubCat/AddSubCat">
+    <button style={{ height: "100%", padding: "8px" }}>+</button>
+  </Link>
+</div>
+
+{/* Brands Dropdown */}
+<div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+  <label style={{ flex: 1, fontWeight: "bold" }}>
+    Brands (optional)
+    <select
+      value={selectedBrand}
+      onChange={handleBrandChange}
+      style={{ width: "100%", padding: "8px" }}
+    >
+      <option value="">Select a Brand</option>
+      {Array.isArray(brands) &&
+        brands.map((branddata) => (
+          <option key={branddata.id} value={branddata.id}>
+            {branddata.brand_name}
+          </option>
+        ))}
+    </select>
+  </label>
+  <Link to="/Product/AddBrands">
+    <button style={{ height: "100%", padding: "8px" }}>+</button>
+  </Link>
+</div>
+
 
     <label style={{ fontWeight: "bold" }}>
                 Season (optional)
@@ -845,21 +961,23 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                   <option value="Autumn">Autumn</option>
                 </select>
               </label>
-              <label style={{ fontWeight: "bold" }}>
-                Description (optional)
-                <input
-                  type="text"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+              
             </div>
           )}
 
           {activeTab === 1 && (
             <div className="form-column">
+              
+              <label style={{ fontWeight: "bold" }}>
+                Notes (optional)
+                <input
+                  type="text"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
               {/* Color and Size Inputs */}
               <label style={{ fontWeight: "bold" }}>
   Color (optional)
