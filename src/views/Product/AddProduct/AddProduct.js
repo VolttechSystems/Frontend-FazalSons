@@ -748,6 +748,7 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
 
      {/* Confirmation Dialog */}
       {/* Dialog Box */}
+      {setProductList.length > 0 && ( // Check if table has data */}
       <Dialog open={isDialogOpen} onClose={() => handleDialogClose(false)}>
         <DialogContent>
           <DialogContentText>
@@ -762,7 +763,7 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
             OK
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> )}
 
 
       {/* Category Dialog */}

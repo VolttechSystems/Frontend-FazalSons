@@ -90,7 +90,7 @@ const AllProducts = () => {
               <td>{product.product_name}</td>
               <td>
                 
-  <Link to={`/Product/AllProducts/Barcodes/${product.sku}}`}>
+  <Link to={`/Product/AllProducts/Barcodes/${product.sku}`}>
   <Barcode
     value={product.sku} // Use only SKU as the barcode value
     format="CODE128"
