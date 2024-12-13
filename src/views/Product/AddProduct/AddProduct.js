@@ -673,6 +673,7 @@ const resetForm = () => {
     token_price: '',
     brand_name: '',
     variations: '',
+    notes :'',
   }));
   setSelectedVariations({});
   setEditMode(false);

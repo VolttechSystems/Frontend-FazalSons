@@ -5,7 +5,7 @@ import { CAlert, CButton } from '@coreui/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, Box, Typography, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint } from '@fortawesome/free-solid-svg-icons';
-
+import { useNavigate, useParams, Link } from 'react-router-dom';
 
 
   function Transections() {
@@ -1081,7 +1081,10 @@ const handleReturn = async () => {
             </option>
           ))}
         </select>
-                <button className="add-customer">+</button>
+        <Link to="/Customer/AddCustomer">
+        <button className="add-customer">+</button>
+          </Link>
+               
                 <select
   className="salesman-select"
   onChange={handleSalesmanChange}
@@ -1110,80 +1113,93 @@ const handleReturn = async () => {
 
             {/* Display Table if a product is selected */}
             {tableData.length > 0 ? (
-  <table border="1" width="100%" cellPadding="10" style={{ marginTop: "20px" }}>
-    <thead>
-      <tr>
-        <th>SKU</th>
-        <th>Product Name</th>
-        <th>Quantity</th>
-        <th>Price</th>
-        <th>Amount</th>
-        <th>Disc. %</th>
-        <th>Disc. Value</th>
-        <th>Net Amount</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {tableData.map((product, index) => (
-        <tr key={index}>
-          <td>{product.sku}</td>
-          <td>{product.product_name}</td>
-          <td>
-            <input
-              type="number"
-              value={product.quantity}
-              onChange={(e) => {
-                const qty = e.target.value;
-                setTableData((prevData) => {
-                  const updatedData = [...prevData];
-                  updatedData[index].quantity = parseInt(qty) || 1;
-                  return updatedData;
-                });
-              }}
-            />
-          </td>
-          <td>{product.selling_price}</td>
-          <td>{(product.selling_price * product.quantity).toFixed(2)}</td>
-          <td>
-            <input
-              type="number"
-              value={product.discount}
-              onChange={(e) => {
-                const discount = e.target.value;
-                setTableData((prevData) => {
-                  const updatedData = [...prevData];
-                  updatedData[index].discount = parseFloat(discount) || 0;
-                  return updatedData;
-                });
-              }}
-            />
-          </td>
-          <td>
-            {(
-              (product.selling_price * product.quantity * product.discount) /
-              100
-            ).toFixed(2)}
-          </td>
-          <td>
-            {(
-              product.selling_price * product.quantity -
-              (product.selling_price * product.quantity * product.discount) / 100
-            ).toFixed(2)}
-          </td>
-          <td>
-            <button
-              onClick={() =>
-                setTableData((prevData) => prevData.filter((_, i) => i !== index))
-              }
-            >
-              ❌
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+ <table border="1" width="100%" cellPadding="10" style={{ marginTop: "20px" }}>
+ <thead>
+   <tr>
+     <th>SKU</th>
+     <th>Product Name</th>
+     <th>Quantity</th>
+     <th>Price</th>
+     <th>Amount</th>
+     <th>Disc. %</th>
+     <th>Disc. Value</th>
+     <th>Net Amount</th>
+     <th>Action</th>
+   </tr>
+ </thead>
+ <tbody>
+   {tableData.map((product, index) => (
+     <tr key={index}>
+       <td>{product.sku}</td>
+       <td>{product.product_name}</td>
+       <td>
+         <input
+           type="number"
+           value={product.quantity}
+           onChange={(e) => {
+             const qty = parseInt(e.target.value) || 1;
+             setTableData((prevData) => {
+               const updatedData = [...prevData];
+               updatedData[index].quantity = qty;
+               return updatedData;
+             });
+           }}
+         />
+       </td>
+       <td>{product.selling_price}</td>
+       <td>{(product.selling_price * product.quantity).toFixed(2)}</td>
+       <td>
+         <input
+           type="number"
+           value={product.discount}
+           onChange={(e) => {
+             const discount = parseFloat(e.target.value) || 0;
+             setTableData((prevData) => {
+               const updatedData = [...prevData];
+               const totalAmount = product.selling_price * product.quantity;
+               updatedData[index].discount = discount;
+               updatedData[index].discountValue = (totalAmount * discount) / 100;
+               return updatedData;
+             });
+           }}
+         />
+       </td>
+       <td>
+         <input
+           type="number"
+           value={(product.discountValue || 0).toFixed(2)}
+           onChange={(e) => {
+             const discountValue = parseFloat(e.target.value) || 0;
+             setTableData((prevData) => {
+               const updatedData = [...prevData];
+               const totalAmount = product.selling_price * product.quantity;
+               updatedData[index].discountValue = discountValue;
+               updatedData[index].discount = (discountValue / totalAmount) * 100;
+               return updatedData;
+             });
+           }}
+         />
+       </td>
+       <td>
+         {(
+           product.selling_price * product.quantity -
+           (product.selling_price * product.quantity * product.discount) / 100
+         ).toFixed(2)}
+       </td>
+       <td>
+         <button
+           onClick={() =>
+             setTableData((prevData) => prevData.filter((_, i) => i !== index))
+           }
+         >
+           ❌
+         </button>
+       </td>
+     </tr>
+   ))}
+ </tbody>
+</table>
+
 ) : (
   <p>No products selected yet.</p>
 )}
@@ -1232,66 +1248,72 @@ const handleReturn = async () => {
     </tbody>
   </table>
 
+  <div className="fee-section">
+  {/* Fee Select Dropdown */}
+  <div className="fee-dropdown">
+    <label htmlFor="additional-fee">Additional Fee:</label>
+    <select id="additional-fee" onChange={handleFeeSelection}>
+      <option value="">Select Additional Fee</option>
+      {additionalFees.map((fee) => (
+        <option key={fee.id} value={fee.id}>
+          {fee.fee_name}
+        </option>
+      ))}
+    </select>
+    <Link to="/Admin/AdditionalFee">
+      <button className="add-fee-btn">+</button>
+    </Link>
+  </div>
+
+
+  {/* Dynamically Render Input Fields */}
+  <div className="selected-fees">
+    {selectedFees.map((fee) => (
+      <div key={fee.id} className="fee-item">
+        <label>{fee.fee_name}:</label>
+        <input
+          type="number"
+          value={fee.value}
+          onChange={(e) => handleInputChange(fee.id, e.target.value)}
+        />
+        <button className="remove-btn" onClick={() => handleRemoveFee(fee.id)}>
+          X
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
+<div className="payment-summary">
+  <div className="payment-row">
+    <label className="payment-label">
+      CARD:
+      <input type="number" className="payment-input" placeholder="0" />
+    </label>
+    <label className="payment-label">
+      CASH:
+      <input type="number" className="payment-input" placeholder="0" />
+    </label>
+    <label className="payment-label">
+      CHANGE:
+      <input type="number" className="payment-input" placeholder="0" />
+    </label>
+  </div>
+  <div className="payment-total">
+    <span className="total-amount">
+      {(
+        tableData.reduce(
+          (acc, item) =>
+            acc +
+            item.selling_price * item.quantity -
+            (item.selling_price * item.quantity * item.discount) / 100,
+          0
+        )
+      ).toFixed(2)}
+    </span>
   
-  <div>
-      {/* Fee Select Dropdown */}
-      <div className="fee-dropdown">
-        <label htmlFor="additional-fee">Additional Fee:</label>
-        <select id="additional-fee" onChange={handleFeeSelection}>
-          <option value="">Select Additional Fee</option>
-          {additionalFees.map((fee) => (
-            <option key={fee.id} value={fee.id}>
-              {fee.fee_name}
-            </option>
-          ))}
-        </select>
-      </div>
 
-      {/* Dynamically Render Input Fields */}
-      <div className="selected-fees">
-        {selectedFees.map((fee) => (
-          <div key={fee.id} className="fee-item">
-            <label>{fee.fee_name}:</label>
-            <input
-              type="number"
-              value={fee.value}
-              onChange={(e) => handleInputChange(fee.id, e.target.value)}
-            />
-            <button className="remove-btn" onClick={() => handleRemoveFee(fee.id)}>
-              X
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
 
-  <div className="payment-summary">
-    <div className="payment-row">
-      <label className="payment-label">
-        CARD:
-        <input type="number" className="payment-input" placeholder="0" />
-      </label>
-      <label className="payment-label">
-        CASH:
-        <input type="number" className="payment-input" placeholder="0" />
-      </label>
-      <label className="payment-label">
-        CHANGE:
-        <input type="number" className="payment-input" placeholder="0" />
-      </label>
-    </div>
-    <div className="payment-total">
-      <span className="total-amount">
-        {(
-          tableData.reduce(
-            (acc, item) =>
-              acc +
-              item.selling_price * item.quantity - 
-              (item.selling_price * item.quantity * item.discount) / 100,
-            0
-          )
-        ).toFixed(2)}
-      </span>
       {/* <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
         {alertMessage}
       </CAlert> */}
