@@ -32,7 +32,7 @@ const AddParentCategory = () => {
   useEffect(() => {
     const fetchCategoryHeads = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
+        const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
         setCategoryHeads(response.data);
       } catch (error) {
         console.error('Error fetching category heads:', error);
@@ -43,7 +43,7 @@ const AddParentCategory = () => {
     const fetchParentCategoryDetails = async () => {
       if (id) {
         try {
-          const response = await axios.get(`http://16.171.145.107/pos/products/action_parent_category/${id}/`);
+          const response = await axios.get(`http://195.26.253.123/pos/products/action_parent_category/${id}/`);
           const data = response.data;
           setCategoryHead(data.hc_name);
           setPCname(data.pc_name);
@@ -74,10 +74,10 @@ const AddParentCategory = () => {
 
     try {
       if (id) {
-        await axios.put(`http://16.171.145.107/pos/products/action_parent_category/${id}/`, ParentCategoryData);
+        await axios.put(`http://195.26.253.123/pos/products/action_parent_category/${id}/`, ParentCategoryData);
         alert('Parent Category updated successfully!');
       } else {
-        await axios.post('http://16.171.145.107/pos/products/add_parent_category', ParentCategoryData);
+        await axios.post('http://195.26.253.123/pos/products/add_parent_category', ParentCategoryData);
         alert('Parent Category added successfully!');
       }
 

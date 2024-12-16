@@ -53,7 +53,7 @@ class AddAtt extends Component {
   fetchAttributeTypes = async () => {
     try {
       const response = await fetch(
-        "http://16.171.145.107/pos/products/add_attribute_type"
+        "http://195.26.253.123/pos/products/add_attribute_type"
       );
       const result = await response.json();
       if (response.ok) {
@@ -72,7 +72,7 @@ class AddAtt extends Component {
   fetchData = async () => {
     try {
       const response = await fetch(
-        "http://16.171.145.107/pos/products/variation_group/"
+        "http://195.26.253.123/pos/products/variation_group/"
       );
       const result = await response.json();
       if (response.ok) {
@@ -155,7 +155,7 @@ class AddAtt extends Component {
 
     try {
       const response = await fetch(
-        "http://16.171.145.107/pos/products/variation_group/",
+        "http://195.26.253.123/pos/products/variation_group/",
         {
           method: "POST",
           headers: {
@@ -229,7 +229,7 @@ class AddAtt extends Component {
   
     try {
       const response = await fetch(
-        `http://16.171.145.107/pos/products/action_variations_group/${editData.att_id}`,
+        `http://195.26.253.123/pos/products/action_variations_group/${editData.att_id}`,
         {
           method: "PUT",
           headers: {
@@ -263,7 +263,7 @@ class AddAtt extends Component {
   handleDelete = async (attId) => {
     try {
       // Make the API call to delete the variation group
-      await axios.delete(`http://16.171.145.107/pos/products/action_variations_group/${attId}`);
+      await axios.delete(`http://195.26.253.123/pos/products/action_variations_group/${attId}`);
       
       // Update the state by filtering out the deleted attribute
       this.setState((prevState) => ({
@@ -287,7 +287,7 @@ class AddAtt extends Component {
 
   //   try {
   //     const response = await fetch(
-  //       `http://16.171.145.107/pos/products/action_variations_group/${attId}`,
+  //       `http://195.26.253.123/pos/products/action_variations_group/${attId}`,
   //       {
   //         method: "DELETE",
   //       }

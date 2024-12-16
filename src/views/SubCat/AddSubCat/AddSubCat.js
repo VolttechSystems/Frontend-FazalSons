@@ -43,15 +43,15 @@ const AddSubCat = () => {
 
 
 
-  const API_ADD_SUBCATEGORIES = 'http://16.171.145.107/pos/products/add_subcategories';
-  const API_HEAD_CATEGORIES = 'http://16.171.145.107/pos/products/add_head_category';
-  const API_PARENT_CATEGORIES = 'http://16.171.145.107/pos/products/add_parent_category';
-  const API_ATT_TYPES = 'http://16.171.145.107/pos/products/add_attribute_type';
-  const API_FETCH_VARIATIONS_GROUP = 'http://16.171.145.107/pos/products/fetch_variations_group';
+  const API_ADD_SUBCATEGORIES = 'http://195.26.253.123/pos/products/add_subcategories';
+  const API_HEAD_CATEGORIES = 'http://195.26.253.123/pos/products/add_head_category';
+  const API_PARENT_CATEGORIES = 'http://195.26.253.123/pos/products/add_parent_category';
+  const API_ATT_TYPES = 'http://195.26.253.123/pos/products/add_attribute_type';
+  const API_FETCH_VARIATIONS_GROUP = 'http://195.26.253.123/pos/products/fetch_variations_group';
 
-  const API_UPDATE_SUBCATEGORY = 'http://16.171.145.107/pos/products/action_subcategories';
-  const API_FETCH_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
-  const API_FETCH_SUBCATEGORIES = 'http://16.171.145.107/pos/products/add_subcategories';
+  const API_UPDATE_SUBCATEGORY = 'http://195.26.253.123/pos/products/action_subcategories';
+  const API_FETCH_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories';
+  const API_FETCH_SUBCATEGORIES = 'http://195.26.253.123/pos/products/add_subcategories';
 
   // Fetch initial data and categories list
   useEffect(() => {
@@ -141,7 +141,7 @@ useEffect(() => {
 // Fetch Head Categories
 const fetchHeadCategories = async () => {
   try {
-    const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
+    const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
     setHeadCategories(response.data);
   } catch (error) {
     console.error('Error fetching head categories:', error);
@@ -172,7 +172,7 @@ const handleHeadCategoryChange = async (e) => {
   if (headCategoryId) {
     try {
       const response = await axios.get(
-        `http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
+        `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
       );
       console.log('Parent Categories:', response.data);
       setParentCategories(response.data); // Populate parent categories
@@ -212,7 +212,7 @@ const handleParentCategoryChange = async (e) => {
       try {
         // Fetch categories based on parent category
         const response = await axios.get(
-          `http://16.171.145.107/pos/products/fetch_parent_to_category/${parentCategoryId}/`
+          `http://195.26.253.123/pos/products/fetch_parent_to_category/${parentCategoryId}/`
         );
         console.log('Categories:', response.data); // Log fetched categories
         setCategories(response.data); // Populate the categories dropdown

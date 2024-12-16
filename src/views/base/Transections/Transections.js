@@ -111,7 +111,7 @@ const [closingDate, setClosingDate] = useState("");
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await fetch('http://16.171.145.107/pos/transaction/get_all_invoices/1');
+        const response = await fetch('http://195.26.253.123/pos/transaction/get_all_invoices/1');
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -137,7 +137,7 @@ const [closingDate, setClosingDate] = useState("");
    useEffect(() => {
     const fetchdueInvoices = async () => {
       try {
-        const response = await fetch('http://16.171.145.107/pos/transaction/get_due_invoices/1');
+        const response = await fetch('http://195.26.253.123/pos/transaction/get_due_invoices/1');
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -161,7 +161,7 @@ const [closingDate, setClosingDate] = useState("");
 
 const handleSalesButtonClick = async () => {
   try {
-    const response = await axios.get("http://16.171.145.107/pos/transaction/today_sale_report/1");
+    const response = await axios.get("http://195.26.253.123/pos/transaction/today_sale_report/1");
     console.log(response.data); // Check the data structure
     setSalesData(response.data);
     setIsOpen(true);
@@ -224,7 +224,7 @@ const fetchNewProducts = async () => {
   try {
     // Make the API request to get products for the selected invoice code
     const response = await fetch(
-      `http://16.171.145.107/pos/transaction/get_invoice_products/${selectedInvoice}/`
+      `http://195.26.253.123/pos/transaction/get_invoice_products/${selectedInvoice}/`
     );
 
     // Check if the response is successful
@@ -260,7 +260,7 @@ const fetchNewProductDetails = async () => {
 
   try {
     const response = await fetch(
-      `http://16.171.145.107/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`
+      `http://195.26.253.123/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`
     );
 
     if (!response.ok) {
@@ -301,7 +301,7 @@ const handleSalesReturn = async () => {
   console.log("Submitting return data:", requestData);
 
   try {
-    const response = await fetch("http://16.171.145.107/pos/transaction/transactions_return", {
+    const response = await fetch("http://195.26.253.123/pos/transaction/transactions_return", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -347,7 +347,7 @@ const handleProductChange = (event) => {
     useEffect(() => {
         const fetchSalesmen = async () => {
             try {
-                const response = await fetch('http://16.171.145.107/pos/transaction/add_salesman');
+                const response = await fetch('http://195.26.253.123/pos/transaction/add_salesman');
                 const data = await response.json();
                 if (data && Array.isArray(data)) {
                     setSalesmen(data);
@@ -359,7 +359,7 @@ const handleProductChange = (event) => {
 
         const fetchAdditionalFees = async () => {
             try {
-                const response = await fetch('http://16.171.145.107/pos/transaction/add_additional_fee');
+                const response = await fetch('http://195.26.253.123/pos/transaction/add_additional_fee');
                 const data = await response.json();
                 if (data && Array.isArray(data)) {
                     setAdditionalFees(data);
@@ -371,7 +371,7 @@ const handleProductChange = (event) => {
 
         const fetchDeliveryFees = async () => {
             try {
-                const response = await fetch('http://16.171.145.107/pos/transaction/action_additional_fee/id/');
+                const response = await fetch('http://195.26.253.123/pos/transaction/action_additional_fee/id/');
                 const data = await response.json();
                 if (data && Array.isArray(data)) {
                     setDeliveryFees(data);
@@ -384,7 +384,7 @@ const handleProductChange = (event) => {
          const fetchAllProducts = async () => {
       try {
         const response = await fetch(
-          "http://16.171.145.107/pos/transaction/all_product"
+          "http://195.26.253.123/pos/transaction/all_product"
         );
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -398,7 +398,7 @@ const handleProductChange = (event) => {
 
     const fetchCustomer = async () => {
       try {
-          const response = await fetch('http://16.171.145.107/pos/customer/add_customer');
+          const response = await fetch('http://195.26.253.123/pos/customer/add_customer');
           const data = await response.json();
           if (data && Array.isArray(data)) {
               setCustomer(data);
@@ -426,7 +426,7 @@ const handleProductChange = (event) => {
     console.log("Fetching product details for SKU:", sku); // Debug log
     try {
       const response = await fetch(
-        `http://16.171.145.107/pos/transaction/products_detail/${sku}/`
+        `http://195.26.253.123/pos/transaction/products_detail/${sku}/`
       );
       if (!response.ok) {
         console.error("API Error:", response.status, response.statusText);
@@ -487,7 +487,7 @@ const handleProductChange = (event) => {
     };
   
     try {
-      const response = await fetch("http://16.171.145.107/pos/transaction/add_transaction", {
+      const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
         method: "POST", // Changed to POST
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload), // Send payload as body
@@ -572,7 +572,7 @@ const handleReturn = async () => {
   };
 
   try {
-    const response = await fetch("http://16.171.145.107/pos/transaction/add_transaction", {
+    const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Specify JSON payload
@@ -845,7 +845,7 @@ const handleReturn = async () => {
               try {
                 // Fetch the due amount for the selected invoice
                 const response = await fetch(
-                  `http://16.171.145.107/pos/transaction/get_amount_of_due_invoices/${invoiceCode}`
+                  `http://195.26.253.123/pos/transaction/get_amount_of_due_invoices/${invoiceCode}`
                 );
                 if (response.ok) {
                   const data = await response.json();
@@ -941,7 +941,7 @@ const handleReturn = async () => {
 
         // Send PUT request to the API
         const response = await fetch(
-          `http://16.171.145.107/pos/transaction/receive_due_invoice/${selectedDueInvoice}`,
+          `http://195.26.253.123/pos/transaction/receive_due_invoice/${selectedDueInvoice}`,
           {
             method: "PUT",
             headers: {

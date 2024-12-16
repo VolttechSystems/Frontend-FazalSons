@@ -18,7 +18,7 @@ const AdditionalFee = () => {
 
   const fetchFees = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/transaction/add_additional_fee'); // Replace with the actual endpoint for fetching fees
+      const response = await axios.get('http://195.26.253.123/pos/transaction/add_additional_fee'); // Replace with the actual endpoint for fetching fees
       setFees(response.data); // Adjust based on the response structure
     } catch (error) {
       console.error('Error fetching fees:', error);
@@ -35,12 +35,12 @@ const AdditionalFee = () => {
     try {
       if (editingFeeId) {
         // Update existing fee
-        await axios.put(`http://16.171.145.107/pos/transaction/action_additional_fee/${editingFeeId}/`, formData);
+        await axios.put(`http://195.26.253.123/pos/transaction/action_additional_fee/${editingFeeId}/`, formData);
         setFees(fees.map(fee => (fee.id === editingFeeId ? { ...fee, ...formData } : fee)));
         setEditingFeeId(null);
       } else {
         // Add new fee
-        const response = await axios.post('http://16.171.145.107/pos/transaction/add_additional_fee', formData);
+        const response = await axios.post('http://195.26.253.123/pos/transaction/add_additional_fee', formData);
         setFees([...fees, response.data]);
       }
       setFormData({ fee_name: '', fee_amount: '' });
@@ -56,7 +56,7 @@ const AdditionalFee = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://16.171.145.107/pos/transaction/action_additional_fee/${id}/`);
+      await axios.delete(`http://195.26.253.123/pos/transaction/action_additional_fee/${id}/`);
       setFees(fees.filter(fee => fee.id !== id));
     } catch (error) {
       console.error('Error deleting fee:', error);

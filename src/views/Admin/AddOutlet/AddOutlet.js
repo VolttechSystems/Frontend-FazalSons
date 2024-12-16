@@ -20,7 +20,7 @@ const AddOutlet = () => {
 
   const fetchOutlets = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/products/add_outlet'); // Replace with the actual endpoint for fetching outlets
+      const response = await axios.get('http://195.26.253.123/pos/products/add_outlet'); // Replace with the actual endpoint for fetching outlets
       setOutlets(response.data); // Adjust based on the response structure
     } catch (error) {
       console.error('Error fetching outlets:', error);
@@ -37,12 +37,12 @@ const AddOutlet = () => {
     try {
       if (editingOutletId) {
         // Update existing outlet
-        await axios.put(`http://16.171.145.107/pos/products/action_outlet/${editingOutletId}/`, formData);
+        await axios.put(`http://195.26.253.123/pos/products/action_outlet/${editingOutletId}/`, formData);
         setOutlets(outlets.map(outlet => (outlet.id === editingOutletId ? formData : outlet)));
         setEditingOutlet(null);
       } else {
         // Add new outlet
-        await axios.post('http://16.171.145.107/pos/products/add_outlet', formData);
+        await axios.post('http://195.26.253.123/pos/products/add_outlet', formData);
         setOutlets([...outlets, formData]);
       }
       setFormData({ outlet_code: '', outlet_name: '' });
@@ -58,7 +58,7 @@ const AddOutlet = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://16.171.145.107/pos/products/action_outlet/${id}/`);
+      await axios.delete(`http://195.26.253.123/pos/products/action_outlet/${id}/`);
       setOutlets(outlets.filter(outlet => outlet.id !== id)); // Remove deleted outlet from the state
     } catch (error) {
       console.error('Error deleting outlet:', error);

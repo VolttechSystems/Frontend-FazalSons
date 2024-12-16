@@ -148,7 +148,7 @@ const Attributes = () => {
 
   const fetchAttributes = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/products/add_attributes');
+      const response = await axios.get('http://195.26.253.123/pos/products/add_attributes');
       setAttributes(response.data);
       setLoading(false);
     } catch (error) {
@@ -161,7 +161,7 @@ const Attributes = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this attribute?')) {
       try {
-        await axios.delete(`http://16.171.145.107/pos/products/action_attributes/${id}/`);
+        await axios.delete(`http://195.26.253.123/pos/products/action_attributes/${id}/`);
         alert('Attribute deleted successfully!');
         fetchAttributes();
       } catch (error) {

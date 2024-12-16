@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './AddStock.css';
@@ -10,12 +8,10 @@ const AddStock = () => {
   const [selectedProduct, setSelectedProduct] = useState('');
   const [updatedStock, setUpdatedStock] = useState({});
 
-  // Fetch product list on component mount
   useEffect(() => {
     const fetchProductList = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/get_product/');
-        console.log('Product list fetched:', response.data); // Log the product list
+        const response = await axios.get('http://195.26.253.123/pos/products/get_product/');
         setProductList(response.data);
       } catch (error) {
         console.error('Error fetching product list:', error);
@@ -24,20 +20,18 @@ const AddStock = () => {
     fetchProductList();
   }, []);
 
-  // Fetch stock data when a product is selected
   useEffect(() => {
     if (selectedProduct) {
       const fetchStockData = async () => {
         try {
           const encodedProductName = encodeURIComponent(selectedProduct);
           const response = await axios.get(
-            `http://16.171.145.107/pos/stock/add_stock/${encodedProductName}/`
+            `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`
           );
-          console.log('Stock data fetched:', response.data);
           if (Array.isArray(response.data) && response.data.length > 0) {
             setStockData(response.data);
           } else {
-            setStockData([]); // Reset to empty if no stock data
+            setStockData([]);
           }
         } catch (error) {
           console.error('Error fetching stock data:', error);
@@ -45,85 +39,64 @@ const AddStock = () => {
       };
       fetchStockData();
     } else {
-      setStockData([]); 
+      setStockData([]);
     }
   }, [selectedProduct]);
 
-  // Handle stock update input change
   const handleStockInputChange = (e, sku) => {
     const { value } = e.target;
     setUpdatedStock((prev) => ({
       ...prev,
-      [sku]: Number(value), // Store the added quantity for each SKU
+      [sku]: Number(value),
     }));
   };
 
-  // Handle form submission to update stock quantities
   const handleSubmit = async () => {
-  // Construct the payload with the correct structure
-  const updatedItems = stockData
-    .filter((item) => {
-      const additionalQuantity = updatedStock[item.sku] || 0;
-      const newQuantity = (parseInt(item.avail_quantity) + additionalQuantity).toString();
-      return newQuantity !== item.avail_quantity.toString();
-    })
-    .map((item) => {
-      const additionalQuantity = updatedStock[item.sku] || 0;
-      const newQuantity = (parseInt(item.avail_quantity) + additionalQuantity).toString();
-      
-      return {
-        "avail_quantity": newQuantity, // Ensure this is a string
-        "sku": item.sku
-      };
-    });
+    const updatedItems = stockData
+      .filter((item) => {
+        const additionalQuantity = updatedStock[item.sku] || 0;
+        const newQuantity = (parseInt(item.avail_quantity) + additionalQuantity).toString();
+        return newQuantity !== item.avail_quantity.toString();
+      })
+      .map((item) => {
+        const additionalQuantity = updatedStock[item.sku] || 0;
+        const newQuantity = (parseInt(item.avail_quantity) + additionalQuantity).toString();
+        return {
+          avail_quantity: newQuantity,
+          sku: item.sku,
+        };
+      });
 
-  if (updatedItems.length === 0) {
-    console.log("No stock data was updated.");
-    return;
-  }
+    if (updatedItems.length === 0) {
+      return;
+    }
 
-  // Log the exact payload to be sent
-  console.log('Payload to be sent:', JSON.stringify(updatedItems));
-
-  try {
-    const response = await axios.put(
-      `http://16.171.145.107/pos/stock/add_stock/${selectedProduct}/`, // Ensure the endpoint ends with `/`
-      updatedItems, // Send `updatedItems` directly
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-
-    console.log('Stock updated successfully:', response.data);
-
-    // Update stock data with new quantities after successful update
-    const updatedStockData = stockData.map((item) => {
-      const updatedItem = updatedItems.find((updated) => updated.sku === item.sku);
-      if (updatedItem) {
-        return { ...item, avail_quantity: updatedItem.avail_quantity };
-      }
-      return item;
-    });
-
-    setStockData(updatedStockData);
-    setUpdatedStock({});
-  } catch (error) {
-    console.error('Error updating stock:', error.response ? error.response.data : error.message);
-    alert(`Error: ${error.response ? error.response.data : error.message}`);
-  }
-};
-
-  
-  
-  
-
-
-  
-  
+    try {
+      const response = await axios.put(
+        `http://195.26.253.123/pos/stock/add_stock/${selectedProduct}/`,
+        updatedItems,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      const updatedStockData = stockData.map((item) => {
+        const updatedItem = updatedItems.find((updated) => updated.sku === item.sku);
+        if (updatedItem) {
+          return { ...item, avail_quantity: updatedItem.avail_quantity };
+        }
+        return item;
+      });
+      setStockData(updatedStockData);
+      setUpdatedStock({});
+    } catch (error) {
+      console.error('Error updating stock:', error.response ? error.response.data : error.message);
+      alert(`Error: ${error.response ? error.response.data : error.message}`);
+    }
+  };
 
   return (
-    <div>
+    <div className="container">
       <h2>Stock Management</h2>
 
-      <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+      <div className="select-container">
         <select onChange={(e) => setSelectedProduct(e.target.value)} value={selectedProduct}>
           <option value="">Select Product</option>
           {productList.map((product) => (
@@ -135,7 +108,7 @@ const AddStock = () => {
       </div>
 
       {stockData.length > 0 ? (
-        <table border="1" style={{ width: '100%', textAlign: 'center' }}>
+        <table>
           <thead>
             <tr>
               <th>ID</th>
@@ -155,7 +128,7 @@ const AddStock = () => {
                 <td>{item.sku}</td>
                 <td>{item.color}</td>
                 <td>{item.size}</td>
-                <td>{item.avail_quantity + (updatedStock[item.sku] || 0)}</td> {/* Show current quantity with updates */}
+                <td>{item.avail_quantity + (updatedStock[item.sku] || 0)}</td>
                 <td>
                   <input
                     type="number"
@@ -169,12 +142,10 @@ const AddStock = () => {
           </tbody>
         </table>
       ) : (
-        <p>No stock data available for the selected product.</p>
+        <p className="no-stock-message">No stock data available for the selected product.</p>
       )}
 
-      <button onClick={handleSubmit} style={{ marginTop: '20px' }}>
-        Update Stock
-      </button>
+      <button onClick={handleSubmit}>Update Stock</button>
     </div>
   );
 };

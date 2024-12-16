@@ -18,7 +18,7 @@ const CustomerChannel = () => {
   const [editId, setEditId] = useState(null);
   
 
-  const baseUrl = 'http://16.171.145.107/pos/customer';
+  const baseUrl = 'http://195.26.253.123/pos/customer';
 
  // Fetch channels on component load
  useEffect(() => {

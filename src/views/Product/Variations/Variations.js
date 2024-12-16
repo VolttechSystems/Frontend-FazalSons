@@ -31,7 +31,7 @@ const Variations = () => {
   
   const fetchVariations = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/products/add_variations');
+      const response = await axios.get('http://195.26.253.123/pos/products/add_variations');
       setVariations(response.data);
       setLoading(false);
     } catch (error) {
@@ -43,7 +43,7 @@ const Variations = () => {
 
     const fetchAttributes = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/add_attribute');
+        const response = await axios.get('http://195.26.253.123/pos/products/add_attribute');
         setAttributes(response.data);
         console.log('Fetched Attributes:', response.data);
       } catch (error) {
@@ -56,7 +56,7 @@ const Variations = () => {
     const handleDelete = async (id) => {
       if (window.confirm('Are you sure you want to delete this variation?')) {
         try {
-          await axios.delete(`http://16.171.145.107/pos/products/action_variation/${id}/`);
+          await axios.delete(`http://195.26.253.123/pos/products/action_variation/${id}/`);
           alert('variation deleted successfully!');
           fetchVariations(); 
         } catch (error) {

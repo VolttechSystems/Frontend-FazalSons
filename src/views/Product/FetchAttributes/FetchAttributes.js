@@ -27,7 +27,7 @@
 //   useEffect(() => {
 //     const fetchAttributeTypes = async () => {
 //       try {
-//         const response = await axios.get('http://16.171.145.107/pos/products/fetch_all_attribute_type/');
+//         const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_attribute_type/');
 //         setAttributeTypes(response.data);
 //       } catch (error) {
 //         console.error('Error fetching attribute types:', error);
@@ -42,7 +42,7 @@
 //     setSelectedAttributeType(attributeTypeName);
 //     if (attributeTypeName) {
 //       try {
-//         const response = await axios.get(`http://16.171.145.107/pos/products/fetch_attribute/${attributeTypeName}/`);
+//         const response = await axios.get(`http://195.26.253.123/pos/products/fetch_attribute/${attributeTypeName}/`);
 //         setAttributes(response.data);
 //       } catch (error) {
 //         console.error('Error fetching attributes:', error);
@@ -153,7 +153,7 @@ const FetchAttributes = () => {
   useEffect(() => {
     const fetchAttributeTypes = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/fetch_all_attribute_type/');
+        const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_attribute_type/');
         setAttributeTypes(response.data);
       } catch (error) {
         console.error('Error fetching attribute types:', error);
@@ -171,7 +171,7 @@ const FetchAttributes = () => {
 
     if (attributeTypeName) {
       try {
-        const response = await axios.get(`http://16.171.145.107/pos/products/fetch_attribute/${attributeTypeName}/`);
+        const response = await axios.get(`http://195.26.253.123/pos/products/fetch_attribute/${attributeTypeName}/`);
         console.log('Attributes response:', response.data); // Log the response
         // Setting attributes based on the response
         setAttributes(response.data);

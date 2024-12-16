@@ -37,9 +37,9 @@ const SubCategory = () => {
     const fetchData = async () => {
       try {
         const [subCategoriesRes, categoriesRes, parentCategoriesRes] = await Promise.all([
-          axios.get('http://16.171.145.107/pos/products/add_subcategory'),
-          axios.get('http://16.171.145.107/pos/products/add_category'),
-          axios.get('http://16.171.145.107/pos/products/add_parent_category'),
+          axios.get('http://195.26.253.123/pos/products/add_subcategory'),
+          axios.get('http://195.26.253.123/pos/products/add_category'),
+          axios.get('http://195.26.253.123/pos/products/add_parent_category'),
         ]);
         setSubCategories(subCategoriesRes.data);
         setCategories(categoriesRes.data);
@@ -66,7 +66,7 @@ const SubCategory = () => {
 
   // const fetchSubcategoryById = async (id) => {
   //   try {
-  //     const response = await axios.get(`http://16.171.145.107/pos/products/action_subcategory/${id}/`); // Corrected API path
+  //     const response = await axios.get(`http://195.26.253.123/pos/products/action_subcategory/${id}/`); // Corrected API path
   //     const subCategoryData = response.data;
   //     navigate('/Product/AddSubCategory', { state: { subCategoryData } });
   //   } catch (error) {
@@ -80,7 +80,7 @@ const SubCategory = () => {
   const handleDeleteSubcategory = async (id) => {
     try {
       if (window.confirm('Are you sure you want to delete this subcategory?')) {
-        await axios.delete(`http://16.171.145.107/pos/products/action_subcategory/${id}/`);
+        await axios.delete(`http://195.26.253.123/pos/products/action_subcategory/${id}/`);
         setSubCategories(subCategories.filter((subCategory) => subCategory.id !== id));
         alert('Subcategory deleted successfully!');
       }

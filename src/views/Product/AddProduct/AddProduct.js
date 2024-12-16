@@ -76,7 +76,7 @@ const [attributes, setAttributes] = useState([]);
     if (confirmDelete) {
       // API call to delete all products
       axios
-        .delete("http://16.171.145.107/pos/products/all-temp-product-delete")
+        .delete("http://195.26.253.123/pos/products/all-temp-product-delete")
         .then((response) => {
           console.log("All products deleted successfully");
           // Clear the product list (update the state to empty)
@@ -106,8 +106,8 @@ const fetchAttributes = async (categoryId, subCategoryId) => {
 
   // Use the appropriate URL based on whether subCategoryId is provided
   const url = subCategoryId
-    ? `http://16.171.145.107/pos/products/fetch_subcategories/${encodeURIComponent(subCategoryId)}`
-    : `http://16.171.145.107/pos/products/fetch_categories/${encodeURIComponent(categoryId)}`;
+    ? `http://195.26.253.123/pos/products/fetch_subcategories/${encodeURIComponent(subCategoryId)}`
+    : `http://195.26.253.123/pos/products/fetch_categories/${encodeURIComponent(categoryId)}`;
 
   try {
     const response = await axios.get(url);
@@ -194,7 +194,7 @@ useEffect(() => {
 // Fetch Head Categories
 const fetchHeadCategories = async () => {
   try {
-    const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
+    const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
     setHeadCategories(response.data);
   } catch (error) {
     console.error('Error fetching head categories:', error);
@@ -220,7 +220,7 @@ const handleHeadCategoryChange = async (e) => {
   if (headCategoryId) {
     try {
       const response = await axios.get(
-        `http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
+        `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
       );
       console.log('Parent Categories:', response.data);
       setParentCategories(response.data); // Populate parent categories
@@ -238,7 +238,7 @@ const handleHeadCategoryChange = async (e) => {
 useEffect(() => {
   const fetchBrands = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/products/add_brand');
+      const response = await axios.get('http://195.26.253.123/pos/products/add_brand');
       const brandsData = response.data.results || [];
       setBrands(Array.isArray(brandsData) ? brandsData : []);
     } catch (error) {
@@ -268,7 +268,7 @@ const handleParentCategoryChange = async (e) => {
 
   try {
     const response = await axios.get(
-      `http://16.171.145.107/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`
+      `http://195.26.253.123/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`
     );
     setCategories(response.data); // Populate categories
   } catch (error) {
@@ -299,7 +299,7 @@ const handleCategoryChange = async (e) => {
 
   try {
     const response = await axios.get(
-      `http://16.171.145.107/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`
+      `http://195.26.253.123/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`
     );
     setSubCategories(response.data); // Populate subcategories
 
@@ -427,17 +427,17 @@ const colorOptions = [
     { value: 'XXL', label: 'XXL' },
   ];
 
-  // const BASE_URL = 'http://16.171.145.107/pos';
+  // const BASE_URL = 'http://195.26.253.123/pos';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
        
         const [headResponse, parentResponse, brandResponse] = await Promise.all([
-          axios.get('http://16.171.145.107/pos/products/add_head_category'),
-          axios.get('http://16.171.145.107/pos/products/add_parent_category/'),
+          axios.get('http://195.26.253.123/pos/products/add_head_category'),
+          axios.get('http://195.26.253.123/pos/products/add_parent_category/'),
           
-          axios.get('http://16.171.145.107/pos/products/add_brand')
+          axios.get('http://195.26.253.123/pos/products/add_brand')
         ]);
         
         //const brandsData = brandResponse.data.results || [];
@@ -471,7 +471,7 @@ const colorOptions = [
   
   const fetchProductList = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/products/add_temp_product');
+      const response = await axios.get('http://195.26.253.123/pos/products/add_temp_product');
       setProductList(response.data);  
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -482,7 +482,7 @@ const colorOptions = [
   useEffect(() => {
     const fetchOutlets = async () => {
       try {
-        const response = await axios.get("http://16.171.145.107/pos/products/fetch_all_outlet/");
+        const response = await axios.get("http://195.26.253.123/pos/products/fetch_all_outlet/");
         setOutlets(response.data); // Assuming the response data is an array
       } catch (error) {
         console.error("Error fetching outlets:", error);
@@ -558,7 +558,7 @@ const colorOptions = [
     brand: selectedBrand, // This will send the brand id as "3", "4", etc.
   };
     try {
-      const response = await axios.post('http://16.171.145.107/pos/products/add_temp_product', newProduct);
+      const response = await axios.post('http://195.26.253.123/pos/products/add_temp_product', newProduct);
       if (response.status === 200 || response.status === 201) {
         alert('Product added successfully!');
         fetchProductList();
@@ -620,7 +620,7 @@ const handleUpdate = async () => {
     };
 
     try {
-      const response = await axios.put(`http://16.171.145.107/pos/products/action_temp_product/${editProductId}/`, updatedProductData); 
+      const response = await axios.put(`http://195.26.253.123/pos/products/action_temp_product/${editProductId}/`, updatedProductData); 
       if (response.status === 200 || response.status === 201) {
         const updatedProductList = productList.map((product) =>
           product.id === editProductId
@@ -648,7 +648,7 @@ const handleUpdate = async () => {
   
 const handleDelete = async (id) => {
   try {
-    const response = await axios.delete(`http://16.171.145.107/pos/products/action_temp_product/${id}/`);
+    const response = await axios.delete(`http://195.26.253.123/pos/products/action_temp_product/${id}/`);
     if (response.status === 200 || response.status === 204) {
       setProductList(prevList => prevList.filter((product) => product.id !== id));
       alert('Product deleted successfully!');
@@ -687,7 +687,7 @@ const handlePublish = async () => {
  
 
   try {
-    const response = await axios.post('http://16.171.145.107/pos/products/add_product');
+    const response = await axios.post('http://195.26.253.123/pos/products/add_product');
     if (response.status === 201 || response.status === 200) {
       alert('Product published successfully!');
       history.push('/Product/AllProducts'); 
@@ -806,13 +806,18 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
       <option value="" disabled>
         Select Outlet
       </option>
-      {outlets.map((outlet) => (
-        <option key={outlet.id} value={outlet.id}>
-          {outlet.outlet_name}
-        </option>
-      ))}
+      {Array.isArray(outlets) && outlets.length > 0 ? (
+        outlets.map((outlet) => (
+          <option key={outlet.id} value={outlet.id}>
+            {outlet.outlet_name}
+          </option>
+        ))
+      ) : (
+        <option disabled>Loading outlets...</option>
+      )}
     </select>
   </label>
+
   <Link to="/Admin/AddOutlet">
     <button style={{ height: "100%", padding: "8px" }}>+</button> {/* Matches dropdown height */}
   </Link>

@@ -36,7 +36,7 @@ const AddCustomer = () => {
   const [customerTypes, setCustomerTypes] = useState([]);
   const [editingCustomerId, setEditingCustomerId] = useState(null);
   const navigate = useNavigate();
-  const apiUrl = 'http://16.171.145.107/pos/customer';
+  const apiUrl = 'http://195.26.253.123/pos/customer';
 
   useEffect(() => {
     fetchCustomers();

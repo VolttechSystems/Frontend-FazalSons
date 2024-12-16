@@ -45,7 +45,7 @@ const AddSubCategory = () => {
   useEffect(() => {
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
+        const response = await axios.get('http://195.26.253.123/pos/products/add_parent_category');
         setParentCategories(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);
@@ -54,7 +54,7 @@ const AddSubCategory = () => {
 
     const fetchCategory = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/add_category');
+        const response = await axios.get('http://195.26.253.123/pos/products/add_category');
         setCategory(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -63,7 +63,7 @@ const AddSubCategory = () => {
 
     const fetchAttributeTypes = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/fetch_all_attribute_type/');
+        const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_attribute_type/');
         setAttributeTypes(response.data);
       } catch (error) {
         console.error('Error fetching attribute types:', error);
@@ -74,7 +74,7 @@ const AddSubCategory = () => {
     if (id) {
       const fetchSubcategory = async () => {
         try {
-          const response = await axios.get(`http://16.171.145.107/pos/products/action_subcategory/${id}/`);
+          const response = await axios.get(`http://195.26.253.123/pos/products/action_subcategory/${id}/`);
           const data = response.data;
           setSubcategoryName(data.sub_category_name);
           setSymbol(data.symbol);
@@ -104,7 +104,7 @@ const AddSubCategory = () => {
 
     if (attributeTypeName) {
       try {
-        const response = await axios.get(`http://16.171.145.107/pos/products/fetch_attribute/${attributeTypeName}/`);
+        const response = await axios.get(`http://195.26.253.123/pos/products/fetch_attribute/${attributeTypeName}/`);
         setAttributes(response.data);
       } catch (error) {
         console.error('Error fetching attributes:', error);
@@ -121,7 +121,7 @@ const AddSubCategory = () => {
 
     if (attributeName) {
       try {
-        const response = await axios.get(`http://16.171.145.107/pos/products/fetch_variation/${encodeURIComponent(attributeName)}/`);
+        const response = await axios.get(`http://195.26.253.123/pos/products/fetch_variation/${encodeURIComponent(attributeName)}/`);
         setVariations(response.data);  // Update variations with the response
       } catch (error) {
         console.error('Error fetching variations:', error);
@@ -145,10 +145,10 @@ const AddSubCategory = () => {
 
     try {
       if (id) {
-        await axios.put(`http://16.171.145.107/pos/products/action_subcategory/${id}/`, newSubcategory);
+        await axios.put(`http://195.26.253.123/pos/products/action_subcategory/${id}/`, newSubcategory);
         alert('SubCategory updated successfully!');
       } else {
-        await axios.post('http://16.171.145.107/pos/products/add_subcategory', newSubcategory);
+        await axios.post('http://195.26.253.123/pos/products/add_subcategory', newSubcategory);
         alert('SubCategory added successfully!');
       }
       navigate('/Product/SubCategory');

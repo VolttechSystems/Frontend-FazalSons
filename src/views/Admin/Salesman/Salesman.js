@@ -20,7 +20,7 @@
 
 //   const fetchSalesmen = async () => {
 //     try {
-//       const response = await axios.get('http://16.171.145.107/pos/transaction/add_salesman');
+//       const response = await axios.get('http://195.26.253.123/pos/transaction/add_salesman');
 //       setSalesmen(response.data);
 //     } catch (error) {
 //       console.error('Error fetching salesmen:', error);
@@ -52,7 +52,7 @@
 //       if (editingSalesmanId) {
         
 //         const response = await axios.put(
-//           `http://16.171.145.107/pos/transaction/action_salesman/${editingSalesmanId}/`,
+//           `http://195.26.253.123/pos/transaction/action_salesman/${editingSalesmanId}/`,
 //           dataToSend,
 //           { headers: { 'Content-Type': 'application/json' } }
 //         );
@@ -63,7 +63,7 @@
 //       } else {
        
 //         const response = await axios.post(
-//           'http://16.171.145.107/pos/transaction/add_salesman',
+//           'http://195.26.253.123/pos/transaction/add_salesman',
 //           dataToSend,
 //           { headers: { 'Content-Type': 'application/json' } }
 //         );
@@ -96,7 +96,7 @@
 
 //   const handleDelete = async (id) => {
 //     try {
-//       await axios.delete(`http://16.171.145.107/pos/transaction/action_salesman/${id}/`);
+//       await axios.delete(`http://195.26.253.123/pos/transaction/action_salesman/${id}/`);
 //       setSalesmen(salesmen.filter(salesman => salesman.id !== id));
 //     } catch (error) {
 //       console.error('Error deleting salesman:', error);
@@ -217,7 +217,7 @@ const Salesman = () => {
 
   const fetchSalesmen = async () => {
     try {
-      const response = await axios.get('http://16.171.145.107/pos/transaction/add_salesman');
+      const response = await axios.get('http://195.26.253.123/pos/transaction/add_salesman');
       setSalesmen(response.data);
     } catch (error) {
       console.error('Error fetching salesmen:', error);
@@ -260,7 +260,7 @@ const Salesman = () => {
     try {
       if (editingSalesmanId) {
         const response = await axios.put(
-          `http://16.171.145.107/pos/transaction/action_salesman/${editingSalesmanId}/`,
+          `http://195.26.253.123/pos/transaction/action_salesman/${editingSalesmanId}/`,
           dataToSend,
           { headers: { 'Content-Type': 'application/json' } }
         );
@@ -270,7 +270,7 @@ const Salesman = () => {
         setEditingSalesmanId(null);
       } else {
         const response = await axios.post(
-          'http://16.171.145.107/pos/transaction/add_salesman',
+          'http://195.26.253.123/pos/transaction/add_salesman',
           dataToSend,
           { headers: { 'Content-Type': 'application/json' } }
         );
@@ -305,7 +305,7 @@ const Salesman = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://16.171.145.107/pos/transaction/action_salesman/${id}/`);
+      await axios.delete(`http://195.26.253.123/pos/transaction/action_salesman/${id}/`);
       setSalesmen(salesmen.filter(salesman => salesman.id !== id));
     } catch (error) {
       console.error('Error deleting salesman:', error);

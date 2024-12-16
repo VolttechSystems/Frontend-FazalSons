@@ -44,7 +44,7 @@ const AddCategory = () => {
   useEffect(() => {
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/add_parent_category');
+        const response = await axios.get('http://195.26.253.123/pos/products/add_parent_category');
         setParentCategories(response.data);
       } catch (error) {
         console.error('Error fetching parent categories:', error);
@@ -53,7 +53,7 @@ const AddCategory = () => {
     };
     const fetchAttributeTypes = async () => {
       try {
-        const response = await axios.get('http://16.171.145.107/pos/products/fetch_all_attribute_type/');
+        const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_attribute_type/');
         setAttributeTypes(response.data);
       } catch (error) {
         console.error('Error fetching attribute types:', error);
@@ -134,10 +134,10 @@ const AddCategory = () => {
 
     try {
       if (id) {
-        await axios.put(`http://16.171.145.107/pos/products/action_category/${id}/`, categoryData);
+        await axios.put(`http://195.26.253.123/pos/products/action_category/${id}/`, categoryData);
         alert('Category updated successfully!');
       } else {
-        await axios.post('http://16.171.145.107/pos/products/add_category', categoryData);
+        await axios.post('http://195.26.253.123/pos/products/add_category', categoryData);
         alert('Category added successfully!');
       }
       navigate('/Product/Category');

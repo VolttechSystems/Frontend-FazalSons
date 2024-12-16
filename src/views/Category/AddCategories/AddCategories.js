@@ -40,14 +40,14 @@ const AddCategories = () => {
 
 
 
-  const API_ADD_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
-  const API_HEAD_CATEGORIES = 'http://16.171.145.107/pos/products/add_head_category';
-  const API_PARENT_CATEGORIES = 'http://16.171.145.107/pos/products/add_parent_category';
-  const API_ATT_TYPES = 'http://16.171.145.107/pos/products/add_attribute_type';
-  const API_FETCH_VARIATIONS_GROUP = 'http://16.171.145.107/pos/products/fetch_variations_group';
+  const API_ADD_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories';
+  const API_HEAD_CATEGORIES = 'http://195.26.253.123/pos/products/add_head_category';
+  const API_PARENT_CATEGORIES = 'http://195.26.253.123/pos/products/add_parent_category';
+  const API_ATT_TYPES = 'http://195.26.253.123/pos/products/add_attribute_type';
+  const API_FETCH_VARIATIONS_GROUP = 'http://195.26.253.123/pos/products/fetch_variations_group';
 
-  const API_UPDATE_CATEGORY = 'http://16.171.145.107/pos/products/action_categories';
-  const API_FETCH_CATEGORIES = 'http://16.171.145.107/pos/products/add_categories';
+  const API_UPDATE_CATEGORY = 'http://195.26.253.123/pos/products/action_categories';
+  const API_FETCH_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories';
 
   // Fetch initial data and categories list
   useEffect(() => {
@@ -127,7 +127,7 @@ useEffect(() => {
 // Fetch Head Categories
 const fetchHeadCategories = async () => {
   try {
-    const response = await axios.get('http://16.171.145.107/pos/products/add_head_category');
+    const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
     setHeadCategories(response.data);
   } catch (error) {
     console.error('Error fetching head categories:', error);
@@ -157,7 +157,7 @@ const handleHeadCategoryChange = async (e) => {
   if (headCategoryId) {
     try {
       const response = await axios.get(
-        `http://16.171.145.107/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
+        `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`
       );
       setParentCategories(response.data); // Populate parent categories
     } catch (error) {
