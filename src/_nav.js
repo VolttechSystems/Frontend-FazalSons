@@ -137,12 +137,12 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Category',
+        name: 'Add Category',
         to: '/Product/Category',
       },
       {
         component: CNavItem,
-        name: 'Sub-Categories',
+        name: 'Add Sub-Category',
         to: '/Product/SubCategory',
       },
       {
@@ -151,16 +151,16 @@ const _nav = [
         to: '/Product/Brands',
       },
       
-      {
-        component: CNavItem,
-        name: 'Attributes',
-        to: '/Product/Attributes',
-      },
-      {
-        component: CNavItem,
-        name: 'Variations',
-        to: '/Product/Variations',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Attributes',
+      //   to: '/Product/Attributes',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Variations',
+      //   to: '/Product/Variations',
+      // },
       {
         component: CNavItem,
         name: 'Add Attribute',
@@ -182,24 +182,24 @@ const _nav = [
       
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Category',
-    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Add Category',
-        to: '/Category/AddCategories',
-      },
-      {
-        component: CNavItem,
-        name: 'Add Sub Category',
-        to: '/SubCat/AddSubCat',
-      },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Category',
+  //   icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Add Category',
+  //       to: '/Category/AddCategories',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Add Sub Category',
+  //       to: '/SubCat/AddSubCat',
+  //     },
       
-    ],
-  },
+  //   ],
+  // },
 
   
   

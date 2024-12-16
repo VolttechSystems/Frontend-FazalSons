@@ -1,0 +1,139 @@
+.form-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-textarea {
+    resize: none;
+    height: 80px;
+  }
+  
+  .form-checkbox {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .add-button,
+  .submit-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-button:hover,
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Table Styling */
+.subcategories-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.subcategories-table th, .subcategories-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.subcategories-table th {
+  background-color: #f4f4f4;
+}
+
+.subcategories-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Button Styling */
+.btn-edit {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+.btn-edit:hover {
+  background-color: darkgreen;
+}
+
+.btn-delete {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.btn-delete:hover {
+  background-color: darkred;
+}
+
+/* Add variation button and other buttons alignment */
+button.add-variation-button,
+button + button {
+  width: auto;
+  margin-left: 10px;
+}
+
+button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
