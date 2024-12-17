@@ -5,7 +5,6 @@ import './AdditionalFee.css'; // Create a CSS file for styling if needed
 const AdditionalFee = () => {
   const [formData, setFormData] = useState({
     fee_name: '',
-    //fee_amount: '',
   });
 
   const [fees, setFees] = useState([]);
@@ -43,7 +42,7 @@ const AdditionalFee = () => {
         const response = await axios.post('http://195.26.253.123/pos/transaction/add_additional_fee', formData);
         setFees([...fees, response.data]);
       }
-      setFormData({ fee_name: '', fee_amount: '' });
+      setFormData({ fee_name: '' });
     } catch (error) {
       console.error('Error adding/updating fee:', error);
     }
@@ -77,16 +76,6 @@ const AdditionalFee = () => {
             required
           />
         </div>
-        <div>
-          <label>Fee Amount:</label>
-          <input
-            type="number"
-            name="fee_amount"
-            value={formData.fee_amount}
-            onChange={handleChange}
-            required
-          />
-        </div>
         <button type="submit">{editingFeeId ? 'Update Fee' : 'Add Fee'}</button>
       </form>
 
@@ -96,7 +85,6 @@ const AdditionalFee = () => {
           <thead>
             <tr>
               <th>Fee Type</th>
-              
               <th>Actions</th>
             </tr>
           </thead>
@@ -104,7 +92,6 @@ const AdditionalFee = () => {
             {fees.map((fee) => (
               <tr key={fee.id}>
                 <td>{fee.fee_name}</td>
-                
                 <td>
                   <button type="button" onClick={() => handleEdit(fee)}>Edit</button>
                   <button type="button" onClick={() => handleDelete(fee.id)}>Delete</button>

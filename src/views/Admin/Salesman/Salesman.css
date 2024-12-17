@@ -1,81 +1,127 @@
 /* Container styles */
 .container {
-    width: 90%;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Form styles */
-  form {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  form h2 {
-    color: #333;
-    margin-bottom: 15px;
-  }
-  
-  form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  form input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  
-  form button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #51b86b;
-    color: white;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  form button:hover {
-    background-color: #3eba5b;
-  }
-  
-  /* Table styles */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  table thead tr {
-    background-color: #24b139;
-    color: white;
-  }
-  
-  table th,
-  table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-  
-  table tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  table tbody tr:hover {
-    background-color: #e9ecef;
-  }
-  
-  table th {
-    font-weight: bold;
-  }
-  
+  width: 90%;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+/* Form styles */
+form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+form h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+form input[type="text"],
+form select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+}
+
+form select {
+  cursor: pointer;
+}
+
+form input[type="text"]:focus,
+form select:focus {
+  border-color: #51b86b;
+  box-shadow: 0 0 4px rgba(81, 184, 107, 0.5);
+  outline: none;
+}
+
+form button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #51b86b;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #3eba5b;
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table thead tr {
+  background-color: #24b139;
+  color: white;
+}
+
+table th,
+table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+table th {
+  font-weight: bold;
+}
+/* Table Action Buttons */
+table button {
+  padding: 8px 12px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* Edit Button */
+table button:first-child {
+  background-color: #51b86b; /* Green */
+}
+
+table button:first-child:hover {
+  background-color: #3ea95b;
+  transform: scale(1.05);
+}
+
+/* Delete Button */
+table button:last-child {
+  background-color: #e74c3c; /* Red */
+}
+
+table button:last-child:hover {
+  background-color: #d43f2f;
+  transform: scale(1.05);
+}
