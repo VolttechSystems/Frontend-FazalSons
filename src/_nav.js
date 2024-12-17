@@ -24,6 +24,7 @@ const _nav = [
     
   },
   
+  
   {
     component: CNavTitle,
     name: 'Components',
@@ -43,6 +44,11 @@ const _nav = [
         component: CNavItem,
         name: 'Register Systems',
         to: '/base/RegisterSystem',
+      },
+      {
+        component: CNavItem,
+        name: 'Login',
+        to: '/pages/Login',
       },
       
      
