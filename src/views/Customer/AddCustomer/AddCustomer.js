@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -7,28 +6,28 @@ import './AddCustomer.css';
 const AddCustomer = () => {
   const [formData, setFormData] = useState({
     dateTime: '',
-    customerChannel: '',
+    customer_channel: '',
     customerType: '',
     first_name: '',
     last_name: '',
-    displayName: '',
+    display_name: '',
     gender: '',
-    companyName: '',
+    company_name: '',
     email: '',
-    mobileNumber: '',
-    internationalNumber: '',
-    landlineNumber: '',
+    mobile_no: '',
+    international_no: '',
+    landline_no: '',
     password: '',
     address: '',
     shippingAddressSameAsMain: false,
-    shippingAddress: '',
-    shippingCity: '',
-    shippingZipCode: '',
-    shippingState: '',
-    shippingCountry: '',
-    internalNote: '',
-    avatar: null,
-    onlineAccess: 'No',
+    shipping_address: '',
+    city: '',
+    zip_code: '',
+    province: '',
+    country: '',
+    internal_note: '',
+    image: null,
+    online_access: 'no',
     status: 'active'
   });
   const [customers, setCustomers] = useState([]);
@@ -44,7 +43,6 @@ const AddCustomer = () => {
     fetchCustomerTypes();
   }, []);
 
-  // Fetch all customers
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(`${apiUrl}/add_customer`);
@@ -54,20 +52,18 @@ const AddCustomer = () => {
     }
   };
 
-  // Fetch customer channels
   const fetchCustomerChannels = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/add_customer_channel`); 
+      const response = await axios.get(`${apiUrl}/add_customer_channel`);
       setCustomerChannels(response.data);
     } catch (error) {
       console.error('Error fetching customer channels:', error);
     }
   };
 
-  // Fetch customer types
   const fetchCustomerTypes = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/add_customer_type`); 
+      const response = await axios.get(`${apiUrl}/add_customer_type`);
       setCustomerTypes(response.data);
     } catch (error) {
       console.error('Error fetching customer types:', error);
@@ -81,7 +77,6 @@ const AddCustomer = () => {
       [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -95,28 +90,28 @@ const AddCustomer = () => {
 
       setFormData({
         dateTime: '',
-        customerChannel: '',
+        customer_channel: '',
         customerType: '',
         first_name: '',
         last_name: '',
-        displayName: '',
+        display_name: '',
         gender: '',
-        companyName: '',
+        company_name: '',
         email: '',
-        mobileNumber: '',
-        internationalNumber: '',
-        landlineNumber: '',
+        mobile_no: '',
+        international_no: '',
+        landline_no: '',
         password: '',
         address: '',
         shippingAddressSameAsMain: false,
-        shippingAddress: '',
-        shippingCity: '',
-        shippingZipCode: '',
-        shippingState: '',
-        shippingCountry: '',
-        internalNote: '',
-        avatar: null,
-        onlineAccess: 'No',
+        shipping_address: '',
+        city: '',
+        zip_code: '',
+        province: '',
+        country: '',
+        internal_note: '',
+        image: null,
+        online_access: 'No',
         status: 'active'
       });
       setEditingCustomerId(null);
@@ -127,7 +122,10 @@ const AddCustomer = () => {
   };
 
   const handleEdit = (customer) => {
-    setFormData(customer);
+    setFormData({
+      ...customer,
+      shippingAddressSameAsMain: customer.shipping_address === customer.address
+    });
     setEditingCustomerId(customer.id);
   };
 
@@ -144,7 +142,7 @@ const AddCustomer = () => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-      <h3>{editingCustomerId ? 'Edit Customer' : 'Add Customer'}</h3>
+        <h3>{editingCustomerId ? 'Edit Customer' : 'Add Customer'}</h3>
 
         {/* Date & Time */}
         <div>
@@ -155,7 +153,7 @@ const AddCustomer = () => {
         {/* Customer Channel */}
         <div>
           <label>Customer Channel: *</label>
-          <select name="customerChannel" value={formData.customerChannel} onChange={handleChange} required>
+          <select name="customer_channel" value={formData.customer_channel} onChange={handleChange} required>
             <option value="">Select Channel</option>
             {customerChannels.map((channel) => (
               <option key={channel.id} value={channel.customer_channel}>{channel.customer_channel}</option>
@@ -167,7 +165,7 @@ const AddCustomer = () => {
         {/* Customer Type */}
         <div>
           <label>Customer Type: *</label>
-          <select name="customerType" value={formData.customerType} onChange={handleChange} required>
+          <select name="customer_type" value={formData.customer_type} onChange={handleChange} required>
             <option value="">Select Type</option>
             {customerTypes.map((type) => (
               <option key={type.id} value={type.customer_type}>{type.customer_type}</option>
@@ -189,7 +187,7 @@ const AddCustomer = () => {
         {/* Display Name */}
         <div>
           <label>Display Name:</label>
-          <input type="text" name="displayName" value={formData.displayName} onChange={handleChange} />
+          <input type="text" name="display_name" value={formData.display_name} onChange={handleChange} />
         </div>
 
         {/* Gender */}
@@ -205,7 +203,7 @@ const AddCustomer = () => {
         {/* Company Name */}
         <div>
           <label>Company Name:</label>
-          <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} />
+          <input type="text" name="company_name" value={formData.company_name} onChange={handleChange} />
         </div>
 
         {/* Email */}
@@ -217,19 +215,19 @@ const AddCustomer = () => {
         {/* Mobile Number */}
         <div>
           <label>Mobile #</label>
-          <input type="text" name="mobileNumber" value={formData.mobileNumber} onChange={handleChange} required />
+          <input type="text" name="mobile_no" value={formData.mobile_no} onChange={handleChange} required />
         </div>
 
         {/* International Number */}
         <div>
           <label>International #</label>
-          <input type="text" name="internationalNumber" value={formData.internationalNumber} onChange={handleChange} />
+          <input type="text" name="international_no" value={formData.international_no} onChange={handleChange} />
         </div>
 
         {/* Landline Number */}
         <div>
           <label>Landline Number:</label>
-          <input type="text" name="landlineNumber" value={formData.landlineNumber} onChange={handleChange} />
+          <input type="text" name="landline_no" value={formData.landline_no} onChange={handleChange} />
         </div>
 
         {/* Password */}
@@ -244,96 +242,156 @@ const AddCustomer = () => {
           <input type="text" name="address" value={formData.address} onChange={handleChange} />
         </div>
 
-        {/* Shipping Address */}
+        {/* Shipping Address Checkbox */}
         <div>
           <label>
             <input
               type="checkbox"
               name="shippingAddressSameAsMain"
               checked={formData.shippingAddressSameAsMain}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e); // Update the checkbox state
+                setFormData((prevData) => ({
+                  ...prevData,
+                  shipping_address: e.target.checked ? prevData.address : '', // Copy address or clear
+                }));
+              }}
             />
             Shipping Address same as main address
           </label>
         </div>
+
+        {/* Shipping Address */}
         <div>
           <label>Shipping Address:</label>
-          <input type="text" name="shippingAddress" value={formData.shippingAddress} onChange={handleChange} />
+          <input
+            type="text"
+            name="shipping_address"
+            value={formData.shipping_address}
+            onChange={handleChange}
+            disabled={formData.shippingAddressSameAsMain}
+          />
         </div>
-        <div>
-          <label>Shipping City:</label>
-          <input type="text" name="shippingCity" value={formData.shippingCity} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Shipping Zip Code:</label>
-          <input type="text" name="shippingZipCode" value={formData.shippingZipCode} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Shipping State:</label>
-          <input type="text" name="shippingState" value={formData.shippingState} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Shipping Country:</label>
-          <input type="text" name="shippingCountry" value={formData.shippingCountry} onChange={handleChange} />
+<div>
+          <label>City:</label>
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+          />
         </div>
 
-        {/* Internal Note */}
+        <div>
+          <label>Zip Code:</label>
+          <input
+            type="text"
+            name="zip_code"
+            value={formData.zip_code}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div>
+          <label>Province:</label>
+          <input
+            type="text"
+            name="province"
+            value={formData.province}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div>
+          <label>Country:</label>
+          <input
+            type="text"
+            name="country"
+            value={formData.country}
+            onChange={handleChange}
+          />
+        </div>
+
         <div>
           <label>Internal Note:</label>
-          <textarea name="internalNote" value={formData.internalNote} onChange={handleChange}></textarea>
+          <textarea
+            name="internal_note"
+            value={formData.internal_note}
+            onChange={handleChange}
+          />
         </div>
 
-        {/* Avatar */}
         <div>
-          <label>Avatar:</label>
-          <input type="file" name="avatar" onChange={handleChange} />
+          <label>Image:</label>
+          <input
+            type="file"
+            name="image"
+            onChange={handleChange}
+          />
         </div>
 
-        {/* Online Access */}
         <div>
           <label>Online Access:</label>
-          <select name="onlineAccess" value={formData.onlineAccess} onChange={handleChange}>
-            <option value="No">No</option>
-            <option value="Yes">Yes</option>
+          <select
+            name="online_access"
+            value={formData.online_access}
+            onChange={handleChange}
+          >
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
           </select>
         </div>
 
-        {/* Status */}
         <div>
           <label>Status:</label>
-          <select name="status" value={formData.status} onChange={handleChange}>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
 
-        {/* Submit Button */}
         <button type="submit">{editingCustomerId ? 'Update Customer' : 'Add Customer'}</button>
       </form>
 
+      <hr />
+
       {/* Customer Table */}
       <h3>Customer List</h3>
-      <table>
+      <table className="customer-table">
         <thead>
           <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
+            <th>Customer ID</th>
+            <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {customers.map((customer) => (
-            <tr key={customer.id}>
-              <td>{customer.first_name}</td>
-              <td>{customer.last_name}</td>
-              <td>{customer.email}</td>
-              <td>
-                <button onClick={() => handleEdit(customer)}>Edit</button>
-                <button onClick={() => handleDelete(customer.id)}>Delete</button>
-              </td>
+          {customers.length > 0 ? (
+            customers.map((customer) => (
+              <tr key={customer.id}>
+                <td>{customer.id}</td>
+                <td>{customer.first_name} {customer.last_name}</td>
+                <td>{customer.email}</td>
+                <td>{customer.mobile_no}</td>
+                <td>{customer.status}</td>
+                <td>
+                  <button onClick={() => handleEdit(customer)}>Edit</button>
+                  <button onClick={() => handleDelete(customer.id)}>Delete</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6">No customers found</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

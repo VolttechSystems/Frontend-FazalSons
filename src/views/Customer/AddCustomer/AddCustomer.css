@@ -126,3 +126,36 @@ button[type="button"] {
 button[type="button"]:hover {
   background-color: #0056b3;
 }
+
+/* Table Action Buttons */
+table button {
+  padding: 8px 12px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* Edit Button */
+table button:first-child {
+  background-color: #51b86b; /* Green */
+}
+
+table button:first-child:hover {
+  background-color: #3ea95b;
+  transform: scale(1.05);
+}
+
+/* Delete Button */
+table button:last-child {
+  background-color: #e74c3c; /* Red */
+}
+
+table button:last-child:hover {
+  background-color: #d43f2f;
+  transform: scale(1.05);
+}
