@@ -8,6 +8,8 @@ import { faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 
 
+
+
   function Transections() {
     const [products, setProducts] = useState([]); // List of products in the table
     const [salesmen, setSalesmen] = useState([]);
@@ -54,6 +56,8 @@ const [closingDate, setClosingDate] = useState("");
   const [newproducts, setnewProducts] = useState([]); // For fetching products of the selected invoice
   const [isOpen, setIsOpen] = useState(false);
   const [salesData, setSalesData] = useState([]);
+  const { outletId } = useParams(); // Get the outletId from the URL parameter
+  const [loading,setLoading]=  useState([]);
 
   
   // Calculate total payment after discount
@@ -105,66 +109,79 @@ const [closingDate, setClosingDate] = useState("");
     setIsDialogOpenthree(false);
   };
 
-
-
-   // Fetch invoices from the API
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const response = await fetch('http://195.26.253.123/pos/transaction/get_all_invoices/1');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        console.log(data); // Log the response to ensure the structure
-        setInvoices(data); // Assuming the response is an array of invoices
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
+  const fetchInvoices = async () => {
+   
+    setLoading(true); // Set loading to true when starting to fetch data
+    try {
+      console.log(`Fetching invoices for Outlet ID: ${outletId}`); // Log to confirm outletId
+      const response = await fetch(`http://195.26.253.123/pos/transaction/get_all_invoices/${outletId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    };
-    
-    
+      const data = await response.json();
+      console.log("Wasfa",data); // Log the response data for verification
+      setInvoices(data); // Update the invoices state with the fetched data
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      setError("Error fetching invoices."); // Set the error state
+    } finally {
+      setLoading(false); // Set loading to false once the data is fetched or an error occurs
+    }
+  };
 
-    fetchInvoices(); // Fetch invoices when the component mounts
-  }, []); // Empty dependency array, runs once when the component mounts
+
+
+// Fetch invoices based on the dynamic outlet ID
+useEffect(() => {
+ 
+  console.log(outletId)
+  
+  
+  fetchInvoices(); // Fetch invoices when the component mounts or outletId changes
+}, [outletId]); // Dependency array includes outletId to refetch invoices on change
 
 
 
+// useEffect(() => {
+//   console.log("----")
+//   console.log(invoices)
+//   console.log("----")
+// },[invoices])
   
    // Fetch invoices from the API
-   useEffect(() => {
-    const fetchdueInvoices = async () => {
-      try {
-        const response = await fetch('http://195.26.253.123/pos/transaction/get_due_invoices/1');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        console.log(data); // Log the response to ensure the structure
-        setdueInvoices(data); // Assuming the response is an array of invoices
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
+  // Fetch due invoices dynamically based on outletId
+useEffect(() => {
+  const fetchdueInvoices = async () => {
+    try {
+      console.log(`Fetching due invoices for Outlet ID: ${outletId}`); // Log outletId for verification
+      const response = await fetch(`http://195.26.253.123/pos/transaction/get_due_invoices/${outletId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    };
-    
-    
 
-    fetchdueInvoices(); // Fetch invoices when the component mounts
-  }, []); // Empty dependency array, runs once when the component mounts
+      const data = await response.json();
+      console.log("Due Invoices:", data); // Log the response for debugging
+      setdueInvoices(data); // Update the due invoices state
+    } catch (error) {
+      console.error("Error fetching due invoices:", error);
+    }
+  };
+
+  if (outletId) { // Ensure outletId is available
+    fetchdueInvoices();
+  }
+}, [outletId]); // Refetch due invoices when outletId changes
 
 //new 
 
-
 const handleSalesButtonClick = async () => {
   try {
-    const response = await axios.get("http://195.26.253.123/pos/transaction/today_sale_report/1");
-    console.log(response.data); // Check the data structure
-    setSalesData(response.data);
-    setIsOpen(true);
+    console.log(`Fetching sales data for Outlet ID: ${outletId}`); // Log outletId for verification
+    const response = await axios.get(`http://195.26.253.123/pos/transaction/today_sale_report/${outletId}`);
+    console.log("Sales Data:", response.data); // Check the structure of the response data
+    setSalesData(response.data); // Update the sales data state
+    setIsOpen(true); // Open the sales modal/dialog
   } catch (error) {
     console.error("Error fetching sales data:", error);
   }

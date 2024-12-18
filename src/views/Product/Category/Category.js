@@ -37,7 +37,7 @@ const AddCategories = () => {
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [selectedParentCategory, setSelectedParentCategory] = useState('');
   const [selectedHeadCategory, setSelectedHeadCategory] = useState('');
-
+  const [selectedOptions, setSelectedOptions] = useState(null);
 
 
   const API_ADD_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories';
@@ -62,6 +62,7 @@ const AddCategories = () => {
     
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
+        console.log("line 65",attTypesResponse.data)
         setAttTypes(attTypesResponse.data);
         setCategories(categoriesResponse.data);
       } catch (error) {
@@ -275,12 +276,13 @@ const handleRadioChange = (groupName) => {
 
   // Handle Multi-select Attribute Type Change
   const handleMultiSelectChange = (selectedOption) => {
+    console.log(selectedOption)
     const selectedIds = selectedOption ? selectedOption.map((option) => option.value) : [];
     setFormData((prevState) => ({
       ...prevState,
       attType: selectedIds,
     }));
-    setSelectedGroup([]); // Reset selected groups when attribute types change
+    setSelectedGroup([]);
   };
 
 const handleGroupSelection = (attType, attributeName, attributeId, event) => {
@@ -434,24 +436,37 @@ const handleInputChange = (e) => {
             attribute_group: categoryData.attribute_group , // Array of selected attributes
             attType: categoryData.att_type || [], // Pre-fill `att_type`
         });
-
+        
+        // setAttTypes(categoryData.attribute_group)
+        console.log("asdsad",categoryData.attribute_group)
+       const newData= categoryData.attribute_group.map((g)=>({
+          value:g.id,
+          label:g.name,
+        }))
+        console.log("newData",newData)
+        setAttTypes(newData)
+        setSelectedOptions(newData)
+     
+     //   setTableData(categoryData.attribute_group)
         //Pre-fill table's selected attributes
         
-        const initialSelectedGroup = {};
+        // const initialSelectedGroup = {};
  
-        // Assuming `formData.attribute_group` is an array of objects like:
-        // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
-        categoryData.attribute_group.map((group,index) => {
-            console.log("Processing group:", group);
-            if (group.att_type && group.attribute_id) {
-              console.log("inside")
-                initialSelectedGroup[group.att_type] = group.attribute_id; // Map `att_type` to `attribute_id`
-            }
-        });
+        // // Assuming `formData.attribute_group` is an array of objects like:
+        // // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
+        // categoryData.attribute_group.map((group,index) => {
+        //     console.log("Processing group:", group);
+        //     if ( group.id) {
+        //       console.log("inside")
+        //         initialSelectedGroup[group.att_type] = group.id; // Map `att_type` to `attribute_id`
+        //     }
+        // });
+
+
         console.log("after")
         
-        console.log("Initial Selected Group:", initialSelectedGroup);
-        setSelectedGroup(initialSelectedGroup);
+        // console.log("Initial Selected Group:", initialSelectedGroup);
+        // setSelectedGroup(initialSelectedGroup);
         
         setEditMode(true);
         setEditCategoryId(categoryData.id); // Store the ID for updating
@@ -643,6 +658,7 @@ const handleInputChange = (e) => {
             isMulti
             options={attTypes.map((type) => ({ value: type.id, label: type.att_type }))}
             onChange={handleMultiSelectChange}
+            value={selectedOptions}
           />
         </div>
 <div>

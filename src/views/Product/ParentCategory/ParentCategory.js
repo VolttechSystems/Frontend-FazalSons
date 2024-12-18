@@ -168,6 +168,27 @@ const ParentCategory = () => {
     return headcat ? headcat.hc_name: 'Category Head not found'; 
   };
 
+
+  
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this Parent Category?')) {
+      try {
+        await axios.delete(`http://195.26.253.123/pos/products/action_parent_category/${id}/`);
+        alert('Parent Category deleted successfully!');
+        fetchBrands(); // Refresh the brands list after deletion
+      } catch (error) {
+        console.error('Error deleting Parent Category:', error);
+        alert('Failed to delete Parent Category.');
+      }
+    }
+  };
+
+  const handleEdit = (id) => {
+    console.log("Editing Parent Category with ID:", id);
+    navigate(`/Product/AddParentCategory/${id}`);
+  };
+
+
   return (
     <CRow>
        <div className="d-grid gap-2 d-md-flex justify-content-md-end">

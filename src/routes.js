@@ -86,7 +86,7 @@ const routes = [
   { path: '/Admin/AddOutlet', name: 'AddOutlet', element: AddOutlet }, // AddOutlet
   { path: '/Product/FetchAttributes', name: 'FetchAttributes', element: FetchAttributes }, // FetchAttributes
   { path: '/Product/AddSubCategory/:id', name: 'EditCategory', element: AddSubCategory }, // Edit SubCategory
-  { path: '/base/Transections/:id', name: 'Transections', element: Transections }, // Transections
+  { path: '/base/Transections/:outletId', name: 'Transections', element: Transections }, // Transections
   { path: '/Product/AddAtt', name: 'AddAtt', element: AddAtt }, //AddAtt
   { path: '/Category/AddCategories', name: 'AddCategories', element: AddCategories }, //AddCategories
   { path: '/SubCat/AddSubCat', name: 'AddSubCat', element: AddSubCat}, //AddSubCat
