@@ -658,7 +658,6 @@ const handleInputChange = (e) => {
             isMulti
             options={attTypes.map((type) => ({ value: type.id, label: type.att_type }))}
             onChange={handleMultiSelectChange}
-            value={selectedOptions}
           />
         </div>
 <div>
