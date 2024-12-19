@@ -57,7 +57,6 @@ useEffect(() => {
     }));
   };
 
-
   const handleSubmit = async () => {
     const updatedItems = stockData
       .filter((item) => updatedStock[item.sku] !== undefined)

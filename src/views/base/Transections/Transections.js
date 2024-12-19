@@ -208,22 +208,34 @@ const handleClose = () => {
   setSelectedDueInvoice(DueinvoiceCode); // Set the selected invoice code to state
 };
 
-
-// Handle Dropdown Selection
-const handleFeeSelection = (event) => {
+ // Handle Dropdown Selection
+ const handleFeeSelection = (event) => {
   const selectedFeeId = event.target.value;
-  const selectedFee = additionalFees.find((fee) => fee.id === parseInt(selectedFeeId));
+  const selectedFee = additionalFees.find(
+    (fee) => fee.id === parseInt(selectedFeeId)
+  );
 
   // Avoid duplicates
   if (selectedFee && !selectedFees.some((fee) => fee.id === selectedFee.id)) {
-    setSelectedFees([...selectedFees, { ...selectedFee, value: '' }]);
+    setSelectedFees([
+      ...selectedFees,
+      {
+        ...selectedFee,
+        additional_fee_code: selectedFee.fee_code || "", // Fee code from dropdown
+        additional_fee: "", // Default additional fee (number input)
+      },
+    ]);
   }
 };
 
-// Handle Input Change
+// Handle Input Change for Fee Value
 const handleInputChange = (id, value) => {
   setSelectedFees((prevFees) =>
-    prevFees.map((fee) => (fee.id === id ? { ...fee, value } : fee))
+    prevFees.map((fee) =>
+      fee.id === id
+        ? { ...fee, additional_fee: parseFloat(value) || "" } // Update the fee value
+        : fee
+    )
   );
 };
 
@@ -231,8 +243,6 @@ const handleInputChange = (id, value) => {
 const handleRemoveFee = (id) => {
   setSelectedFees((prevFees) => prevFees.filter((fee) => fee.id !== id));
 };
-
-
 
 // Fetch products for the selected invoice
 const fetchNewProducts = async () => {
@@ -489,6 +499,8 @@ const handleProductChange = (event) => {
   };
   
   const handlePayment = async () => {
+
+    const additionalFeeData = selectedFees.length > 0 ? selectedFees[0] : { additional_fee_code: "", additional_fee: "" };
     const payload = {
       sku: tableData.map((item) => item.sku),
       quantity: tableData.map((item) => item.quantity),
@@ -496,11 +508,11 @@ const handleProductChange = (event) => {
       item_discount: tableData.map((item) => item.discount),
       cust_code: selectedCustomer,
       overall_discount: "0", // Adjust if you have an overall discount field
-      outlet_code: "1", // Replace with dynamic outlet code if applicable
+      outlet_code: outletId, // Replace with dynamic outlet code if applicable
       saleman_code: selectedSalesman,
       advanced_payment: advancePayment, // Include advance payment here
-      additional_fee_code: "",
-      additional_fee: "",
+      additional_fee_code: additionalFeeData.additional_fee_code || "", // Fee code from dropdown
+      additional_fee: additionalFeeData.additional_fee || "", // Fee value (number input)
     };
   
     try {
@@ -1290,7 +1302,7 @@ const handleReturn = async () => {
         <label>{fee.fee_name}:</label>
         <input
           type="number"
-          value={fee.value}
+          value={fee.additional_fee}
           onChange={(e) => handleInputChange(fee.id, e.target.value)}
         />
         <button className="remove-btn" onClick={() => handleRemoveFee(fee.id)}>
