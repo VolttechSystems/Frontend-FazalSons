@@ -182,9 +182,7 @@ useEffect(() => {
         console.log("Selected Attribute Types:", formData.attType);
 
         const responses = await Promise.all(
-          formData.attType.map((typeId) =>
-            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
-          )
+          formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId.id}`))
         );
 
         const data = responses.flatMap((res) => res.data);
@@ -218,7 +216,7 @@ useEffect(() => {
       try {
         const responses = await Promise.all(
           formData.attType.map((typeId) =>
-            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId.id}`)
           )
         );
 
@@ -235,10 +233,7 @@ useEffect(() => {
 }, [formData.attType]);
 
 
-const handleRadioChange = (groupName) => {
-  setSelectedGroup(groupName);
-  console.log("Selected Group:", groupName); // Debugging log
-};
+ 
 
 //  useEffect(() => {
 //     if (formData.attType.length > 0) {
@@ -276,7 +271,11 @@ const handleRadioChange = (groupName) => {
 
   // Handle Multi-select Attribute Type Change
   const handleMultiSelectChange = (selectedOption) => {
-    console.log(selectedOption)
+    const newSelectedOptions= selectedOption.map((item)=>({
+      id:item.value,
+      name:item.label,
+    }))
+    
     const selectedIds = selectedOption ? selectedOption.map((option) => option.value) : [];
     setFormData((prevState) => ({
       ...prevState,
@@ -285,39 +284,25 @@ const handleRadioChange = (groupName) => {
     setSelectedGroup([]);
   };
 
-const handleGroupSelection = (attType, attributeName, attributeId, event) => {
-  const { value, checked } = event.target;
-
-  // Update selectedGroup for the current att_type
-  setSelectedGroup((prevState) => ({
-    ...prevState,
-    [attType]: attributeId,
-  }));
-
-  // Update formData with the selected attribute_id and attribute_name
-  setFormData((prevState) => ({
-    ...prevState,
-    attribute_id: attributeId,
-    attribute_name: attributeName,
-  }));
-
-  // Manage selectedAttributes array
-  setSelectedAttributes((prevState) => {
-    // Filter out previous entries with the same att_type
-    const filteredAttributes = prevState.filter(
-      (attr) => !attr.startsWith(attType)
-    );
-
-    if (checked) {
-      // Add the new selection for the current att_type
-      return [...filteredAttributes, `${attType}:${value}`];
-    }
-    return filteredAttributes; // If unchecked, just return filtered array
-  });
-
-  console.log("selectedGroup", selectedGroup);
-  console.log("selectedAttributes", selectedAttributes);
-};
+  const handleGroupSelection = (att_type, attribute_name, attribute_id, e) => {
+    setSelectedGroup((prevSelectedGroup) => {
+      const newSelectedGroup = [...prevSelectedGroup];
+      
+      // Find if the current att_type already exists in selectedGroup
+      const index = newSelectedGroup.findIndex(item => item.att_type === att_type);
+      
+      if (index >= 0) {
+        // If it exists, update its value
+        newSelectedGroup[index] = { att_type, attribute_id };
+      } else {
+        // If it doesn't exist, add a new selection
+        newSelectedGroup.push({ att_type, attribute_id });
+      }
+      
+      return newSelectedGroup;
+    });
+  };
+  
 
   
   
@@ -438,8 +423,8 @@ const handleInputChange = (e) => {
         });
         
         // setAttTypes(categoryData.attribute_group)
-        console.log("asdsad",categoryData.attribute_group)
-       const newData= categoryData.attribute_group.map((g)=>({
+       
+       const newData= categoryData.att_type.map((g)=>({
           value:g.id,
           label:g.name,
         }))
@@ -447,26 +432,26 @@ const handleInputChange = (e) => {
         setAttTypes(newData)
         setSelectedOptions(newData)
      
-     //   setTableData(categoryData.attribute_group)
         //Pre-fill table's selected attributes
         
-        // const initialSelectedGroup = {};
+        const initialSelectedGroup = {};
  
-        // // Assuming `formData.attribute_group` is an array of objects like:
-        // // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
-        // categoryData.attribute_group.map((group,index) => {
-        //     console.log("Processing group:", group);
-        //     if ( group.id) {
-        //       console.log("inside")
-        //         initialSelectedGroup[group.att_type] = group.id; // Map `att_type` to `attribute_id`
-        //     }
-        // });
+        // Assuming `formData.attribute_group` is an array of objects like:
+        // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
+        categoryData.attribute_group.map((group) => {
+            console.log("Processing group:", group);
+            if ( group.id) {
+              console.log("inside")
+                initialSelectedGroup[group.att_type] = group.id; // Map `att_type` to `attribute_id`
+            }
+        });
 
 
-        console.log("after")
+        console.log("selected goup",selectedGroup)
         
-        // console.log("Initial Selected Group:", initialSelectedGroup);
-        // setSelectedGroup(initialSelectedGroup);
+        console.log("Initial Selected Group:", initialSelectedGroup);
+        setSelectedGroup(initialSelectedGroup);
+        // checked={selectedGroup[item.att_type] === item.attribute_id}
         
         setEditMode(true);
         setEditCategoryId(categoryData.id); // Store the ID for updating
@@ -658,7 +643,6 @@ const handleInputChange = (e) => {
             isMulti
             options={attTypes.map((type) => ({ value: type.id, label: type.att_type }))}
             onChange={handleMultiSelectChange}
-            value={selectedOptions}
           />
         </div>
 <div>

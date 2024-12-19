@@ -58,17 +58,13 @@ useEffect(() => {
   };
 
 
-
   const handleSubmit = async () => {
-    // Only send items where the user updated stock
     const updatedItems = stockData
-      .filter((item) => updatedStock[item.sku] !== undefined) // Include only changed inputs
-      .map((item) => {
-        return {
-          sku: item.sku,
-          avail_quantity: updatedStock[item.sku].toString(), // Send only the updated value
-        };
-      });
+      .filter((item) => updatedStock[item.sku] !== undefined)
+      .map((item) => ({
+        sku: item.sku,
+        avail_quantity: updatedStock[item.sku].toString(),
+      }));
   
     if (updatedItems.length === 0) {
       alert('No changes made to stock!');
@@ -88,7 +84,12 @@ useEffect(() => {
       const updatedStockData = stockData.map((item) => {
         const updatedItem = updatedItems.find((updated) => updated.sku === item.sku);
         if (updatedItem) {
-          return { ...item, avail_quantity: updatedItem.avail_quantity };
+          return { 
+            ...item, 
+            avail_quantity: (
+              parseInt(item.original_quantity) + parseInt(updatedStock[item.sku] || 0)
+            ).toString(), // Add the updated stock to the original stock
+          };
         }
         return item;
       });
@@ -100,6 +101,7 @@ useEffect(() => {
       alert(`Error: ${error.response ? error.response.data : error.message}`);
     }
   };
+  
   
 
   return (
