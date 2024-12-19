@@ -497,29 +497,30 @@ const handleProductChange = (event) => {
       return acc;
     }, {});
   };
-  
-  const handlePayment = async () => {
 
-    const additionalFeeData = selectedFees.length > 0 ? selectedFees[0] : { additional_fee_code: "", additional_fee: "" };
+  const handlePayment = async () => {
+    const feeCodes = selectedFees.map(fee => `'${fee.fee_code}'`).join(', ');
+    const fees = selectedFees.map(fee => fee.additional_fee).join(', ');
+  
     const payload = {
-      sku: tableData.map((item) => item.sku),
-      quantity: tableData.map((item) => item.quantity),
-      rate: tableData.map((item) => item.selling_price),
-      item_discount: tableData.map((item) => item.discount),
+      sku: tableData.map(item => item.sku),
+      quantity: tableData.map(item => item.quantity),
+      rate: tableData.map(item => item.selling_price),
+      item_discount: tableData.map(item => item.discount),
       cust_code: selectedCustomer,
-      overall_discount: "0", // Adjust if you have an overall discount field
-      outlet_code: outletId, // Replace with dynamic outlet code if applicable
+      overall_discount: "0",
+      outlet_code: outletId,
       saleman_code: selectedSalesman,
-      advanced_payment: advancePayment, // Include advance payment here
-      additional_fee_code: additionalFeeData.additional_fee_code || "", // Fee code from dropdown
-      additional_fee: additionalFeeData.additional_fee || "", // Fee value (number input)
+      advanced_payment: advancePayment,
+      additional_fee_code: `[${feeCodes}]`,  // Correctly formatted with single quotes and array brackets
+      additional_fee: `[${fees}]`,  // Correctly formatted as an array of numbers
     };
   
     try {
       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
-        method: "POST", // Changed to POST
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), // Send payload as body
+        body: JSON.stringify(payload),
       });
   
       if (response.ok) {
@@ -527,7 +528,9 @@ const handleProductChange = (event) => {
         setAlertMessage("Transaction added successfully!");
         setVisible(true);
       } else {
-        setAlertMessage("Failed to add transaction!");
+        const errorData = await response.json();
+        console.error("API Error Response:", errorData);
+        setAlertMessage("Failed to add transaction! Please check your input.");
         setVisible(true);
       }
     } catch (error) {
@@ -536,7 +539,8 @@ const handleProductChange = (event) => {
       setVisible(true);
     }
   };
-
+  
+  
   
     // Handle SKU selection
     const handleProductSelect = (e) => {
