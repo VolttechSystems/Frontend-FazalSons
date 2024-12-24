@@ -39,6 +39,7 @@ const AddCategories = React.lazy(() => import('./views/Category/AddCategories/Ad
 const AddSubCat = React.lazy(() => import('./views/SubCat/AddSubCat/AddSubCat'))
 const AdditionalFee = React.lazy(() => import('./views/Admin/AdditionalFee/AdditionalFee'))
 const Barcodes = React.lazy(() => import('./views/Product/AllProducts/Barcodes'))
+const NewBarcode = React.lazy(() => import('./views/pages/barcode/NewBarcode'))
 
 
 
@@ -52,6 +53,7 @@ const routes = [
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
   { path: '/Product/AllProducts/Barcodes/:sku', name: 'Barcodes', element: Barcodes }, // SKU added here
+  { path: '/pages/barcode/NewBarcode/:sku', name: 'NewBarcode', element: NewBarcode }, // SKU added here
   
   { path: '/base/POS', name: 'POS', element: POS }, // POS
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
