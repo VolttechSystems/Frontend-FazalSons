@@ -45,11 +45,11 @@ const _nav = [
         name: 'Register Systems',
         to: '/base/RegisterSystem',
       },
-      {
-        component: CNavItem,
-        name: 'Login',
-        to: '/pages/Login',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Login',
+      //   to: '/pages/Login',
+      // },
       
      
     ],
