@@ -1,0 +1,11 @@
+.bg-body-tertiary {
+    background-color: #f8f9fa;
+  }
+  
+  @media (max-width: 768px) {
+    .flex-fill {
+      max-width: 100% !important;
+      margin-bottom: 1rem;
+    }
+  }
+  
