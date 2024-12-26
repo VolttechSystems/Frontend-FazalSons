@@ -8,15 +8,14 @@ const NewBarcode = () => {
   const [productDetails, setProductDetails] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch product details based on SKU
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         const response = await axios.get(
-          `http://195.26.253.123/pos/products/add_product/${sku}`
+          `http://195.26.253.123/pos/products/barcode_product_data/${sku}/`
         );
-        if (response.data && response.data.length > 0) {
-          setProductDetails(response.data[0]); // Assuming you want the first product in the array
+        if (response.data && Object.keys(response.data).length > 0) {
+          setProductDetails(response.data); // Use the response data directly
         } else {
           setError('No product details found.');
         }
@@ -24,9 +23,10 @@ const NewBarcode = () => {
         setError('Failed to fetch product details.');
       }
     };
-
+  
     fetchProductDetails();
   }, [sku]);
+  
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
@@ -67,7 +67,7 @@ const NewBarcode = () => {
             <>
               <span>{productDetails.product_name}</span>
               <span>{productDetails.description}</span>
-              <span>${productDetails.selling_price}</span>
+              <span>Rs.{productDetails.selling_price}</span>
             </>
           )}
         </div>

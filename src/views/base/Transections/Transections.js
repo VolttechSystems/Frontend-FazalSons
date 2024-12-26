@@ -1148,89 +1148,104 @@ const handleReturn = async () => {
             {tableData.length > 0 ? (
  <table border="1" width="100%" cellPadding="10" style={{ marginTop: "20px" }}>
  <thead>
-   <tr>
-     <th>SKU</th>
-     <th>Product Name</th>
-     <th>Quantity</th>
-     <th>Price</th>
-     <th>Amount</th>
-     <th>Disc. %</th>
-     <th>Disc. Value</th>
-     <th>Net Amount</th>
-     <th>Action</th>
-   </tr>
- </thead>
- <tbody>
-   {tableData.map((product, index) => (
-     <tr key={index}>
-       <td>{product.sku}</td>
-       <td>{product.product_name}</td>
-       <td>
-         <input
-           type="number"
-           value={product.quantity}
-           onChange={(e) => {
-             const qty = parseInt(e.target.value) || 1;
-             setTableData((prevData) => {
-               const updatedData = [...prevData];
-               updatedData[index].quantity = qty;
-               return updatedData;
-             });
-           }}
-         />
-       </td>
-       <td>{product.selling_price}</td>
-       <td>{(product.selling_price * product.quantity).toFixed(2)}</td>
-       <td>
-         <input
-           type="number"
-           value={product.discount}
-           onChange={(e) => {
-             const discount = parseFloat(e.target.value) || 0;
-             setTableData((prevData) => {
-               const updatedData = [...prevData];
-               const totalAmount = product.selling_price * product.quantity;
-               updatedData[index].discount = discount;
-               updatedData[index].discountValue = (totalAmount * discount) / 100;
-               return updatedData;
-             });
-           }}
-         />
-       </td>
-       <td>
-         <input
-           type="number"
-           value={(product.discountValue || 0).toFixed(2)}
-           onChange={(e) => {
-             const discountValue = parseFloat(e.target.value) || 0;
-             setTableData((prevData) => {
-               const updatedData = [...prevData];
-               const totalAmount = product.selling_price * product.quantity;
-               updatedData[index].discountValue = discountValue;
-               updatedData[index].discount = (discountValue / totalAmount) * 100;
-               return updatedData;
-             });
-           }}
-         />
-       </td>
-       <td>
-         {(
-           product.selling_price * product.quantity -
-           (product.selling_price * product.quantity * product.discount) / 100
-         ).toFixed(2)}
-       </td>
-       <td>
-         <button
-           onClick={() =>
-             setTableData((prevData) => prevData.filter((_, i) => i !== index))
-           }
-         >
-           ❌
-         </button>
-       </td>
-     </tr>
-   ))}
- </tbody>
+  <tr>
+    <th>SKU</th>
+    <th>Product Name</th>
+    <th>Quantity</th>
+    <th>Selling Price</th>
+    <th>Total</th>
+    <th>Discount %</th>
+    <th>Discount Value</th>
+    <th>Total After Discount</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+<tbody>
+  {tableData.map((product, index) => (
+    <tr key={index}>
+      <td>{product.sku}</td>
+      <td>{product.product_name}</td>
+      <td>
+        <input
+          type="number"
+          value={product.quantity}
+          onChange={(e) => {
+            const qty = e.target.value;
+            setTableData((prevData) => {
+              const updatedData = [...prevData];
+              updatedData[index].quantity = parseInt(qty) || 1;
+              return updatedData;
+            });
+          }}
+          className="no-spinner"
+        />
+      </td>
+      <td>{product.selling_price}</td>
+      <td>{(product.selling_price * product.quantity).toFixed(2)}</td>
+      <td>
+        <input
+          type="number"
+          value={product.discount}
+          onChange={(e) => {
+            const discount = e.target.value;
+            setTableData((prevData) => {
+              const updatedData = [...prevData];
+              updatedData[index].discount = parseFloat(discount) || 0;
+              return updatedData;
+            });
+          }}
+          className="no-spinner"
+        />
+      </td>
+      <td>
+        <input
+          type="number"
+          value={(
+            (product.selling_price * product.quantity * product.discount) / 100
+          ).toFixed(2)}
+          onChange={(e) => {
+            const discountValue = e.target.value;
+            setTableData((prevData) => {
+              const updatedData = [...prevData];
+              updatedData[index].discount = (discountValue / (product.selling_price * product.quantity)) * 100 || 0;
+              updatedData[index].discountValue = parseFloat(discountValue) || 0;
+              return updatedData;
+            });
+          }}
+          className="no-spinner"
+        />
+      </td>
+      <td>
+        <input
+          type="number"
+          value={(
+            product.selling_price * product.quantity -
+            (product.selling_price * product.quantity * product.discount) / 100
+          ).toFixed(2)}
+          onChange={(e) => {
+            const netAmount = e.target.value;
+            setTableData((prevData) => {
+              const updatedData = [...prevData];
+              updatedData[index].netAmount = parseFloat(netAmount) || 0;
+              return updatedData;
+            });
+          }}
+          className="no-spinner"
+        />
+      </td>
+      <td>
+        <button
+          onClick={() =>
+            setTableData((prevData) => prevData.filter((_, i) => i !== index))
+          }
+        >
+          ❌
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
 </table>
 
 ) : (

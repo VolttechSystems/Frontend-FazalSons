@@ -44,7 +44,7 @@ const SaleReport = () => {
       <div className="dropdowns">
         {/* Outlet Dropdown */}
         <div className="dropdown">
-          <label htmlFor="outlet">Select Outlet</label>
+          <label htmlFor="outlet">Outlet</label>
           <select
             id="outlet"
             className="dropdown"

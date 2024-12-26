@@ -110,7 +110,7 @@ const _nav = [
     ],
   },
 
-  
+
   {
     component: CNavGroup,
     name: 'Customer',
@@ -196,19 +196,19 @@ const _nav = [
       
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Stock',
-    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Add Stock',
-        to: '/Stock/AddStock',
-      },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Stock',
+  //   icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Add Stock',
+  //       to: '/Stock/AddStock',
+  //     },
       
-    ],
-  },
+  //   ],
+  // },
   
   
 //   {
