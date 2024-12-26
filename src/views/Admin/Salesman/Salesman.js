@@ -78,7 +78,7 @@ const Salesman = () => {
       wholesale_commission: salesman.wholesale_commission || '',
       retail_commission: salesman.retail_commission || '',
       token_commission: salesman.token_commission || '',
-      outlet: salesman.outlet?.id || '' // Set outlet ID if available
+      outlet: salesman.outlet || '' // Set outlet ID if available
     });
     setEditingSalesmanId(salesman.id);
     setShowCommissions(!!salesman.wholesale_commission);
