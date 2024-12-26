@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import axios from "axios";
 import "./SaleReport.css";
 
@@ -6,13 +6,26 @@ const SaleReport = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reportData, setReportData] = useState([]);
+  const [outlets, setOutlets] = useState([]); // State to hold outlet data
+  const [selectedOutlet, setSelectedOutlet] = useState(''); // State to store selected outlet
 
-  // Fetch the sales report based on the selected dates whenever start or end date changes
+  // Fetch outlets for the dropdown
   useEffect(() => {
-    if (startDate && endDate) {
+    axios.get("http://195.26.253.123/pos/products/fetch_all_outlet/") // Assuming the outlet API is this
+      .then(response => {
+        setOutlets(response.data); // Assuming the response is an array of outlets
+      })
+      .catch(error => {
+        console.error("There was an error fetching the outlets!", error);
+      });
+  }, []);
+
+  // Fetch the sales report based on the selected dates and outlet
+  useEffect(() => {
+    if (startDate && endDate && selectedOutlet) {
       const formattedStartDate = new Date(startDate).toISOString().split('T')[0]; // Format to yyyy-mm-dd
       const formattedEndDate = new Date(endDate).toISOString().split('T')[0]; // Format to yyyy-mm-dd
-      const url = `http://195.26.253.123/pos/report/sales_report/${formattedStartDate}/${formattedEndDate}/`;
+      const url = `http://195.26.253.123/pos/report/sales_report/${selectedOutlet}/${formattedStartDate}/${formattedEndDate}/`;
 
       axios.get(url)
         .then(response => {
@@ -22,68 +35,87 @@ const SaleReport = () => {
           console.error("There was an error fetching the report data!", error);
         });
     }
-  }, [startDate, endDate]); // The effect runs whenever startDate or endDate changes
+  }, [startDate, endDate, selectedOutlet]); // The effect runs whenever startDate, endDate, or selectedOutlet changes
 
   return (
     <div className="report-container">
       <h2 className="heading">Sale Report</h2>
 
-      <div className="date-picker-container">
+      <div className="dropdowns">
+        {/* Outlet Dropdown */}
+        <div className="dropdown">
+          <label htmlFor="outlet">Select Outlet</label>
+          <select
+            id="outlet"
+            className="dropdown"
+            value={selectedOutlet}
+            onChange={(e) => setSelectedOutlet(e.target.value)}
+          >
+            <option value="">Select an Outlet</option>
+            {outlets.map((outlet) => (
+              <option key={outlet.id} value={outlet.id}>
+                {outlet.outlet_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Start Date Picker */}
-        <div className="date-picker">
-          <label htmlFor="start-date">Start Date</label>
+        <div className="date-wrapper">
+          <label htmlFor="start-date" className="label">Start Date</label>
           <input
             type="date"
             id="start-date"
+            className="date-input"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
         </div>
 
         {/* End Date Picker */}
-        <div className="date-picker">
-          <label htmlFor="end-date">End Date</label>
+        <div className="date-wrapper">
+          <label htmlFor="end-date" className="label">End Date</label>
           <input
             type="date"
             id="end-date"
+            className="date-input"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
       </div>
 
-   {/* Table for displaying the sales report */}
-{reportData.length > 0 && (
-  <div className="report-table-container">
-    <table className="report-table">
-      <thead>
-        <tr>
-          <th>Till Date</th>
-          <th>Total Sale</th>
-        </tr>
-      </thead>
-      <tbody>
-        {reportData.map((item, index) => (
-          <tr key={index}>
-            <td>{item.till_date}</td>
-            <td>{item.total_sale}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+      {/* Table for displaying the sales report */}
+      {reportData.length > 0 && (
+        <div className="report-table-container">
+          <table className="report-table">
+            <thead>
+              <tr>
+                <th>Till Date</th>
+                <th>Total Sale</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reportData.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.till_date}</td>
+                  <td>{item.total_sale}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-    {/* Displaying the total of total_sale */}
-    <div className="totals-container">
-      <p>
-        <strong>Total of Total Sale:</strong>{" "}
-        {reportData
-          .reduce((acc, item) => acc + parseFloat(item.total_sale || 0), 0)
-          .toFixed(2)}
-      </p>
-    </div>
-  </div>
-)}
-
+          {/* Displaying the total of total_sale */}
+          <div className="totals-container">
+            <p>
+              <strong>Total of Total Sale:</strong>{" "}
+              {reportData
+                .reduce((acc, item) => acc + parseFloat(item.total_sale || 0), 0)
+                .toFixed(2)}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
