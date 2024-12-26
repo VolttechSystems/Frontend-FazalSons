@@ -208,22 +208,34 @@ const handleClose = () => {
   setSelectedDueInvoice(DueinvoiceCode); // Set the selected invoice code to state
 };
 
-
-// Handle Dropdown Selection
-const handleFeeSelection = (event) => {
+ // Handle Dropdown Selection
+ const handleFeeSelection = (event) => {
   const selectedFeeId = event.target.value;
-  const selectedFee = additionalFees.find((fee) => fee.id === parseInt(selectedFeeId));
+  const selectedFee = additionalFees.find(
+    (fee) => fee.id === parseInt(selectedFeeId)
+  );
 
   // Avoid duplicates
   if (selectedFee && !selectedFees.some((fee) => fee.id === selectedFee.id)) {
-    setSelectedFees([...selectedFees, { ...selectedFee, value: '' }]);
+    setSelectedFees([
+      ...selectedFees,
+      {
+        ...selectedFee,
+        fee_code: selectedFee.fee_code || "", // Fee code from dropdown
+        fee_amount: "", // Default additional fee (number input)
+      },
+    ]);
   }
 };
 
-// Handle Input Change
+// Handle Input Change for Fee Value
 const handleInputChange = (id, value) => {
   setSelectedFees((prevFees) =>
-    prevFees.map((fee) => (fee.id === id ? { ...fee, value } : fee))
+    prevFees.map((fee) =>
+      fee.id === id
+        ? { ...fee, fee_amount: parseFloat(value) || "" } // Update the fee value
+        : fee
+    )
   );
 };
 
@@ -231,8 +243,6 @@ const handleInputChange = (id, value) => {
 const handleRemoveFee = (id) => {
   setSelectedFees((prevFees) => prevFees.filter((fee) => fee.id !== id));
 };
-
-
 
 // Fetch products for the selected invoice
 const fetchNewProducts = async () => {
@@ -487,27 +497,30 @@ const handleProductChange = (event) => {
       return acc;
     }, {});
   };
-  
+
   const handlePayment = async () => {
+    const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
+const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
+  
     const payload = {
-      sku: tableData.map((item) => item.sku),
-      quantity: tableData.map((item) => item.quantity),
-      rate: tableData.map((item) => item.selling_price),
-      item_discount: tableData.map((item) => item.discount),
+      sku: tableData.map(item => item.sku),
+      quantity: tableData.map(item => item.quantity),
+      rate: tableData.map(item => item.selling_price),
+      item_discount: tableData.map(item => item.discount),
       cust_code: selectedCustomer,
-      overall_discount: "0", // Adjust if you have an overall discount field
-      outlet_code: "1", // Replace with dynamic outlet code if applicable
+      overall_discount: "0",
+      outlet_code: outletId,
       saleman_code: selectedSalesman,
-      advanced_payment: advancePayment, // Include advance payment here
-      additional_fee_code: "",
-      additional_fee: "",
+      advanced_payment: advancePayment,
+      fee_code: feeCodes,  // Pass as an array
+  fee_amount: fees,  // Pass as an array
     };
   
     try {
       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
-        method: "POST", // Changed to POST
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), // Send payload as body
+        body: JSON.stringify(payload),
       });
   
       if (response.ok) {
@@ -515,7 +528,9 @@ const handleProductChange = (event) => {
         setAlertMessage("Transaction added successfully!");
         setVisible(true);
       } else {
-        setAlertMessage("Failed to add transaction!");
+        const errorData = await response.json();
+        console.error("API Error Response:", errorData);
+        setAlertMessage("Failed to add transaction! Please check your input.");
         setVisible(true);
       }
     } catch (error) {
@@ -524,7 +539,8 @@ const handleProductChange = (event) => {
       setVisible(true);
     }
   };
-
+  
+  
   
     // Handle SKU selection
     const handleProductSelect = (e) => {
@@ -1290,7 +1306,7 @@ const handleReturn = async () => {
         <label>{fee.fee_name}:</label>
         <input
           type="number"
-          value={fee.value}
+          value={fee.fee_amount}
           onChange={(e) => handleInputChange(fee.id, e.target.value)}
         />
         <button className="remove-btn" onClick={() => handleRemoveFee(fee.id)}>

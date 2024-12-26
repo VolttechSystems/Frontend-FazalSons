@@ -39,7 +39,13 @@ const AddCategories = React.lazy(() => import('./views/Category/AddCategories/Ad
 const AddSubCat = React.lazy(() => import('./views/SubCat/AddSubCat/AddSubCat'))
 const AdditionalFee = React.lazy(() => import('./views/Admin/AdditionalFee/AdditionalFee'))
 const Barcodes = React.lazy(() => import('./views/Product/AllProducts/Barcodes'))
+const NewBarcode = React.lazy(() => import('./views/pages/barcode/NewBarcode'))
 
+//Reports
+const DaySale = React.lazy(() => import('./views/Reports/DaySale/DaySale'))
+const SaleReport = React.lazy(() => import('./views/Reports/SaleReport/SaleReport'))
+const ProfitReport = React.lazy(() => import('./views/Reports/ProfitReport/ProfitReport'))
+const CommissionReport = React.lazy(() => import('./views/Reports/CommissionReport/CommissionReport'))
 
 
 const routes = [
@@ -52,6 +58,7 @@ const routes = [
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
   { path: '/Product/AllProducts/Barcodes/:sku', name: 'Barcodes', element: Barcodes }, // SKU added here
+  { path: '/pages/barcode/NewBarcode/:sku', name: 'NewBarcode', element: NewBarcode }, // SKU added here
   
   { path: '/base/POS', name: 'POS', element: POS }, // POS
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
@@ -91,6 +98,12 @@ const routes = [
   { path: '/Category/AddCategories', name: 'AddCategories', element: AddCategories }, //AddCategories
   { path: '/SubCat/AddSubCat', name: 'AddSubCat', element: AddSubCat}, //AddSubCat
   { path: '/Admin/AdditionalFee', name: 'AdditionalFee', element: AdditionalFee }, // AdditionalFee
+
+  //Reports
+  { path: '/Reports/DaySale', name: 'DaySale', element: DaySale }, //DaySale
+  { path: '/Reports/SaleReport', name: 'SaleReport', element: SaleReport }, //SaleReport
+  { path: '/Reports/ProfitReport', name: 'ProfitReport', element: ProfitReport }, //ProfitReport
+  { path: '/Reports/CommissionReport', name: 'CommissionReport', element: CommissionReport }, //CommissionReport
 ]
 
 export default routes

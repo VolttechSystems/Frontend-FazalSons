@@ -1,0 +1,95 @@
+/* Main container for the report */
+.report-container {
+  width: 80%; /* Center and constrain the report width */
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #fff; /* White background */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Heading styling */
+.heading {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Dropdown container - Flexbox layout */
+.dropdowns {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Each dropdown wrapper */
+.dropdown-wrapper {
+  width: 48%; /* Ensure dropdowns are of equal width */
+}
+
+/* Label styling for dropdowns */
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Dropdown input styling */
+.dropdown {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Rounded corners */
+  background-color: #f9f9f9; /* Slight gray background */
+  transition: border-color 0.3s ease;
+}
+
+/* Dropdown focus state */
+.dropdown:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+/* Table for displaying the report */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow for table */
+}
+
+/* Table header styling */
+.report-table th {
+  padding: 15px;
+  background-color: #f2f2f2;
+  font-size: 16px;
+  text-align: center;
+  border-bottom: 2px solid #ddd;
+  color: #333;
+}
+
+/* Table cell styling */
+.report-table td {
+  padding: 12px;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  color: #555;
+}
+
+/* Table row hover effect */
+.report-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Alternate row color for better readability */
+.report-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}

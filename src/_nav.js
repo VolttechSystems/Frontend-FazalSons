@@ -45,11 +45,11 @@ const _nav = [
         name: 'Register Systems',
         to: '/base/RegisterSystem',
       },
-      {
-        component: CNavItem,
-        name: 'Login',
-        to: '/pages/Login',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Login',
+      //   to: '/pages/Login',
+      // },
       
      
     ],
@@ -78,34 +78,39 @@ const _nav = [
      
     ],
   },
+
+  //Reports
   {
     component: CNavGroup,
     name: 'Reports',
-    to: '/buttons',
     icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: 'Profit Report',
-        to: '/buttons/buttons',
+        name: 'Profit Sale',
+        to: '/Reports/ProfitReport',
+        
       },
       {
         component: CNavItem,
         name: 'Sales Commission Report',
-        to: '/buttons/button-groups',
+        to: '/Reports/CommissionReport',
       },
       {
         component: CNavItem,
         name: 'Sales Report',
-        to: '/buttons/dropdowns',
+        to: '/Reports/SaleReport',
       },
       {
         component: CNavItem,
         name: 'Sale by Day',
-        to: '/buttons/dropdowns',
+        to: '/Reports/DaySale',
       },
+      
     ],
   },
+
+  
   {
     component: CNavGroup,
     name: 'Customer',
@@ -120,6 +125,22 @@ const _nav = [
     ],
   },
   
+
+  {
+    component: CNavGroup,
+    name: 'Stock',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Add Stock',
+        to: '/Stock/AddStock',
+      },
+      
+    ],
+  },
+
+
   {
     component: CNavGroup,
     name: 'Product',
@@ -188,25 +209,6 @@ const _nav = [
       
     ],
   },
-  // {
-  //   component: CNavGroup,
-  //   name: 'Category',
-  //   icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  //   items: [
-  //     {
-  //       component: CNavItem,
-  //       name: 'Add Category',
-  //       to: '/Category/AddCategories',
-  //     },
-  //     {
-  //       component: CNavItem,
-  //       name: 'Add Sub Category',
-  //       to: '/SubCat/AddSubCat',
-  //     },
-      
-  //   ],
-  // },
-
   
   
 //   {

@@ -1,0 +1,122 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './ProfitReport.css'; // Assuming the CSS from previous styles
+
+const ProfitReport = () => {
+  const [outlets, setOutlets] = useState([]);
+  const [dates, setDates] = useState([]);
+  const [selectedOutlet, setSelectedOutlet] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [reportData, setReportData] = useState([]);
+
+  // Fetch all outlets when component mounts
+  useEffect(() => {
+    axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/')
+      .then(response => {
+        setOutlets(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching outlets:', error);
+      });
+  }, []);
+
+  // Fetch available dates when outlet is selected
+  const handleOutletChange = (event) => {
+    const outletId = event.target.value;
+    setSelectedOutlet(outletId);
+
+    // Fetch dates for the selected outlet
+    axios.get(`http://195.26.253.123/pos/report/all_outlet_dates/${outletId}/`)
+      .then(response => {
+        setDates(response.data.dates);
+      })
+      .catch(error => {
+        console.error('Error fetching dates:', error);
+      });
+  };
+
+  // Fetch profit report when both outlet and date are selected
+  const handleDateChange = (event) => {
+    const selectedDate = event.target.value;
+    setSelectedDate(selectedDate);
+
+    if (selectedOutlet && selectedDate) {
+      axios.get(`http://195.26.253.123/pos/report/profit_report/${selectedOutlet}/${selectedDate}/`)
+        .then(response => {
+          setReportData(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching profit report:', error);
+        });
+    }
+  };
+
+  return (
+    <div className="report-container">
+      <h1 className="heading">Profit Report</h1>
+
+      <div className="dropdowns">
+        {/* First dropdown for outlet selection */}
+        <div className="dropdown-wrapper">
+          <label>Choose Outlet</label>
+          <select
+            className="dropdown"
+            value={selectedOutlet || ''}
+            onChange={handleOutletChange}
+          >
+            <option value="">Select Outlet</option>
+            {outlets.map(outlet => (
+              <option key={outlet.id} value={outlet.id}>
+                {outlet.outlet_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Second dropdown for date selection */}
+        <div className="dropdown-wrapper">
+          <label>Choose Date</label>
+          <select
+            className="dropdown"
+            value={selectedDate || ''}
+            onChange={handleDateChange}
+            disabled={!selectedOutlet}
+          >
+            <option value="">Select Date</option>
+            {dates.map((date, index) => (
+              <option key={index} value={date}>
+                {date}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Table to display the profit report */}
+      {reportData.length > 0 && (
+        <table className="report-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Total Sales</th>
+              <th>Total Cost</th>
+              <th>Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reportData.map((item, index) => (
+              <tr key={index}>
+                <td>{item.date}</td>
+                <td>{item.total_sales}</td>
+                <td>{item.total_cost}</td>
+                <td>{item.profit}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
+export default ProfitReport;

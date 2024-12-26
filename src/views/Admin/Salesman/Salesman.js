@@ -43,18 +43,18 @@ const Salesman = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const dataToSend = {
+      CheckBoxValue: showCommissions ? "true" : "false", // Include the checkbox value
       salesman_name: formData.salesman_name,
       wholesale_commission: !showCommissions ? String(formData.wholesale_commission) : '',
       retail_commission: !showCommissions ? String(formData.retail_commission) : '',
       token_commission: !showCommissions ? String(formData.token_commission) : '',
       outlet: formData.outlet, // Send the selected outlet ID
     };
-
+  
     try {
       if (editingSalesmanId) {
         await axios.put(
@@ -70,6 +70,7 @@ const Salesman = () => {
       console.error('Error submitting data:', error);
     }
   };
+  
 
   const handleEdit = (salesman) => {
     setFormData({
