@@ -92,29 +92,42 @@ const ProfitReport = () => {
         </div>
       </div>
 
-      {/* Table to display the profit report */}
-      {reportData.length > 0 && (
-        <table className="report-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Total Sales</th>
-              <th>Total Cost</th>
-              <th>Profit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.date}</td>
-                <td>{item.total_sales}</td>
-                <td>{item.total_cost}</td>
-                <td>{item.profit}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+     {/* Table to display the profit report */}
+{reportData.length > 0 && (
+  <table className="report-table">
+    <thead>
+      <tr>
+        <th>Invoice Code</th>
+        <th>SKU</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Cost Price</th>
+        <th>Total Cost</th>
+        <th>Selling Price</th>
+       
+        <th>Profit</th>
+       
+      </tr>
+    </thead>
+    <tbody>
+      {reportData.map((item, index) => (
+        <tr key={index}>
+          <td>{item.invoice_code}</td>
+          <td>{item.sku}</td>
+          <td>{item.product_name}</td>
+          <td>{item.quantity}</td>
+          <td>{item.cost_price}</td>
+          <td>{item.total_cost}</td>
+          <td>{item.selling_price}</td>
+        
+          <td>{item.profit}</td>
+          
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
     </div>
   );
 };

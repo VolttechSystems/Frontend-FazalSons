@@ -90,17 +90,21 @@ const DaySale = () => {
         <table className="report-table">
           <thead>
             <tr>
-              <th>Product Name</th>
-              <th>Quantity Sold</th>
-              <th>Amount</th>
+              <th>Outlet Name</th>
+              <th>Invoice Code</th>
+              <th>Customer Type</th>
+              <th>Total Amount</th>
+              <th>Return Amount</th>
             </tr>
           </thead>
           <tbody>
             {reportData.map((item, index) => (
               <tr key={index}>
-                <td>{item.product_name}</td>
-                <td>{item.quantity_sold}</td>
-                <td>{item.amount}</td>
+                <td>{item.outlet_name}</td>
+                <td>{item.invoice_code}</td>
+                <td>{item.customer_type}</td>
+                <td>{item.total_amount}</td>
+                <td>{item.return_amount}</td>
               </tr>
             ))}
           </tbody>
