@@ -167,9 +167,59 @@ const CommissionReport = () => {
           </tr>
         ))}
       </tbody>
+      <tfoot>
+  <tr>
+    <td colSpan="4" style={{ textAlign: "right", fontWeight: "bold" }}>
+      Totals:
+    </td>
+    <td>
+      <strong>
+        {commissionData.reduce((acc, item) => acc + parseFloat(item.quantity || 0), 0)}
+      </strong>
+    </td>
+    <td>
+      <strong>
+        {commissionData
+          .reduce((acc, item) => acc + parseFloat(item.Price || 0), 0)
+          .toFixed(2)}
+      </strong>
+    </td>
+    <td>
+      <strong>
+        {commissionData
+          .reduce((acc, item) => acc + parseFloat(item.gross_total || 0), 0)
+          .toFixed(2)}
+      </strong>
+    </td>
+    <td>
+      <strong>
+        {commissionData
+          .reduce((acc, item) => acc + parseFloat(item.discount || 0), 0)
+          .toFixed(2)}
+      </strong>
+    </td>
+    <td>
+      <strong>
+        {commissionData
+          .reduce((acc, item) => acc + parseFloat(item.total || 0), 0)
+          .toFixed(2)}
+      </strong>
+    </td>
+    <td></td>
+    <td>
+      <strong>
+        {commissionData
+          .reduce((acc, item) => acc + parseFloat(item.Commission || 0), 0)
+          .toFixed(2)}
+      </strong>
+    </td>
+  </tr>
+</tfoot>
+
     </table>
   </div>
 )}
+
 
 
     </div>

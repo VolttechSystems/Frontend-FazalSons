@@ -85,31 +85,46 @@ const DaySale = () => {
         </div>
       </div>
 
+      
       {/* Table for displaying the daily sale report */}
-      {reportData.length > 0 && (
-        <table className="report-table">
-          <thead>
-            <tr>
-              <th>Outlet Name</th>
-              <th>Invoice Code</th>
-              <th>Customer Type</th>
-              <th>Total Amount</th>
-              <th>Return Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.outlet_name}</td>
-                <td>{item.invoice_code}</td>
-                <td>{item.customer_type}</td>
-                <td>{item.total_amount}</td>
-                <td>{item.return_amount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+{reportData.length > 0 && (
+  <div className="report-table-container">
+    <table className="report-table">
+      <thead>
+        <tr>
+          <th>Outlet Name</th>
+          <th>Invoice Code</th>
+          <th>Customer Type</th>
+          <th>Total Amount</th>
+          <th>Return Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {reportData.map((item, index) => (
+          <tr key={index}>
+            <td>{item.outlet_name}</td>
+            <td>{item.invoice_code}</td>
+            <td>{item.customer_type}</td>
+            <td>{item.total_amount}</td>
+            <td>{item.return_amount}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    {/* Displaying the totals */}
+    <div className="totals-container">
+      <p>
+        Total of Total Amount: {reportData.reduce((acc, item) => acc + parseFloat(item.total_amount || 0), 0).toFixed(2)}
+      </p>
+      <p>
+        Total of Return Amount: {reportData.reduce((acc, item) => acc + parseFloat(item.return_amount || 0), 0).toFixed(2)}
+      </p>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };

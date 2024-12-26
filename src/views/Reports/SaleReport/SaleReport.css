@@ -102,4 +102,18 @@
   .report-table tr:nth-child(even) {
     background-color: #f9f9f9;
   }
+  .totals-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .totals-container p {
+    margin: 5px 0;
+    font-weight: bold;
+  }
   

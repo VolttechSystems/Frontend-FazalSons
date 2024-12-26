@@ -92,7 +92,7 @@ const ProfitReport = () => {
         </div>
       </div>
 
-     {/* Table to display the profit report */}
+   {/* Table to display the profit report */}
 {reportData.length > 0 && (
   <table className="report-table">
     <thead>
@@ -104,9 +104,7 @@ const ProfitReport = () => {
         <th>Cost Price</th>
         <th>Total Cost</th>
         <th>Selling Price</th>
-       
         <th>Profit</th>
-       
       </tr>
     </thead>
     <tbody>
@@ -119,14 +117,51 @@ const ProfitReport = () => {
           <td>{item.cost_price}</td>
           <td>{item.total_cost}</td>
           <td>{item.selling_price}</td>
-        
           <td>{item.profit}</td>
-          
         </tr>
       ))}
     </tbody>
+    <tfoot>
+      <tr>
+        <td colSpan="3" style={{ textAlign: "right", fontWeight: "bold" }}>Totals:</td>
+        <td>
+          <strong>
+            {reportData.reduce((acc, item) => acc + parseFloat(item.quantity || 0), 0)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.cost_price || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.total_cost || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.selling_price || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.profit || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+      </tr>
+    </tfoot>
   </table>
 )}
+
 
     </div>
   );

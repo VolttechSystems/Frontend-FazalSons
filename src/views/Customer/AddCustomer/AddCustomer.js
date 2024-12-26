@@ -208,8 +208,8 @@ const AddCustomer = () => {
 
         {/* Email */}
         <div>
-          <label>Email: *</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+          <label>Email:</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange}  />
         </div>
 
         {/* Mobile Number */}
@@ -233,7 +233,7 @@ const AddCustomer = () => {
         {/* Password */}
         <div>
           <label>Password:</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+          <input type="password" name="password" value={formData.password} onChange={handleChange} />
         </div>
 
         {/* Address */}
