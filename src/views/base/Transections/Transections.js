@@ -1181,16 +1181,16 @@ const handleReturn = async () => {
         />
       </td>
       <td>{product.selling_price}</td>
-      <td>{(product.selling_price * product.quantity).toFixed(2)}</td>
+      <td>{(product.selling_price * product.quantity)}</td> {/* Multiply and return as integer */}
       <td>
         <input
           type="number"
           value={product.discount}
           onChange={(e) => {
-            const discount = e.target.value;
+            const discount = parseInt(e.target.value) || 0;  // Ensure discount is an integer
             setTableData((prevData) => {
               const updatedData = [...prevData];
-              updatedData[index].discount = parseFloat(discount) || 0;
+              updatedData[index].discount = discount;
               return updatedData;
             });
           }}
@@ -1200,15 +1200,13 @@ const handleReturn = async () => {
       <td>
         <input
           type="number"
-          value={(
-            (product.selling_price * product.quantity * product.discount) / 100
-          ).toFixed(2)}
+          value={((product.selling_price * product.quantity * product.discount) / 100)} // Result will be an integer now
           onChange={(e) => {
-            const discountValue = e.target.value;
+            const discountValue = parseInt(e.target.value) || 0;
             setTableData((prevData) => {
               const updatedData = [...prevData];
               updatedData[index].discount = (discountValue / (product.selling_price * product.quantity)) * 100 || 0;
-              updatedData[index].discountValue = parseFloat(discountValue) || 0;
+              updatedData[index].discountValue = discountValue;
               return updatedData;
             });
           }}
@@ -1218,15 +1216,12 @@ const handleReturn = async () => {
       <td>
         <input
           type="number"
-          value={(
-            product.selling_price * product.quantity -
-            (product.selling_price * product.quantity * product.discount) / 100
-          ).toFixed(2)}
+          value={product.selling_price * product.quantity - (product.selling_price * product.quantity * product.discount) / 100} // Calculate as integer
           onChange={(e) => {
-            const netAmount = e.target.value;
+            const netAmount = parseInt(e.target.value) || 0;  // Ensure netAmount is an integer
             setTableData((prevData) => {
               const updatedData = [...prevData];
-              updatedData[index].netAmount = parseFloat(netAmount) || 0;
+              updatedData[index].netAmount = netAmount;
               return updatedData;
             });
           }}

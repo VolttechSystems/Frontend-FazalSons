@@ -30,7 +30,7 @@ const NewBarcode = () => {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Barcode for SKU: {sku}</h1>
+      {/* <h1>Barcode for SKU: {sku}</h1> */}
       <div
         style={{
           display: 'inline-block',
