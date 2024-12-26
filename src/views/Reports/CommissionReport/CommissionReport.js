@@ -133,27 +133,45 @@ const CommissionReport = () => {
       </button>
 
       {commissionData.length > 0 && (
-        <table className="report-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Total Sales</th>
-              <th>Commission</th>
-              <th>Net Commission</th>
-            </tr>
-          </thead>
-          <tbody>
-            {commissionData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.date}</td>
-                <td>{item.total_sales}</td>
-                <td>{item.commission}</td>
-                <td>{item.net_commission}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+  <div className="report-table-container">
+    <table className="report-table">
+      <thead>
+        <tr>
+          <th>Till Date</th>
+          <th>Invoice</th>
+          <th>SKU</th>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Gross Total</th>
+          <th>Discount</th>
+          <th>Total</th>
+          <th>Percentage (%)</th>
+          <th>Commission</th>
+        </tr>
+      </thead>
+      <tbody>
+        {commissionData.map((item, index) => (
+          <tr key={index}>
+            <td>{item.till_date}</td>
+            <td>{item.invoice}</td>
+            <td>{item.sku}</td>
+            <td>{item.product}</td>
+            <td>{item.quantity}</td>
+            <td>{item.Price}</td>
+            <td>{item.gross_total}</td>
+            <td>{item.discount}</td>
+            <td>{item.total}</td>
+            <td>{item["Per(%)"]}</td>
+            <td>{item.Commission}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+
     </div>
   );
 };

@@ -52,27 +52,26 @@ const SaleReport = () => {
         </div>
       </div>
 
-      {/* Table for displaying the sales report */}
-      {reportData.length > 0 && (
-        <table className="report-table">
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Quantity Sold</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.product_name}</td>
-                <td>{item.quantity_sold}</td>
-                <td>{item.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+     {/* Table for displaying the sales report */}
+{reportData.length > 0 && (
+  <table className="report-table">
+    <thead>
+      <tr>
+        <th>Till Date</th>
+        <th>Total Sale</th>
+      </tr>
+    </thead>
+    <tbody>
+      {reportData.map((item, index) => (
+        <tr key={index}>
+          <td>{item.till_date}</td>
+          <td>{item.total_sale}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
     </div>
   );
 };
