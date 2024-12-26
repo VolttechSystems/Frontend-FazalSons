@@ -86,7 +86,7 @@ const DaySale = () => {
       </div>
 
       
-      {/* Table for displaying the daily sale report */}
+   {/* Table for displaying the daily sale report */}
 {reportData.length > 0 && (
   <div className="report-table-container">
     <table className="report-table">
@@ -109,18 +109,18 @@ const DaySale = () => {
             <td>{item.return_amount}</td>
           </tr>
         ))}
+        
+        {/* Row for displaying the totals */}
+        <tr className="totals-row">
+         
+          <td></td> {/* Empty cell for invoice code */}
+          <td></td> {/* Empty cell for customer type */}
+          <td><strong>Total:</strong></td>
+          <td><strong>{reportData.reduce((acc, item) => acc + parseFloat(item.total_amount || 0), 0).toFixed(2)}</strong></td>
+          <td><strong>{reportData.reduce((acc, item) => acc + parseFloat(item.return_amount || 0), 0).toFixed(2)}</strong></td>
+        </tr>
       </tbody>
     </table>
-
-    {/* Displaying the totals */}
-    <div className="totals-container">
-      <p>
-        Total of Total Amount: {reportData.reduce((acc, item) => acc + parseFloat(item.total_amount || 0), 0).toFixed(2)}
-      </p>
-      <p>
-        Total of Return Amount: {reportData.reduce((acc, item) => acc + parseFloat(item.return_amount || 0), 0).toFixed(2)}
-      </p>
-    </div>
   </div>
 )}
 

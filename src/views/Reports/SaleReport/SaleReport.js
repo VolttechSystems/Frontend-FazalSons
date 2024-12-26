@@ -84,38 +84,40 @@ const SaleReport = () => {
           />
         </div>
       </div>
-
-      {/* Table for displaying the sales report */}
-      {reportData.length > 0 && (
-        <div className="report-table-container">
-          <table className="report-table">
-            <thead>
-              <tr>
-                <th>Till Date</th>
-                <th>Total Sale</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reportData.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.till_date}</td>
-                  <td>{item.total_sale}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Displaying the total of total_sale */}
-          <div className="totals-container">
-            <p>
-              <strong>Total of Total Sale:</strong>{" "}
+{/* Table for displaying the sales report */}
+{reportData.length > 0 && (
+  <div className="report-table-container">
+    <table className="report-table">
+      <thead>
+        <tr>
+          <th>Till Date</th>
+          <th>Total Sale</th>
+        </tr>
+      </thead>
+      <tbody>
+        {reportData.map((item, index) => (
+          <tr key={index}>
+            <td>{item.till_date}</td>
+            <td>{item.total_sale}</td>
+          </tr>
+        ))}
+        
+        {/* Row for displaying the total of total_sale */}
+        <tr className="totals-row">
+          <td><strong>Total:</strong></td>
+          <td>
+            <strong>
               {reportData
                 .reduce((acc, item) => acc + parseFloat(item.total_sale || 0), 0)
                 .toFixed(2)}
-            </p>
-          </div>
-        </div>
-      )}
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
     </div>
   );
 };
