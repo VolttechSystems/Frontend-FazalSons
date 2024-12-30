@@ -66,6 +66,16 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'System Roles',
+        to: '/Admin/SysRoles',
+      },
+      {
+        component: CNavItem,
+        name: 'Register User',
+        to: '/Admin/RegisterUser',
+      },
+      {
+        component: CNavItem,
         name: 'Outlet',
         to: '/Admin/AddOutlet',
       },
