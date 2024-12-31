@@ -284,16 +284,17 @@ const SysRoles = () => {
 
   const handleAddOrEditRole = async () => {
     try {
+      // Map permission IDs, handle null values
       const selectedPermissionIDs = selectedPermissions.map(
         (permission) => permission.value
       );
-
+  
       const requestData = {
         sys_role_name: roleName,
         status: status.toLowerCase(),
-        permissions: selectedPermissionIDs,
+        permissions: selectedPermissionIDs.filter((id) => id !== null), // Exclude nulls
       };
-
+  
       if (editingRoleId) {
         await axios.put(
           `http://195.26.253.123/pos/accounts/action-system-role/${editingRoleId}/`,
@@ -307,7 +308,7 @@ const SysRoles = () => {
         );
         alert("Role added successfully!");
       }
-
+  
       fetchRoles();
       clearForm();
     } catch (error) {
@@ -315,18 +316,21 @@ const SysRoles = () => {
       setErrorMessage("Failed to add/update role.");
     }
   };
-
+  
   const handleEdit = (role) => {
     setEditingRoleId(role.id);
     setRoleName(role.sys_role_name);
     setStatus(role.status === "active" ? "Active" : "Inactive");
-
-    const preselectedPermissions = role.permissions.map((perm) => ({
-      value: perm.permission_id,
-      label: perm.permission_name,
-    }));
-    setSelectedPermissions(preselectedPermissions);
+  
+    const preselectedPermissions = role.permissions
+      .filter((perm) => perm) // Remove null permissions
+      .map((perm) => ({
+        value: perm.id,
+        label: perm.permission_name,
+      }));
+    setSelectedPermissions(preselectedPermissions); // Set pre-filled values in state
   };
+  
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this role?")) {
@@ -393,11 +397,12 @@ const SysRoles = () => {
       <div>
         <label>Permissions:</label>
         <Select
-          options={permissions}
-          isMulti
-          value={selectedPermissions}
-          onChange={setSelectedPermissions}
-        />
+  options={permissions}
+  isMulti
+  value={selectedPermissions}
+  onChange={(selected) => setSelectedPermissions(selected || [])} // Set empty array if no selection
+/>
+
       </div>
 
       <button onClick={handleAddOrEditRole}>
