@@ -59,6 +59,7 @@ const [closingDate, setClosingDate] = useState("");
   const { outletId } = useParams(); // Get the outletId from the URL parameter
   const [loading,setLoading]=  useState([]);
 
+  const [sku, setSku] = useState(""); // Holds the scanned SKU
   
   // Calculate total payment after discount
   useEffect(() => {
@@ -475,6 +476,20 @@ const handleProductChange = (event) => {
       console.error("Error fetching product details:", error);
     }
   };
+
+  const handleScan = async (event) => {
+    if (event.key === "Enter") {
+        const product = await fetchProductDetails(sku);
+        // console.log("Product:", product);
+        if (product) {
+            setProducts((prev) => [...prev, product]);
+        } 
+        // else {
+        //     alert("Product not found.");
+        // }
+        setSku(""); // Reset input field
+    }
+};
   
   
   useEffect(() => {
@@ -497,6 +512,10 @@ const handleProductChange = (event) => {
       return acc;
     }, {});
   };
+
+
+
+
 
   const handlePayment = async () => {
     const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
@@ -1129,6 +1148,16 @@ const handleReturn = async () => {
             </option>
           ))}
         </select>
+
+        <input
+                type="text"
+                // value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                onKeyDown={handleScan} // Capture "Enter" key
+                placeholder="Scan or Enter SKU"
+                autoFocus // Focus input for scanner
+            />
+
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
           <option>Select Product</option>
