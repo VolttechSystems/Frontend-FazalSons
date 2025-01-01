@@ -13,6 +13,13 @@
     color: #333;
     margin-bottom: 20px;
   }
+
+  
+  h3 {
+   
+    color: #333;
+    margin-top: 20px;
+  }
   
   .form {
     display: flex;
