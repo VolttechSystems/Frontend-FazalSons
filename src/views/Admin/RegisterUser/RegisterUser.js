@@ -5,6 +5,7 @@ import './RegisterUser.css';
 
 function RegisterUser() {
   const [systemRoles, setSystemRoles] = useState([]);
+  const [showPassword, setShowPassword] = useState(false); 
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -37,17 +38,23 @@ function RegisterUser() {
 
   const fetchUsers = () => {
     axios
-      .get("http://195.26.253.123/pos/accounts/register_user/") // Ensure this is correct endpoint
+      .get("http://195.26.253.123/pos/accounts/register_user/")
       .then((response) => {
-        console.log(response.data); // Log the response to check its structure
-        if (Array.isArray(response.data)) {
-          setUserList(response.data); // Assuming the data is an array
+        console.log("Fetched Users Data:", response.data); // Debug log
+        if (Array.isArray(response.data.results)) {
+          setUserList(response.data.results); // Use the "results" array
         } else {
-          console.error("Data is not in expected format", response.data);
+          console.error("Unexpected data format:", response.data);
         }
       })
       .catch((error) => console.log("Error fetching users:", error));
   };
+
+ 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev); // Toggle password visibility
+  };
+  
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -90,6 +97,19 @@ function RegisterUser() {
       .catch((error) => console.log("Error registering user:", error));
   };
 
+    // Handle user delete
+    const handleDelete = (userId) => {
+      if (window.confirm("Are you sure you want to delete this user?")) {
+        axios
+          .delete(`http://195.26.253.123/pos/accounts/delete_user/${userId}`)
+          .then((response) => {
+            console.log("User deleted successfully:", response);
+            fetchUsers(); // Refresh the user list
+          })
+          .catch((error) => console.error("Error deleting user:", error));
+      }
+    };
+
   return (
     <div className="container">
       <h2>Register User</h2>
@@ -126,15 +146,28 @@ function RegisterUser() {
           />
         </div>
         <div className="input-group">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+  <label>Password</label>
+  <div className="password-wrapper">
+    <input
+      type={showPassword ? "text" : "password"} // Toggle between "text" and "password"
+      name="password"
+      value={formData.password}
+      onChange={handleChange}
+      required
+      placeholder="Enter your password"
+    />
+    <span
+      className="toggle-password"
+      onClick={togglePasswordVisibility}
+      style={{ cursor: "pointer" }}
+    >
+      <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i> {/* Professional Eye Icon */}
+    </span>
+  </div>
+</div>
+
+
+        
         <div className="input-group">
           <label>Email</label>
           <input
@@ -199,23 +232,27 @@ function RegisterUser() {
             <th>Last Name</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Phone Number</th>
-            <th>System Roles</th>
+            <th>Actions</th> 
+           
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(userList) && userList.length > 0 ? (
-            userList.map((user, index) => (
-              <tr key={index}>
+        {userList.length > 0 ? (
+    userList.map((user, index) => (
+      <tr key={index}>
                 <td>{user.first_name}</td>
                 <td>{user.last_name}</td>
                 <td>{user.username}</td>
                 <td>{user.email || "N/A"}</td>
-                <td>{user.phone_number || "N/A"}</td>
                 <td>
-                  {user.system_roles &&
-                    user.system_roles.map((role) => role.sys_role_name).join(", ")}
+                  <button
+                    onClick={() => handleDelete(user.id)} // Pass user ID dynamically
+                    className="delete-button"
+                  >
+                    Delete
+                  </button>
                 </td>
+                
               </tr>
             ))
           ) : (
