@@ -514,6 +514,9 @@ button:focus {
   font-weight: bold;
   text-align: right;
 }
+
+
+
   /* Fee Dropdown Section */
 .fee-dropdowns {
 display: flex;

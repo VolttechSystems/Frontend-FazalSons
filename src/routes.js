@@ -52,6 +52,10 @@ const CommissionReport = React.lazy(() => import('./views/Reports/CommissionRepo
 const SysRoles = React.lazy(() => import('./views/Admin/SysRoles/SysRoles'))
 const RegisterUser = React.lazy(() => import('./views/Admin/RegisterUser/RegisterUser'))
 
+
+//Payment
+const Payment = React.lazy(() => import('./views/Admin/Payment/Payment'))
+
 const routes = [
 
 
@@ -112,6 +116,8 @@ const routes = [
   //Roles
   { path: '/Admin/SysRoles', name: 'SysRoles', element: SysRoles }, // SysRoles
   { path: '/Admin/RegisterUser', name: 'RegisterUser', element: RegisterUser }, // RegisterUser
+
+  { path: '/Admin/Payment', name: 'Payment', element: Payment }, // Payment
 ]
 
 export default routes

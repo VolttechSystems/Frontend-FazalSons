@@ -84,6 +84,11 @@ const _nav = [
         name: 'Additional Fee',
         to: '/Admin/AdditionalFee',
       },
+      {
+        component: CNavItem,
+        name: 'Payment Methods',
+        to: '/Admin/Payment',
+      },
       
      
     ],

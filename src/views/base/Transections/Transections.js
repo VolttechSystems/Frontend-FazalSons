@@ -15,7 +15,14 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
     const [salesmen, setSalesmen] = useState([]);
     const [customer, setCustomer] = useState([]);
     const [additionalFees, setAdditionalFees] = useState([]);
+    
     const [selectedFees, setSelectedFees] = useState([]);
+
+
+    const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPayments, setSelectedPayments] = useState([]);
+
+
     const [deliveryFees, setDeliveryFees] = useState([]);
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [allProducts, setAllProducts] = useState({});
@@ -141,15 +148,6 @@ useEffect(() => {
 }, [outletId]); // Dependency array includes outletId to refetch invoices on change
 
 
-
-// useEffect(() => {
-//   console.log("----")
-//   console.log(invoices)
-//   console.log("----")
-// },[invoices])
-  
-   // Fetch invoices from the API
-  // Fetch due invoices dynamically based on outletId
 useEffect(() => {
   const fetchdueInvoices = async () => {
     try {
@@ -227,6 +225,48 @@ const handleClose = () => {
     ]);
   }
 };
+
+
+//PAYMENT METHOD 
+
+// Handle Payment Method Selection
+const handlePaymentSelection = (event) => {
+  const selectedPaymentId = event.target.value;
+  const selectedPayment = paymentMethods.find(
+    (method) => method.id === parseInt(selectedPaymentId)
+  );
+
+  // Avoid duplicates
+  if (selectedPayment && !selectedPayments.some((payment) => payment.id === selectedPayment.id)) {
+    setSelectedPayments([
+      ...selectedPayments,
+      {
+        ...selectedPayment,
+        payment_method_name: selectedPayment.pm_name || "", // Payment method name from dropdown
+        payment_method_amount: "", // Default payment amount (number input)
+      },
+    ]);
+  }
+};
+
+// Handle input change for payment method amount
+const handlePaymentInputChange = (paymentId, value) => {
+  setSelectedPayments((prevPayments) =>
+    prevPayments.map((payment) =>
+      payment.id === paymentId
+        ? { ...payment, payment_method_amount: value }
+        : payment
+    )
+  );
+};
+
+// Remove selected payment method
+const handleRemovePayment = (paymentId) => {
+  setSelectedPayments((prevPayments) =>
+    prevPayments.filter((payment) => payment.id !== paymentId)
+  );
+};
+//PAYMENT
 
 // Handle Input Change for Fee Value
 const handleInputChange = (id, value) => {
@@ -396,6 +436,19 @@ const handleProductChange = (event) => {
             }
         };
 
+        const fetchPayment = async () => {
+          try {
+            const response = await fetch('http://195.26.253.123/pos/transaction/add_payment');
+            const data = await response.json();
+            if (data && Array.isArray(data)) {
+              setPaymentMethods(data);
+            }
+          } catch (error) {
+            console.error('Error fetching payment methods:', error);
+          }
+        };
+
+
         const fetchDeliveryFees = async () => {
             try {
                 const response = await fetch('http://195.26.253.123/pos/transaction/action_additional_fee/id/');
@@ -440,6 +493,7 @@ const handleProductChange = (event) => {
         fetchDeliveryFees();
         fetchAllProducts();
         fetchCustomer();
+        fetchPayment();
         const interval = setInterval(() => {
             setCurrentDateTime(new Date());
         }, 1000);
@@ -499,30 +553,39 @@ const handleProductChange = (event) => {
   };
 
   const handlePayment = async () => {
-    const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
-const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
+    // Create arrays for fee codes and amounts
+    const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array for fee codes
+    const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array for fee amounts
+  
+    // Create arrays for payment methods and their amounts
+    const paymentMethods = selectedPayments.map(payment => payment.id);  // Payment method IDs
+    const paymentAmounts = selectedPayments.map(payment => payment.payment_method_amount);  // Payment method amounts
   
     const payload = {
-      sku: tableData.map(item => item.sku),
-      quantity: tableData.map(item => item.quantity),
-      rate: tableData.map(item => item.selling_price),
-      item_discount: tableData.map(item => item.discount),
-      cust_code: selectedCustomer,
-      overall_discount: "0",
-      outlet_code: outletId,
-      saleman_code: selectedSalesman,
-      advanced_payment: advancePayment,
-      fee_code: feeCodes,  // Pass as an array
-  fee_amount: fees,  // Pass as an array
+      sku: tableData.map(item => item.sku),  // SKU of the items
+      quantity: tableData.map(item => item.quantity),  // Quantity of each item
+      rate: tableData.map(item => item.selling_price),  // Price of each item
+      item_discount: tableData.map(item => item.discount),  // Item discount
+      cust_code: selectedCustomer,  // Customer code
+      overall_discount: "0",  // Overall discount (can be updated as needed)
+      outlet_code: outletId,  // Outlet code
+      saleman_code: selectedSalesman,  // Salesman code
+      advanced_payment: advancePayment,  // Advanced payment amount
+      fee_code: feeCodes,  // Fee codes array (can be empty if no fees are selected)
+      fee_amount: fees,  // Fee amounts array (can be empty if no fees are selected)
+      pm_method: paymentMethods,  // Payment method IDs array
+      pm_amount: paymentAmounts,  // Payment amounts array
     };
   
     try {
+      // Sending POST request with the payload
       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
   
+      // Handling response
       if (response.ok) {
         const result = await response.json();
         setAlertMessage("Transaction added successfully!");
@@ -1129,6 +1192,10 @@ const handleReturn = async () => {
             </option>
           ))}
         </select>
+        <Link to="/Admin/Salesman">
+        <button className="add-customer">+</button>
+          </Link>
+
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
           <option>Select Product</option>
@@ -1327,21 +1394,51 @@ const handleReturn = async () => {
   </div>
 </div>
 
+{/* /* PAYMENT METHOD DROPDOWN */ }
 <div className="payment-summary">
-  <div className="payment-row">
-    <label className="payment-label">
-      CARD:
-      <input type="number" className="payment-input" placeholder="0" />
-    </label>
-    <label className="payment-label">
-      CASH:
-      <input type="number" className="payment-input" placeholder="0" />
-    </label>
-    <label className="payment-label">
-      CHANGE:
-      <input type="number" className="payment-input" placeholder="0" />
-    </label>
-  </div>
+<div className="payment-method-section">
+      {/* Payment Method Dropdown */}
+      <div className="payment-method-dropdown">
+        <label htmlFor="payment-method">Payment Method:</label>
+        <select
+          id="payment-method"
+          onChange={handlePaymentSelection}
+        >
+          <option value="">Select Payment Method</option>
+          {paymentMethods.map((method) => (
+            <option key={method.id} value={method.id}>
+              {method.pm_name}
+            </option>
+          ))}
+        </select>
+        <Link to="/Admin/PaymentMethod">
+          <button className="add-payment-method-btn">+</button>
+        </Link>
+      </div>
+
+      {/* Dynamically Render Input Fields for Selected Payment Methods */}
+      <div className="selected-payment-methods">
+        {selectedPayments.map((payment) => (
+          <div key={payment.id} className="payment-item">
+            <label>{payment.pm_name}:</label>
+            <input
+              type="number"
+              value={payment.payment_method_amount}
+              onChange={(e) =>
+                handlePaymentInputChange(payment.id, e.target.value)
+              }
+            />
+            <button
+              className="remove-btn"
+              onClick={() => handleRemovePayment(payment.id)}
+            >
+              X
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  
   <div className="payment-total">
     <span className="total-amount">
       {(
