@@ -4,13 +4,15 @@ import './Transections.css';
 import { CAlert, CButton } from '@coreui/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, Box, Typography, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-
-
+import { faPrint, faExpand } from '@fortawesome/free-solid-svg-icons';
 
 
   function Transections() {
+    //fullscreen
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+
     const [products, setProducts] = useState([]); // List of products in the table
     const [salesmen, setSalesmen] = useState([]);
     const [customer, setCustomer] = useState([]);
@@ -66,6 +68,17 @@ const [closingDate, setClosingDate] = useState("");
   const { outletId } = useParams(); // Get the outletId from the URL parameter
   const [loading,setLoading]=  useState([]);
 
+
+
+  // Handle Fullscreen Toggle
+  const handleFullscreenToggle = () => {
+    if (!isFullscreen) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+    setIsFullscreen(!isFullscreen);
+};
   
   // Calculate total payment after discount
   useEffect(() => {
@@ -693,8 +706,7 @@ const handleReturn = async () => {
     return (
         <div className="transactions-page">
             <header className="t-header">
-                {/* Fullscreen Toggle Button */}
-                
+              
 
                 {/* <h1 className="t-logo">FAZAL SONS</h1> */}
                 <div className="t-header-info">
@@ -1145,18 +1157,16 @@ const handleReturn = async () => {
       </Dialog>
     </div>
 
-                    <span className="t-date-time">{formatDateTime(currentDateTime)} | IP: 39.55.138.194</span>
+                    <span className="t-date-time">{formatDateTime(currentDateTime)}</span>
                 </div>
-                {/* <div className="t-profile">
-                    <span className="t-notification-badge">5</span>
-                    <span className="t-profile-name">Ali Tehseen</span>
-                </div> */}
-                <button 
-                    className="fullscreen-toggle" 
-                    onClick={toggleFullScreen}
-                >
-                    Fullscreen
-                </button>
+                 {/* Fullscreen Toggle Button */}
+                 <div className="t-header-left">
+        {/* Fullscreen Toggle Button */}
+        <Button variant="contained" onClick={handleFullscreenToggle} sx={{ marginRight: '10px' }}>
+            <FontAwesomeIcon icon={faExpand} />
+        </Button>
+    </div>
+               
             </header>
 
             
@@ -1396,7 +1406,6 @@ const handleReturn = async () => {
 
 {/* /* PAYMENT METHOD DROPDOWN */ }
 <div className="payment-summary">
-<div className="payment-method-section">
       {/* Payment Method Dropdown */}
       <div className="payment-method-dropdown">
         <label htmlFor="payment-method">Payment Method:</label>
@@ -1436,7 +1445,7 @@ const handleReturn = async () => {
             </button>
           </div>
         ))}
-      </div>
+   
     </div>
   
   <div className="payment-total">
