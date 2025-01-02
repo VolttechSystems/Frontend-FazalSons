@@ -220,7 +220,6 @@ useEffect(() => {
             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
           )
         );
-
         const data = responses.flatMap((res) => res.data);
         setTableData(data);
       } catch (error) {
@@ -232,45 +231,6 @@ useEffect(() => {
     setTableData([]);
   }
 }, [formData.attType]);
-
-
-const handleRadioChange = (groupName) => {
-  setSelectedGroup(groupName);
-  console.log("Selected Group:", groupName); // Debugging log
-};
-
-//  useEffect(() => {
-//     if (formData.attType.length > 0) {
-//         const fetchAttributes = async () => {
-//             try {
-//                 console.log("Selected Attribute Types:", formData.attType);
-
-//                 const responses = await Promise.all(
-//                     formData.attType.map((typeId) =>
-//                         axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
-//                     )
-//                 );
-
-//                 const data = responses.flatMap((res) => res.data);
-
-//                 const groupedData = data.map((group) => ({
-//                   att_type: group.att_type || "Unnamed Group", 
-//                   attribute_group: Array.isArray(group.attribute_name) ? group.attribute_name : [], 
-//                     variation: Array.isArray(group.variation) ? group.variation : [], 
-//                 }));
-
-//                 console.log("Fetched Attributes for Table:", groupedData);
-//                 setTableData(groupedData);
-//             } catch (error) {
-//                 console.error("Error fetching Attributes:", error);
-//             }
-//         };
-
-//         fetchAttributes();
-//     } else {
-//         setTableData([]); 
-//     }
-// }, [formData.attType]);
 
 
   // Handle Multi-select Attribute Type Change
@@ -336,8 +296,9 @@ const handleInputChange = (e) => {
   }));
 };
 
-  
-  
+   useEffect(() => {
+    console.log({selectedGroup})
+  }, [selectedGroup]);
   
   
   
@@ -413,6 +374,7 @@ const handleInputChange = (e) => {
    
   };
   
+
   
   const handleEdit = async (category) => { 
     try {
@@ -439,24 +401,37 @@ const handleInputChange = (e) => {
         
         const initialSelectedGroup = {};
  
-        // Assuming `formData.attribute_group` is an array of objects like:
-        // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
         categoryData.attribute_group.map((group,index) => {
-            console.log("Processing group:", group);
-            if (group.att_type && group.attribute_id) {
-              console.log("inside")
-                initialSelectedGroup[group.att_type] = group.attribute_id; // Map `att_type` to `attribute_id`
-            }
+          
+           // if (group.att_type && group.attribute_id) {
+            //     initialSelectedGroup[group.att_type] = group.attribute_id; // Map `att_type` to `attribute_id`
+            // }
         });
-        console.log("after")
+
+        const transformArray = (arr) => {
+          const result = {};
         
-        console.log("Initial Selected Group:", initialSelectedGroup);
-        setSelectedGroup(initialSelectedGroup);
+          categoryData.attribute_group.forEach(item => {
+            result[item.att_type_name] = item.id;
+          });
+        
+          return result;
+        };
+        
+        setSelectedGroup(transformArray);
+
+        const responses = await Promise.all(
+          categoryData.att_type.map((id) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)
+          )
+        );
+        const data = responses.flatMap((res) => res.data);
+        setTableData(data);
+
         
         setEditMode(true);
         setEditCategoryId(categoryData.id); // Store the ID for updating
     } catch (error) {
-        console.error('Error fetching category for edit:', error);
         setMessage('Failed to fetch category details.');
     }
 };
@@ -658,7 +633,7 @@ const handleInputChange = (e) => {
       >
         <thead>
           {/* Conditionally render headers based on selection */}
-          {selectedAttributeType && (
+           
             <tr>
               <th style={{ border: "1px solid black" }}>#</th>
               <th style={{ border: "1px solid black" }}>Attribute Type</th>
@@ -667,13 +642,14 @@ const handleInputChange = (e) => {
               </th>
               <th style={{ border: "1px solid black" }}>Variations</th>
             </tr>
-          )}
+           
         </thead>
-       
+        
         <tbody>
   {Object.values(
     tableData.reduce((acc, item) => {
       if (!acc[item.att_type]) {
+        console.log("checking here 678")
         acc[item.att_type] = { ...item, groups: [] };
       }
       acc[item.att_type].groups.push(item);
@@ -712,7 +688,6 @@ const handleInputChange = (e) => {
             {item.att_type}
           </td>
         )}
-
         {/* Attribute Name Column */}
         <td style={{ border: "1px solid black", textAlign: "center" }}>
           <label

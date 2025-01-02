@@ -143,7 +143,7 @@ const [closingDate, setClosingDate] = useState("");
   useEffect(() => {
     const calculatedTotal = tableData.reduce((sum, item) => {
       const discountedPrice = item.selling_price - (item.selling_price * item.discount) / 100;
-      return sum + item.quantity * discountedPrice + item.additionalFees;
+      return sum + item.quantity * discountedPrice;
     }, 0);
     setTotalPaymentAfterDiscount(calculatedTotal);
   }, [tableData]);
