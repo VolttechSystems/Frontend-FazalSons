@@ -37,7 +37,7 @@ const AddCategories = () => {
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [selectedParentCategory, setSelectedParentCategory] = useState('');
   const [selectedHeadCategory, setSelectedHeadCategory] = useState('');
-  const [selectedOptions, setSelectedOptions] = useState(null);
+
 
 
   const API_ADD_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories';
@@ -62,7 +62,6 @@ const AddCategories = () => {
     
         setHeadCategories(headResponse.data);
         setParentCategories(parentResponse.data);
-        console.log("line 65",attTypesResponse.data)
         setAttTypes(attTypesResponse.data);
         setCategories(categoriesResponse.data);
       } catch (error) {
@@ -182,7 +181,9 @@ useEffect(() => {
         console.log("Selected Attribute Types:", formData.attType);
 
         const responses = await Promise.all(
-          formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId.id}`))
+          formData.attType.map((typeId) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+          )
         );
 
         const data = responses.flatMap((res) => res.data);
@@ -216,7 +217,7 @@ useEffect(() => {
       try {
         const responses = await Promise.all(
           formData.attType.map((typeId) =>
-            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId.id}`)
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
           )
         );
 
@@ -233,7 +234,10 @@ useEffect(() => {
 }, [formData.attType]);
 
 
- 
+const handleRadioChange = (groupName) => {
+  setSelectedGroup(groupName);
+  console.log("Selected Group:", groupName); // Debugging log
+};
 
 //  useEffect(() => {
 //     if (formData.attType.length > 0) {
@@ -271,38 +275,47 @@ useEffect(() => {
 
   // Handle Multi-select Attribute Type Change
   const handleMultiSelectChange = (selectedOption) => {
-    const newSelectedOptions= selectedOption.map((item)=>({
-      id:item.value,
-      name:item.label,
-    }))
-    
     const selectedIds = selectedOption ? selectedOption.map((option) => option.value) : [];
     setFormData((prevState) => ({
       ...prevState,
       attType: selectedIds,
     }));
-    setSelectedGroup([]);
+    setSelectedGroup([]); // Reset selected groups when attribute types change
   };
 
-  const handleGroupSelection = (att_type, attribute_name, attribute_id, e) => {
-    setSelectedGroup((prevSelectedGroup) => {
-      const newSelectedGroup = [...prevSelectedGroup];
-      
-      // Find if the current att_type already exists in selectedGroup
-      const index = newSelectedGroup.findIndex(item => item.att_type === att_type);
-      
-      if (index >= 0) {
-        // If it exists, update its value
-        newSelectedGroup[index] = { att_type, attribute_id };
-      } else {
-        // If it doesn't exist, add a new selection
-        newSelectedGroup.push({ att_type, attribute_id });
-      }
-      
-      return newSelectedGroup;
-    });
-  };
-  
+const handleGroupSelection = (attType, attributeName, attributeId, event) => {
+  const { value, checked } = event.target;
+
+  // Update selectedGroup for the current att_type
+  setSelectedGroup((prevState) => ({
+    ...prevState,
+    [attType]: attributeId,
+  }));
+
+  // Update formData with the selected attribute_id and attribute_name
+  setFormData((prevState) => ({
+    ...prevState,
+    attribute_id: attributeId,
+    attribute_name: attributeName,
+  }));
+
+  // Manage selectedAttributes array
+  setSelectedAttributes((prevState) => {
+    // Filter out previous entries with the same att_type
+    const filteredAttributes = prevState.filter(
+      (attr) => !attr.startsWith(attType)
+    );
+
+    if (checked) {
+      // Add the new selection for the current att_type
+      return [...filteredAttributes, `${attType}:${value}`];
+    }
+    return filteredAttributes; // If unchecked, just return filtered array
+  });
+
+  console.log("selectedGroup", selectedGroup);
+  console.log("selectedAttributes", selectedAttributes);
+};
 
   
   
@@ -421,37 +434,24 @@ const handleInputChange = (e) => {
             attribute_group: categoryData.attribute_group , // Array of selected attributes
             attType: categoryData.att_type || [], // Pre-fill `att_type`
         });
-        
-        // setAttTypes(categoryData.attribute_group)
-       
-       const newData= categoryData.att_type.map((g)=>({
-          value:g.id,
-          label:g.name,
-        }))
-        console.log("newData",newData)
-        setAttTypes(newData)
-        setSelectedOptions(newData)
-     
+
         //Pre-fill table's selected attributes
         
         const initialSelectedGroup = {};
  
         // Assuming `formData.attribute_group` is an array of objects like:
         // [{ att_type: "type1", attribute_id: 1 }, { att_type: "type2", attribute_id: 2 }]
-        categoryData.attribute_group.map((group) => {
+        categoryData.attribute_group.map((group,index) => {
             console.log("Processing group:", group);
-            if ( group.id) {
+            if (group.att_type && group.attribute_id) {
               console.log("inside")
-                initialSelectedGroup[group.att_type] = group.id; // Map `att_type` to `attribute_id`
+                initialSelectedGroup[group.att_type] = group.attribute_id; // Map `att_type` to `attribute_id`
             }
         });
-
-
-        console.log("selected goup",selectedGroup)
+        console.log("after")
         
         console.log("Initial Selected Group:", initialSelectedGroup);
         setSelectedGroup(initialSelectedGroup);
-        // checked={selectedGroup[item.att_type] === item.attribute_id}
         
         setEditMode(true);
         setEditCategoryId(categoryData.id); // Store the ID for updating
