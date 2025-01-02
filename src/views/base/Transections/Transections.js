@@ -478,16 +478,45 @@ const handleProductChange = (event) => {
   };
 
   const handleScan = async (event) => {
+    
     if (event.key === "Enter") {
         const product = await fetchProductDetails(sku);
-        // console.log("Product:", product);
+        console.log(product);
+   
         if (product) {
-            setProducts((prev) => [...prev, product]);
-        } 
-        // else {
-        //     alert("Product not found.");
-        // }
-        setSku(""); // Reset input field
+          setProducts((prev) => {
+              const existingProductIndex = prev.findIndex((p) => p.sku === product.sku);
+              console.log("3");
+
+              if (existingProductIndex !== -1) {
+                console.log("Product already exists, updating quantity");
+                  // If product already exists, update its quantity
+                  const updatedProducts = [...prev];
+                  updatedProducts[existingProductIndex].quantity += 1;
+                  return updatedProducts;
+              }
+               else {
+                console.log("Product doesn't exist, adding to the list");
+                  // If product doesn't exist, add it with a quantity of 1
+                  return [...prev, { ...product, quantity: 1 }];
+              }
+        });
+         }
+        
+      //    else {
+      //     alert("Product not found.");
+      // }
+      setSku(""); // Reset input field
+
+
+        // console.log("Product:", product);
+    //     if (product) {
+    //         setProducts((prev) => [...prev, product]);
+    //     } 
+    //     // else {
+    //     //     alert("Product not found.");
+    //     // }
+    //     setSku(""); // Reset input field
     }
 };
   
@@ -1151,10 +1180,10 @@ const handleReturn = async () => {
 
         <input
                 type="text"
-                // value={sku}
+                value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 onKeyDown={handleScan} // Capture "Enter" key
-                placeholder="Scan or Enter SKU"
+                placeholder="Scan Here..."
                 autoFocus // Focus input for scanner
             />
 
