@@ -15,11 +15,60 @@ import {
   CRow,
 } from '@coreui/react'
 import { DocsExample } from 'src/components'
+import React, { useState, useEffect } from 'react';
+import AppSidebar from './AppSidebar';  // Your sidebar component
+import Transactions from './Transactions';  // Your Transaction page
 
-const Layout = () => {
+function Layout() {
+  const [isSidebarVisible, setSidebarVisible] = useState(true);
+  const [isFullScreen, setFullScreen] = useState(false);
+
+  const toggleSidebar = () => setSidebarVisible(!isSidebarVisible);
+
+  useEffect(() => {
+    if (window.location.pathname === '/Transactions') {
+      setSidebarVisible(false); // Hide sidebar on transaction page
+    } else {
+      setSidebarVisible(true); // Show sidebar on other pages
+    }
+  }, [window.location.pathname]);
+
+  const toggleFullScreen = () => {
+    if (!isFullScreen) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+        document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+        document.documentElement.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { // Firefox
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { // IE/Edge
+        document.msExitFullscreen();
+      }
+    }
+    setFullScreen(!isFullScreen);
+  };
+
+// const Layout = () => {
   return (
+    
     <CRow>
       <CCol xs={12}>
+      <div className={isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}>
+      {isSidebarVisible && <AppSidebar/>}
+      <button onClick={toggleSidebar}>Toggle Sidebar</button>
+      <button onClick={toggleFullScreen}>Toggle Full-Screen</button>
+      <Transactions/>
+    </div>
         <CCard className="mb-4">
           <CCardHeader>
             <strong>Layout</strong> <small>Form grid</small>

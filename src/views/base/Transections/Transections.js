@@ -5,12 +5,22 @@ import { CAlert, CButton } from '@coreui/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, Box, Typography, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { faPrint, faExpand } from '@fortawesome/free-solid-svg-icons';
+import { faPrint, faExpand, faCompress  } from '@fortawesome/free-solid-svg-icons';
+import AppSidebar from '/src/components/AppSidebar.js';  // Your sidebar component
+// import Transections from '/Transections.js';
 
 
   function Transections() {
+    useEffect(() => {
+      document.body.style.overflow = 'hidden';  // Hide scrollbars in full-screen mode
+      return () => {
+        document.body.style.overflow = 'auto';  // Reset overflow after leaving full-screen mode
+      };
+    }, []);
     //fullscreen
     const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  
 
 
     const [products, setProducts] = useState([]); // List of products in the table
@@ -70,21 +80,70 @@ const [closingDate, setClosingDate] = useState("");
 
 
 
+    const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+  
+    useEffect(() => {
+      if (window.location.pathname === '/Transactions') {
+        setIsSidebarVisible(false); // Hide sidebar on transaction page
+      } else {
+        setIsSidebarVisible(true); // Show sidebar on other pages
+      }
+    }, [window.location.pathname]);
+  
+    const toggleFullScreen = () => {
+      if (!isFullscreen) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+          document.documentElement.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
+      }
+      setIsFullscreen(!isFullscreen);
+    };
+  
+
   // Handle Fullscreen Toggle
   const handleFullscreenToggle = () => {
     if (!isFullscreen) {
-        document.documentElement.requestFullscreen();
+      document.documentElement.requestFullscreen();  // Enter Fullscreen
+      setIsSidebarVisible(false);  // Hide Sidebar when fullscreen is active
     } else {
-        document.exitFullscreen();
+      document.exitFullscreen();  // Exit Fullscreen
+      setIsSidebarVisible(true);  // Show Sidebar again
     }
-    setIsFullscreen(!isFullscreen);
-};
+    setIsFullscreen(!isFullscreen);  // Toggle fullscreen state
+  };
+
+  useEffect(() => {
+    // If we're on the Transaction page, hide the sidebar by default
+    setIsSidebarVisible(false);
+
+    return () => {
+      setIsSidebarVisible(true);  // Re-enable the sidebar when leaving this page
+    };
+  }, []);
+
+
   
   // Calculate total payment after discount
   useEffect(() => {
     const calculatedTotal = tableData.reduce((sum, item) => {
       const discountedPrice = item.selling_price - (item.selling_price * item.discount) / 100;
-      return sum + item.quantity * discountedPrice;
+      return sum + item.quantity * discountedPrice + item.additionalFees;
     }, 0);
     setTotalPaymentAfterDiscount(calculatedTotal);
   }, [tableData]);
@@ -644,13 +703,13 @@ const handleProductChange = (event) => {
         });
     };
 
-    const toggleFullScreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    };
+    // const toggleFullScreen = () => {
+    //     if (!document.fullscreenElement) {
+    //         document.documentElement.requestFullscreen();
+    //     } else if (document.exitFullscreen) {
+    //         document.exitFullscreen();
+    //     }
+    // };
 
 
     // Function to handle button click and show alert
@@ -704,7 +763,10 @@ const handleReturn = async () => {
 
 
     return (
-        <div className="transactions-page">
+      <div className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
+       <div className={`transaction-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
+             
+
             <header className="t-header">
               
 
@@ -1162,9 +1224,14 @@ const handleReturn = async () => {
                  {/* Fullscreen Toggle Button */}
                  <div className="t-header-left">
         {/* Fullscreen Toggle Button */}
-        <Button variant="contained" onClick={handleFullscreenToggle} sx={{ marginRight: '10px' }}>
-            <FontAwesomeIcon icon={faExpand} />
-        </Button>
+        
+      {isSidebarVisible && <AppSidebar/>}
+      {/* <button onClick={toggleSidebar}>Toggle Sidebar</button>
+      <button onClick={toggleFullScreen}>Toggle Full-Screen</button> */}
+             <Button variant="contained" onClick={handleFullscreenToggle} sx={{ marginRight: '10px' }}>
+        <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} />
+      </Button>
+              {/* <Transactions/> */}
     </div>
                
             </header>
@@ -1359,7 +1426,11 @@ const handleReturn = async () => {
             <td className="summary-label">SALE</td>
             <td className="summary-value">{totalPaymentAfterDiscount.toFixed(2)}</td>
             <td className="summary-label">PURCHASE</td>
-            <td className="summary-value">1300</td>
+            <td className="summary-value">
+          {(
+            tableData.reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+          ).toFixed(2)}
+        </td>
             <td className="summary-label">DISCOUNT</td>
             <td className="summary-value">{totalDiscount.toFixed(2)}</td>
             <td className="summary-label">DUE</td>
@@ -1453,7 +1524,7 @@ const handleReturn = async () => {
       {(
         tableData.reduce(
           (acc, item) =>
-            acc +
+            acc + 
             item.selling_price * item.quantity -
             (item.selling_price * item.quantity * item.discount) / 100,
           0
@@ -1461,12 +1532,6 @@ const handleReturn = async () => {
       ).toFixed(2)}
     </span>
   
-
-
-      {/* <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
-        {alertMessage}
-      </CAlert> */}
-
       <CButton color="primary" onClick={handlePayment}>
         Payment
       </CButton>
@@ -1477,7 +1542,9 @@ const handleReturn = async () => {
 
 
         </div>
+        </div>
     );
 }
+
 
 export default Transections;

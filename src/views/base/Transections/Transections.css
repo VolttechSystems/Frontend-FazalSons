@@ -4,6 +4,21 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+ 
+}
+.container {
+  width: 100%;
+  font-family: Arial, sans-serif;
+  overflow-y: auto;  /* This ensures scrolling happens if content exceeds */
+  padding-right: 2px;  /* Optional: Add space for scrollbar */
+}
+
+.simple-mode {
+  height: 500px;  /* Simple mode height */
+}
+
+.fullscreen-mode {
+  height: 800px;  /* Fullscreen mode height (full viewport) */
 }
 
 body {
@@ -14,6 +29,8 @@ body {
   padding: 20px;
   color: #333;
   background-color: #f4f4f9;
+  width: 900px;
+  overflow-y: auto;  /* This ensures scrolling for long content */
 }
 
 /* Header Styling */
@@ -30,6 +47,7 @@ body {
   display: flex;
   align-items: center;
 }
+
 
 
 
@@ -129,6 +147,7 @@ body {
   border-collapse: collapse;
   margin: 20px 0;
   background-color: #fff;
+  
 }
 
 .product-table th, 
