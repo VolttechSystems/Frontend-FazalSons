@@ -77,6 +77,7 @@ const [closingDate, setClosingDate] = useState("");
   const [salesData, setSalesData] = useState([]);
   const { outletId } = useParams(); // Get the outletId from the URL parameter
   const [loading,setLoading]=  useState([]);
+  const [sku, setSku] = useState("");
 
 
 
@@ -473,6 +474,52 @@ useEffect(() => {
     fetchNewProductDetails();
   }
 }, [selectedProduct]);
+
+
+
+const handleScan = async (event) => {
+    
+  if (event.key === "Enter") {
+      const product = await fetchProductDetails(sku);
+      console.log(product);
+ 
+      if (product) {
+        setProducts((prev) => {
+            const existingProductIndex = prev.findIndex((p) => p.sku === product.sku);
+            console.log("3");
+
+            if (existingProductIndex !== -1) {
+              console.log("Product already exists, updating quantity");
+                // If product already exists, update its quantity
+                const updatedProducts = [...prev];
+                updatedProducts[existingProductIndex].quantity += 1;
+                return updatedProducts;
+            }
+             else {
+              console.log("Product doesn't exist, adding to the list");
+                // If product doesn't exist, add it with a quantity of 1
+                return [...prev, { ...product, quantity: 1 }];
+            }
+      });
+       }
+      
+    //    else {
+    //     alert("Product not found.");
+    // }
+    setSku(""); // Reset input field
+
+
+      // console.log("Product:", product);
+  //     if (product) {
+  //         setProducts((prev) => [...prev, product]);
+  //     } 
+  //     // else {
+  //     //     alert("Product not found.");
+  //     // }
+  //     setSku(""); // Reset input field
+  }
+};
+
 
 
 
@@ -1273,6 +1320,15 @@ const handleReturn = async () => {
         <button className="add-customer">+</button>
           </Link>
 
+
+          <input
+                type="text"
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                onKeyDown={handleScan} // Capture "Enter" key
+                placeholder="Scan Here..."
+                autoFocus // Focus input for scanner
+            />
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
           <option>Select Product</option>
