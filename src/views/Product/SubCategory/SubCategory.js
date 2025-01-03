@@ -368,12 +368,12 @@ const handleInputChange = (e) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const attributeGroup = Array.isArray(formData.attribute_name)
-      ? formData.attribute_name
-      : formData.attribute_name
-          .split(',')
-          .map((item) => item.trim());
   
+    // const attributeGroup = Array.isArray(formData.attribute_name)
+    //   ? formData.attribute_name
+    //   : formData.attribute_name
+    //       .split(',')
+    //       .map((item) => item.trim());
     const payload = {
       //category_name: formData.category_name,
     sub_category_name: formData.sub_category_name,
@@ -395,9 +395,11 @@ const handleInputChange = (e) => {
         const updatedsubCategories = subcategories.map((cat) =>
           cat.id === editsubCategoryId ? response.data : cat
         );
+        if(response){
         setsubCategories(updatedsubCategories);
         setTableData(updatedsubCategories);
-  
+        }
+        
         setMessage("Sub Category updated successfully.");
       } else {
         // POST request to add new subcategory
