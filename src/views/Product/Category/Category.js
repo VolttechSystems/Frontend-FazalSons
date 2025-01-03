@@ -20,7 +20,7 @@ const AddCategories = () => {
     attribute_id : '',
   });
 
-  
+
   const [headCategories, setHeadCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [attTypes, setAttTypes] = useState([]);
@@ -510,18 +510,6 @@ const handleInputChange = (e) => {
   <Link to="/Product/AddParentCategory">
         <button>+</button>
       </Link>
-
-{/* 
-  <select value={selectedParentCategory}
-  onChange={handleParentCategoryChange}
-  disabled={!selectedHeadCategory}>
-  <option value="">Select Parent Category</option>
-  {Array.isArray(parentCategories) && parentCategories.map(parentCategory => (
-    <option key={parentCategory.id} value={parentCategory.id}>
-      {parentCategory.pc_name}
-    </option>
-  ))}
-</select> */}
 </div>
 
 
