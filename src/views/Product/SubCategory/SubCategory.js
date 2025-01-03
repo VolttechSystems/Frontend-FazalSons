@@ -228,28 +228,41 @@ const handleParentCategoryChange = async (e) => {
   
   
   
-// Fetch Groups Based on Selected Attribute Types
-// useEffect(() => {
-//   if (formData.attType.length > 0) {
-//     const fetchGroups = async () => {
-//       try {
-//         const responses = await Promise.all(
-//           formData.attType.map((typeId) =>
-//             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
-//           )
-//         );
 
-//         const data = responses.flatMap((res) => res.data);
-//         setTableData(data);
-//       } catch (error) {
-//         console.error('Error fetching groups:', error);
-//       }
-//     };
-//     fetchGroups();
-//   } else {
-//     setTableData([]);
-//   }
-// }, [formData.attType]);
+  //Fetch attributes and variations
+useEffect(() => {
+  if (formData.attType.length > 0) {
+    const fetchAttributes = async () => {
+      try {
+        console.log("Selected Attribute Types:", formData.attType);
+
+        const responses = await Promise.all(
+          formData.attType.map((typeId) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+          )
+        );
+
+        const data = responses.flatMap((res) => res.data);
+
+        const groupedData = data.map((group) => ({
+          att_type: group.att_type || "Unnamed Group", 
+          attribute_id: Array.isArray(group.attribute_name) ? group.attribute_name : [], 
+            variation: Array.isArray(group.variation) ? group.variation : [], 
+        }));
+
+        console.log("Fetched Attributes for Table:", groupedData);
+        setTableData(groupedData);
+      } catch (error) {
+        console.error("Error fetching Attributes:", error);
+      }
+    };
+
+    fetchAttributes();
+  } else {
+    // setTableData([]); // Clear table when no Attribute Type is selected
+  }
+}, [formData.attType]);
+
 
 
 const handleRadioChange = (groupName) => {
@@ -268,7 +281,6 @@ useEffect(() => {
             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
           )
         );
-
         const data = responses.flatMap((res) => res.data);
         setTableData(data);
       } catch (error) {
@@ -280,6 +292,8 @@ useEffect(() => {
     setTableData([]);
   }
 }, [formData.attType]);
+
+
 
   // Handle Multi-select Attribute Type Change
   const handleMultiSelectChange = (selectedOption) => {
@@ -326,7 +340,6 @@ const handleGroupSelection = (attType, attributeName, attributeId, event) => {
 };
 
   
-  
 
 const handleInputChange = (e) => {
   const { name, value, type, checked } = e.target;
@@ -345,11 +358,12 @@ const handleInputChange = (e) => {
 };
 
   
+     useEffect(() => {
+      console.log({selectedGroup})
+    }, [selectedGroup]);
+     7
+     
   
-  
-  
-  
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();

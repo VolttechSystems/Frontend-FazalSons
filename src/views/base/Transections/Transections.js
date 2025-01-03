@@ -480,7 +480,7 @@ useEffect(() => {
 const handleScan = async (event) => {
     
   if (event.key === "Enter") {
-      const product = await fetchProductDetails(sku);
+      const product = await fetchProductDetailbyScanner(sku);
       console.log(product);
  
       if (product) {
@@ -649,10 +649,57 @@ const handleProductChange = (event) => {
     }
   };
   
+
+
   
   useEffect(() => {
     console.log("Updated Table Data:", tableData);
   }, [tableData]);
+
+//fetch product by scanner
+  
+const fetchProductDetailbyScanner = async (sku) => {
+  console.log("Fetching product details for SKU:", sku); // Debug log
+  try {
+      const response = await fetch(
+          `http://195.26.253.123/pos/transaction/products_detail/${sku}/`
+      );
+      if (!response.ok) {
+          console.error("API Error:", response.status, response.statusText);
+          return;
+      }
+      const product = await response.json();
+      console.log("Product Details Fetched:", product); // Debug log
+
+      setTableData((prevTableData) => {
+          // Check if the SKU already exists in the table data
+          const existingProductIndex = prevTableData.findIndex(
+              (item) => item.sku === sku
+          );
+
+          if (existingProductIndex !== -1) {
+              // Update the quantity of the existing product
+              const updatedTableData = [...prevTableData];
+              updatedTableData[existingProductIndex].quantity += 1;
+              return updatedTableData;
+          } else {
+              // Add a new product to the table data
+              return [
+                  ...prevTableData,
+                  {
+                      sku: product.sku || "N/A",
+                      product_name: product.product_name || "Unknown Product",
+                      quantity: 1,
+                      discount: 0,
+                      selling_price: product.selling_price || 0,
+                  },
+              ];
+          }
+      });
+  } catch (error) {
+      console.error("Error fetching product details:", error);
+  }
+};
 
   
   const groupByProductName = (products) => {

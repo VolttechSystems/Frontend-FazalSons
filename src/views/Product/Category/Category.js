@@ -20,6 +20,7 @@ const AddCategories = () => {
     attribute_id : '',
   });
 
+  
   const [headCategories, setHeadCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [attTypes, setAttTypes] = useState([]);
