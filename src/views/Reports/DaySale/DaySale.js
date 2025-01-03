@@ -222,18 +222,36 @@ const DaySale = () => {
                   <strong>Amount:</strong> {payment.amount}
                 </Typography>
               ))}
-              <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-                Returns
-              </Typography>
-              {detailData.returns.length > 0 ? (
-                detailData.returns.map((returnItem, index) => (
-                  <Typography key={index} sx={{ marginBottom: 1 }}>
-                    <strong>Return Details:</strong> {JSON.stringify(returnItem)}
-                  </Typography>
-                ))
-              ) : (
-                <Typography>No Returns</Typography>
-              )}
+             <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
+  Returns
+</Typography>
+{detailData.returns.length > 0 ? (
+  <Table>
+    <TableHead>
+      <TableRow>
+        <TableCell>Product</TableCell>
+        <TableCell>Variation</TableCell>
+        <TableCell>Quantity</TableCell>
+        <TableCell>Per Rate</TableCell>
+        <TableCell>Item Total</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {detailData.returns.map((returnItem, index) => (
+        <TableRow key={index}>
+          <TableCell>{returnItem.product}</TableCell>
+          <TableCell>{returnItem.variation}</TableCell>
+          <TableCell>{returnItem.quantity}</TableCell>
+          <TableCell>{returnItem.per_rate}</TableCell>
+          <TableCell>{returnItem.item_total}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+) : (
+  <Typography>No Returns</Typography>
+)}
+
             </Box>
           )}
         </DialogContent>
