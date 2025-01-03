@@ -477,16 +477,78 @@ const handleProductChange = (event) => {
     }
   };
 
+
+
+
+  /////// Simulate fetching product details from the backend
+//   const fetchProductDetail = async (sku) => {
+//     try {
+//         // Replace with your actual API call
+//         const response = await fetch(
+//           `http://195.26.253.123/pos/transaction/products_detail/${sku}/`
+//         );
+//         if (!response.ok) throw new Error("Product not found");
+//         const product = await response.json();
+//         return product;
+//     } catch (error) {
+//         console.error(error.message);
+//         return null;
+//     }
+// };
+
+
+const fetchProductDetail = async (sku) => {
+  console.log("Fetching product details for SKU:", sku); // Debug log
+  try {
+      const response = await fetch(
+          `http://195.26.253.123/pos/transaction/products_detail/${sku}/`
+      );
+      if (!response.ok) {
+          console.error("API Error:", response.status, response.statusText);
+          return;
+      }
+      const product = await response.json();
+      console.log("Product Details Fetched:", product); // Debug log
+
+      setTableData((prevTableData) => {
+          // Check if the SKU already exists in the table data
+          const existingProductIndex = prevTableData.findIndex(
+              (item) => item.sku === sku
+          );
+
+          if (existingProductIndex !== -1) {
+              // Update the quantity of the existing product
+              const updatedTableData = [...prevTableData];
+              updatedTableData[existingProductIndex].quantity += 1;
+              return updatedTableData;
+          } else {
+              // Add a new product to the table data
+              return [
+                  ...prevTableData,
+                  {
+                      sku: product.sku || "N/A",
+                      product_name: product.product_name || "Unknown Product",
+                      quantity: 1,
+                      discount: 0,
+                      selling_price: product.selling_price || 0,
+                  },
+              ];
+          }
+      });
+  } catch (error) {
+      console.error("Error fetching product details:", error);
+  }
+};
+
+
   const handleScan = async (event) => {
     
     if (event.key === "Enter") {
-        const product = await fetchProductDetails(sku);
-        console.log(product);
-   
+        const product = await fetchProductDetail(sku);
+    
         if (product) {
           setProducts((prev) => {
               const existingProductIndex = prev.findIndex((p) => p.sku === product.sku);
-              console.log("3");
 
               if (existingProductIndex !== -1) {
                 console.log("Product already exists, updating quantity");
