@@ -81,7 +81,7 @@ const DaySale = () => {
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", color: "#333" }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", color: "#333" ,   textAlign: "center" }}>
           Sale by Day
         </Typography>
         {error && (
