@@ -449,6 +449,7 @@ const handleInputChange = (e) => {
         headCategory:  subcategoryData?.head_id, // Update if necessary
         selectedParentCategory: subcategoryData?.parent_id,
         selectedCategory: subcategoryData?.category_id || '',
+        category_name: subcategoryData?.category_id || '',
         symbol: subcategoryData.symbol || '',
         addSubCategory: subcategoryData.subcategory_option === "True",
         description: subcategoryData.description || '',
