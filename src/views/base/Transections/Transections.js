@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import './Transections.css';
 import { CAlert, CButton } from '@coreui/react';
@@ -6,6 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, S
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+// import React, { useState, useEffect, useRef } from "react";
 
 
 
@@ -60,6 +61,39 @@ const [closingDate, setClosingDate] = useState("");
   const [loading,setLoading]=  useState([]);
 
   const [sku, setSku] = useState(""); // Holds the scanned SKU
+  const [tabIndex, setTabIndex] = useState(-1); // Start with no tabIndex
+  const timerRef = useRef(null); // Reference for the timer
+  const inputRef = useRef(null);
+
+ 
+const resetTimer = () => {
+    clearTimeout(timerRef.current); // Clear previous timer
+    timerRef.current = setTimeout(() => {
+        setTabIndex(0); // Enable tabIndex
+        if (inputRef.current) {
+            inputRef.current.focus(); // Automatically focus the input
+        }
+    }, 15000); // Trigger after 30 seconds
+};
+
+
+useEffect(() => {
+  // Reset the timer whenever the user interacts with the page
+  window.addEventListener("click", resetTimer);
+  window.addEventListener("mousemove", resetTimer);
+  window.addEventListener("keydown", resetTimer);
+
+  // Cleanup on unmount
+  return () => {
+      clearTimeout(timerRef.current);
+      window.removeEventListener("click", resetTimer);
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("keydown", resetTimer);
+  };
+}, []);
+
+
+
   
   // Calculate total payment after discount
   useEffect(() => {
@@ -478,25 +512,6 @@ const handleProductChange = (event) => {
   };
 
 
-
-
-  /////// Simulate fetching product details from the backend
-//   const fetchProductDetail = async (sku) => {
-//     try {
-//         // Replace with your actual API call
-//         const response = await fetch(
-//           `http://195.26.253.123/pos/transaction/products_detail/${sku}/`
-//         );
-//         if (!response.ok) throw new Error("Product not found");
-//         const product = await response.json();
-//         return product;
-//     } catch (error) {
-//         console.error(error.message);
-//         return null;
-//     }
-// };
-
-
 const fetchProductDetail = async (sku) => {
   console.log("Fetching product details for SKU:", sku); // Debug log
   try {
@@ -608,11 +623,55 @@ const fetchProductDetail = async (sku) => {
 
 
 
-  const handlePayment = async () => {
-    const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
-const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
+//   const handlePayment = async () => {
+//     const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
+// const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
   
-    const payload = {
+//     const payload = {
+//       sku: tableData.map(item => item.sku),
+//       quantity: tableData.map(item => item.quantity),
+//       rate: tableData.map(item => item.selling_price),
+//       item_discount: tableData.map(item => item.discount),
+//       cust_code: selectedCustomer,
+//       overall_discount: "0",
+//       outlet_code: outletId,
+//       saleman_code: selectedSalesman,
+//       advanced_payment: advancePayment,
+//       fee_code: feeCodes,  // Pass as an array
+//   fee_amount: fees,  // Pass as an array
+//     };
+  
+//     try {
+//       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       });
+  
+//       if (response.ok) {
+//         const result = await response.json();
+//         setAlertMessage("Transaction added successfully!");
+//         setVisible(true);
+//       } else {
+//         const errorData = await response.json();
+//         console.error("API Error Response:", errorData);
+//         setAlertMessage("Failed to add transaction! Please check your input.");
+//         setVisible(true);
+//       }
+//     } catch (error) {
+//       console.error("Error adding transaction:", error);
+//       setAlertMessage("An error occurred while processing the payment.");
+//       setVisible(true);
+//     }
+//   };
+
+
+
+const handlePayment = async () => {
+  const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
+  const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
+
+  const payload = {
       sku: tableData.map(item => item.sku),
       quantity: tableData.map(item => item.quantity),
       rate: tableData.map(item => item.selling_price),
@@ -623,32 +682,37 @@ const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
       saleman_code: selectedSalesman,
       advanced_payment: advancePayment,
       fee_code: feeCodes,  // Pass as an array
-  fee_amount: fees,  // Pass as an array
-    };
-  
-    try {
+      fee_amount: fees,  // Pass as an array
+  };
+
+  try {
       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
       });
-  
+
+      const result = await response.json(); // Parse the JSON response
+
       if (response.ok) {
-        const result = await response.json();
-        setAlertMessage("Transaction added successfully!");
-        setVisible(true);
+          setAlertMessage(result.message || "Transaction added successfully!"); // Use backend message if available
+          setVisible(true);
       } else {
-        const errorData = await response.json();
-        console.error("API Error Response:", errorData);
-        setAlertMessage("Failed to add transaction! Please check your input.");
-        setVisible(true);
+          const nonFieldErrors = result.non_field_errors;
+          if (nonFieldErrors && nonFieldErrors.length > 0) {
+              setAlertMessage(nonFieldErrors[0]); // Display the first non-field error
+          } else {
+              setAlertMessage("Failed to add transaction! Please check your input.");
+          }
+          setVisible(true);
       }
-    } catch (error) {
+  } catch (error) {
       console.error("Error adding transaction:", error);
       setAlertMessage("An error occurred while processing the payment.");
       setVisible(true);
-    }
-  };
+  }
+};
+
   
   
   
@@ -1239,16 +1303,26 @@ const handleReturn = async () => {
             </option>
           ))}
         </select>
-
         <input
+                ref={inputRef}
+                type="text"
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                onKeyDown={handleScan} // Capture "Enter" key
+                placeholder="Scan Here..."
+                tabIndex={tabIndex} // Dynamically set tabIndex
+                autoFocus // Keep input in focus
+            />
+
+
+        {/* <input
                 type="text"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 onKeyDown={handleScan} // Capture "Enter" key
                 placeholder="Scan Here..."
                 autoFocus // Focus input for scanner
-            />
-
+            /> */}
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
           <option>Select Product</option>
