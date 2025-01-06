@@ -362,8 +362,8 @@ const handleInputChange = (e) => {
         addSubCategory: false,
         status: 'active',
         attType: [],
-        // attribute_name: " ",
-        //  attribute_id : null,
+    attribute_group: [],
+    attribute_id : '',
       });
       
       setEditMode(false);
@@ -384,6 +384,11 @@ const handleInputChange = (e) => {
         const categoryData = response.data;
         //console.log(categoryData[0].category_name, 'bb');
         console.log({categoryData})
+        console.log(categoryData.att_type, 'att_type data');
+
+          // Extract attType IDs
+    const attTypeIds = categoryData.att_type.map((type) => type.id);
+        
 
         // Pre-fill form fields, including `att_type`
         setFormData({
@@ -395,7 +400,7 @@ const handleInputChange = (e) => {
             status: categoryData.status || 'active',
             pc_name: categoryData?.parent_id, // Update if necessary
             attribute_group: categoryData.attribute_group , // Array of selected attributes
-            attType: categoryData.att_type || [], // Pre-fill `att_type`
+            attType: attTypeIds, // Populate attType with IDs
         });
 
         //Pre-fill table's selected attributes
@@ -435,6 +440,8 @@ const handleInputChange = (e) => {
     } catch (error) {
         setMessage('Failed to fetch category details.');
     }
+    
+
 };
 
   
@@ -606,6 +613,10 @@ const handleInputChange = (e) => {
           <Select
             isMulti
             options={attTypes.map((type) => ({ value: type.id, label: type.att_type }))}
+            value={formData.attType.map((id) => {
+              const matchedType = attTypes.find((type) => type.id === id); // Match ID with options
+              return matchedType ? { value: matchedType.id, label: matchedType.att_type } : null;
+            }).filter(Boolean)} // Pre-fill selected options
             onChange={handleMultiSelectChange}
           />
         </div>

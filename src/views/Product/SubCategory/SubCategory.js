@@ -427,9 +427,9 @@ const handleInputChange = (e) => {
         addSubCategory: false,
         status: 'active',
         attType: [],
-        // attribute_name: " ",
-        //  attribute_id : null,
-      });
+        attribute_group: [],
+        attribute_id : '',
+          });
       setEditMode(false);
       setEditsubCategoryId(null);
     } catch (error) {
@@ -443,6 +443,13 @@ const handleInputChange = (e) => {
       // Fetch category details from API
       const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${subcategory.id}`);
       const subcategoryData = response.data;
+      console.log({subcategoryData})
+      console.log(subcategoryData.att_type, 'att_type data');
+         // Extract attType IDs
+    const attTypeIds = subcategoryData.att_type.map((type) => type.id);
+        
+
+
   console.log({subcategoryData})
       // Pre-fill form fields
       setFormData({
@@ -457,7 +464,7 @@ const handleInputChange = (e) => {
         status: subcategoryData.status || 'active',
         // pc_name: subcategoryData?.parent_id, // Update if necessary
         attribute_group: subcategoryData.attribute_group ,// Array of selected attributes
-        attType: subcategoryData.att_type || [], // Pre-fill `att_type`
+        attType: attTypeIds, // Populate attType with IDs
       });
   
       // Pre-fill table's selected attributes
@@ -681,6 +688,10 @@ const handleInputChange = (e) => {
           <Select
             isMulti
             options={attTypes.map((type) => ({ value: type.id, label: type.att_type }))}
+            value={formData.attType.map((id) => {
+              const matchedType = attTypes.find((type) => type.id === id); // Match ID with options
+              return matchedType ? { value: matchedType.id, label: matchedType.att_type } : null;
+            }).filter(Boolean)} // Pre-fill selected options
             onChange={handleMultiSelectChange}
           />
         </div>
