@@ -64,11 +64,16 @@ const [attributes, setAttributes] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [nextTab, setNextTab] = useState(null);
   const [isCategoryDialogOpen, setCategoryDialogOpen] = React.useState(false);
+  const [error, setError] = useState("");
   
    // Function to handle button click and open the dialog
    const handleButtonClick = () => {
     setIsDialogOpen(true);
   };
+
+ 
+
+
 
   // Function to handle dialog close (Delete all products on "OK")
   const handleDialogClose = (confirmDelete) => {
@@ -510,10 +515,14 @@ const colorOptions = [
       ...formData,
       [name]: value,
     });
-  
-  
-   
-  };
+  // Perform validation for Selling Price
+  if (name === "selling_price" && Number(value) <= Number(formData.cost_price)) {
+    setError("Selling Price must be greater than Cost Price");
+  } else {
+    setError("");
+  }
+};
+
 
   const handleBrandChange = (e) => {
     const selectedBrandId = e.target.value; // Get selected brand ID
@@ -1046,6 +1055,7 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                   required
                 />
               </label>
+              {error && <p style={{ color: "red" }}>{error}</p>}
               <label style={{ fontWeight: "bold" }}>
                 Selling Price * 
                 <input
@@ -1093,7 +1103,8 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
                 />
               </label>
               {/* <button type="button" onClick={handleAdd}>Add Product</button> */}
-              <button type="button" onClick={editMode ? handleUpdate : handleAdd}> 
+             
+              <button type="button"  disabled={!!error} onClick={editMode ? handleUpdate : handleAdd}> 
     {editMode ? 'Update Product' : 'Add Product'}
   </button>
 
