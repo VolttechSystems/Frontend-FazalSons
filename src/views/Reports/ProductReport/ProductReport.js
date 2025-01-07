@@ -49,17 +49,24 @@ const ProductReport = () => {
   }, [selectedOutlet, selectedDate]);
 
   const fetchDetailData = (invoiceCode) => {
-    // Fetch product-wise return details
     axios
       .get(
         `http://195.26.253.123/pos/report/product-wise-return-detail/${invoiceCode}/`
       )
       .then((response) => {
-        setDetailData(response.data);
+        const data = response.data;
+        if (Array.isArray(data) && data.length > 0) {
+          setDetailData({
+            items: data,
+          });
+        } else {
+          setDetailData({ items: [] }); // Handle no data case
+        }
         setShowModal(true);
       })
       .catch(() => setError("Failed to fetch detailed report data."));
   };
+  
 
   const closeModal = () => {
     setShowModal(false);
@@ -152,45 +159,50 @@ const ProductReport = () => {
         <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth>
           <DialogTitle sx={{ fontWeight: "bold" }}>Return Details</DialogTitle>
           <DialogContent>
-            {detailData && (
-              <Box>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Invoice Code:</strong> {detailData.invoice_code}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Customer Name:</strong> {detailData.customer_name}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Date:</strong> {detailData.date}
-                </Typography>
-                <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-                  Items
-                </Typography>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Product</TableCell>
-                      <TableCell>Variation</TableCell>
-                      <TableCell>Quantity</TableCell>
-                      <TableCell>Per Rate</TableCell>
-                      <TableCell>Total</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {detailData.items.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{item.product}</TableCell>
-                        <TableCell>{item.variation}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>{item.per_rate}</TableCell>
-                        <TableCell>{item.item_total}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            )}
-          </DialogContent>
+  {detailData && (
+    <Box>
+      <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
+        Items
+      </Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Product</TableCell>
+            <TableCell>Variation</TableCell>
+            <TableCell>SKU</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Rate</TableCell>
+            <TableCell>Discount</TableCell>
+            <TableCell>Total</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {detailData.items && detailData.items.length > 0 ? (
+            detailData.items.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.product}</TableCell>
+                <TableCell>{item.variation}</TableCell>
+                <TableCell>{item.sku}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>{item.rate}</TableCell>
+                <TableCell>{item.discount}</TableCell>
+                <TableCell>{item.total}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} align="center">
+                No items found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </Box>
+  )}
+</DialogContent>
+
+
           <DialogActions>
             <Button onClick={closeModal} variant="contained" color="secondary">
               Close
