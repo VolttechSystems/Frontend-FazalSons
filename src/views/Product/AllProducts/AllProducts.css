@@ -1,0 +1,57 @@
+/* AllProducts.css */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+    text-align: left;
+  }
+  
+  th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+    color: #333;
+    text-transform: uppercase;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  button {
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  .dialog-container {
+    padding: 20px;
+  }
+  
+  .dialog-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  

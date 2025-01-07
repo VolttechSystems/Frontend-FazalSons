@@ -9,6 +9,7 @@ const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 
 const POS = React.lazy(() => import('./views/base/POS/POSTable'))
+const POSTable2 = React.lazy(() => import('./views/base/POSTable2/POSTable2'))
 const Salesman = React.lazy(() => import('./views/Admin/Salesman/Salesman'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
 const Transections = React.lazy(() => import('./views/base/Transections/Transections'))
@@ -72,9 +73,10 @@ const routes = [
   { path: '/pages/barcode/NewBarcode/:sku', name: 'NewBarcode', element: NewBarcode }, // SKU added here
   
   { path: '/base/POS', name: 'POS', element: POS }, // POS
+  { path: '/base/POSTable2', name: 'POSTable2', element: POSTable2 }, // POSTable2
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
   { path: '/Admin/Salesman', name: 'Salesman', element: Salesman }, // Salesman
-  { path: '/Product/AllProducts', name: 'AllProducts', element: AllProducts }, //AllProducts
+  { path: '/Product/AllProducts/:outletId', name: 'AllProducts', element: AllProducts }, //AllProducts
   { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
   { path: '/Product/AddProduct', name: 'AddProduct', element: AddProduct }, //AddProduct

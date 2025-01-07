@@ -174,7 +174,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'All Product',
-        to: '/Product/AllProducts',
+        to: 'base/POSTable2',
         
       },
       {
