@@ -1,0 +1,12 @@
+@media print {
+    body * {
+      visibility: hidden; /* Hide all content */
+    }
+    div[ref] {
+      visibility: visible; /* Show only the barcode */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+  }
