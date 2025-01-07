@@ -1,0 +1,13 @@
+
+@media print {
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0;
+      padding: 0;
+    }
+  
+    div {
+      page-break-inside: avoid;
+    }
+  }

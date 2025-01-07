@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef} from 'react';
 import axios from "axios";
 import './Transections.css';
 import { CAlert, CButton } from '@coreui/react';
@@ -60,6 +60,9 @@ import AppSidebar from '/src/components/AppSidebar.js';  // Your sidebar compone
   const [dueinvoices, setdueInvoices] = useState([]);
   //const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
+  const [tabIndex, setTabIndex] = useState(-1); // Start with no tabIndex
+  const timerRef = useRef(null); // Reference for the timer
+  const inputRef = useRef(null);
 
   //NEW
   const [price, setPrice] = useState(0); // Price of the product
@@ -82,7 +85,31 @@ const [closingDate, setClosingDate] = useState("");
 
 
     const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+
+    const resetTimer = () => {
+      clearTimeout(timerRef.current); // Clear previous timer
+      timerRef.current = setTimeout(() => {
+          setTabIndex(0); // Enable tabIndex
+          if (inputRef.current) {
+              inputRef.current.focus(); // Automatically focus the input
+          }
+      }, 15000); //
+  };
   
+  useEffect(() => {
+    // Reset the timer whenever the user interacts with the page
+    window.addEventListener("click", resetTimer);
+    window.addEventListener("mousemove", resetTimer);
+    window.addEventListener("keydown", resetTimer);
+  
+    // Cleanup on unmount
+    return () => {
+        clearTimeout(timerRef.current);
+        window.removeEventListener("click", resetTimer);
+        window.removeEventListener("mousemove", resetTimer);
+        window.removeEventListener("keydown", resetTimer);
+    };
+  }, []);
     useEffect(() => {
       if (window.location.pathname === '/Transactions') {
         setIsSidebarVisible(false); // Hide sidebar on transaction page
@@ -1369,12 +1396,14 @@ const handleReturn = async () => {
 
 
           <input
+                ref={inputRef}
                 type="text"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 onKeyDown={handleScan} // Capture "Enter" key
                 placeholder="Scan Here..."
-                autoFocus // Focus input for scanner
+                tabIndex={tabIndex} // Dynamically set tabIndex
+                autoFocus // Keep input in focus
             />
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
