@@ -102,7 +102,7 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Profit Sale',
+        name: 'Profit Sale Report',
         to: '/Reports/ProfitReport',
         
       },
@@ -118,8 +118,18 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Sale by Day',
+        name: 'Sale by Day Report',
         to: '/Reports/DaySale',
+      },
+      {
+        component: CNavItem,
+        name: 'Product wise Sale Report',
+        to: '/Reports/ProductReport',
+      },
+      {
+        component: CNavItem,
+        name: 'Payment Method Report',
+        to: '/Reports/PaymentReport',
       },
       
     ],

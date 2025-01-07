@@ -1594,7 +1594,7 @@ const handleReturn = async () => {
             </option>
           ))}
         </select>
-        <Link to="/Admin/PaymentMethod">
+        <Link to="/Admin/Payment">
           <button className="add-payment-method-btn">+</button>
         </Link>
       </div>
