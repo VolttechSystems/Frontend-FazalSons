@@ -1,22 +1,40 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect , useRef} from 'react';
 import axios from "axios";
 import './Transections.css';
 import { CAlert, CButton } from '@coreui/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, Box, Typography, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-// import React, { useState, useEffect, useRef } from "react";
-
-
+import { faPrint, faExpand, faCompress  } from '@fortawesome/free-solid-svg-icons';
+import AppSidebar from '/src/components/AppSidebar.js';  // Your sidebar component
+// import Transections from '/Transections.js';
 
 
   function Transections() {
+    useEffect(() => {
+      document.body.style.overflow = 'hidden';  // Hide scrollbars in full-screen mode
+      return () => {
+        document.body.style.overflow = 'auto';  // Reset overflow after leaving full-screen mode
+      };
+    }, []);
+    //fullscreen
+    const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  
+
+
     const [products, setProducts] = useState([]); // List of products in the table
     const [salesmen, setSalesmen] = useState([]);
     const [customer, setCustomer] = useState([]);
     const [additionalFees, setAdditionalFees] = useState([]);
+    
     const [selectedFees, setSelectedFees] = useState([]);
+
+
+    const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPayments, setSelectedPayments] = useState([]);
+
+
     const [deliveryFees, setDeliveryFees] = useState([]);
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [allProducts, setAllProducts] = useState({});
@@ -42,6 +60,9 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
   const [dueinvoices, setdueInvoices] = useState([]);
   //const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
+  const [tabIndex, setTabIndex] = useState(-1); // Start with no tabIndex
+  const timerRef = useRef(null); // Reference for the timer
+  const inputRef = useRef(null);
 
   //NEW
   const [price, setPrice] = useState(0); // Price of the product
@@ -59,39 +80,90 @@ const [closingDate, setClosingDate] = useState("");
   const [salesData, setSalesData] = useState([]);
   const { outletId } = useParams(); // Get the outletId from the URL parameter
   const [loading,setLoading]=  useState([]);
-
-  const [sku, setSku] = useState(""); // Holds the scanned SKU
-  const [tabIndex, setTabIndex] = useState(-1); // Start with no tabIndex
-  const timerRef = useRef(null); // Reference for the timer
-  const inputRef = useRef(null);
-
- 
-const resetTimer = () => {
-    clearTimeout(timerRef.current); // Clear previous timer
-    timerRef.current = setTimeout(() => {
-        setTabIndex(0); // Enable tabIndex
-        if (inputRef.current) {
-            inputRef.current.focus(); // Automatically focus the input
-        }
-    }, 15000); // Trigger after 30 seconds
-};
+  const [sku, setSku] = useState("");
 
 
-useEffect(() => {
-  // Reset the timer whenever the user interacts with the page
-  window.addEventListener("click", resetTimer);
-  window.addEventListener("mousemove", resetTimer);
-  window.addEventListener("keydown", resetTimer);
 
-  // Cleanup on unmount
-  return () => {
-      clearTimeout(timerRef.current);
-      window.removeEventListener("click", resetTimer);
-      window.removeEventListener("mousemove", resetTimer);
-      window.removeEventListener("keydown", resetTimer);
+    const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+
+    const resetTimer = () => {
+      clearTimeout(timerRef.current); // Clear previous timer
+      timerRef.current = setTimeout(() => {
+          setTabIndex(0); // Enable tabIndex
+          if (inputRef.current) {
+              inputRef.current.focus(); // Automatically focus the input
+          }
+      }, 15000); //
   };
-}, []);
+  
+  useEffect(() => {
+    // Reset the timer whenever the user interacts with the page
+    window.addEventListener("click", resetTimer);
+    window.addEventListener("mousemove", resetTimer);
+    window.addEventListener("keydown", resetTimer);
+  
+    // Cleanup on unmount
+    return () => {
+        clearTimeout(timerRef.current);
+        window.removeEventListener("click", resetTimer);
+        window.removeEventListener("mousemove", resetTimer);
+        window.removeEventListener("keydown", resetTimer);
+    };
+  }, []);
+    useEffect(() => {
+      if (window.location.pathname === '/Transactions') {
+        setIsSidebarVisible(false); // Hide sidebar on transaction page
+      } else {
+        setIsSidebarVisible(true); // Show sidebar on other pages
+      }
+    }, [window.location.pathname]);
+  
+    const toggleFullScreen = () => {
+      if (!isFullscreen) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+          document.documentElement.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
+      }
+      setIsFullscreen(!isFullscreen);
+    };
+  
 
+  // Handle Fullscreen Toggle
+  const handleFullscreenToggle = () => {
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen();  // Enter Fullscreen
+      setIsSidebarVisible(false);  // Hide Sidebar when fullscreen is active
+    } else {
+      document.exitFullscreen();  // Exit Fullscreen
+      setIsSidebarVisible(true);  // Show Sidebar again
+    }
+    setIsFullscreen(!isFullscreen);  // Toggle fullscreen state
+  };
+
+  useEffect(() => {
+    // If we're on the Transaction page, hide the sidebar by default
+    setIsSidebarVisible(false);
+
+    return () => {
+      setIsSidebarVisible(true);  // Re-enable the sidebar when leaving this page
+    };
+  }, []);
 
 
   
@@ -176,15 +248,6 @@ useEffect(() => {
 }, [outletId]); // Dependency array includes outletId to refetch invoices on change
 
 
-
-// useEffect(() => {
-//   console.log("----")
-//   console.log(invoices)
-//   console.log("----")
-// },[invoices])
-  
-   // Fetch invoices from the API
-  // Fetch due invoices dynamically based on outletId
 useEffect(() => {
   const fetchdueInvoices = async () => {
     try {
@@ -262,6 +325,48 @@ const handleClose = () => {
     ]);
   }
 };
+
+
+//PAYMENT METHOD 
+
+// Handle Payment Method Selection
+const handlePaymentSelection = (event) => {
+  const selectedPaymentId = event.target.value;
+  const selectedPayment = paymentMethods.find(
+    (method) => method.id === parseInt(selectedPaymentId)
+  );
+
+  // Avoid duplicates
+  if (selectedPayment && !selectedPayments.some((payment) => payment.id === selectedPayment.id)) {
+    setSelectedPayments([
+      ...selectedPayments,
+      {
+        ...selectedPayment,
+        payment_method_name: selectedPayment.pm_name || "", // Payment method name from dropdown
+        payment_method_amount: "", // Default payment amount (number input)
+      },
+    ]);
+  }
+};
+
+// Handle input change for payment method amount
+const handlePaymentInputChange = (paymentId, value) => {
+  setSelectedPayments((prevPayments) =>
+    prevPayments.map((payment) =>
+      payment.id === paymentId
+        ? { ...payment, payment_method_amount: value }
+        : payment
+    )
+  );
+};
+
+// Remove selected payment method
+const handleRemovePayment = (paymentId) => {
+  setSelectedPayments((prevPayments) =>
+    prevPayments.filter((payment) => payment.id !== paymentId)
+  );
+};
+//PAYMENT
 
 // Handle Input Change for Fee Value
 const handleInputChange = (id, value) => {
@@ -399,6 +504,52 @@ useEffect(() => {
 
 
 
+const handleScan = async (event) => {
+    
+  if (event.key === "Enter") {
+      const product = await fetchProductDetailbyScanner(sku);
+      console.log(product);
+ 
+      if (product) {
+        setProducts((prev) => {
+            const existingProductIndex = prev.findIndex((p) => p.sku === product.sku);
+            console.log("3");
+
+            if (existingProductIndex !== -1) {
+              console.log("Product already exists, updating quantity");
+                // If product already exists, update its quantity
+                const updatedProducts = [...prev];
+                updatedProducts[existingProductIndex].quantity += 1;
+                return updatedProducts;
+            }
+             else {
+              console.log("Product doesn't exist, adding to the list");
+                // If product doesn't exist, add it with a quantity of 1
+                return [...prev, { ...product, quantity: 1 }];
+            }
+      });
+       }
+      
+    //    else {
+    //     alert("Product not found.");
+    // }
+    setSku(""); // Reset input field
+
+
+      // console.log("Product:", product);
+  //     if (product) {
+  //         setProducts((prev) => [...prev, product]);
+  //     } 
+  //     // else {
+  //     //     alert("Product not found.");
+  //     // }
+  //     setSku(""); // Reset input field
+  }
+};
+
+
+
+
 // For the Product Dropdown
 const handleProductChange = (event) => {
   const selectedValue = event.target.value;
@@ -430,6 +581,19 @@ const handleProductChange = (event) => {
                 console.error('Error fetching additional fees:', error);
             }
         };
+
+        const fetchPayment = async () => {
+          try {
+            const response = await fetch('http://195.26.253.123/pos/transaction/add_payment');
+            const data = await response.json();
+            if (data && Array.isArray(data)) {
+              setPaymentMethods(data);
+            }
+          } catch (error) {
+            console.error('Error fetching payment methods:', error);
+          }
+        };
+
 
         const fetchDeliveryFees = async () => {
             try {
@@ -475,6 +639,7 @@ const handleProductChange = (event) => {
         fetchDeliveryFees();
         fetchAllProducts();
         fetchCustomer();
+        fetchPayment();
         const interval = setInterval(() => {
             setCurrentDateTime(new Date());
         }, 1000);
@@ -510,9 +675,17 @@ const handleProductChange = (event) => {
       console.error("Error fetching product details:", error);
     }
   };
+  
 
 
-const fetchProductDetail = async (sku) => {
+  
+  useEffect(() => {
+    console.log("Updated Table Data:", tableData);
+  }, [tableData]);
+
+//fetch product by scanner
+  
+const fetchProductDetailbyScanner = async (sku) => {
   console.log("Fetching product details for SKU:", sku); // Debug log
   try {
       const response = await fetch(
@@ -555,53 +728,6 @@ const fetchProductDetail = async (sku) => {
   }
 };
 
-
-  const handleScan = async (event) => {
-    
-    if (event.key === "Enter") {
-        const product = await fetchProductDetail(sku);
-    
-        if (product) {
-          setProducts((prev) => {
-              const existingProductIndex = prev.findIndex((p) => p.sku === product.sku);
-
-              if (existingProductIndex !== -1) {
-                console.log("Product already exists, updating quantity");
-                  // If product already exists, update its quantity
-                  const updatedProducts = [...prev];
-                  updatedProducts[existingProductIndex].quantity += 1;
-                  return updatedProducts;
-              }
-               else {
-                console.log("Product doesn't exist, adding to the list");
-                  // If product doesn't exist, add it with a quantity of 1
-                  return [...prev, { ...product, quantity: 1 }];
-              }
-        });
-         }
-        
-      //    else {
-      //     alert("Product not found.");
-      // }
-      setSku(""); // Reset input field
-
-
-        // console.log("Product:", product);
-    //     if (product) {
-    //         setProducts((prev) => [...prev, product]);
-    //     } 
-    //     // else {
-    //     //     alert("Product not found.");
-    //     // }
-    //     setSku(""); // Reset input field
-    }
-};
-  
-  
-  useEffect(() => {
-    console.log("Updated Table Data:", tableData);
-  }, [tableData]);
-
   
   const groupByProductName = (products) => {
     return products.reduce((acc, product) => {
@@ -619,81 +745,40 @@ const fetchProductDetail = async (sku) => {
     }, {});
   };
 
-
-
-
-
-//   const handlePayment = async () => {
-//     const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
-// const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
+  const handlePayment = async () => {
+    // Create arrays for fee codes and amounts
+    const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array for fee codes
+    const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array for fee amounts
   
-//     const payload = {
-//       sku: tableData.map(item => item.sku),
-//       quantity: tableData.map(item => item.quantity),
-//       rate: tableData.map(item => item.selling_price),
-//       item_discount: tableData.map(item => item.discount),
-//       cust_code: selectedCustomer,
-//       overall_discount: "0",
-//       outlet_code: outletId,
-//       saleman_code: selectedSalesman,
-//       advanced_payment: advancePayment,
-//       fee_code: feeCodes,  // Pass as an array
-//   fee_amount: fees,  // Pass as an array
-//     };
+    // Create arrays for payment methods and their amounts
+    const paymentMethods = selectedPayments.map(payment => payment.id);  // Payment method IDs
+    const paymentAmounts = selectedPayments.map(payment => payment.payment_method_amount);  // Payment method amounts
   
-//     try {
-//       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(payload),
-//       });
+    const payload = {
+      sku: tableData.map(item => item.sku),  // SKU of the items
+      quantity: tableData.map(item => item.quantity),  // Quantity of each item
+      rate: tableData.map(item => item.selling_price),  // Price of each item
+      item_discount: tableData.map(item => item.discount),  // Item discount
+      cust_code: selectedCustomer,  // Customer code
+      overall_discount: "0",  // Overall discount (can be updated as needed)
+      outlet_code: outletId,  // Outlet code
+      saleman_code: selectedSalesman,  // Salesman code
+      advanced_payment: advancePayment,  // Advanced payment amount
+      fee_code: feeCodes,  // Fee codes array (can be empty if no fees are selected)
+      fee_amount: fees,  // Fee amounts array (can be empty if no fees are selected)
+      pm_method: paymentMethods,  // Payment method IDs array
+      pm_amount: paymentAmounts,  // Payment amounts array
+    };
   
-//       if (response.ok) {
-//         const result = await response.json();
-//         setAlertMessage("Transaction added successfully!");
-//         setVisible(true);
-//       } else {
-//         const errorData = await response.json();
-//         console.error("API Error Response:", errorData);
-//         setAlertMessage("Failed to add transaction! Please check your input.");
-//         setVisible(true);
-//       }
-//     } catch (error) {
-//       console.error("Error adding transaction:", error);
-//       setAlertMessage("An error occurred while processing the payment.");
-//       setVisible(true);
-//     }
-//   };
-
-
-
-const handlePayment = async () => {
-  const feeCodes = selectedFees.map(fee => fee.fee_code);  // Create an array
-  const fees = selectedFees.map(fee => fee.fee_amount);  // Create an array
-
-  const payload = {
-      sku: tableData.map(item => item.sku),
-      quantity: tableData.map(item => item.quantity),
-      rate: tableData.map(item => item.selling_price),
-      item_discount: tableData.map(item => item.discount),
-      cust_code: selectedCustomer,
-      overall_discount: "0",
-      outlet_code: outletId,
-      saleman_code: selectedSalesman,
-      advanced_payment: advancePayment,
-      fee_code: feeCodes,  // Pass as an array
-      fee_amount: fees,  // Pass as an array
-  };
-
-  try {
+    try {
+      // Sending POST request with the payload
       const response = await fetch("http://195.26.253.123/pos/transaction/add_transaction", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
       });
-
-      const result = await response.json(); // Parse the JSON response
-
+  
+      // Handling response
       if (response.ok) {
           setAlertMessage(result.message || "Transaction added successfully!"); // Use backend message if available
           setVisible(true);
@@ -742,13 +827,13 @@ const handlePayment = async () => {
         });
     };
 
-    const toggleFullScreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    };
+    // const toggleFullScreen = () => {
+    //     if (!document.fullscreenElement) {
+    //         document.documentElement.requestFullscreen();
+    //     } else if (document.exitFullscreen) {
+    //         document.exitFullscreen();
+    //     }
+    // };
 
 
     // Function to handle button click and show alert
@@ -802,10 +887,12 @@ const handleReturn = async () => {
 
 
     return (
-        <div className="transactions-page">
+      <div className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
+       <div className={`transaction-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
+             
+
             <header className="t-header">
-                {/* Fullscreen Toggle Button */}
-                
+              
 
                 {/* <h1 className="t-logo">FAZAL SONS</h1> */}
                 <div className="t-header-info">
@@ -1256,18 +1343,21 @@ const handleReturn = async () => {
       </Dialog>
     </div>
 
-                    <span className="t-date-time">{formatDateTime(currentDateTime)} | IP: 39.55.138.194</span>
+                    <span className="t-date-time">{formatDateTime(currentDateTime)}</span>
                 </div>
-                {/* <div className="t-profile">
-                    <span className="t-notification-badge">5</span>
-                    <span className="t-profile-name">Ali Tehseen</span>
-                </div> */}
-                <button 
-                    className="fullscreen-toggle" 
-                    onClick={toggleFullScreen}
-                >
-                    Fullscreen
-                </button>
+                 {/* Fullscreen Toggle Button */}
+                 <div className="t-header-left">
+        {/* Fullscreen Toggle Button */}
+        
+      {isSidebarVisible && <AppSidebar/>}
+      {/* <button onClick={toggleSidebar}>Toggle Sidebar</button>
+      <button onClick={toggleFullScreen}>Toggle Full-Screen</button> */}
+             <Button variant="contained" onClick={handleFullscreenToggle} sx={{ marginRight: '10px' }}>
+        <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} />
+      </Button>
+              {/* <Transactions/> */}
+    </div>
+               
             </header>
 
             
@@ -1303,7 +1393,12 @@ const handleReturn = async () => {
             </option>
           ))}
         </select>
-        <input
+        <Link to="/Admin/Salesman">
+        <button className="add-customer">+</button>
+          </Link>
+
+
+          <input
                 ref={inputRef}
                 type="text"
                 value={sku}
@@ -1313,16 +1408,6 @@ const handleReturn = async () => {
                 tabIndex={tabIndex} // Dynamically set tabIndex
                 autoFocus // Keep input in focus
             />
-
-
-        {/* <input
-                type="text"
-                value={sku}
-                onChange={(e) => setSku(e.target.value)}
-                onKeyDown={handleScan} // Capture "Enter" key
-                placeholder="Scan Here..."
-                autoFocus // Focus input for scanner
-            /> */}
                 <select className="product-dropdown" onChange={handleProductSelect}>
                 console.log("All Products:", allProducts);
           <option>Select Product</option>
@@ -1476,7 +1561,11 @@ const handleReturn = async () => {
             <td className="summary-label">SALE</td>
             <td className="summary-value">{totalPaymentAfterDiscount.toFixed(2)}</td>
             <td className="summary-label">PURCHASE</td>
-            <td className="summary-value">1300</td>
+            <td className="summary-value">
+          {(
+            tableData.reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+          ).toFixed(2)}
+        </td>
             <td className="summary-label">DISCOUNT</td>
             <td className="summary-value">{totalDiscount.toFixed(2)}</td>
             <td className="summary-label">DUE</td>
@@ -1521,27 +1610,56 @@ const handleReturn = async () => {
   </div>
 </div>
 
+{/* /* PAYMENT METHOD DROPDOWN */ }
 <div className="payment-summary">
-  <div className="payment-row">
-    <label className="payment-label">
-      CARD:
-      <input type="number" className="payment-input" placeholder="0" />
-    </label>
-    <label className="payment-label">
-      CASH:
-      <input type="number" className="payment-input" placeholder="0" />
-    </label>
-    <label className="payment-label">
-      CHANGE:
-      <input type="number" className="payment-input" placeholder="0" />
-    </label>
-  </div>
+      {/* Payment Method Dropdown */}
+      <div className="payment-method-dropdown">
+        <label htmlFor="payment-method">Payment Method:</label>
+        <select
+          id="payment-method"
+          onChange={handlePaymentSelection}
+        >
+          <option value="">Select Payment Method</option>
+          {paymentMethods.map((method) => (
+            <option key={method.id} value={method.id}>
+              {method.pm_name}
+            </option>
+          ))}
+        </select>
+        <Link to="/Admin/Payment">
+          <button className="add-payment-method-btn">+</button>
+        </Link>
+      </div>
+
+      {/* Dynamically Render Input Fields for Selected Payment Methods */}
+      <div className="selected-payment-methods">
+        {selectedPayments.map((payment) => (
+          <div key={payment.id} className="payment-item">
+            <label>{payment.pm_name}:</label>
+            <input
+              type="number"
+              value={payment.payment_method_amount}
+              onChange={(e) =>
+                handlePaymentInputChange(payment.id, e.target.value)
+              }
+            />
+            <button
+              className="remove-btn"
+              onClick={() => handleRemovePayment(payment.id)}
+            >
+              X
+            </button>
+          </div>
+        ))}
+   
+    </div>
+  
   <div className="payment-total">
     <span className="total-amount">
       {(
         tableData.reduce(
           (acc, item) =>
-            acc +
+            acc + 
             item.selling_price * item.quantity -
             (item.selling_price * item.quantity * item.discount) / 100,
           0
@@ -1549,12 +1667,6 @@ const handleReturn = async () => {
       ).toFixed(2)}
     </span>
   
-
-
-      {/* <CAlert color="primary" dismissible visible={visible} onClose={() => setVisible(false)}>
-        {alertMessage}
-      </CAlert> */}
-
       <CButton color="primary" onClick={handlePayment}>
         Payment
       </CButton>
@@ -1565,7 +1677,9 @@ const handleReturn = async () => {
 
 
         </div>
+        </div>
     );
 }
+
 
 export default Transections;

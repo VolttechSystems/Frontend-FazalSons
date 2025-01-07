@@ -105,6 +105,9 @@ const ProfitReport = () => {
         <th>Total Cost</th>
         <th>Selling Price</th>
         <th>Profit</th>
+        <th>Return Rate</th>
+        <th>Return Quantity</th>
+        <th>Return Total</th>
       </tr>
     </thead>
     <tbody>
@@ -118,6 +121,9 @@ const ProfitReport = () => {
           <td>{item.total_cost}</td>
           <td>{item.selling_price}</td>
           <td>{item.profit}</td>
+          <td>{item.return_rate}</td>
+          <td>{item.return_quantity}</td>
+          <td>{item.return_total}</td>
         </tr>
       ))}
     </tbody>
@@ -154,6 +160,27 @@ const ProfitReport = () => {
           <strong>
             {reportData
               .reduce((acc, item) => acc + parseFloat(item.profit || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.return_rate || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.return_quantity || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
+              .reduce((acc, item) => acc + parseFloat(item.return_total || 0), 0)
               .toFixed(2)}
           </strong>
         </td>

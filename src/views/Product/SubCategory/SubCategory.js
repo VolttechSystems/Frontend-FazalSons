@@ -228,28 +228,41 @@ const handleParentCategoryChange = async (e) => {
   
   
   
-// Fetch Groups Based on Selected Attribute Types
-// useEffect(() => {
-//   if (formData.attType.length > 0) {
-//     const fetchGroups = async () => {
-//       try {
-//         const responses = await Promise.all(
-//           formData.attType.map((typeId) =>
-//             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
-//           )
-//         );
 
-//         const data = responses.flatMap((res) => res.data);
-//         setTableData(data);
-//       } catch (error) {
-//         console.error('Error fetching groups:', error);
-//       }
-//     };
-//     fetchGroups();
-//   } else {
-//     setTableData([]);
-//   }
-// }, [formData.attType]);
+  //Fetch attributes and variations
+useEffect(() => {
+  if (formData.attType.length > 0) {
+    const fetchAttributes = async () => {
+      try {
+        console.log("Selected Attribute Types:", formData.attType);
+
+        const responses = await Promise.all(
+          formData.attType.map((typeId) =>
+            axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
+          )
+        );
+
+        const data = responses.flatMap((res) => res.data);
+
+        const groupedData = data.map((group) => ({
+          att_type: group.att_type || "Unnamed Group", 
+          attribute_id: Array.isArray(group.attribute_name) ? group.attribute_name : [], 
+            variation: Array.isArray(group.variation) ? group.variation : [], 
+        }));
+
+        console.log("Fetched Attributes for Table:", groupedData);
+        setTableData(groupedData);
+      } catch (error) {
+        console.error("Error fetching Attributes:", error);
+      }
+    };
+
+    fetchAttributes();
+  } else {
+    // setTableData([]); // Clear table when no Attribute Type is selected
+  }
+}, [formData.attType]);
+
 
 
 const handleRadioChange = (groupName) => {
@@ -268,7 +281,6 @@ useEffect(() => {
             axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)
           )
         );
-
         const data = responses.flatMap((res) => res.data);
         setTableData(data);
       } catch (error) {
@@ -280,6 +292,8 @@ useEffect(() => {
     setTableData([]);
   }
 }, [formData.attType]);
+
+
 
   // Handle Multi-select Attribute Type Change
   const handleMultiSelectChange = (selectedOption) => {
@@ -326,7 +340,6 @@ const handleGroupSelection = (attType, attributeName, attributeId, event) => {
 };
 
   
-  
 
 const handleInputChange = (e) => {
   const { name, value, type, checked } = e.target;
@@ -345,28 +358,29 @@ const handleInputChange = (e) => {
 };
 
   
+     useEffect(() => {
+      console.log({selectedGroup})
+    }, [selectedGroup]);
+     7
+     
   
-  
-  
-  
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const attributeGroup = Array.isArray(formData.attribute_name)
-      ? formData.attribute_name
-      : formData.attribute_name
-          .split(',')
-          .map((item) => item.trim());
   
+    // const attributeGroup = Array.isArray(formData.attribute_name)
+    //   ? formData.attribute_name
+    //   : formData.attribute_name
+    //       .split(',')
+    //       .map((item) => item.trim());
     const payload = {
       //category_name: formData.category_name,
     sub_category_name: formData.sub_category_name,
     symbol: formData.symbol,
     description: formData.description,
     status: formData.status,
-    //pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
+    // pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
     category: formData.category_name ? parseInt(formData.category_name, 10) : null,
     attribute_group: selectedAttributes.map((attr) => attr.split(":")[1]), // Extract only the attribute_id
     };
@@ -381,17 +395,25 @@ const handleInputChange = (e) => {
         const updatedsubCategories = subcategories.map((cat) =>
           cat.id === editsubCategoryId ? response.data : cat
         );
-        setsubCategories(updatedsubCategories);
-        setTableData(updatedsubCategories);
-  
+        if(response){
+        setsubCategories((prev)=> prev,...response.data);
+        setTableData((prev)=> prev,...response.data);
+        }
+
         setMessage("Sub Category updated successfully.");
       } else {
         // POST request to add new subcategory
         const response = await axios.post(API_ADD_SUBCATEGORIES, payload);
         const newsubCategory = response.data;
-        setsubCategories((prevsubCategories) => [...prevsubCategories, newsubCategory]);
-        setTableData((prevData) => [...prevData, newsubCategory]);
-        setMessage("subcategory added successfully.");
+        // setsubCategories((prevsubCategories) => [...prevsubCategories, newsubCategory]);
+        // setTableData((prevData) => [...prevData, newsubCategory]);
+        // setMessage("subcategory added successfully.");
+
+        if(newsubCategory){
+          setsubCategories((prev) => [...prev, ...response.data]);
+          setTableData((prev) => [...prev, ...response.data]);
+          setMessage("Category added successfully.");
+        }
       }
 
       // Reset form and exit edit mode
@@ -405,9 +427,9 @@ const handleInputChange = (e) => {
         addSubCategory: false,
         status: 'active',
         attType: [],
-        // attribute_name: " ",
-        //  attribute_id : null,
-      });
+        attribute_group: [],
+        attribute_id : '',
+          });
       setEditMode(false);
       setEditsubCategoryId(null);
     } catch (error) {
@@ -421,25 +443,58 @@ const handleInputChange = (e) => {
       // Fetch category details from API
       const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${subcategory.id}`);
       const subcategoryData = response.data;
-  console.log(subcategoryData)
+      console.log({subcategoryData})
+      console.log(subcategoryData.att_type, 'att_type data');
+         // Extract attType IDs
+    const attTypeIds = subcategoryData.att_type.map((type) => type.id);
+        
+
+
+  console.log({subcategoryData})
       // Pre-fill form fields
       setFormData({
-        headCategory: '', // Update if necessary
-        category: subcategoryData.category ? subcategoryData.category.toString() : '',
+        headCategory:  subcategoryData?.head_id, // Update if necessary
+        selectedParentCategory: subcategoryData?.parent_id,
+        selectedCategory: subcategoryData?.category_id || '',
+        category_name: subcategoryData?.category_id || '',
         symbol: subcategoryData.symbol || '',
         addSubCategory: subcategoryData.subcategory_option === "True",
         description: subcategoryData.description || '',
+        sub_category_name: subcategoryData.sub_category_name,
         status: subcategoryData.status || 'active',
-        //pc_name: categoryData.pc_name ? categoryData.pc_name.toString() : '',
-        attribute_group: subcategoryData.attribute_group || [], // Array of selected attributes
+        // pc_name: subcategoryData?.parent_id, // Update if necessary
+        attribute_group: subcategoryData.attribute_group ,// Array of selected attributes
+        attType: attTypeIds, // Populate attType with IDs
       });
   
       // Pre-fill table's selected attributes
       const initialSelectedGroup = {};
-      subcategoryData.attribute_group.forEach((group) => {
-        initialSelectedGroup[group] = group; // Populate based on `group` logic
+      subcategoryData.attribute_group.map((group,index) => {
+          
+        // if (group.att_type && group.attribute_id) {
+         //     initialSelectedGroup[group.att_type] = group.attribute_id; // Map `att_type` to `attribute_id`
+         // }
+     });
+
+     const transformArray = (arr) => {
+      const result = {};
+    
+      subcategoryData.attribute_group.forEach(item => {
+        result[item.att_type_name] = item.id;
       });
-      setSelectedGroup(initialSelectedGroup);
+    
+      return result;
+    };
+
+      setSelectedGroup(transformArray);
+      
+      const responses = await Promise.all(
+        subcategoryData.att_type.map((id) =>
+          axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)
+        )
+      );
+      const data = responses.flatMap((res) => res.data);
+      setTableData(data);
   
       setEditMode(true);
       setEditsubCategoryId(subcategoryData.id); // Store the ID for updating
@@ -633,6 +688,10 @@ const handleInputChange = (e) => {
           <Select
             isMulti
             options={attTypes.map((type) => ({ value: type.id, label: type.att_type }))}
+            value={formData.attType.map((id) => {
+              const matchedType = attTypes.find((type) => type.id === id); // Match ID with options
+              return matchedType ? { value: matchedType.id, label: matchedType.att_type } : null;
+            }).filter(Boolean)} // Pre-fill selected options
             onChange={handleMultiSelectChange}
           />
         </div>

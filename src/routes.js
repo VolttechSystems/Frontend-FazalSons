@@ -41,15 +41,23 @@ const AdditionalFee = React.lazy(() => import('./views/Admin/AdditionalFee/Addit
 const Barcodes = React.lazy(() => import('./views/Product/AllProducts/Barcodes'))
 const NewBarcode = React.lazy(() => import('./views/pages/barcode/NewBarcode'))
 
+
 //Reports
 const DaySale = React.lazy(() => import('./views/Reports/DaySale/DaySale'))
 const SaleReport = React.lazy(() => import('./views/Reports/SaleReport/SaleReport'))
 const ProfitReport = React.lazy(() => import('./views/Reports/ProfitReport/ProfitReport'))
 const CommissionReport = React.lazy(() => import('./views/Reports/CommissionReport/CommissionReport'))
+const ProductReport = React.lazy(() => import('./views/Reports/ProductReport/ProductReport'))
+const PaymentReport = React.lazy(() => import('./views/Reports/PaymentReport/PaymentReport'))
 
 
 //System Roles
 const SysRoles = React.lazy(() => import('./views/Admin/SysRoles/SysRoles'))
+const RegisterUser = React.lazy(() => import('./views/Admin/RegisterUser/RegisterUser'))
+
+
+//Payment
+const Payment = React.lazy(() => import('./views/Admin/Payment/Payment'))
 
 const routes = [
 
@@ -107,9 +115,14 @@ const routes = [
   { path: '/Reports/SaleReport', name: 'SaleReport', element: SaleReport }, //SaleReport
   { path: '/Reports/ProfitReport', name: 'ProfitReport', element: ProfitReport }, //ProfitReport
   { path: '/Reports/CommissionReport', name: 'CommissionReport', element: CommissionReport }, //CommissionReport
+  { path: '/Reports/ProductReport', name: 'ProductReport', element: ProductReport }, //ProductReport
+  { path: '/Reports/PaymentReport', name: 'PaymentReport', element: PaymentReport }, //PaymentReport
 
   //Roles
   { path: '/Admin/SysRoles', name: 'SysRoles', element: SysRoles }, // SysRoles
+  { path: '/Admin/RegisterUser', name: 'RegisterUser', element: RegisterUser }, // RegisterUser
+
+  { path: '/Admin/Payment', name: 'Payment', element: Payment }, // Payment
 ]
 
 export default routes
