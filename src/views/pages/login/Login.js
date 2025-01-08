@@ -31,25 +31,38 @@ const Login = () => {
       setError('Please enter both username and password');
       return;
     }
+  
     try {
       const response = await axios.post('http://195.26.253.123/pos/accounts/login', {
         username,
         password,
       });
-
+  
       if (response.data.token) {
+        // Store token
         localStorage.setItem('authToken', response.data.token);
+  
+        // Store system roles and permissions in JSON format
+        const sysRoles = JSON.stringify(response.data.System_role || []);  // Corrected the property name
+        const permissions = JSON.stringify(
+          response.data.System_role?.[0]?.permissions || []  // Access permissions for the first role
+        );
+  
+        // Store in localStorage
+        localStorage.setItem('SysRoles', sysRoles);
+        localStorage.setItem('Permissions', permissions);
+  
         alert('Login successful!');
         navigate('/dashboard/');
       } else {
         setError('Unexpected response from the server');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
       setError('Invalid username or password');
     }
   };
-
+  
   return (
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center"

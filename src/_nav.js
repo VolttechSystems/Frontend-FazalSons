@@ -20,6 +20,7 @@ const _nav = [
     component: CNavItem,
     name: 'Dashboard',
     to: '/dashboard',
+    // key:"doashboard",
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     
   },
@@ -33,23 +34,21 @@ const _nav = [
     component: CNavGroup,
     name: 'Point of Sale',
     to: '/base',
+    key:'/Transaction',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'POS',
         to: '/base/POS',
+        key: 'Transaction', // Permission key for this item
       },
       {
         component: CNavItem,
         name: 'Register Systems',
         to: '/base/RegisterSystem',
+        key: 'Transaction', // Permission key for this item
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Login',
-      //   to: '/pages/Login',
-      // },
       
      
     ],
@@ -57,37 +56,44 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Admin',
+    key:'/Admin',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Salesman',
         to: '/Admin/Salesman',
+        key:'/Admin',
       },
       {
         component: CNavItem,
         name: 'System Roles',
         to: '/Admin/SysRoles',
+        key:'/Admin',
       },
       {
         component: CNavItem,
         name: 'Register User',
         to: '/Admin/RegisterUser',
+        key:'/Admin',
       },
       {
         component: CNavItem,
         name: 'Outlet',
         to: '/Admin/AddOutlet',
+        key:'/Admin',
       },
       {
         component: CNavItem,
         name: 'Additional Fee',
         to: '/Admin/AdditionalFee',
+        key:'/Admin',
       },
       {
         component: CNavItem,
         name: 'Payment Methods',
         to: '/Admin/Payment',
+        key:'/Admin',
       },
       
      
@@ -98,38 +104,45 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Reports',
+    key:'/Reports',
     icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Profit Sale Report',
         to: '/Reports/ProfitReport',
+        key:'/Reports',
         
       },
       {
         component: CNavItem,
         name: 'Sales Commission Report',
         to: '/Reports/CommissionReport',
+        key:'/Reports',
       },
       {
         component: CNavItem,
         name: 'Sales Report',
         to: '/Reports/SaleReport',
+        key:'/Reports',
       },
       {
         component: CNavItem,
         name: 'Sale by Day Report',
         to: '/Reports/DaySale',
+        key:'/Reports',
       },
       {
         component: CNavItem,
         name: 'Product wise Sale Report',
         to: '/Reports/ProductReport',
+        key:'/Reports',
       },
       {
         component: CNavItem,
         name: 'Payment Method Report',
         to: '/Reports/PaymentReport',
+        key:'/Reports',
       },
       
     ],
@@ -139,12 +152,14 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Customer',
+    key:'/Customer',
     icon: <CIcon icon={cilNotes} customClassName="nav-icon"/>,
     items: [
       {
         component: CNavItem,
         name: 'Add Customer',
         to: '/Customer/AddCustomer',
+        key:'/Customer',
       },
      
     ],
@@ -154,12 +169,14 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Stock',
+    key:'/Stock',
     icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Add Stock',
         to: '/Stock/AddStock',
+        key:'/Stock',
       },
       
     ],
@@ -169,105 +186,57 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Product',
+    key:'/Product',
     icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'All Product',
         to: 'base/POSTable2',
+        key:'/Product',
         
       },
       {
         component: CNavItem,
         name: 'Add Product',
         to: '/Product/AddProduct',
+        key:'/Product',
       },
       {
         component: CNavItem,
         name: 'Parent Category',
         to: '/Product/ParentCategory',
+        key:'/Product',
       },
       {
         component: CNavItem,
         name: 'Add Category',
         to: '/Product/Category',
+        key:'/Product',
       },
       {
         component: CNavItem,
         name: 'Add Sub-Category',
         to: '/Product/SubCategory',
+        key:'/Product',
       },
       {
         component: CNavItem,
         name: 'Brands',
         to: '/Product/Brands',
+        key:'/Product',
       },
       
-      // {
-      //   component: CNavItem,
-      //   name: 'Attributes',
-      //   to: '/Product/Attributes',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Variations',
-      //   to: '/Product/Variations',
-      // },
+     
       {
         component: CNavItem,
         name: 'Add Attribute',
         to: '/Product/AddAtt',
+        key:'/Product',
       },
       
     ],
   },
-  // {
-  //   component: CNavGroup,
-  //   name: 'Stock',
-  //   icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  //   items: [
-  //     {
-  //       component: CNavItem,
-  //       name: 'Add Stock',
-  //       to: '/Stock/AddStock',
-  //     },
-      
-  //   ],
-  // },
-  
-  
-//   {
-//     component: CNavTitle,
-//     name: 'Extras',
-//   },
-//   {
-//     component: CNavGroup,
-//     name: 'Pages',
-//     icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-//     items: [
-//       {
-//         component: CNavItem,
-//         name: 'Login',
-//         to: '/login',
-//       },
-//       {
-//         component: CNavItem,
-//         name: 'Register',
-//         to: '/register',
-//       },
-//       {
-//         component: CNavItem,
-//         name: 'Error 404',
-//         to: '/404',
-//       },
-//       {
-//         component: CNavItem,
-//         name: 'Error 500',
-//         to: '/500',
-//       },
-//     ],
-//   },
-  
 ]
 
 export default _nav
