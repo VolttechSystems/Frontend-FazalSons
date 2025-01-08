@@ -66,6 +66,9 @@ const ProductEdit = () => {
           onChange={handleChange}
           fullWidth
           margin="normal"
+          InputProps={{
+            readOnly: true, // Makes the field read-only
+          }}
         />
         <TextField
           label="SKU"
@@ -74,6 +77,9 @@ const ProductEdit = () => {
           onChange={handleChange}
           fullWidth
           margin="normal"
+          InputProps={{
+            readOnly: true, // Makes the field read-only
+          }}
         />
         <TextField
           label="Cost Price"

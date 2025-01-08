@@ -154,6 +154,13 @@ const ProfitReport = () => {
         <td>
           <strong>
             {reportData
+              .reduce((acc, item) => acc + parseFloat(item.total || 0), 0)
+              .toFixed(2)}
+          </strong>
+        </td>
+        <td>
+          <strong>
+            {reportData
               .reduce((acc, item) => acc + parseFloat(item.selling_price || 0), 0)
               .toFixed(2)}
           </strong>
