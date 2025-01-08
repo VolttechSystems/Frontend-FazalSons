@@ -792,16 +792,7 @@ const closeCategoryDialog = () => setCategoryDialogOpen(false);
         <form>
           {activeTab === 0 && (
             <div className="form-column">
-               {/* <label style={{ fontWeight: "bold" }}>
-                Product Name *
-                <input
-                  type="text"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={handleChange}
-                  required
-                />
-              </label> */}
+               
              <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
   <label style={{ flex: 1, fontWeight: "bold" }}>
     Outlet Name:

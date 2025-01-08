@@ -14,6 +14,7 @@ const Salesman = React.lazy(() => import('./views/Admin/Salesman/Salesman'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
 const Transections = React.lazy(() => import('./views/base/Transections/Transections'))
 const AllProducts = React.lazy(() => import('./views/Product/AllProducts/AllProducts'))
+const ProductEdit = React.lazy(() => import('./views/Product/ProductEdit/ProductEdit'))
 const Brands = React.lazy(() => import('./views/Product/Brands/Brands'))
 const AddBrands = React.lazy(() => import('./views/Product/AddBrands/AddBrands'))
 const AddProduct = React.lazy(() => import('./views/Product/AddProduct/AddProduct'))
@@ -77,6 +78,7 @@ const routes = [
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
   { path: '/Admin/Salesman', name: 'Salesman', element: Salesman }, // Salesman
   { path: '/Product/AllProducts/:outletId', name: 'AllProducts', element: AllProducts }, //AllProducts
+  { path: '/Product/ProductEdit/:id', name: 'ProductEdit', element: ProductEdit }, //ProductEdit
   { path: '/Product/Brands', name: 'Brands', element: Brands }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
   { path: '/Product/AddProduct', name: 'AddProduct', element: AddProduct }, //AddProduct

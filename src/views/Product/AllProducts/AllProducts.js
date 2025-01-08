@@ -37,6 +37,7 @@ const AllProducts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const navigate = useNavigate();
   const { outletId } = useParams();
+  
 
   // Fetch all products
   const fetchProducts = async () => {
@@ -86,8 +87,8 @@ const AllProducts = () => {
     }
   };
 
-  const handleEdit = (sku) => {
-    navigate(`/Product/AddProduct/${sku}`); // Navigate to AddProduct with product ID
+  const handleEdit = (id) => {
+    navigate(`/Product/ProductEdit/${id}`); // Navigate to AddProduct with product ID
   };
 
   const handleCloseModal = () => {
@@ -197,7 +198,7 @@ const AllProducts = () => {
                       <TableCell>{detail.selling_price}</TableCell>
                       <TableCell>
                         <Button
-                          onClick={() => handleEdit(detail.sku)}
+                          onClick={() => handleEdit(detail.id)}
                           variant="contained"
                           style={{
                             marginRight: "8px",

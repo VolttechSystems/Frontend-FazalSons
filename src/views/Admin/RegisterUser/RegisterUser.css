@@ -91,7 +91,37 @@
     height: 16px;
     margin-left: 10px;
   }
-  
+  /* Button container for the table */
+td button {
+  margin-right: 10px; /* Adds spacing between buttons */
+  padding: 5px 12px;  /* Padding for buttons */
+  font-size: 0.875rem; /* Slightly smaller font size */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Delete button - Green */
+.delete-button {
+  background-color: #28a745; /* Green */
+  color: #fff;
+}
+
+.delete-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+/* Edit button - Blue */
+.edit-button {
+  background-color: #007bff; /* Blue */
+  color: #fff;
+}
+
+.edit-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
   button {
     padding: 12px;
     font-size: 16px;
@@ -148,4 +178,118 @@
   .user-table tr:hover {
     background-color: #f1f1f1;
   }
-  
+/* Modal container */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Background overlay */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* When modal is visible */
+.modal.show {
+  display: flex;
+}
+
+/* Modal content */
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title of the modal */
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Username text */
+.modal-username {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+/* Input field styles */
+.modal-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.modal-input:focus {
+  border-color: #007bff;
+}
+/* Button container (right alignment) */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;  /* Align buttons to the right */
+  gap: 10px;  /* Space between buttons */
+}
+
+/* Button styles */
+.modal-btn {
+  padding: 5px 12px;  /* Reduced padding */
+  font-size: 1rem;  /* Smaller font size */
+  width: auto;  /* Allow buttons to adjust width based on content */
+  min-width: 80px;  /* Make sure buttons don't get too small */
+  max-width: 120px;  /* Limit button width */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Update Password button style */
+.modal-update-btn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.modal-update-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Cancel button style */
+.modal-cancel-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.modal-cancel-btn:hover {
+  background-color: #c82333;
+}
+
+/* Style for password validation errors */
+.password-errors {
+  margin-top: 10px;
+  color: #dc3545; /* Red color for errors */
+}
+
+.error-message {
+  font-size: 0.875rem; /* Slightly smaller font size */
+  margin: 5px 0;
+}
+.success-message {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
