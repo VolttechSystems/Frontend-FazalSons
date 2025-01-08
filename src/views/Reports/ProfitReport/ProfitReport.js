@@ -104,6 +104,7 @@ const ProfitReport = () => {
         <th>Cost Price</th>
         <th>Total Cost</th>
         <th>Selling Price</th>
+        <th>Total</th>
         <th>Profit</th>
         <th>Return Rate</th>
         <th>Return Quantity</th>
@@ -120,6 +121,7 @@ const ProfitReport = () => {
           <td>{item.cost_price}</td>
           <td>{item.total_cost}</td>
           <td>{item.selling_price}</td>
+          <td>{item.total}</td>
           <td>{item.profit}</td>
           <td>{item.return_rate}</td>
           <td>{item.return_quantity}</td>
