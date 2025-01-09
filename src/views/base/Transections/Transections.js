@@ -969,9 +969,9 @@ const handleReturn = async () => {
     </Box>
 
 
-                    <button className="t-header-button" onClick={handleButton}>
+    <Button variant="contained" onClick={handleButton}>
         Sales Return
-      </button>
+      </Button>
   {/* Styled Sales Return Dialog */}
   <Dialog open={isDialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
       <DialogTitle>Sale Return</DialogTitle>
@@ -1274,21 +1274,11 @@ const handleReturn = async () => {
 
       <div>
       {/* Trigger Button */}
-      <button
-        className="t-header-button"
+     <Button variant="contained"
         onClick={handleOpenDialogthree}
-        style={{
-          padding: "8px 16px",
-          fontSize: "16px",
-          backgroundColor: "#1976d2",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-          borderRadius: "4px",
-        }}
       >
         Close Till
-      </button>
+      </Button>
 
             {/* Dialog */}
             <Dialog

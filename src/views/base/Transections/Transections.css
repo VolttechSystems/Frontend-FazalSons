@@ -29,7 +29,7 @@ body {
   padding: 20px;
   color: #333;
   background-color: #f4f4f9;
-  width: 900px;
+  width: 100%;
   overflow-y: auto;  /* This ensures scrolling for long content */
 }
 

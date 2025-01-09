@@ -182,7 +182,8 @@ const AddCustomer = () => {
         <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
           <label style={{ fontWeight: "bold" }}>Customer Type: *</label>
           <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
-          <select name="customer_type" value={formData.customer_type} onChange={handleChange} required  style={{ flex: 1, padding: "8px" }}>
+          <select name="customer_type" value={formData.customer_type} onChange={handleChange} required
+            style={{ flex: 1, padding: "8px" }}>
             <option value="">Select Type</option>
             {customerTypes.map((type) => (
               <option key={type.id} value={type.customer_type}>{type.customer_type}</option>

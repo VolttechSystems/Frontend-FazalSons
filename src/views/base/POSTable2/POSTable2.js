@@ -64,7 +64,7 @@ const POSTable2 = () => {
                       <CTableDataCell>{outlet.outlet_name}</CTableDataCell>
                       <CTableDataCell>
                         <Link to={`/Product/AllProducts/${outlet.id}`}>
-                          <CButton color="primary">→</CButton>
+                        <CButton style={{ backgroundColor: "#007bff", color: "white", border: "none" }}>→</CButton>
                         </Link>
                       </CTableDataCell>
                     </CTableRow>

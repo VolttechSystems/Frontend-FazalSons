@@ -63,9 +63,10 @@ const POSTable = () => {
                       <CTableDataCell>{outlet.system_name || `System - ${index + 1}`}</CTableDataCell>
                       <CTableDataCell>{outlet.outlet_name}</CTableDataCell>
                       <CTableDataCell>
-                        <Link to={`/base/Transections/${outlet.id}`}>
-                          <CButton color="primary">→</CButton>
-                        </Link>
+                      <Link to={`/base/Transections/${outlet.id}`}>
+  <CButton style={{ backgroundColor: "#007bff", color: "white", border: "none" }}>→</CButton>
+</Link>
+
                       </CTableDataCell>
                     </CTableRow>
                   ))}
