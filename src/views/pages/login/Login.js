@@ -1,9 +1,6 @@
-
-
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import './login.css';
+import React, { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import './login.css'
 import {
   CButton,
   CCard,
@@ -16,53 +13,43 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
-} from '@coreui/react';
-import CIcon from '@coreui/icons-react';
-import { cilLockLocked, cilUser } from '@coreui/icons';
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilLockLocked, cilUser } from '@coreui/icons'
+import { Network, Urls } from '../../../api-config'
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
   const handleLogin = async () => {
     if (!username || !password) {
-      setError('Please enter both username and password');
-      return;
+      setError('Please enter both username and password')
+      return
     }
-  
-    try {
-      const response = await axios.post('http://195.26.253.123/pos/accounts/login', {
-        username,
-        password,
-      });
-  
-      if (response.data.token) {
-        // Store token
-        localStorage.setItem('authToken', response.data.token);
-  
-        // Store system roles and permissions in JSON format
-        const sysRoles = JSON.stringify(response.data.System_role || []);  // Corrected the property name
-        const permissions = JSON.stringify(
-          response.data.System_role?.[0]?.permissions || []  // Access permissions for the first role
-        );
-  
-        // Store in localStorage
-        localStorage.setItem('SysRoles', sysRoles);
-        localStorage.setItem('Permissions', permissions);
-  
-        alert('Login successful!');
-        navigate('/dashboard/');
-      } else {
-        setError('Unexpected response from the server');
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Invalid username or password');
-    }
-  };
-  
+
+    const response = await Network.post(Urls.login, {
+      username,
+      password,
+    })
+
+    if (!response.ok) return setError(response.data.error)
+
+    const { token, System_role } = response.data
+    localStorage.setItem('authToken', token)
+    const sysRoles = JSON.stringify(response.data.System_role || []) // Corrected the property name
+    const permissions = JSON.stringify(
+      System_role?.[0]?.permissions || [], // Access permissions for the first role
+    )
+
+    // Store in localStorage
+    localStorage.setItem('SysRoles', sysRoles)
+    localStorage.setItem('Permissions', permissions)
+    navigate('/dashboard/')
+  }
+
   return (
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center"
@@ -80,14 +67,22 @@ const Login = () => {
                 <CCardBody>
                   {/* Add Fazal Sons branding */}
                   <div className="text-center mb-3">
-                    <h1 style={{ fontFamily: 'Arial, sans-serif', fontWeight: 'bold', color: '#1c5b8b' }}>
+                    <h1
+                      style={{
+                        fontFamily: 'Arial, sans-serif',
+                        fontWeight: 'bold',
+                        color: '#1c5b8b',
+                      }}
+                    >
                       Fazal Sons
                     </h1>
                     <p className="text-muted">Your trusted partner in POS solutions</p>
                   </div>
                   <CForm>
                     <h2 className="text-center">Login</h2>
-                    <p className="text-body-secondary text-center">Sign in to access your account</p>
+                    <p className="text-body-secondary text-center">
+                      Sign in to access your account
+                    </p>
                     {error && <p className="text-danger text-center">{error}</p>}
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
@@ -155,7 +150,7 @@ const Login = () => {
         </CRow>
       </CContainer>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
