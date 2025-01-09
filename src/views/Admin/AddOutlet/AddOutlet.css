@@ -1,81 +1,115 @@
 /* Container styles */
-.container {
-    width: 90%;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Form styles */
-  form {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  form h2 {
-    color: #333;
-    margin-bottom: 15px;
-  }
-  
-  form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  form input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  
-  form button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #51b86b;
-    color: white;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  form button:hover {
-    background-color: #3eba5b;
-  }
-  
-  /* Table styles */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  table thead tr {
-    background-color: #24b139;
-    color: white;
-  }
-  
-  table th,
-  table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-  
-  table tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  table tbody tr:hover {
-    background-color: #e9ecef;
-  }
-  
-  table th {
-    font-weight: bold;
-  }
-  
+.outlet-container {
+  width: 90%;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+/* Form styles */
+.outlet-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.outlet-form h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.outlet-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.outlet-form-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.outlet-form-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: green;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.outlet-form-button:hover {
+  background-color: darkgreen
+  ;
+}
+
+/* Table styles */
+.outlet-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.outlet-table-header {
+  background-color: #0056b3;
+  color: white;
+}
+
+.outlet-table-header th {
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+.outlet-table-body tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.outlet-table-body tr:hover {
+  background-color: #e9ecef;
+}
+
+.outlet-table-cell {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.outlet-table-actions button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.outlet-table-actions button:hover {
+  background-color: #0056b3;
+}
+
+.outlet-table-actions .delete-button {
+  background-color: #dc3545;
+}
+
+.outlet-table-actions .delete-button:hover {
+  background-color: #c82333;
+}
+
+
+.outlet-table-actions .E-button {
+  background-color: green;
+}
+
+.outlet-table-actions .E-button:hover {
+  background-color: darkgreen;
+}

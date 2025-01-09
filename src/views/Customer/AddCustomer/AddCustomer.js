@@ -151,27 +151,45 @@ const AddCustomer = () => {
         </div>
 
         {/* Customer Channel */}
-        <div>
-          <label>Customer Channel: *</label>
-          <select name="customer_channel" value={formData.customer_channel} onChange={handleChange} required>
-            <option value="">Select Channel</option>
-            {customerChannels.map((channel) => (
-              <option key={channel.id} value={channel.customer_channel}>{channel.customer_channel}</option>
-            ))}
-          </select>
-          <button type="button" onClick={() => navigate('/Customer/CustomerChannel')}>+</button>
-        </div>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+  <label style={{ fontWeight: "bold" }}>Customer Channel: *</label>
+  <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
+    <select
+      name="customer_channel"
+      value={formData.customer_channel}
+      onChange={handleChange}
+      required
+      style={{ flex: 1, padding: "8px" }}
+    >
+      <option value="">Select Channel</option>
+      {customerChannels.map((channel) => (
+        <option key={channel.id} value={channel.customer_channel}>
+          {channel.customer_channel}
+        </option>
+      ))}
+    </select>
+    <button
+      style={{ padding: "8px" }}
+      type="button"
+      onClick={() => navigate('/Customer/CustomerChannel')}
+    >
+      +
+    </button>
+  </div>
+</div>
 
         {/* Customer Type */}
-        <div>
-          <label>Customer Type: *</label>
-          <select name="customer_type" value={formData.customer_type} onChange={handleChange} required>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+          <label style={{ fontWeight: "bold" }}>Customer Type: *</label>
+          <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
+          <select name="customer_type" value={formData.customer_type} onChange={handleChange} required  style={{ flex: 1, padding: "8px" }}>
             <option value="">Select Type</option>
             {customerTypes.map((type) => (
               <option key={type.id} value={type.customer_type}>{type.customer_type}</option>
             ))}
           </select>
-          <button type="button" onClick={() => navigate('/Customer/CustomerType')}>+</button>
+          <button  style={{ padding: "8px" }} type="button" onClick={() => navigate('/Customer/CustomerType')}>+</button>
+        </div>
         </div>
 
         {/* Full Name */}
@@ -192,13 +210,15 @@ const AddCustomer = () => {
 
         {/* Gender */}
         <div>
-          <label>Gender:</label>
-          <select name="gender" value={formData.gender} onChange={handleChange}>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+  <label>Gender:</label>
+  <select name="gender" value={formData.gender} onChange={handleChange}>
+    <option value="" disabled>Select Gender</option> {/* Placeholder */}
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
+
 
         {/* Company Name */}
         <div>

@@ -103,35 +103,26 @@ td button {
 }
 
 /* Delete button - Green */
-.delete-button {
-  background-color: #28a745; /* Green */
+.del-button1 {
+  background-color: red; /* Green */
   color: #fff;
 }
 
-.delete-button:hover {
-  background-color: #218838; /* Darker green on hover */
+.del-button1:hover {
+  background-color: darkred; /* Darker green on hover */
 }
 
 /* Edit button - Blue */
-.edit-button {
-  background-color: #007bff; /* Blue */
+.edit-button1 {
+  background-color: green; /* Blue */
   color: #fff;
 }
 
-.edit-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+.edit-button1:hover {
+  background-color: darkgreen; /* Darker blue on hover */
 }
 
-  button {
-    padding: 12px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+ 
   
   button:hover {
     background-color: #0056b3;
@@ -164,11 +155,6 @@ td button {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
-  }
-  
-  .user-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
   }
   
   .user-table tr:nth-child(even) {
@@ -293,3 +279,58 @@ td button {
   font-weight: bold;
   margin-top: 10px;
 }
+/* Style for the User Table Title */
+.user-table-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Style for the User Table Header */
+.user-table-header {
+  background-color:  #007bff; /* Blue background */
+}
+
+.user-table-header-item {
+  color: rgb(255, 255, 255);
+  background-color:  #007bff; /* Blue background */
+  padding: 10px;
+  text-align: left;
+}
+
+/* General User Table Styling */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th, 
+.user-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.user-table tr:nth-child(even) {
+  background-color: #007bff;
+}
+
+/* Add User button - Green, smaller width, and left-aligned */
+.addUser-button1 {
+  padding: 8px 16px; /* Adjust padding to make it smaller */
+  width: 120px; /* Set a smaller fixed width */
+  border: none;
+  background-color: green; /* Green color */
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center; /* Center the text inside the button */
+  float: left; /* Align button to the left */
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px; /* Add spacing below the button if needed */
+}
+
+.addUser-button1:hover {
+  background-color: darkgreen; /* Darker green on hover */
+}
+

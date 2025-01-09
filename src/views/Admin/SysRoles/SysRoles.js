@@ -160,10 +160,13 @@ const SysRoles = () => {
 
       </div>
 
-      <button onClick={handleAddOrEditRole}>
-        {editingRoleId ? "Update Role" : "Add Role"}
-      </button>
-      <button onClick={clearForm}>Clear</button>
+      <button className="add-edit-role-btn" onClick={handleAddOrEditRole}>
+  {editingRoleId ? "Update Role" : "Add Role"}
+</button>
+<button className="clear-role-btn" onClick={clearForm}>
+  Clear
+</button>
+
 
       <table>
         <thead>

@@ -174,20 +174,23 @@ const Salesman = () => {
           </select>
         </div>
 
-        <button type="submit">{editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}</button>
+        <button type="submit" className="salesman-submit-btn">
+  {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
+</button>
+
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Salesman Name</th>
-            <th>Wholesale Commission</th>
-            <th>Retail Commission</th>
-            <th>Token Commission</th>
-            <th>Outlet</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <table className="salesman-table">
+  <thead className="salesman-table-header">
+    <tr>
+      <th>Salesman Name</th>
+      <th>Wholesale Commission</th>
+      <th>Retail Commission</th>
+      <th>Token Commission</th>
+      <th>Outlet</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
         <tbody>
           {salesmen.map((salesman) => (
             <tr key={salesman.id}>

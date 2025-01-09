@@ -467,29 +467,40 @@ const handleInputChange = (e) => {
       {message && <p className="form-message">{message}</p>}
       <form className="form" onSubmit={handleSubmit}>
         {/* Head Category Dropdown */}
-        <div className="form-group">
-          <label>Head Category:</label>
-          <select
-            name="headCategory"
-            value={formData.headCategory}
-            onChange={handleHeadCategoryChange}
-            className="form-select"
-          >
-            <option value="">Select</option>
-            {headCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.hc_name}
-              </option>
-            ))}
-          </select>
-          <Link to="/Product/AddHeadCategory">
-        <button>+</button>
-      </Link>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+          <label style={{ fontWeight: "bold" }}>Head Category: *</label>
+          <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
+            <select
+              name="headCategory"
+              value={formData.headCategory}
+              onChange={handleHeadCategoryChange}
+              style={{
+                flex: 1,
+                padding: "8px",
+                border: "1px solid #ced4da", // Matches input field border
+                borderRadius: "4px",         // Adds consistent rounded corners
+                backgroundColor: "#fff",    // Matches input field background
+              }}
+            >
+              <option value="">Select</option>
+              {headCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.hc_name}
+                </option>
+              ))}
+            </select>
+            <Link to="/Product/AddHeadCategory">
+              <button style={{ padding: "8px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+                +
+              </button>
+            </Link>
+          </div>
         </div>
-
+        
         {/* Parent Category Dropdown */}
-        <div className="form-group">
-  <label>Parent Category:</label>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+  <label style={{ fontWeight: "bold" }}>Parent Category: *</label>
+  <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
   <select
     name="pc_name"
     value={formData.pc_name}
@@ -502,7 +513,15 @@ const handleInputChange = (e) => {
 
       
     }}
-    className="form-select"
+   
+    style={{
+      flex: 1,
+      padding: "8px",
+      border: "1px solid #ced4da", // Matches input field border
+      borderRadius: "4px",         // Adds consistent rounded corners
+      backgroundColor: "#fff",    // Matches input field background
+    }}
+
   > 
 
     <option value="">Select Parent Category</option>  {/* Default option */}
@@ -515,9 +534,10 @@ const handleInputChange = (e) => {
     ))}
   </select>
   <Link to="/Product/AddParentCategory">
-        <button>+</button>
+        <button style={{ padding: "8px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>+</button>
       </Link>
-</div>
+      </div>
+      </div>
 
 
 

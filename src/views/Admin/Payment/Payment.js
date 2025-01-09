@@ -81,27 +81,40 @@ const Payment = () => {
 
       {/* Payment Methods Table */}
       {payments.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Payment Method Name</th>
-              <th>Actions</th>
+        <table className="payment-methods-table">
+        <thead className="payment-methods-header">
+          <tr>
+            <th>ID</th>
+            <th>Payment Method Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {payments.map((payment) => (
+            <tr key={payment.id}>
+              <td>{payment.id}</td>
+              <td>{payment.pm_name}</td>
+              <td>
+                <button
+                  className="payment-edit-button"
+                  type="button"
+                  onClick={() => handleEdit(payment)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="payment-delete-button"
+                  type="button"
+                  onClick={() => handleDelete(payment.id)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {payments.map((payment) => (
-              <tr key={payment.id}>
-                <td>{payment.id}</td>
-                <td>{payment.pm_name}</td>
-                <td>
-                  <button type="button" onClick={() => handleEdit(payment)}>Edit</button>
-                  <button type="button" onClick={() => handleDelete(payment.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          ))}
+        </tbody>
+      </table>
+      
       )}
     </div>
   );

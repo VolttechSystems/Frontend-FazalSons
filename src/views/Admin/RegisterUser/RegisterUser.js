@@ -281,24 +281,25 @@ function RegisterUser() {
             placeholder="Select roles"
           />
         </div>
-        <button type="submit">Add User</button>
+        <button className="addUser-button1" type="submit">Add User</button>
       </form>
     
 
 
       {/* User Table */}
-      <h3>Registered Users</h3>
-      <table className="user-table">
-        <thead>
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Actions</th> 
-           
-          </tr>
-        </thead>
+     
+<h3 className="user-table-title">Registered Users</h3>
+<table className="user-table">
+  <thead className="user-table-header">
+    <tr>
+      <th className="user-table-header-item">First Name</th>
+      <th className="user-table-header-item">Last Name</th>
+      <th className="user-table-header-item">Username</th>
+      <th className="user-table-header-item">Email</th>
+      <th className="user-table-header-item">Actions</th>
+    </tr>
+  </thead>
+
         <tbody>
         {userList.length > 0 ? (
     userList.map((user, index) => (
@@ -308,18 +309,19 @@ function RegisterUser() {
                 <td>{user.username}</td>
                 <td>{user.email || "N/A"}</td>
                 <td>
-                  <button
-                    onClick={() => handleDelete(user.id)} // Pass user ID dynamically
-                    className="delete-button"
-                  >
-                    Delete
-                  </button>
-                  <button
+                <button
                     onClick={() => handleEditClick(user)}
-                    className="edit-button"
+                    className="edit-button1"
                   >
                     Edit
                   </button>
+                  <button
+                    onClick={() => handleDelete(user.id)} // Pass user ID dynamically
+                    className="del-button1"
+                  >
+                    Delete
+                  </button>
+                 
                 </td>
                 
               </tr>
