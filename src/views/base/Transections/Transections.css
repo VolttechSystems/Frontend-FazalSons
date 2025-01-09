@@ -19,8 +19,8 @@ body {
 
 /* Simple Mode */
 .simple-mode {
-  height: 700px;  /* Set consistent height */
-  max-width: 1700px; /* Fixed width for simple mode */
+  height: 500px;  /* Set consistent height */
+  max-width: 1500px; /* Fixed width for simple mode */
   margin: 0 auto; /* Center content */
 }
 
