@@ -884,8 +884,9 @@ const handleReturn = async () => {
 
 
     return (
-      <div className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
-       <div className={`transaction-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
+      <div id="transaction-container" className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
+      <div className={`transactions-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
+     
              
 
             <header className="t-header">

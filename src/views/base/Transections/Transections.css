@@ -1,37 +1,43 @@
-/* Transections.css */
-
+/* General Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
- 
-}
-.container {
-  width: 100%;
-  font-family: Arial, sans-serif;
-  overflow-y: auto;  /* This ensures scrolling happens if content exceeds */
-  padding-right: 2px;  /* Optional: Add space for scrollbar */
-}
-
-.simple-mode {
-  height: 500px;  /* Simple mode height */
-}
-
-.fullscreen-mode {
-  height: 800px;  /* Fullscreen mode height (full viewport) */
 }
 
 body {
   font-family: Arial, sans-serif;
 }
 
+/* Main container styling */
+#transaction-container {
+  font-family: Arial, sans-serif;
+  overflow-y: auto;  /* Ensure scrolling for excess content */
+  padding-right: 2px;  /* Optional: Space for scrollbar */
+  width: 100%; /* Prevent content shrinkage */
+}
+
+/* Simple Mode */
+.simple-mode {
+  height: 700px;  /* Set consistent height */
+  max-width: 1700px; /* Fixed width for simple mode */
+  margin: 0 auto; /* Center content */
+}
+
+/* Fullscreen Mode */
+.fullscreen-mode {
+  height: 100vh;  /* Full viewport height */
+  max-width: 100%; /* Full screen width */
+}
+
+/* Transactions Page Styling */
 .transactions-page {
   padding: 20px;
   color: #333;
   background-color: #f4f4f9;
-  width: 100%;
-  overflow-y: auto;  /* This ensures scrolling for long content */
+  overflow-y: auto; /* Ensure scrolling for long content */
 }
+
 
 /* Header Styling */
 .t-header {
