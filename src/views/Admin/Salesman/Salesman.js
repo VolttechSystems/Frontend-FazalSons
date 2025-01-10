@@ -22,6 +22,7 @@ const Salesman = () => {
     fetchOutlets() // Fetch outlets separately
   }, [])
 
+  //AddSaleman
   const fetchSalesmen = async () => {
     const response = await Network.get(Urls.addSalesman)
     if (!response.ok) return consoe.log(response.data.error)

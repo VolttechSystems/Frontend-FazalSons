@@ -1,61 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './AddStock.css';
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import './AddStock.css'
 
 const AddStock = () => {
-  const [stockData, setStockData] = useState([]);
-  const [productList, setProductList] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState('');
-  const [updatedStock, setUpdatedStock] = useState({});
+  const [stockData, setStockData] = useState([])
+  const [productList, setProductList] = useState([])
+  const [selectedProduct, setSelectedProduct] = useState('')
+  const [updatedStock, setUpdatedStock] = useState({})
 
   useEffect(() => {
     const fetchProductList = async () => {
       try {
-        const response = await axios.get('http://195.26.253.123/pos/products/get_product/');
-        setProductList(response.data);
+        const response = await axios.get('http://195.26.253.123/pos/products/get_product/')
+        setProductList(response.data)
       } catch (error) {
-        console.error('Error fetching product list:', error);
+        console.error('Error fetching product list:', error)
       }
-    };
-    fetchProductList();
-  }, []);
+    }
+    fetchProductList()
+  }, [])
 
-
-useEffect(() => {
-  if (selectedProduct) {
-    const fetchStockData = async () => {
-      try {
-        const encodedProductName = encodeURIComponent(selectedProduct);
-        const response = await axios.get(
-          `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`
-        );
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          const stockWithOriginal = response.data.map((item) => ({
-            ...item,
-            original_quantity: item.avail_quantity, // Store original stock value
-          }));
-          setStockData(stockWithOriginal);
-        } else {
-          setStockData([]);
+  useEffect(() => {
+    if (selectedProduct) {
+      const fetchStockData = async () => {
+        try {
+          const encodedProductName = encodeURIComponent(selectedProduct)
+          const response = await axios.get(
+            `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`,
+          )
+          if (Array.isArray(response.data) && response.data.length > 0) {
+            const stockWithOriginal = response.data.map((item) => ({
+              ...item,
+              original_quantity: item.avail_quantity, // Store original stock value
+            }))
+            setStockData(stockWithOriginal)
+          } else {
+            setStockData([])
+          }
+        } catch (error) {
+          console.error('Error fetching stock data:', error)
         }
-      } catch (error) {
-        console.error('Error fetching stock data:', error);
       }
-    };
-    fetchStockData();
-  } else {
-    setStockData([]);
-  }
-}, [selectedProduct]);
-
+      fetchStockData()
+    } else {
+      setStockData([])
+    }
+  }, [selectedProduct, stockData])
 
   const handleStockInputChange = (e, sku) => {
-    const { value } = e.target;
+    const { value } = e.target
     setUpdatedStock((prev) => ({
       ...prev,
       [sku]: Number(value),
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async () => {
     const updatedItems = stockData
@@ -63,45 +61,44 @@ useEffect(() => {
       .map((item) => ({
         sku: item.sku,
         avail_quantity: updatedStock[item.sku].toString(),
-      }));
-  
+      }))
+
     if (updatedItems.length === 0) {
-      alert('No changes made to stock!');
-      return;
+      alert('No changes made to stock!')
+      return
     }
-  
+
     try {
       await axios.put(
         `http://195.26.253.123/pos/stock/add_stock/${selectedProduct}/`,
         updatedItems,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-  
-      alert('Stock updated successfully!');
-  
+        { headers: { 'Content-Type': 'application/json' } },
+      )
+
+      alert('Stock updated successfully!')
+
       // Update stockData to reflect changes on the frontend
+      // console.log('maaz')
       const updatedStockData = stockData.map((item) => {
-        const updatedItem = updatedItems.find((updated) => updated.sku === item.sku);
+        const updatedItem = updatedItems.find((updated) => updated.sku === item.sku)
         if (updatedItem) {
-          return { 
-            ...item, 
+          return {
+            ...item,
             avail_quantity: (
               parseInt(item.original_quantity) + parseInt(updatedStock[item.sku] || 0)
             ).toString(), // Add the updated stock to the original stock
-          };
+          }
         }
-        return item;
-      });
-  
-      setStockData(updatedStockData);
-      setUpdatedStock({});
+        return item
+      })
+
+      setStockData(updatedStockData)
+      setUpdatedStock({})
     } catch (error) {
-      console.error('Error updating stock:', error);
-      alert(`Error: ${error.response ? error.response.data : error.message}`);
+      console.error('Error updating stock:', error)
+      alert(`Error: ${error.response ? error.response.data : error.message}`)
     }
-  };
-  
-  
+  }
 
   return (
     <div className="container">
@@ -131,32 +128,31 @@ useEffect(() => {
               <th>Add Stock</th>
             </tr>
           </thead>
-         <tbody>
-  {stockData.map((item) => {
-    const additionalStock = updatedStock[item.sku] || 0; // Get the user-entered stock
-    const newQuantity = parseInt(item.avail_quantity) + parseInt(additionalStock); // Sum of original + added stock
-
-    return (
-      <tr key={item.id}>
-        <td>{item.id}</td>
-        <td>{item.product_name}</td>
-        <td>{item.sku}</td>
-        <td>{item.color}</td>
-        <td>{item.size}</td>
-        <td>{newQuantity}</td> {/* Display updated quantity */}
-        <td>
-          <input
-            type="number"
-            min="0"
-            value={updatedStock[item.sku] || ''}
-            onChange={(e) => handleStockInputChange(e, item.sku)}
-          />
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
+          <tbody>
+            {stockData.map((item) => {
+              const additionalStock = updatedStock[item.sku] || 0 // Get the user-entered stock
+              const newQuantity = parseInt(item.avail_quantity) + parseInt(additionalStock) // Sum of original + added stock
+              console.log(newQuantity, 'maaz2')
+              return (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.product_name}</td>
+                  <td>{item.sku}</td>
+                  <td>{item.color}</td>
+                  <td>{item.size}</td>
+                  <td>{newQuantity}</td> {/* Display updated quantity */}
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      value={updatedStock[item.sku] || ''}
+                      onChange={(e) => handleStockInputChange(e, item.sku)}
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
         </table>
       ) : (
         <p className="no-stock-message">No stock data available for the selected product.</p>
@@ -164,7 +160,7 @@ useEffect(() => {
 
       <button onClick={handleSubmit}>Update Stock</button>
     </div>
-  );
-};
+  )
+}
 
-export default AddStock;
+export default AddStock

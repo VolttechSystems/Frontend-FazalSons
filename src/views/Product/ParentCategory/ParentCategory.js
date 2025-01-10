@@ -1,115 +1,4 @@
-
-
-// import React, { useEffect, useState } from 'react';
-// import {
-//   CButton,
-//   CCard,
-//   CCardBody,
-//   CCardHeader,
-//   CCol,
-//   CRow,
-//   CTable,
-//   CTableBody,
-//   CTableDataCell,
-//   CTableHead,
-//   CTableHeaderCell,
-//   CTableRow,
-// } from '@coreui/react';
-// import { Link } from 'react-router-dom';
-// import axios from 'axios';
-
-
-// const Loader = () => {
-//   return (
-//     <div className="text-center my-5">
-//       <div className="spinner-border text-primary" role="status">
-//         <span className="visually-hidden">Loading...</span>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const ParentCategory = () => {
-//   const [pc, setParentcategory] = useState([]);
-//   const [hc, setHeadcatgory] = useState([]);
-//   const [loading, setLoading] = useState(true); 
-//   const [error, setError] = useState(''); 
-
-//   useEffect(() => {
-//     const fetchParentcategory = async () => {
-//       try {
-//         const response = await axios.get('http://16.170.232.76/pos/products/add_parent_category'); // Replace with your API endpoint
-//         setParentcategory(response.data); 
-//         setLoading(false);
-//       } catch (error) {
-//         console.error('Error fetching head categories:', error);
-//         setError('Failed to fetch head categories.');
-//       }
-//     };
-
-//     fetchParentcategory();
-//   }, []);
-
-
-//   const getCategoryHead = (categoryhead) => {
-    
-//     const headcat = hc.find(attr => attr.attribute_name === categoryhead);
-    
-//     return headcat ? headcat.attribute_name : 'Attribute not found';
-//   };
-
-//   return (
-//     <CRow>
-//       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-//         <Link to="/Product/AddParentCategory">
-//           <CButton color="primary" className="me-md-2">Add Parent Category</CButton>
-//         </Link>
-//       </div>
-//       <CCol>
-//         <CCard className="mb-4">
-//           <CCardHeader>
-//             <strong>All Parent Categories</strong>
-//           </CCardHeader>
-//           <CCardBody>
-//             {loading && <Loader />}
-//             {error && <p className="text-danger">{error}</p>}
-//             {!loading && !error && (
-//               <CTable>
-//                 <CTableHead color="light">
-//                   <CTableRow>
-//                     <CTableHeaderCell scope="col">Sr.#</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Category Head</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Parent Category</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Short Form/Symbol</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Description</CTableHeaderCell>
-//                     <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-//                   </CTableRow>
-//                 </CTableHead>
-//                 <CTableBody>
-//                   {pc.map((parent, index) => (
-//                     <CTableRow key={parent.id}>
-//                       <CTableDataCell>{index + 1}</CTableDataCell>
-//                       <CTableDataCell>{pc.hc_name}</CTableDataCell> 
-//                       <CTableDataCell>{getCategoryHead(pc.hc_name)}</CTableDataCell>
-//                       <CTableDataCell>{pc.pc_name}</CTableDataCell> 
-//                       <CTableDataCell>{pc.symbol}</CTableDataCell> 
-//                       <CTableDataCell>{pc.description}</CTableDataCell> 
-//                       <CTableDataCell>{pc.status}</CTableDataCell> 
-//                     </CTableRow>
-//                   ))}
-//                 </CTableBody>
-//               </CTable>
-//             )}
-//           </CCardBody>
-//         </CCard>
-//       </CCol>
-//     </CRow>
-//   );
-// };
-
-// export default ParentCategory;
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -122,80 +11,91 @@ import {
   CTableDataCell,
   CTableHeaderCell,
   CTableRow,
-} from '@coreui/react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+} from '@coreui/react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { Network, Urls } from '../../../api-config'
 
 const ParentCategory = () => {
-  const [pc, setParentcategory] = useState([]);
-  const [hc, setHeadcategory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [pc, setParentcategory] = useState([])
+  const [hc, setHeadcategory] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchParentcategory = async () => {
-      try {
-        const response = await axios.get('http://195.26.253.123/pos/products/add_parent_category');
-        setParentcategory(response.data);
-      } catch (error) {
-        console.error('Error fetching parent categories:', error);
-        setError('Failed to fetch parent categories.');
-      }
-    };
+      // try {
+      //   const response = await axios.get('http://195.26.253.123/pos/products/add_parent_category')
+      //   setParentcategory(response.data)
+      // } catch (error) {
+      //   console.error('Error fetching parent categories:', error)
+      //   setError('Failed to fetch parent categories.')
+      // }
+
+      const response = await Network.get(Urls.addParentCategory)
+      if (!response.ok) return consoe.log(response.data.error)
+      setParentcategory(response.data)
+    }
 
     const fetchHeadcategory = async () => {
-      try {
-        const response = await axios.get('http://195.26.253.123/pos/products/add_head_category'); // Adjust to your actual API endpoint
-        setHeadcategory(response.data);
-      } catch (error) {
-        console.error('Error fetching head categories:', error);
-        setError('Failed to fetch head categories.');
-      }
-    };
+      // try {
+      //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category') // Adjust to your actual API endpoint
+      //   setHeadcategory(response.data)
+      // } catch (error) {
+      //   console.error('Error fetching head categories:', error)
+      //   setError('Failed to fetch head categories.')
+      // }
+      const response = await Network.get(Urls.addHeadCategory)
+      if (!response.ok) return consoe.log(response.data.error)
+      setHeadcategory(response.data)
+    }
 
     const fetchData = async () => {
-      await Promise.all([fetchParentcategory(), fetchHeadcategory()]);
-      setLoading(false); // Set loading to false after both fetches
-    };
-
-    fetchData();
-  }, []);
-
-  
-  const getCategoryHead = (categoryHeadName) => {
-    const headcat = hc.find(attr => attr.hc_name_id === categoryHeadName); 
-    return headcat ? headcat.hc_name: 'Category Head not found'; 
-  };
-
-
-  
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this Parent Category?')) {
-      try {
-        await axios.delete(`http://195.26.253.123/pos/products/action_parent_category/${id}/`);
-        alert('Parent Category deleted successfully!');
-        fetchBrands(); // Refresh the brands list after deletion
-      } catch (error) {
-        console.error('Error deleting Parent Category:', error);
-        alert('Failed to delete Parent Category.');
-      }
+      await Promise.all([fetchParentcategory(), fetchHeadcategory()])
+      setLoading(false) // Set loading to false after both fetches
     }
-  };
+
+    fetchData()
+  }, [])
+
+  const getCategoryHead = (categoryHeadName) => {
+    const headcat = hc.find((attr) => attr.hc_name_id === categoryHeadName)
+    return headcat ? headcat.hc_name : 'Category Head not found'
+  }
+
+  const handleDelete = async (id) => {
+    // if (window.confirm('Are you sure you want to delete this Parent Category?')) {
+    //   try {
+    //     await axios.delete(`http://195.26.253.123/pos/products/action_parent_category/${id}/`)
+    //     alert('Parent Category deleted successfully!')
+    //     fetchBrands() // Refresh the brands list after deletion
+    //   } catch (error) {
+    //     console.error('Error deleting Parent Category:', error)
+    //     alert('Failed to delete Parent Category.')
+    //   }
+    // }
+
+    const response = await Network.delete(`${Urls.updateParentCategory}/${id}/`)
+    if (!response.ok) return console.log(response.data.error)
+    alert('Parent Category deleted successfully!')
+    fetchBrands()
+  }
 
   const handleEdit = (id) => {
-    console.log("Editing Parent Category with ID:", id);
-    navigate(`/Product/AddParentCategory/${id}`);
-  };
-
+    console.log('Editing Parent Category with ID:', id)
+    navigate(`/Product/AddParentCategory/${id}`)
+  }
 
   return (
     <CRow>
-       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-         <Link to="/Product/AddParentCategory">
-           <CButton color="primary" className="me-md-2">Add Parent Category</CButton>
-         </Link>
-       </div>
+      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+        <Link to="/Product/AddParentCategory">
+          <CButton color="primary" className="me-md-2">
+            Add Parent Category
+          </CButton>
+        </Link>
+      </div>
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>
@@ -227,8 +127,17 @@ const ParentCategory = () => {
                       <CTableDataCell>{parent.description}</CTableDataCell>
                       <CTableDataCell>{parent.status}</CTableDataCell>
                       <CTableDataCell>
-                        <CButton color="warning" size="sm" onClick={() => handleEdit(parent.id)}>Edit</CButton>
-                        <CButton color="danger" size="sm" onClick={() => handleDelete(parent.id)} className="ms-2">Delete</CButton>
+                        <CButton color="warning" size="sm" onClick={() => handleEdit(parent.id)}>
+                          Edit
+                        </CButton>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          onClick={() => handleDelete(parent.id)}
+                          className="ms-2"
+                        >
+                          Delete
+                        </CButton>
                       </CTableDataCell>
                     </CTableRow>
                   ))}
@@ -239,7 +148,7 @@ const ParentCategory = () => {
         </CCard>
       </CCol>
     </CRow>
-  );
-};
+  )
+}
 
-export default ParentCategory;
+export default ParentCategory

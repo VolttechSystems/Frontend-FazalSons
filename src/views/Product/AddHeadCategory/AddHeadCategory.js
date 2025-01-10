@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   CCard,
   CCardBody,
@@ -16,79 +16,100 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-} from '@coreui/react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+} from '@coreui/react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { Network, Urls } from '../../../api-config'
 
 const AddHeadCategory = () => {
-  const [hc_name, setHCname] = useState('');
-  const [status, setStatus] = useState('active'); 
-  const [symbol, setSymbol] = useState('');
-  const [description, setDescription] = useState('');
-  const [types, setTypes] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const navigate = useNavigate();
+  const [hc_name, setHCname] = useState('')
+  const [status, setStatus] = useState('active')
+  const [symbol, setSymbol] = useState('')
+  const [description, setDescription] = useState('')
+  const [types, setTypes] = useState([])
+  const [editingIndex, setEditingIndex] = useState(null)
+  const navigate = useNavigate()
 
-  
   const fetchHeadCategory = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
-      setTypes(response.data); 
-    } catch (error) {
-      console.error('Error fetching category head:', error);
-    }
-  };
+    // try {
+    //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
+    //   setTypes(response.data);
+    // } catch (error) {
+    //   console.error('Error fetching category head:', error);
+    // }
+    const response = await Network.get(Urls.addHeadCategory)
+    if (!response.ok) return consoe.log(response.data.error)
+    setTypes(response.data)
+  }
 
-  
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const requestData = { hc_name:hc_name,symbol,description,status};
+    e.preventDefault()
+    const requestData = { hc_name: hc_name, symbol, description, status }
 
-    try {
-      if (editingIndex !== null) {
-        
-        await axios.put(`http://195.26.253.123/pos/products/action_head_category/${types[editingIndex].id}/`, requestData);
-        setEditingIndex(null); 
-      } else {
-       
-        await axios.post('http://195.26.253.123/pos/products/add_head_category', requestData);
-      }
-      // Reset the form
-      setHCname('');
-      setStatus('active');
-      setSymbol('') ;
-      setDescription('');
-      fetchHeadCategory(); 
-    } catch (error) {
-      console.error('Error adding/editing Head Category :', error);
-    }
-  };
+    // try {
+    //   if (editingIndex !== null) {
+    //     await axios.put(
+    //       `http://195.26.253.123/pos/products/action_head_category/${types[editingIndex].id}/`,
+    //       requestData,
+    //     )
+    //     setEditingIndex(null)
+    //   } else {
+    //     await axios.post('http://195.26.253.123/pos/products/add_head_category', requestData)
+    //   }
+    //   // Reset the form
+    //   setHCname('')
+    //   setStatus('active')
+    //   setSymbol('')
+    //   setDescription('')
+    //   fetchHeadCategory()
+    // } catch (error) {
+    //   console.error('Error adding/editing Head Category :', error)
+    // }
+
+    const isEditing = editingIndex
+
+    const url = isEditing
+      ? `${Urls.updateHeadCategory}/${types[editingIndex].id}/`
+      : Urls.addHeadCategory
+    const req = isEditing ? 'put' : 'post'
+
+    console.log
+    const response = await Network[req](url, requestData)
+    if (!response.ok) return console.log(response.data.error)
+    alert(isEditing ? 'Head Category updated successfully!' : 'Category added successfully!')
+    setEditingIndex(null)
+    setHCname('')
+    setStatus('active')
+    setSymbol('')
+    setDescription('')
+    fetchHeadCategory()
+  }
 
   // Function to handle edit button click
   const handleEdit = (index) => {
-    const selectedType = types[index];
-    
-      setHCname(selectedType.hc_name);
-      setStatus(selectedType.status);
-      setSymbol(selectedType.symbol) ;
-      setDescription(selectedType.description);
-      setEditingIndex(index);
-  };
+    const selectedType = types[index]
+
+    setHCname(selectedType.hc_name)
+    setStatus(selectedType.status)
+    setSymbol(selectedType.symbol)
+    setDescription(selectedType.description)
+    setEditingIndex(index)
+  }
 
   // Function to handle delete button click
   const handleDelete = async (index) => {
-    const id = types[index].id; // Assuming each type has a unique `id`
+    const id = types[index].id // Assuming each type has a unique `id`
     try {
-      await axios.delete(`http://195.26.253.123/pos/products/action_head_category/${id}/`);
-      fetchHeadCategory(); 
+      await axios.delete(`http://195.26.253.123/pos/products/action_head_category/${id}/`)
+      fetchHeadCategory()
     } catch (error) {
-      console.error('Error deleting category head:', error);
+      console.error('Error deleting category head:', error)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchHeadCategory();
-  }, []);
+    fetchHeadCategory()
+  }, [])
 
   return (
     <CRow>
@@ -100,68 +121,74 @@ const AddHeadCategory = () => {
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="hc_name" className="col-sm-2 col-form-label">Head Category Name</CFormLabel>
+                <CFormLabel htmlFor="hc_name" className="col-sm-2 col-form-label">
+                  Head Category Name
+                </CFormLabel>
                 <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="hc_name" 
-                    value={hc_name || ''}  
-                    onChange={(e) => setHCname(e.target.value)} 
-                    required 
+                  <CFormInput
+                    type="text"
+                    id="hc_name"
+                    value={hc_name || ''}
+                    onChange={(e) => setHCname(e.target.value)}
+                    required
                   />
                 </CCol>
               </CRow>
               <fieldset className="row mb-3">
                 <legend className="col-form-label col-sm-2 pt-0">Status</legend>
                 <CCol sm={8}>
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="active" 
-                    value="active" 
-                    label="Active" 
-                    checked={status === 'active'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="active"
+                    value="active"
+                    label="Active"
+                    checked={status === 'active'}
+                    onChange={(e) => setStatus(e.target.value)}
                   />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="inactive" 
-                    value="inactive" 
-                    label="Inactive" 
-                    checked={status === 'inactive'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="inactive"
+                    value="inactive"
+                    label="Inactive"
+                    checked={status === 'inactive'}
+                    onChange={(e) => setStatus(e.target.value)}
                   />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="pending" 
-                    value="pending" 
-                    label="Pending" 
-                    checked={status === 'pending'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="pending"
+                    value="pending"
+                    label="Pending"
+                    checked={status === 'pending'}
+                    onChange={(e) => setStatus(e.target.value)}
                   />
                 </CCol>
               </fieldset>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="symbol" className="col-sm-2 col-form-label">Symbol</CFormLabel>
+                <CFormLabel htmlFor="symbol" className="col-sm-2 col-form-label">
+                  Symbol
+                </CFormLabel>
                 <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="symbol" 
-                    value={symbol || ''} 
-                    onChange={(e) => setSymbol(e.target.value)} 
+                  <CFormInput
+                    type="text"
+                    id="symbol"
+                    value={symbol || ''}
+                    onChange={(e) => setSymbol(e.target.value)}
                   />
                 </CCol>
               </CRow>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">Description</CFormLabel>
+                <CFormLabel htmlFor="description" className="col-sm-2 col-form-label">
+                  Description
+                </CFormLabel>
                 <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="description" 
-                    value={description || ''} 
-                    onChange={(e) => setDescription(e.target.value)} 
+                  <CFormInput
+                    type="text"
+                    id="description"
+                    value={description || ''}
+                    onChange={(e) => setDescription(e.target.value)}
                   />
                 </CCol>
               </CRow>
@@ -169,7 +196,9 @@ const AddHeadCategory = () => {
                 <CButton color="primary" type="submit">
                   {editingIndex !== null ? 'Update' : 'Add'}
                 </CButton>
-                <CButton color="secondary" onClick={() => navigate('/Product/AddParentCategory')}>Go to Add Parent Category</CButton>
+                <CButton color="secondary" onClick={() => navigate('/Product/AddParentCategory')}>
+                  Go to Add Parent Category
+                </CButton>
               </div>
             </CForm>
 
@@ -190,10 +219,14 @@ const AddHeadCategory = () => {
                     <CTableDataCell>{item.status}</CTableDataCell>
                     <CTableDataCell>{item.symbol}</CTableDataCell>
                     <CTableDataCell>{item.description}</CTableDataCell>
-                   
+
                     <CTableDataCell>
-                      <CButton color="warning" onClick={() => handleEdit(index)}>Edit</CButton>
-                      <CButton color="danger" onClick={() => handleDelete(index)}>Delete</CButton>
+                      <CButton color="warning" onClick={() => handleEdit(index)}>
+                        Edit
+                      </CButton>
+                      <CButton color="danger" onClick={() => handleDelete(index)}>
+                        Delete
+                      </CButton>
                     </CTableDataCell>
                   </CTableRow>
                 ))}
@@ -203,7 +236,7 @@ const AddHeadCategory = () => {
         </CCard>
       </CCol>
     </CRow>
-  );
-};
+  )
+}
 
-export default AddHeadCategory;
+export default AddHeadCategory

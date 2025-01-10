@@ -18,6 +18,7 @@ import {
 } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { Network, Urls } from '../../../api-config'
 
 const AddProduct = () => {
   const initialFormData = {
@@ -233,13 +234,18 @@ const AddProduct = () => {
 
   useEffect(() => {
     const fetchBrands = async () => {
-      try {
-        const response = await axios.get('http://195.26.253.123/pos/products/add_brand')
-        const brandsData = response.data.results || []
-        setBrands(Array.isArray(brandsData) ? brandsData : [])
-      } catch (error) {
-        console.error('Error fetching brands:', error)
-      }
+      // try {
+      //   const response = await axios.get('http://195.26.253.123/pos/products/add_brand')
+      //   const brandsData = response.data.results || []
+      //   setBrands(Array.isArray(brandsData) ? brandsData : [])
+      // } catch (error) {
+      //   console.error('Error fetching brands:', error)
+      // }
+
+      const response = await Network.get(Urls.addBrand)
+      if (!response.ok) return consoe.log(response.data.error)
+      const brandsData = response.data.results || []
+      setBrands(Array.isArray(brandsData) ? brandsData : [])
     }
 
     fetchBrands()
@@ -422,16 +428,16 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [headResponse, parentResponse, brandResponse] = await Promise.all([
+        const [headResponse, parentResponse] = await Promise.all([
           axios.get('http://195.26.253.123/pos/products/add_head_category'),
           axios.get('http://195.26.253.123/pos/products/add_parent_category/'),
 
-          axios.get('http://195.26.253.123/pos/products/add_brand'),
+          // axios.get('http://195.26.253.123/pos/products/add_brand'),
         ])
 
         //const brandsData = brandResponse.data.results || [];
         // Set states with fetched data
-        setBrands(Array.isArray(brandResponse.data.results) ? brandResponse.data.results : [])
+        // setBrands(Array.isArray(brandResponse.data.results) ? brandResponse.data.results : [])
         setHeadCategories(headResponse.data)
         setParentCategories(parentResponse.data)
       } catch (error) {
@@ -451,23 +457,30 @@ const AddProduct = () => {
   }, [])
 
   const fetchProductList = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_temp_product')
-      setProductList(response.data)
-    } catch (error) {
-      console.error('Error fetching products:', error)
-    }
+    // try {
+    //   const response = await axios.get('http://195.26.253.123/pos/products/add_temp_product')
+    //   setProductList(response.data)
+    // } catch (error) {
+    //   console.error('Error fetching products:', error)
+    // }
+
+    const response = await Network.get(Urls.addProduct)
+    if (!response.ok) return console.log(response.data.error)
+    setProductList(response.data)
   }
 
   // Function to fetch outlets from API
   useEffect(() => {
     const fetchOutlets = async () => {
-      try {
-        const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/')
-        setOutlets(response.data) // Assuming the response data is an array
-      } catch (error) {
-        console.error('Error fetching outlets:', error)
-      }
+      //   try {
+      //     const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/')
+      //     setOutlets(response.data) // Assuming the response data is an array
+      //   } catch (error) {
+      //     console.error('Error fetching outlets:', error)
+      //   }
+      const response = await Network.get(Urls.fetchtheOutlets)
+      if (!response.ok) return consoe.log(response.data.error)
+      setOutlets(response.data)
     }
 
     fetchOutlets()
@@ -536,22 +549,28 @@ const AddProduct = () => {
       sub_category: selectedsubCategory,
       brand: selectedBrand, // This will send the brand id as "3", "4", etc.
     }
-    try {
-      const response = await axios.post(
-        'http://195.26.253.123/pos/products/add_temp_product',
-        newProduct,
-      )
-      if (response.status === 200 || response.status === 201) {
-        alert('Product added successfully!')
-        fetchProductList()
-        resetForm()
-      } else {
-        alert('Failed to add the product. Please try again.')
-      }
-    } catch (error) {
-      console.error('Error adding product:', error)
-      alert('An error occurred while adding the product.')
-    }
+    // try {
+    //   const response = await axios.post(
+    //     'http://195.26.253.123/pos/products/add_temp_product',
+    //     newProduct,
+    //   )
+    //   if (response.status === 200 || response.status === 201) {
+    //     alert('Product added successfully!')
+    //     fetchProductList()
+    //     resetForm()
+    //   } else {
+    //     alert('Failed to add the product. Please try again.')
+    //   }
+    // } catch (error) {
+    //   console.error('Error adding product:', error)
+    //   alert('An error occurred while adding the product.')
+    // }
+
+    const response = await Network.post(Urls.addProduct, newProduct)
+    if (!response.ok) return console.log(response.data.error)
+    alert('Product added successfully!')
+    fetchProductList()
+    resetForm()
   }
 
   const handleEdit = async (id, e) => {

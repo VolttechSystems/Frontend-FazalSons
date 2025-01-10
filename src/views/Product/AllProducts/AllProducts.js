@@ -1,10 +1,8 @@
-
-
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Barcode from "react-barcode";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import "./AllProducts.css";
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import Barcode from 'react-barcode'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import './AllProducts.css'
 import {
   Button,
   Dialog,
@@ -17,9 +15,10 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+} from '@mui/material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { Network, Urls } from '../../../api-config'
 
 const Loader = () => (
   <div className="text-center my-5">
@@ -27,74 +26,86 @@ const Loader = () => (
       <span className="visually-hidden">Loading...</span>
     </div>
   </div>
-);
+)
 
 const AllProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [productDetails, setProductDetails] = useState(null); // Store product details for modal
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-  const navigate = useNavigate();
-  const { outletId } = useParams();
-  
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [productDetails, setProductDetails] = useState(null) // Store product details for modal
+  const [isModalOpen, setIsModalOpen] = useState(false) // Modal state
+  const navigate = useNavigate()
+  const { outletId } = useParams()
 
   // Fetch all products
   const fetchProducts = async () => {
-    try {
-      const response = await axios.get(
-        `http://195.26.253.123/pos/products/show_product/${outletId}/`
-      );
-      setProducts(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setError("Failed to fetch products.");
-      setLoading(false);
-    }
-  };
+    // try {
+    //   const response = await axios.get(
+    //     `http://195.26.253.123/pos/products/show_product/${outletId}/`
+    //   );
+    //   setProducts(response.data);
+    //   setLoading(false);
+    // } catch (error) {
+    //   console.error("Error fetching products:", error);
+    //   setError("Failed to fetch products.");
+    //   setLoading(false);
+    // }
+    // (Urls.addBrand)
+
+    // const url = outletId
+    //       ? `${Urls.fetchAllProducts}/${outletId}/`
+    //       : Urls.addHeadCategory
+
+    const response = await Network.get(`${Urls.fetchAllProducts}${outletId}/`)
+    if (!response.ok) return console.log(response.data.error)
+    setProducts(response.data)
+    setLoading(false)
+  }
 
   // Fetch product details for modal
   const fetchProductDetails = async (productId) => {
-    try {
-      const response = await axios.get(
-        `http://195.26.253.123/pos/products/shows_all_product_detail/${productId}/`
-      );
-      setProductDetails(response.data);
-      setIsModalOpen(true); // Open modal after fetching details
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-      alert("Failed to fetch product details.");
-    }
-  };
+    // try {
+    //   const response = await axios.get(
+    //     `http://195.26.253.123/pos/products/shows_all_product_detail/${productId}/`,
+    //   )
+    //   setProductDetails(response.data)
+    //   setIsModalOpen(true) // Open modal after fetching details
+    // } catch (error) {
+    //   console.error('Error fetching product details:', error)
+    //   alert('Failed to fetch product details.')
+    // }
+
+    const response = await Network.get(`${Urls.ShowAllProductDetails}${productId}/`)
+    if (!response.ok) return console.log(response.data.error)
+    setProductDetails(response.data)
+    setIsModalOpen(true) // Open modal after fetching details
+  }
 
   useEffect(() => {
-    fetchProducts();
-  }, [outletId]);
+    fetchProducts()
+  }, [outletId])
 
   const handleDelete = async (sku) => {
-    if (window.confirm("Are you sure you want to delete this Product?")) {
+    if (window.confirm('Are you sure you want to delete this Product?')) {
       try {
-        await axios.delete(
-          `http://195.26.253.123/pos/products/action_product/${sku}/`
-        );
-        alert("Product deleted successfully!");
-        fetchProducts(); // Refresh products after deletion
+        await axios.delete(`http://195.26.253.123/pos/products/action_product/${sku}/`)
+        alert('Product deleted successfully!')
+        fetchProducts() // Refresh products after deletion
       } catch (error) {
-        console.error("Error deleting Product:", error);
-        alert("Failed to delete Product.");
+        console.error('Error deleting Product:', error)
+        alert('Failed to delete Product.')
       }
     }
-  };
+  }
 
   const handleEdit = (id) => {
-    navigate(`/Product/ProductEdit/${id}`); // Navigate to AddProduct with product ID
-  };
+    navigate(`/Product/ProductEdit/${id}`) // Navigate to AddProduct with product ID
+  }
 
   const handleCloseModal = () => {
-    setIsModalOpen(false); // Close modal
-    setProductDetails(null); // Clear product details
-  };
+    setIsModalOpen(false) // Close modal
+    setProductDetails(null) // Clear product details
+  }
 
   return (
     <div>
@@ -122,7 +133,7 @@ const AllProducts = () => {
                 <Button
                   onClick={() => fetchProductDetails(product.id)}
                   variant="contained"
-                  style={{ backgroundColor: "#1976d2", color: "#fff" }}
+                  style={{ backgroundColor: '#1976d2', color: '#fff' }}
                 >
                   Product Detail
                 </Button>
@@ -158,13 +169,13 @@ const AllProducts = () => {
                       <TableCell>{header.head_category}</TableCell>
                       <TableCell>{header.parent_category}</TableCell>
                       <TableCell>{header.category}</TableCell>
-                      <TableCell>{header.sub_category || "-"}</TableCell>
+                      <TableCell>{header.sub_category || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
 
-              <Typography variant="h6" style={{ marginTop: "20px" }}>
+              <Typography variant="h6" style={{ marginTop: '20px' }}>
                 Detailed Information
               </Typography>
               <Table>
@@ -201,8 +212,8 @@ const AllProducts = () => {
                           onClick={() => handleEdit(detail.id)}
                           variant="contained"
                           style={{
-                            marginRight: "8px",
-                            backgroundColor: "#6ac267",
+                            marginRight: '8px',
+                            backgroundColor: '#6ac267',
                           }}
                         >
                           <FontAwesomeIcon icon={faEdit} />
@@ -210,7 +221,7 @@ const AllProducts = () => {
                         <Button
                           onClick={() => handleDelete(detail.sku)}
                           variant="contained"
-                          style={{ backgroundColor: "#ee4262" }}
+                          style={{ backgroundColor: '#ee4262' }}
                         >
                           <FontAwesomeIcon icon={faTrash} />
                         </Button>
@@ -231,7 +242,7 @@ const AllProducts = () => {
         </DialogActions>
       </Dialog>
     </div>
-  );
-};
+  )
+}
 
-export default AllProducts;
+export default AllProducts

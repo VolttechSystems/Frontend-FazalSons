@@ -27,17 +27,24 @@ const AddBrands = () => {
     // Fetch brand details for editing
     if (id) {
       const fetchBrandDetails = async () => {
-        try {
-          const response = await axios.get(`http://195.26.253.123/pos/products/action_brand/${id}/`)
-          const brand = response.data
-          setBrandName(brand.brand_name)
-          setSymbol(brand.symbol)
-          setDescription(brand.description)
-          setStatus(brand.status)
-        } catch (error) {
-          console.error('Failed to fetch brand for editing:', error)
-          setErrorMessage('Failed to load brand details.')
-        }
+        // try {
+        //   const response = await axios.get(`http://195.26.253.123/pos/products/action_brand/${id}/`)
+        //   const brand = response.data
+        //   setBrandName(brand.brand_name)
+        //   setSymbol(brand.symbol)
+        //   setDescription(brand.description)
+        //   setStatus(brand.status)
+        // } catch (error) {
+        //   console.error('Failed to fetch brand for editing:', error)
+        //   setErrorMessage('Failed to load brand details.')
+        // }
+        const response = await Network.get(`${Urls.updateBrand}/${id}/`)
+        if (!response.ok) return console.log(response.data.error)
+        const brand = response.data
+        setBrandName(brand.brand_name)
+        setSymbol(brand.symbol)
+        setDescription(brand.description)
+        setStatus(brand.status)
       }
       fetchBrandDetails()
     }
@@ -52,13 +59,32 @@ const AddBrands = () => {
       status: status,
     }
 
-    const url = id ? `${Urls.updateBrand}/${id}` : Urls.addBrand
+    // const response = await Network.post(Urls.addBrand, brandData)
+    // if (!response.ok) return consoe.log(response.data.error)
+    // alert('Brand added successfully!')
+    // navigate('/Product/Brands')
+
+    const url = id ? `${Urls.updateBrand}/${id}/` : Urls.addBrand
     const req = id ? 'put' : 'post'
 
     const response = await Network[req](url, brandData)
-    if (!response.ok) return consoe.log(response.data.error)
+    if (!response.ok) return console.log(response.data.error)
     alert(id ? 'Brand updated successfully!' : 'Brand added successfully!')
     navigate('/Product/Brands')
+
+    // try {
+    //   if (id) {
+    //     await axios.put(`http://195.26.253.123/pos/products/action_brand/${id}/`, brandData)
+    //     alert('Brand updated successfully!')
+    //   } else {
+    //     await axios.post('http://195.26.253.123/pos/products/add_brand', brandData)
+    //     alert('Brand added successfully!')
+    //   }
+    //   navigate('/Product/Brands')
+    // } catch (error) {
+    //   console.error('Error saving the brand:', error)
+    //   setErrorMessage('Error saving the brand. Please try again.')
+    // }
   }
 
   return (
