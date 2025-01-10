@@ -149,7 +149,7 @@ const AllProducts = () => {
         <DialogContent>
           {productDetails ? (
             <div>
-              <Typography variant="h6">Header Information</Typography>
+              <Typography variant="h6">Parent Information</Typography>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -219,7 +219,7 @@ const AllProducts = () => {
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
                         <Button
-                          onClick={() => handleDelete(detail.sku)}
+                          onClick={() => handleDelete(detail.id)}
                           variant="contained"
                           style={{ backgroundColor: '#ee4262' }}
                         >
