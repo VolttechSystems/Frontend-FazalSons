@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -18,26 +18,31 @@ import { sygnet } from 'src/assets/brand/sygnet'
 
 // sidebar nav config
 import navigation from '../_nav'
+import _nav from '../_nav'
+import useAuth from '../hooks/useAuth'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const { systemRoles } = useAuth()
+  console.log({ systemRoles })
 
+  // Function to filter navigation items based on permissions
+  const filterNavItems = (navItems) => {
+    const permissions = systemRoles.length > 0 ? systemRoles[0].permissions : []
 
-  const permissions = ["dashboard"]
-
-  const filterNavItems = (nav)=>{
-
-    return navItems.filter(navItem=>{
-      if(permissions.includes(navItem.key)){
+    return navItems.filter((item) => {
+      if (permissions.some((permission) => permission.permission_name === item.key)) {
         return true
       }
+      return false
     })
-
-
   }
 
+  const filteredNav = useMemo(() => {
+    return filterNavItems(navigation)
+  }, [systemRoles])
 
   return (
     <CSidebar
@@ -63,38 +68,37 @@ const AppSidebar = () => {
       
     </CSidebarHeader> */}
 
-<CSidebarHeader className="border-bottom">
-<CSidebarHeader className="border-bottom">
-  <CSidebarBrand to="/" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
-    <span
-      className="sidebar-brand-full"
-      style={{
-        fontFamily: "'Times New Roman', serif",
-        fontSize: '1.9rem',
-        color: '#ffffff',
-        fontWeight: 'bold',
-        marginLeft: '10px',
-        textDecoration: 'none !important', // Remove underline
-      }}
-    >
-      Fazal Sons
-    </span>
-    <span
-      className="sidebar-brand-narrow"
-      style={{
-        fontFamily: "'Times New Roman', serif", // Ensure the same font for consistency
-        fontSize: '1.2rem',
-        color: '#ffffff',
-        fontWeight: '600',
-        marginLeft: '5px',
-        textDecoration: 'none !important', // Remove underline
-      }}
-    >
-      FS
-    </span>
-  </CSidebarBrand>
-</CSidebarHeader>
-
+      <CSidebarHeader className="border-bottom">
+        <CSidebarHeader className="border-bottom">
+          <CSidebarBrand to="/" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+            <span
+              className="sidebar-brand-full"
+              style={{
+                fontFamily: "'Times New Roman', serif",
+                fontSize: '1.9rem',
+                color: '#ffffff',
+                fontWeight: 'bold',
+                marginLeft: '10px',
+                textDecoration: 'none !important', // Remove underline
+              }}
+            >
+              Fazal Sons
+            </span>
+            <span
+              className="sidebar-brand-narrow"
+              style={{
+                fontFamily: "'Times New Roman', serif", // Ensure the same font for consistency
+                fontSize: '1.2rem',
+                color: '#ffffff',
+                fontWeight: '600',
+                marginLeft: '5px',
+                textDecoration: 'none !important', // Remove underline
+              }}
+            >
+              FS
+            </span>
+          </CSidebarBrand>
+        </CSidebarHeader>
 
         <CCloseButton
           className="d-lg-none"
@@ -103,12 +107,7 @@ const AppSidebar = () => {
         />
       </CSidebarHeader>
 
-
-
-
-
-
-      <AppSidebarNav items={navigation} />
+      <AppSidebarNav items={filteredNav} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}

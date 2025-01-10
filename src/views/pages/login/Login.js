@@ -17,11 +17,14 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { Network, Urls } from '../../../api-config'
+import useAuth from '../../../hooks/useAuth'
 
 const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+
+  const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleLogin = async () => {
@@ -38,15 +41,14 @@ const Login = () => {
     if (!response.ok) return setError(response.data.error)
 
     const { token, System_role } = response.data
+
     localStorage.setItem('authToken', token)
     const sysRoles = JSON.stringify(response.data.System_role || []) // Corrected the property name
-    const permissions = JSON.stringify(
-      System_role?.[0]?.permissions || [], // Access permissions for the first role
-    )
+
+    login(token, System_role)
 
     // Store in localStorage
     localStorage.setItem('SysRoles', sysRoles)
-    localStorage.setItem('Permissions', permissions)
     navigate('/dashboard/')
   }
 

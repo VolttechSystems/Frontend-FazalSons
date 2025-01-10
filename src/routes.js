@@ -8,7 +8,7 @@ const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 //Product
 
-const POS = React.lazy(() => import('./views/base/POS/POSTable'))
+const POS = React.lazy(() => import('./views/base/POS/POS'))
 const POSTable2 = React.lazy(() => import('./views/base/POSTable2/POSTable2'))
 const Salesman = React.lazy(() => import('./views/Admin/Salesman/Salesman'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
@@ -80,7 +80,7 @@ const routes = [
     path: '/base/POS',
     name: 'POS',
     element: 'POS',
-    element: (props) => <AuthGuard element={POS} requiredPermission="Admin" {...props} />,
+    element: (props) => <AuthGuard element={POS} requiredPermission="Transaction" {...props} />,
   }, // POS
   {
     path: '/base/POSTable2',

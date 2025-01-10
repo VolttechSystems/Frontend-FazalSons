@@ -164,6 +164,12 @@ td button {
   .user-table tr:hover {
     background-color: #f1f1f1;
   }
+  .user-table td {
+    border: 1px solid #ddd; /* Optional: Add borders for better visuals */
+    padding: 8px; /* Optional: Add some padding for readability */
+    background-color: #f1f1f1;
+  }
+  
 /* Modal container */
 .modal {
   display: none; /* Hidden by default */
