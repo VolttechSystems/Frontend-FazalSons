@@ -24,6 +24,21 @@ const AppSidebar = () => {
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+
+  const permissions = ["dashboard"]
+
+  const filterNavItems = (nav)=>{
+
+    return navItems.filter(navItem=>{
+      if(permissions.includes(navItem.key)){
+        return true
+      }
+    })
+
+
+  }
+
+
   return (
     <CSidebar
       className="border-end"

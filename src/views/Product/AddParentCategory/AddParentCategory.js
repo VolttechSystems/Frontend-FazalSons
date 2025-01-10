@@ -1,6 +1,4 @@
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   CButton,
   CCard,
@@ -13,56 +11,72 @@ import {
   CFormLabel,
   CRow,
   CFormSelect,
-} from '@coreui/react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+} from '@coreui/react'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import axios from 'axios'
+import { Network, Urls } from '../../../api-config'
 
 const AddParentCategory = () => {
-  const [categoryHeads, setCategoryHeads] = useState([]);
-  const [hc_name, setCategoryHead] = useState('');
-  const [pc_name, setPCname] = useState('');
-  const [symbol, setShortForm] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('active');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [categoryHeads, setCategoryHeads] = useState([])
+  const [hc_name, setCategoryHead] = useState('')
+  const [pc_name, setPCname] = useState('')
+  const [symbol, setShortForm] = useState('')
+  const [description, setDescription] = useState('')
+  const [status, setStatus] = useState('active')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const navigate = useNavigate()
+  const { id } = useParams()
 
   useEffect(() => {
     const fetchCategoryHeads = async () => {
-      try {
-        const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
-        setCategoryHeads(response.data);
-      } catch (error) {
-        console.error('Error fetching category heads:', error);
-        setErrorMessage('Failed to fetch category heads.');
-      }
-    };
+      // try {
+      //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
+      //   setCategoryHeads(response.data);
+      // } catch (error) {
+      //   console.error('Error fetching category heads:', error);
+      //   setErrorMessage('Failed to fetch category heads.');
+      // }
+
+      const response = await Network.get(Urls.addHeadCategory)
+      if (!response.ok) return consoe.log(response.data.error)
+      setCategoryHeads(response.data)
+    }
 
     const fetchParentCategoryDetails = async () => {
       if (id) {
-        try {
-          const response = await axios.get(`http://195.26.253.123/pos/products/action_parent_category/${id}/`);
-          const data = response.data;
-          setCategoryHead(data.hc_name);
-          setPCname(data.pc_name);
-          setShortForm(data.symbol);
-          setDescription(data.description);
-          setStatus(data.status);
-        } catch (error) {
-          console.error('Error fetching parent category details:', error);
-          setErrorMessage('Failed to fetch category details.');
-        }
-      }
-    };
+        // try {
+        //   const response = await axios.get(
+        //     `http://195.26.253.123/pos/products/action_parent_category/${id}/`,
+        //   )
+        //   const data = response.data
+        //   setCategoryHead(data.hc_name)
+        //   setPCname(data.pc_name)
+        //   setShortForm(data.symbol)
+        //   setDescription(data.description)
+        //   setStatus(data.status)
+        // } catch (error) {
+        //   console.error('Error fetching parent category details:', error)
+        //   setErrorMessage('Failed to fetch category details.')
+        // }
 
-    fetchCategoryHeads();
-    fetchParentCategoryDetails();
-  }, [id]);
+        const response = await Network.get(`${Urls.updateParentCategory}/${id}/`)
+        if (!response.ok) return console.log(response.data.error)
+        const data = response.data
+        setCategoryHead(data.hc_name)
+        setPCname(data.pc_name)
+        setShortForm(data.symbol)
+        setDescription(data.description)
+        setStatus(data.status)
+      }
+    }
+
+    fetchCategoryHeads()
+    fetchParentCategoryDetails()
+  }, [id])
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     const ParentCategoryData = {
       hc_name: hc_name,
@@ -70,43 +84,57 @@ const AddParentCategory = () => {
       symbol: symbol,
       description: description,
       status: status,
-    };
-
-    try {
-      if (id) {
-        await axios.put(`http://195.26.253.123/pos/products/action_parent_category/${id}/`, ParentCategoryData);
-        alert('Parent Category updated successfully!');
-      } else {
-        await axios.post('http://195.26.253.123/pos/products/add_parent_category', ParentCategoryData);
-        alert('Parent Category added successfully!');
-      }
-
-      navigate('/Product/ParentCategory');
-    } catch (error) {
-      console.error('There was an error saving the Parent Category!', error);
-      setErrorMessage('Error saving Parent Category. Please try again.');
     }
-  };
+
+    // try {
+    //   if (id) {
+    //     await axios.put(
+    //       `http://195.26.253.123/pos/products/action_parent_category/${id}/`,
+    //       ParentCategoryData,
+    //     )
+    //     alert('Parent Category updated successfully!')
+    //   } else {
+    //     await axios.post(
+    //       'http://195.26.253.123/pos/products/add_parent_category',
+    //       ParentCategoryData,
+    //     )
+    //     alert('Parent Category added successfully!')
+    //   }
+
+    //   navigate('/Product/ParentCategory')
+    // } catch (error) {
+    //   console.error('There was an error saving the Parent Category!', error)
+    //   setErrorMessage('Error saving Parent Category. Please try again.')
+    // }
+
+    if (id) {
+      const url = id ? `${Urls.updateParentCategory}/${id}/` : Urls.addParentCategory
+      const req = id ? 'put' : 'post'
+
+      const response = await Network[req](url, ParentCategoryData)
+      if (!response.ok) return consoe.log(response.data.error)
+      alert(id ? 'Parent Category updated successfully!' : 'Parent Category added successfully!')
+    }
+    navigate('/Product/ParentCategory')
+  }
 
   const handleAddCategoryHead = () => {
-       navigate('/Product/AddHeadCategory');
-     };
+    navigate('/Product/AddHeadCategory')
+  }
 
   return (
     <CRow>
       <CCol xs={12}>
         <CCard className="mb-4">
-        
           <CCardHeader>
             <strong>{id ? 'Edit Parent Category' : 'Add Parent Category'}</strong>
             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-          <Link to="/Product/ParentCategory">
-            <CButton color="primary">Parent Category</CButton>
-          </Link>
-        </div>
+              <Link to="/Product/ParentCategory">
+                <CButton color="primary">Parent Category</CButton>
+              </Link>
+            </div>
           </CCardHeader>
           <CCardBody>
-         
             {errorMessage && <p className="text-danger">{errorMessage}</p>}
             <CForm onSubmit={handleSubmit}>
               <div className="mb-3">
@@ -124,8 +152,10 @@ const AddParentCategory = () => {
                     </option>
                   ))}
                 </CFormSelect>
-                <CButton color="primary" onClick={handleAddCategoryHead} className="ms-2"> + </CButton>
-               
+                <CButton color="primary" onClick={handleAddCategoryHead} className="ms-2">
+                  {' '}
+                  +{' '}
+                </CButton>
               </div>
               <div className="mb-3">
                 <CFormLabel htmlFor="pc_name">Parent Category *</CFormLabel>
@@ -144,7 +174,6 @@ const AddParentCategory = () => {
                   id="symbol"
                   value={symbol}
                   onChange={(e) => setShortForm(e.target.value)}
-                  
                 />
               </div>
               <div className="mb-3">
@@ -154,7 +183,6 @@ const AddParentCategory = () => {
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  
                 />
               </div>
               <div className="mb-3">
@@ -200,7 +228,7 @@ const AddParentCategory = () => {
         </CCard>
       </CCol>
     </CRow>
-  );
-};
+  )
+}
 
-export default AddParentCategory;
+export default AddParentCategory

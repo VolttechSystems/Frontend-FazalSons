@@ -115,4 +115,37 @@
   .Select__control {
     margin-bottom: 20px;
   }
-  
+
+ /* Styles for Add/Edit Role Button */
+.add-edit-role-btn {
+  color: white;
+  background-color: green;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-edit-role-btn:hover {
+  background-color: darkgreen;
+}
+
+/* Styles for Clear Button */
+.clear-role-btn {
+  color: white;
+  background-color: red;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.clear-role-btn:hover {
+  background-color: darkred;
+}
+
+/* Focus outline removal */
+.add-edit-role-btn:focus,
+.clear-role-btn:focus {
+  outline: none;
+}

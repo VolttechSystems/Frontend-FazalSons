@@ -39,7 +39,7 @@
   }
   
   form button {
-    background-color: #4CAF50;
+    background-color: green;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -49,51 +49,71 @@
   }
   
   form button:hover {
-    background-color: #45a049;
+    background-color: darkgreen;
   }
   
-  /* Table styling */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  table th,
-  table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  table th {
-    background-color: #f2f2f2;
-    color: #333;
-  }
-  
-  table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  table td button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  table td button:hover {
-    background-color:  #4CAF50;
-  }
-  
-  table td button:first-child {
-    margin-right: 10px;
-  }
-  
+
+ /* Table Styling */
+.payment-methods-table {
+  width: 100%;
+  border-collapse: collapse; /* Ensures borders don't overlap */
+  margin-top: 20px;
+}
+
+.payment-methods-table th,
+.payment-methods-table td {
+  border: 1px solid #ddd; /* Light gray border */
+  padding: 10px; /* Spacing inside cells */
+  text-align: left; /* Align text to the left */
+}
+
+.payment-methods-header {
+  background-color: #0056b3; /* Blue background */
+  color: white; /* White font */
+  border-bottom: 2px solid #0056b3; /* Slightly darker border under the header */
+}
+
+/* Table Row Borders */
+.payment-methods-table tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray for alternate rows */
+}
+
+.payment-methods-table tr:hover {
+  background-color: #e9ecef; /* Slightly darker gray on hover */
+  border: 1px solid #ccc; /* Highlight border on hover */
+}
+/* Edit Button Styling */
+.payment-edit-button {
+  padding: 8px 15px;
+  margin-right: 10px; /* Adds space to the right of the Edit button */
+  border: 1px solid green; /* Green border */
+  background-color: green; /* Green background */
+  color: white; /* White font */
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.payment-edit-button:hover {
+  background-color: darkgreen; /* Darker green on hover */
+  border-color: darkgreen; /* Darker green border on hover */
+}
+
+/* Delete Button Styling */
+.payment-delete-button {
+  padding: 8px 15px;
+  margin-left: 10px; /* Optional: Adds space to the left of the Delete button */
+  border: 1px solid red; /* Red border */
+  background-color: red; /* Red background */
+  color: white; /* White font */
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.payment-delete-button:hover {
+  background-color: darkred; /* Darker red on hover */
+  border-color: darkred; /* Darker red border on hover */
+}

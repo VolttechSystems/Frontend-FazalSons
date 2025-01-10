@@ -526,85 +526,106 @@ const handleInputChange = (e) => {
       <h2 className="form-title">Add Sub-Categories</h2>
       {message && <p className="form-message">{message}</p>}
       <form className="form" onSubmit={handleSubmit}>
-        {/* Head Category Dropdown */}
-        <div className="form-group">
-          <label>Head Category:</label>
-          <select
-            name="headCategory"
-            value={formData.headCategory}
-            onChange={handleHeadCategoryChange}
-            className="form-select"
-          >
-            <option value="">Select</option>
-            {headCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.hc_name}
-              </option>
-            ))}
-          </select>
-          <Link to="/Product/AddHeadCategory">
-        <button>+</button>
-      </Link>
-        </div>
-
-        {/* Parent Category Dropdown */}
-        <div className="form-group">
-  <label>Parent Category:</label>
-  <select
-    name="pc_name"
-    value={formData.selectedParentCategory}
-    onChange={handleParentCategoryChange}
-    className="form-select"
-  > 
-
-    <option value="">Select Parent Category</option>  {/* Default option */}
-    {parentCategories.map((category) => (
-      
-      <option key={category.id} value={category.id}>
-        {category.pc_name}
-      </option>
-     
-    ))}
-  </select>
-  <Link to="/Product/AddParentCategory">
-        <button>+</button>
-      </Link>
-
-
+   {/* Head Category Dropdown */}
+<div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+  <label style={{ fontWeight: "bold" }}>Head Category: *</label>
+  <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
+    <select
+      name="headCategory"
+      value={formData.headCategory}
+      onChange={handleHeadCategoryChange}
+      style={{
+        flex: 1,
+        padding: "8px",
+        border: "1px solid #ced4da", // Matches input field border
+        borderRadius: "4px",         // Adds consistent rounded corners
+        backgroundColor: "#fff",    // Matches input field background
+      }}
+    >
+      <option value="">Select</option>
+      {headCategories.map((category) => (
+        <option key={category.id} value={category.id}>
+          {category.hc_name}
+        </option>
+      ))}
+    </select>
+    <Link to="/Product/AddHeadCategory">
+      <button style={{ padding: "8px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+        +
+      </button>
+    </Link>
+  </div>
 </div>
 
-<div className="form-group">
-  <label>Category:</label>
-  <select
-    name="category_name"
-    value={formData.selectedCategory}
-    onChange={(e) => {
-      const selectedOptionId = e.target.value; // Get the ID of the selected option
-      console.log({selectedOptionId})
-      setFormData({
-        ...formData,
-        category_name: selectedOptionId,  // Store the selected ID instead of the name
-      });
-      //console.log(category_name)
-
-      
-    }}
-    className="form-select"
-  > 
-
-    <option value="">Select Category</option>  {/* Default option */}
-    {categories.map((category) => (
-      
-      <option key={category.id} value={category.id}>
-        {category.category_name}
-      </option>
-     
-    ))}
-  </select>
-  <Link to="/Category/AddCategories">
-        <button>+</button>
-      </Link>
+{/* Parent Category Dropdown */}
+<div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+  <label style={{ fontWeight: "bold" }}>Parent Category: *</label>
+  <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
+    <select
+      name="pc_name"
+      value={formData.selectedParentCategory}
+      onChange={handleParentCategoryChange}
+      style={{
+        flex: 1,
+        padding: "8px",
+        border: "1px solid #ced4da", // Matches input field border
+        borderRadius: "4px",         // Adds consistent rounded corners
+        backgroundColor: "#fff",    // Matches input field background
+      }}
+    >
+      <option value="">Select Parent Category</option>
+      {parentCategories.map((category) => (
+        <option key={category.id} value={category.id}>
+          {category.pc_name}
+        </option>
+      ))}
+    </select>
+    <Link to="/Product/AddParentCategory">
+      <button style={{ padding: "8px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+        +
+      </button>
+    </Link>
   </div>
+</div>
+
+{/* Category Dropdown */}
+<div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "10px" }}>
+  <label style={{ fontWeight: "bold" }}>Category: *</label>
+  <div style={{ display: "flex", gap: "7px", alignItems: "center" }}>
+    <select
+      name="category_name"
+      value={formData.selectedCategory}
+      onChange={(e) => {
+        const selectedOptionId = e.target.value;
+        setFormData({
+          ...formData,
+          category_name: selectedOptionId,
+        });
+      }}
+      style={{
+        flex: 1,
+        padding: "8px",
+        border: "1px solid #ced4da", // Matches input field border
+        borderRadius: "4px",         // Adds consistent rounded corners
+        backgroundColor: "#fff",    // Matches input field background
+      }}
+    >
+      <option value="">Select Category</option>
+      {categories.map((category) => (
+        <option key={category.id} value={category.id}>
+          {category.category_name}
+        </option>
+      ))}
+    </select>
+    <Link to="/Category/AddCategories">
+      <button style={{ padding: "8px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+        +
+      </button>
+    </Link>
+  </div>
+</div>
+
+
 
 
 

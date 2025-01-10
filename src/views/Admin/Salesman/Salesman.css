@@ -64,35 +64,8 @@ form button:hover {
 }
 
 /* Table styles */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
 
-table thead tr {
-  background-color: #24b139;
-  color: white;
-}
 
-table th,
-table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
-}
-
-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-table tbody tr:hover {
-  background-color: #e9ecef;
-}
-
-table th {
-  font-weight: bold;
-}
 /* Table Action Buttons */
 table button {
   padding: 8px 12px;
@@ -124,4 +97,49 @@ table button:last-child {
 table button:last-child:hover {
   background-color: #d43f2f;
   transform: scale(1.05);
+}
+.salesman-submit-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color: #28a745; /* Green color */
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.salesman-submit-btn:hover {
+  background-color: #218838; /* Darker green for hover */
+}
+/* Unique class for the table */
+.salesman-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.salesman-table th,
+.salesman-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.salesman-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.salesman-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Styling for the table header */
+.salesman-table-header thead {
+  background-color: #007bff; /* Blue background */
+  color: white; /* White font */
+}
+
+.salesman-table-header th {
+  font-weight: bold;
 }

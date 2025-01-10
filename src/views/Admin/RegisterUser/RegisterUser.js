@@ -18,6 +18,14 @@ function RegisterUser() {
     system_roles: []
   });
   const [userList, setUserList] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({ username: "", user_id: null });
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordErrors, setNewPasswordErrors] = useState([]); // Declare the state for errors
+  const [passwordChangeMessage, setPasswordChangeMessage] = useState(null);
+
+
+
 
   // Fetch system roles from API
   useEffect(() => {
@@ -50,11 +58,52 @@ function RegisterUser() {
       .catch((error) => console.log("Error fetching users:", error));
   };
 
- 
+  const handleEditClick = (user) => {
+    console.log("Edit user clicked:", user); // Debugging
+    setSelectedUser({ username: user.username, user_id: user.id });
+    setShowEditModal(true);
+  };
+  
+  const handlePasswordChange = () => {
+    const payload = {
+      user_id: selectedUser.user_id,
+      new_password: newPassword,
+    };
+  
+    axios
+      .post("http://195.26.253.123/pos/accounts/admin-change-password/", payload)
+      .then((response) => {
+        // Log the entire response to make sure the message is in the response
+        console.log("Response from backend:", response);
+  
+        // Check if message exists in response.data
+        if (response.data && response.data.message) {
+          setPasswordChangeMessage(response.data.message);
+        } else {
+          console.log("No message found in response data");
+        }
+  
+        // Reset the modal and password fields after success
+        setShowEditModal(false);
+        setNewPassword("");
+        setNewPasswordErrors([]); // Reset errors on success
+      })
+      .catch((error) => {
+        console.error("Error changing password:", error);
+        if (error.response && error.response.data) {
+          setNewPasswordErrors(error.response.data.new_password || []); // Set errors if available
+        }
+      });
+  };
+  
+
+  
+
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev); // Toggle password visibility
   };
-  
+
+
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -112,6 +161,11 @@ function RegisterUser() {
 
   return (
     <div className="container">
+        {passwordChangeMessage && (
+      <div className="alert alert-success" role="alert">
+        {passwordChangeMessage}
+      </div>
+    )}
       <h2>Register User</h2>
       <form className="form" onSubmit={handleSubmit}>
         {/* Form Fields */}
@@ -166,7 +220,14 @@ function RegisterUser() {
   </div>
 </div>
 
-
+ {/* Show password validation errors */}
+ {newPasswordErrors.length > 0 && (
+          <div className="password-errors">
+            {newPasswordErrors.map((error, index) => (
+              <p key={index} className="error-message">{error}</p>
+            ))}
+          </div>
+        )}
         
         <div className="input-group">
           <label>Email</label>
@@ -220,22 +281,25 @@ function RegisterUser() {
             placeholder="Select roles"
           />
         </div>
-        <button type="submit">Add User</button>
+        <button className="addUser-button1" type="submit">Add User</button>
       </form>
+    
+
 
       {/* User Table */}
-      <h3>Registered Users</h3>
-      <table className="user-table">
-        <thead>
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Actions</th> 
-           
-          </tr>
-        </thead>
+     
+<h3 className="user-table-title">Registered Users</h3>
+<table className="user-table">
+  <thead className="user-table-header">
+    <tr>
+      <th className="user-table-header-item">First Name</th>
+      <th className="user-table-header-item">Last Name</th>
+      <th className="user-table-header-item">Username</th>
+      <th className="user-table-header-item">Email</th>
+      <th className="user-table-header-item">Actions</th>
+    </tr>
+  </thead>
+
         <tbody>
         {userList.length > 0 ? (
     userList.map((user, index) => (
@@ -245,12 +309,19 @@ function RegisterUser() {
                 <td>{user.username}</td>
                 <td>{user.email || "N/A"}</td>
                 <td>
+                <button
+                    onClick={() => handleEditClick(user)}
+                    className="edit-button1"
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={() => handleDelete(user.id)} // Pass user ID dynamically
-                    className="delete-button"
+                    className="del-button1"
                   >
                     Delete
                   </button>
+                 
                 </td>
                 
               </tr>
@@ -264,6 +335,47 @@ function RegisterUser() {
           )}
         </tbody>
       </table>
+      {showEditModal && selectedUser && (
+  <div className="modal show">
+    <div className="modal-content">
+      <h3 className="modal-title">Change Password</h3>
+      <p className="modal-username">
+        Username: <strong>{selectedUser.username}</strong>
+      </p>
+      <input
+        type="password"
+        className="modal-input"
+        id="new-password"
+        placeholder="Enter new password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+       
+        />
+        
+        {/* Display password validation errors */}
+        {newPasswordErrors.length > 0 && (
+          <div className="password-errors">
+            {newPasswordErrors.map((error, index) => (
+              <p key={index} className="error-message">{error}</p>
+            ))}
+          </div>
+        )}
+
+
+     <div className="modal-buttons">
+  <button className="modal-btn modal-update-btn" onClick={handlePasswordChange}>
+    Update Password
+  </button>
+  <button className="modal-btn modal-cancel-btn" onClick={() => setShowEditModal(false)}>
+    Cancel
+  </button>
+</div>
+
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

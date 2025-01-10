@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   CCard,
   CCardBody,
@@ -12,36 +12,42 @@ import {
   CTableRow,
   CTableDataCell,
   CButton,
-} from '@coreui/react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+} from '@coreui/react'
+import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { Network, Urls } from '../../../api-config'
 
-const POSTable = () => {
-  const [outlets, setOutlets] = useState([]); // State to store outlets data
-  const [loading, setLoading] = useState(true); // State for loading indicator
+const POSTable2 = () => {
+  const [outlets, setOutlets] = useState([]) // State to store outlets data
+  const [loading, setLoading] = useState(true) // State for loading indicator
 
   useEffect(() => {
     // Fetch outlets data from the API
     const fetchOutlets = async () => {
-      try {
-        const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/');
-        setOutlets(response.data); // Assuming the response data is an array of outlets
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching outlets:', error);
-        setLoading(false);
-      }
-    };
+      // try {
+      //   const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/');
+      //   setOutlets(response.data); // Assuming the response data is an array of outlets
+      //   setLoading(false);
+      // } catch (error) {
+      //   console.error('Error fetching outlets:', error);
+      //   setLoading(false);
+      // }
 
-    fetchOutlets();
-  }, []);
+      const response = await Network.get(Urls.fetchtheOutlets)
+      if (!response.ok) return console.log(response.data.error)
+      setOutlets(response.data)
+      setLoading(false)
+    }
+
+    fetchOutlets()
+  }, [])
 
   return (
     <CRow>
       <CCol>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Register Systems</strong>
+            <strong>Select Outlet</strong>
           </CCardHeader>
           <CCardBody>
             {loading ? (
@@ -60,13 +66,18 @@ const POSTable = () => {
                   {outlets.map((outlet, index) => (
                     <CTableRow key={outlet.id}>
                       <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
-                      <CTableDataCell>{outlet.system_name || `System - ${index + 1}`}</CTableDataCell>
+                      <CTableDataCell>
+                        {outlet.system_name || `System - ${index + 1}`}
+                      </CTableDataCell>
                       <CTableDataCell>{outlet.outlet_name}</CTableDataCell>
                       <CTableDataCell>
-                      <Link to={`/base/Transections/${outlet.id}`}>
-  <CButton style={{ backgroundColor: "#007bff", color: "white", border: "none" }}>→</CButton>
-</Link>
-
+                        <Link to={`/Product/AllProducts/${outlet.id}`}>
+                          <CButton
+                            style={{ backgroundColor: '#007bff', color: 'white', border: 'none' }}
+                          >
+                            →
+                          </CButton>
+                        </Link>
                       </CTableDataCell>
                     </CTableRow>
                   ))}
@@ -77,7 +88,7 @@ const POSTable = () => {
         </CCard>
       </CCol>
     </CRow>
-  );
-};
+  )
+}
 
-export default POSTable;
+export default POSTable2

@@ -64,44 +64,51 @@ const AdditionalFee = () => {
 
   return (
     <div className="container">
-      <form onSubmit={handleSubmit}>
-        <h2>{editingFeeId ? 'Edit Additional Fee' : 'Add New Additional Fee'}</h2>
-        <div>
-          <label>Fee Type:</label>
-          <input
-            type="text"
-            name="fee_name"
-            value={formData.fee_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">{editingFeeId ? 'Update Fee' : 'Add Fee'}</button>
-      </form>
-
-      {/* Fee Table */}
-      {fees.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Fee Type</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fees.map((fee) => (
-              <tr key={fee.id}>
-                <td>{fee.fee_name}</td>
-                <td>
-                  <button type="button" onClick={() => handleEdit(fee)}>Edit</button>
-                  <button type="button" onClick={() => handleDelete(fee.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+  <form onSubmit={handleSubmit}>
+    <h2>{editingFeeId ? 'Edit Additional Fee' : 'Add New Additional Fee'}</h2>
+    <div>
+      <label>Fee Type:</label>
+      <input
+        type="text"
+        name="fee_name"
+        value={formData.fee_name}
+        onChange={handleChange}
+        required
+      />
     </div>
+    <button className="add-fee-button" type="submit">
+      {editingFeeId ? 'Update Fee' : 'Add Fee'}
+    </button>
+  </form>
+
+  {/* Fee Table */}
+  {fees.length > 0 && (
+    <table className="fee-table">
+      <thead>
+        <tr className="fee-table-header">
+          <th>Fee Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {fees.map((fee) => (
+          <tr key={fee.id}>
+            <td>{fee.fee_name}</td>
+            <td>
+              <button className="edit-fee-button" type="button" onClick={() => handleEdit(fee)}>
+                Edit
+              </button>
+              <button className="delete-fee-button" type="button" onClick={() => handleDelete(fee.id)}>
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
+
   );
 };
 

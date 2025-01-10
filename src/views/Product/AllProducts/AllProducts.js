@@ -1,72 +1,115 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Barcode from 'react-barcode';
-import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import Barcode from 'react-barcode'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import './AllProducts.css'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { Network, Urls } from '../../../api-config'
 
-const Loader = () => {
-  return (
-    <div className="text-center my-5">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
+const Loader = () => (
+  <div className="text-center my-5">
+    <div className="spinner-border text-primary" role="status">
+      <span className="visually-hidden">Loading...</span>
     </div>
-  );
-};
+  </div>
+)
 
 const AllProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [productDetails, setProductDetails] = useState(null) // Store product details for modal
+  const [isModalOpen, setIsModalOpen] = useState(false) // Modal state
+  const navigate = useNavigate()
+  const { outletId } = useParams()
 
-  // Define fetchProducts outside of useEffect so it can be reused
+  // Fetch all products
   const fetchProducts = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_product');
-      setProducts(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Failed to fetch products.');
-      setLoading(false);
-    }
-  };
+    // try {
+    //   const response = await axios.get(
+    //     `http://195.26.253.123/pos/products/show_product/${outletId}/`
+    //   );
+    //   setProducts(response.data);
+    //   setLoading(false);
+    // } catch (error) {
+    //   console.error("Error fetching products:", error);
+    //   setError("Failed to fetch products.");
+    //   setLoading(false);
+    // }
+    // (Urls.addBrand)
+
+    // const url = outletId
+    //       ? `${Urls.fetchAllProducts}/${outletId}/`
+    //       : Urls.addHeadCategory
+
+    const response = await Network.get(`${Urls.fetchAllProducts}${outletId}/`)
+    if (!response.ok) return console.log(response.data.error)
+    setProducts(response.data)
+    setLoading(false)
+  }
+
+  // Fetch product details for modal
+  const fetchProductDetails = async (productId) => {
+    // try {
+    //   const response = await axios.get(
+    //     `http://195.26.253.123/pos/products/shows_all_product_detail/${productId}/`,
+    //   )
+    //   setProductDetails(response.data)
+    //   setIsModalOpen(true) // Open modal after fetching details
+    // } catch (error) {
+    //   console.error('Error fetching product details:', error)
+    //   alert('Failed to fetch product details.')
+    // }
+
+    const response = await Network.get(`${Urls.ShowAllProductDetails}${productId}/`)
+    if (!response.ok) return console.log(response.data.error)
+    setProductDetails(response.data)
+    setIsModalOpen(true) // Open modal after fetching details
+  }
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts()
+  }, [outletId])
 
-  const handleDelete = async (id) => {
-    console.log({ id });
+  const handleDelete = async (sku) => {
     if (window.confirm('Are you sure you want to delete this Product?')) {
       try {
-        await axios.delete(`http://195.26.253.123/pos/products/action_product/${id}/`);
-        alert('Product deleted successfully!');
-        fetchProducts(); 
+        await axios.delete(`http://195.26.253.123/pos/products/action_product/${sku}/`)
+        alert('Product deleted successfully!')
+        fetchProducts() // Refresh products after deletion
       } catch (error) {
-        console.error('Error deleting Product:', error);
-        alert('Failed to delete Product.');
+        console.error('Error deleting Product:', error)
+        alert('Failed to delete Product.')
       }
     }
-  };
+  }
 
   const handleEdit = (id) => {
-    console.log("Editing Product with ID:", id);
-    navigate(`/Product/AddProduct/${id}`); // Navigates to the AddProduct page with product ID
-  };
-  
+    navigate(`/Product/ProductEdit/${id}`) // Navigate to AddProduct with product ID
+  }
 
- 
-
+  const handleCloseModal = () => {
+    setIsModalOpen(false) // Close modal
+    setProductDetails(null) // Clear product details
+  }
 
   return (
     <div>
       {loading && <Loader />}
-      {loading && <p>Loading products...</p>}
       {error && <p className="text-danger">{error}</p>}
       <h2>ALL PRODUCTS</h2>
       <table>
@@ -74,12 +117,8 @@ const AllProducts = () => {
           <tr>
             <th>ID</th>
             <th>Product Name</th>
-            <th>SKU</th>
-            {/* <th>Barcode</th> */}
-            <th>Item</th>
-            <th>Color</th>
-            <th>Cost Price</th>
-            <th>Selling Price</th>
+            <th>Outlet</th>
+            <th>Brand</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -88,54 +127,122 @@ const AllProducts = () => {
             <tr key={product.id}>
               <td>{product.id}</td>
               <td>{product.product_name}</td>
+              <td>{product.outlet}</td>
+              <td>{product.brand}</td>
               <td>
-                
-  <Link to={`/pages/barcode/NewBarcode/${product.sku}`}>
-  <Barcode
-    value={product.sku} // Use only SKU as the barcode value
-    format="CODE128"
-    width={0.1}
-    height={10}
-    displayValue={false} // Hide the SKU text in the barcode
-    fontSize={8}
-    margin={5}
-  />
-</Link>
-
-
-
-
-                {product.sku}</td>
-              {/* <td>
-              <Barcode
-                value={product.sku}
-                format="CODE128"
-                width={1}          // Adjust bar width
-                height={20}        // Adjust barcode height
-                displayValue={true} // Show SKU text below barcode
-                fontSize={8}       // Adjust text size
-                margin={5}         // Add margin around the barcode
-              />
-            </td> */}
-
-
-          
-              
-              <td>{product.description}</td>
-              <td>{product.color || "-"}</td>
-              <td>{product.cost_price}</td>
-              <td>{product.selling_price}</td>
-             
-              <td>
-                <button onClick={() => handleEdit(product.id)} style={{ marginRight: '8px', backgroundColor: "#6ac267" }}>  <FontAwesomeIcon icon={faEdit} /> </button>
-                <button onClick={() => handleDelete(product.id)} style={{ marginLeft: '8px' , backgroundColor:"#ee4262"}}><FontAwesomeIcon icon={faTrash} /> </button>
+                <Button
+                  onClick={() => fetchProductDetails(product.id)}
+                  variant="contained"
+                  style={{ backgroundColor: '#1976d2', color: '#fff' }}
+                >
+                  Product Detail
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
-  );
-};
 
-export default AllProducts;
+      {/* Modal for Product Details */}
+      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="lg">
+        <DialogTitle>Product Details</DialogTitle>
+        <DialogContent>
+          {productDetails ? (
+            <div>
+              <Typography variant="h6">Header Information</Typography>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Product Name</TableCell>
+                    <TableCell>Outlet</TableCell>
+                    <TableCell>Head Category</TableCell>
+                    <TableCell>Parent Category</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Sub Category</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {productDetails.header_array.map((header, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{header.product_name}</TableCell>
+                      <TableCell>{header.outlet}</TableCell>
+                      <TableCell>{header.head_category}</TableCell>
+                      <TableCell>{header.parent_category}</TableCell>
+                      <TableCell>{header.category}</TableCell>
+                      <TableCell>{header.sub_category || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              <Typography variant="h6" style={{ marginTop: '20px' }}>
+                Detailed Information
+              </Typography>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>SKU</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Cost Price</TableCell>
+                    <TableCell>Selling Price</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {productDetails.detail_array.map((detail, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {/* SKU with Barcode */}
+                        <Link to={`/pages/barcode/NewBarcode/${detail.sku}`}>
+                          <Barcode
+                            value={detail.sku}
+                            format="CODE128"
+                            width={1.2}
+                            height={30}
+                            displayValue={false}
+                          />
+                        </Link>
+                        {detail.sku}
+                      </TableCell>
+                      <TableCell>{detail.description}</TableCell>
+                      <TableCell>{detail.cost_price}</TableCell>
+                      <TableCell>{detail.selling_price}</TableCell>
+                      <TableCell>
+                        <Button
+                          onClick={() => handleEdit(detail.id)}
+                          variant="contained"
+                          style={{
+                            marginRight: '8px',
+                            backgroundColor: '#6ac267',
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(detail.sku)}
+                          variant="contained"
+                          style={{ backgroundColor: '#ee4262' }}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p>Loading product details...</p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  )
+}
+
+export default AllProducts

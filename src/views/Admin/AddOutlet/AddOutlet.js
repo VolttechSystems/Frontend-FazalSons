@@ -66,58 +66,62 @@ const AddOutlet = () => {
   };
 
   return (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
-        <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
-        <div>
-          <label>Outlet Code:</label>
-          <input
-            type="text"
-            name="outlet_code"
-            value={formData.outlet_code}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Outlet Name:</label>
-          <input
-            type="text"
-            name="outlet_name"
-            value={formData.outlet_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">{editingOutletId ? 'Update Outlet' : 'Add Outlet'}</button>
-      </form>
-
-      {/* Outlet Table */}
-      {outlets.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              
-              <th>Outlet Code</th>
-              <th>Outlet Name</th>
-              <th>Actions</th>
+    <div className="outlet-container">
+    <form className="outlet-form" onSubmit={handleSubmit}>
+      <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
+      <div>
+        <label>Outlet Code:</label>
+        <input
+          className="outlet-form-input"
+          type="text"
+          name="outlet_code"
+          value={formData.outlet_code}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div>
+        <label>Outlet Name:</label>
+        <input
+          className="outlet-form-input"
+          type="text"
+          name="outlet_name"
+          value={formData.outlet_name}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <button className="outlet-form-button" type="submit">
+        {editingOutletId ? 'Update Outlet' : 'Add Outlet'}
+      </button>
+    </form>
+  
+    {/* Outlet Table */}
+    {outlets.length > 0 && (
+      <table className="outlet-table">
+        <thead className="outlet-table-header">
+          <tr>
+            <th>Outlet Code</th>
+            <th>Outlet Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody className="outlet-table-body">
+          {outlets.map((outlet) => (
+            <tr key={outlet.id}>
+              <td className="outlet-table-cell">{outlet.outlet_code}</td>
+              <td className="outlet-table-cell">{outlet.outlet_name}</td>
+              <td className="outlet-table-cell outlet-table-actions">
+                <button className="E-button" type="button" onClick={() => handleEdit(outlet)}>Edit</button>
+                <button className="delete-button" type="button" onClick={() => handleDelete(outlet.id)}>Delete</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {outlets.map((outlet) => (
-              <tr key={outlet.id}>
-                <td>{outlet.outlet_code}</td>
-                <td>{outlet.outlet_name}</td>
-                <td>
-                  <button type="button" onClick={() => handleEdit(outlet)}>Edit</button>
-                  <button type="button" onClick={() => handleDelete(outlet.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+  
   );
 };
 

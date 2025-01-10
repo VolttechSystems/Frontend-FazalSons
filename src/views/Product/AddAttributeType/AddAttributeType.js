@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   CCard,
   CCardBody,
@@ -16,72 +16,101 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-} from '@coreui/react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+} from '@coreui/react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { Network, Urls } from '../../../api-config'
 
 const AddAttributeType = () => {
-  const [attributeType, setAttributeType] = useState('');
-  const [status, setStatus] = useState('active'); // Default status
-  const [types, setTypes] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const navigate = useNavigate();
+  const [attributeType, setAttributeType] = useState('')
+  const [status, setStatus] = useState('active') // Default status
+  const [types, setTypes] = useState([])
+  const [editingIndex, setEditingIndex] = useState(null)
+  const navigate = useNavigate()
 
   // Function to fetch attribute types from the API
   const fetchAttributeTypes = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_attribute_type');
-      setTypes(response.data); // Assuming the response data is an array of attribute types
-    } catch (error) {
-      console.error('Error fetching attribute types:', error);
-    }
-  };
+    // try {
+    //   const response = await axios.get('http://195.26.253.123/pos/products/add_attribute_type');
+    //   setTypes(response.data); // Assuming the response data is an array of attribute types
+    // } catch (error) {
+    //   console.error('Error fetching attribute types:', error);
+    // }
+    const response = await Network.get(Urls.addAttributeTypes)
+    if (!response.ok) return consoe.log(response.data.error)
+    setTypes(response.data)
+  }
 
   // Function to handle form submission for adding/editing attribute types
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const requestData = { att_type: attributeType, status };
+    e.preventDefault()
+    const requestData = { att_type: attributeType, status }
 
-    try {
-      if (editingIndex !== null) {
-        // Edit existing attribute type
-        await axios.put(`http://195.26.253.123/pos/products/action_attribute_type/${types[editingIndex].id}/`, requestData);
-        setEditingIndex(null); // Reset editing index
-      } else {
-        // Add new attribute type
-        await axios.post('http://195.26.253.123/pos/products/add_attribute_type', requestData);
-      }
-      // Reset the form
-      setAttributeType('');
-      setStatus('active'); // Reset to default status
-      fetchAttributeTypes(); // Refetch attribute types after submission
-    } catch (error) {
-      console.error('Error adding/editing attribute type:', error);
-    }
-  };
+    // try {
+    //   if (editingIndex !== null) {
+    //     // Edit existing attribute type
+    //     await axios.put(
+    //       `http://195.26.253.123/pos/products/action_attribute_type/${types[editingIndex].id}/`,
+    //       requestData,
+    //     )
+    //     setEditingIndex(null) // Reset editing index
+    //   } else {
+    //     // Add new attribute type
+    //     await axios.post('http://195.26.253.123/pos/products/add_attribute_type', requestData)
+    //   }
+    //   // Reset the form
+    //   setAttributeType('')
+    //   setStatus('active') // Reset to default status
+    //   fetchAttributeTypes() // Refetch attribute types after submission
+    // } catch (error) {
+    //   console.error('Error adding/editing attribute type:', error)
+    // }
+
+    const isEditing = editingIndex
+
+    const url = isEditing
+      ? `${Urls.updateAttributeType}/${types[editingIndex].id}/`
+      : Urls.addAttributeTypes
+    const req = isEditing ? 'put' : 'post'
+
+    console.log
+    const response = await Network[req](url, requestData)
+    if (!response.ok) return console.log(response.data.error)
+    alert(
+      isEditing ? 'Attribute Types updated successfully!' : 'Attribute Types added successfully!',
+    )
+    setAttributeType('')
+    setStatus('active') // Reset to default status
+    fetchAttributeTypes()
+  }
 
   // Function to handle edit button click
   const handleEdit = (index) => {
-    const selectedType = types[index];
-    setAttributeType(selectedType.att_type);
-    setStatus(selectedType.status);
-    setEditingIndex(index);
-  };
+    const selectedType = types[index]
+    setAttributeType(selectedType.att_type)
+    setStatus(selectedType.status)
+    setEditingIndex(index)
+  }
 
   // Function to handle delete button click
   const handleDelete = async (index) => {
-    const id = types[index].id; // Assuming each type has a unique `id`
-    try {
-      await axios.delete(`http://195.26.253.123/pos/products/action_attribute_type/${id}/`);
-      fetchAttributeTypes(); // Refetch attribute types after deletion
-    } catch (error) {
-      console.error('Error deleting attribute type:', error);
-    }
-  };
+    const id = types[index].id // Assuming each type has a unique `id`
+    // try {
+    //   await axios.delete(`http://195.26.253.123/pos/products/action_attribute_type/${id}/`)
+    //   fetchAttributeTypes() // Refetch attribute types after deletion
+    // } catch (error) {
+    //   console.error('Error deleting attribute type:', error)
+    // }
+
+    const response = await Network.delete(`${Urls.updateAttributeType}/${id}/`)
+    if (!response.ok) return console.log(response.data.error)
+    alert('Attribute Types deleted successfully!')
+    fetchAttributeTypes()
+  }
 
   useEffect(() => {
-    fetchAttributeTypes(); // Fetch attribute types when component mounts
-  }, []);
+    fetchAttributeTypes() // Fetch attribute types when component mounts
+  }, [])
 
   return (
     <CRow>
@@ -93,46 +122,48 @@ const AddAttributeType = () => {
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">Attribute Type</CFormLabel>
+                <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">
+                  Attribute Type
+                </CFormLabel>
                 <CCol sm={8}>
-                  <CFormInput 
-                    type="text" 
-                    id="attributeType" 
-                    value={attributeType} 
-                    onChange={(e) => setAttributeType(e.target.value)} 
-                    required 
+                  <CFormInput
+                    type="text"
+                    id="attributeType"
+                    value={attributeType}
+                    onChange={(e) => setAttributeType(e.target.value)}
+                    required
                   />
                 </CCol>
               </CRow>
               <fieldset className="row mb-3">
                 <legend className="col-form-label col-sm-2 pt-0">Status</legend>
                 <CCol sm={8}>
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="active" 
-                    value="active" 
-                    label="Active" 
-                    checked={status === 'active'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="active"
+                    value="active"
+                    label="Active"
+                    checked={status === 'active'}
+                    onChange={(e) => setStatus(e.target.value)}
                   />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="inactive" 
-                    value="inactive" 
-                    label="Inactive" 
-                    checked={status === 'inactive'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="inactive"
+                    value="inactive"
+                    label="Inactive"
+                    checked={status === 'inactive'}
+                    onChange={(e) => setStatus(e.target.value)}
                   />
-                  <CFormCheck 
-                    type="radio" 
-                    name="status" 
-                    id="pending" 
-                    value="pending" 
-                    label="Pending" 
-                    checked={status === 'pending'} 
-                    onChange={(e) => setStatus(e.target.value)} 
+                  <CFormCheck
+                    type="radio"
+                    name="status"
+                    id="pending"
+                    value="pending"
+                    label="Pending"
+                    checked={status === 'pending'}
+                    onChange={(e) => setStatus(e.target.value)}
                   />
                 </CCol>
               </fieldset>
@@ -140,7 +171,9 @@ const AddAttributeType = () => {
                 <CButton color="primary" type="submit">
                   {editingIndex !== null ? 'Update' : 'Add'}
                 </CButton>
-                <CButton color="secondary" onClick={() => navigate('/Product/AddAttributes')}>Go to Attributes</CButton>
+                <CButton color="secondary" onClick={() => navigate('/Product/AddAttributes')}>
+                  Go to Attributes
+                </CButton>
               </div>
             </CForm>
 
@@ -158,8 +191,12 @@ const AddAttributeType = () => {
                     <CTableDataCell>{item.att_type}</CTableDataCell>
                     <CTableDataCell>{item.status}</CTableDataCell>
                     <CTableDataCell>
-                      <CButton color="warning" onClick={() => handleEdit(index)}>Edit</CButton>
-                      <CButton color="danger" onClick={() => handleDelete(index)}>Delete</CButton>
+                      <CButton color="warning" onClick={() => handleEdit(index)}>
+                        Edit
+                      </CButton>
+                      <CButton color="danger" onClick={() => handleDelete(index)}>
+                        Delete
+                      </CButton>
                     </CTableDataCell>
                   </CTableRow>
                 ))}
@@ -169,7 +206,7 @@ const AddAttributeType = () => {
         </CCard>
       </CCol>
     </CRow>
-  );
-};
+  )
+}
 
-export default AddAttributeType;
+export default AddAttributeType
