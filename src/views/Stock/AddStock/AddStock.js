@@ -20,32 +20,34 @@ const AddStock = () => {
     fetchProductList()
   }, [])
 
-  useEffect(() => {
-    if (selectedProduct) {
-      const fetchStockData = async () => {
-        try {
-          const encodedProductName = encodeURIComponent(selectedProduct)
-          const response = await axios.get(
-            `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`,
-          )
-          if (Array.isArray(response.data) && response.data.length > 0) {
-            const stockWithOriginal = response.data.map((item) => ({
-              ...item,
-              original_quantity: item.avail_quantity, // Store original stock value
-            }))
-            setStockData(stockWithOriginal)
-          } else {
-            setStockData([])
-          }
-        } catch (error) {
-          console.error('Error fetching stock data:', error)
-        }
-      }
-      fetchStockData()
-    } else {
+  // Fetch stock data when selectedProduct changes
+  const fetchStockData = async () => {
+    if (!selectedProduct) {
       setStockData([])
+      return
     }
-  }, [selectedProduct, stockData])
+    try {
+      const encodedProductName = encodeURIComponent(selectedProduct)
+      const response = await axios.get(
+        `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`,
+      )
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        const stockWithOriginal = response.data.map((item) => ({
+          ...item,
+          original_quantity: item.avail_quantity, // Store original stock value
+        }))
+        setStockData(stockWithOriginal)
+      } else {
+        setStockData([])
+      }
+    } catch (error) {
+      console.error('Error fetching stock data:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchStockData()
+  }, [selectedProduct])
 
   const handleStockInputChange = (e, sku) => {
     const { value } = e.target
@@ -94,6 +96,7 @@ const AddStock = () => {
 
       setStockData(updatedStockData)
       setUpdatedStock({})
+      fetchStockData()
     } catch (error) {
       console.error('Error updating stock:', error)
       alert(`Error: ${error.response ? error.response.data : error.message}`)
