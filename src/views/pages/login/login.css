@@ -1,11 +1,105 @@
-.bg-body-tertiary {
-    background-color: #f8f9fa;
+/* Global Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container Styles */
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+/* Card Styles */
+.card-login {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #ffffff;
+  max-width: 300px; /* Set the width of the form */
+  width: 100%; /* Ensure the width is responsive */
+  margin: 0 auto;
+}
+
+/* Card Body Styling */
+.card-body-login {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Title and Branding */
+.text-center h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1c5b8b;
+  margin-bottom: 10px;
+}
+
+.text-center p {
+  font-size: 16px;
+  color: #8d8d8d;
+}
+
+.text-body-secondary {
+  color: #6c757d;
+}
+
+/* Form Styles */
+.c-input-group {
+  margin-bottom: 15px; /* Reduce space between fields */
+}
+
+.c-input-group-text {
+  background-color: #f8f9fa;
+  border-color: #1c5b8b;
+}
+
+.c-form-input {
+  border: 2px solid #1c5b8b;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%; /* Ensure the input takes full width of its container */
+}
+
+.c-form-input:focus {
+  border-color: #0056b3;
+}
+
+/* Button Styles */
+.c-button-login {
+  background-color: #1c5b8b;
+  border-color: #1c5b8b;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px; /* Adjust padding for smaller buttons */
+  border-radius: 5px;
+  text-transform: uppercase;
+  width: 100%; /* Set the button to take full width */
+}
+
+.c-button-login:hover {
+  background-color: #0056b3;
+}
+
+.c-button-link {
+  color: #1c5b8b;
+  text-decoration: none;
+}
+
+.c-button-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .card-login {
+    margin: 0 15px;
   }
-  
-  @media (max-width: 768px) {
-    .flex-fill {
-      max-width: 100% !important;
-      margin-bottom: 1rem;
-    }
+
+  /* Adjust input and button width for smaller screens */
+  .c-form-input, .c-button-login {
+    width: 100%; /* Ensure they are full-width on smaller screens */
   }
-  
+}

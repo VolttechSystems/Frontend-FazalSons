@@ -112,7 +112,7 @@ const Login = () => {
                       />
                     </CInputGroup>
                     <CRow>
-                      <CCol xs={6}>
+                      <CCol xs={12}>
                         <CButton
                           color="primary"
                           className="px-4 w-100"
@@ -125,26 +125,13 @@ const Login = () => {
                           Login
                         </CButton>
                       </CCol>
-                      <CCol xs={6} className="text-right">
+                      <CCol xs={12} className="text-center mt-3">
                         <CButton color="link" className="px-0">
                           Forgot password?
                         </CButton>
                       </CCol>
                     </CRow>
                   </CForm>
-                </CCardBody>
-              </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
-                    <h2>Sign up</h2>
-                    {/* <p>Create your account to access more features.</p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
-                      </CButton>
-                    </Link> */}
-                  </div>
                 </CCardBody>
               </CCard>
             </CCardGroup>
