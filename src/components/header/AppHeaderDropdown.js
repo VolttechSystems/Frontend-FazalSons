@@ -19,12 +19,35 @@ import {
   cilSettings,
   cilTask,
   cilUser,
+  cilPowerStandby,
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-
 import avatar8 from './../../assets/images/avatars/8.jpg'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const AppHeaderDropdown = () => {
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token') // Assuming the token is stored in localStorage
+    try {
+      await axios.post(
+        'http://195.26.253.123/pos/accounts/logout',
+        {}, // Assuming no body is needed; adjust if necessary
+        {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        },
+      )
+      localStorage.removeItem('token') // Clear the token
+      navigate('/login') // Navigate to the login page
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
@@ -87,6 +110,10 @@ const AppHeaderDropdown = () => {
         <CDropdownItem href="#">
           <CIcon icon={cilLockLocked} className="me-2" />
           Lock Account
+        </CDropdownItem>
+        <CDropdownItem onClick={handleLogout}>
+          <CIcon icon={cilPowerStandby} className="me-2" />
+          Logout
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
