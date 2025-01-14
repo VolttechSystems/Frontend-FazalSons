@@ -5,6 +5,7 @@ import './RegisterUser.css';
 
 function RegisterUser() {
   const [systemRoles, setSystemRoles] = useState([]);
+  const [outlet, setOutlet] = useState([]);
   const [showPassword, setShowPassword] = useState(false); 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -15,7 +16,8 @@ function RegisterUser() {
     phone_number: "",
     is_staff: false,
     is_active: true,
-    system_roles: []
+    system_roles: [],
+    outlets: []
   });
   const [userList, setUserList] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -24,7 +26,23 @@ function RegisterUser() {
   const [newPasswordErrors, setNewPasswordErrors] = useState([]); // Declare the state for errors
   const [passwordChangeMessage, setPasswordChangeMessage] = useState(null);
 
+  // Fetch All Outlets from API
 
+  useEffect(() => {
+    axios
+      .get("http://195.26.253.123/pos/products/fetch_all_outlet/")
+      .then((response) => {
+        const outlet = response.data.map((outlet) => ({
+          value: outlet.id,
+          label: outlet.outlet_name
+        }));
+        setOutlet(outlet);
+      })
+      .catch((error) => console.log("Error fetching all outlets:", error));
+
+    // Fetch existing users from backend
+    fetchUsers();
+  }, []);
 
 
   // Fetch system roles from API
@@ -114,12 +132,21 @@ function RegisterUser() {
     });
   };
 
-  // Handle multi-select change
+  // Handle multi-select change for system roles
   const handleMultiSelectChange = (selectedOptions) => {
     const selectedRoles = selectedOptions ? selectedOptions.map(option => option.value) : [];
     setFormData({
       ...formData,
       system_roles: selectedRoles,
+    });
+  };
+
+  // Handle multi-select change for system roles
+  const handleMultiSelectChangeForOutlet = (selectedOptions) => {
+    const selectedOutlets = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setFormData({
+      ...formData,
+      outlets: selectedOutlets,
     });
   };
 
@@ -140,7 +167,8 @@ function RegisterUser() {
           phone_number: "",
           is_staff: false,
           is_active: true,
-          system_roles: []
+          system_roles: [],
+          outlets: []
         });
       })
       .catch((error) => console.log("Error registering user:", error));
@@ -279,6 +307,18 @@ function RegisterUser() {
             value={systemRoles.filter(role =>
               formData.system_roles.includes(role.value))}
             placeholder="Select roles"
+          />
+        </div>
+        <div className="input-group">
+          <label>Outlet</label>
+          <Select
+            isMulti
+            name="outlet"
+            options={outlet}
+            onChange={handleMultiSelectChangeForOutlet}
+            value={outlet.filter(outlet =>
+              formData.outlets.includes(outlet.value))}
+            placeholder="Select Outlets"
           />
         </div>
         <button className="addUser-button1" type="submit">Add User</button>
