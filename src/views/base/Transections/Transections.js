@@ -651,16 +651,30 @@ function Transections() {
         console.error('API Error:', response.status, response.statusText)
         return
       }
+
       const product = await response.json()
       console.log('Product Details Fetched:', product) // Debug log
+
       setTableData((prevTableData) => [
         ...prevTableData,
         {
+          // sku: product.sku || 'N/A',
+          // product_name: product.product_name || 'Unknown Product',
+          // quantity: 1,
+          // discount: 0,
+          // selling_price: product.discount_price || product.selling_price || 0, // Use discount_price if available
+          // // discount_price: product.discount_price || null, // Ensure discount_price is included
+          // discount_value: 0,
+          // total_after_discount: product.discount_price || product.selling_price || 0, // Set initial total
+
           sku: product.sku || 'N/A',
           product_name: product.product_name || 'Unknown Product',
           quantity: 1,
           discount: 0,
-          selling_price: product.selling_price || 0,
+          selling_price: product.selling_price || 0, // Keep the original selling_price
+          discount_price: product.discount_price || null, // Include the discount_price separately
+          discount_value: 0,
+          total_after_discount: product.discount_price || product.selling_price || 0, // Set initial total
         },
       ])
     } catch (error) {
@@ -1411,8 +1425,29 @@ function Transections() {
                       className="no-spinner"
                     />
                   </td>
-                  <td>{product.selling_price}</td>
-                  <td>{product.selling_price * product.quantity}</td>{' '}
+                  <td>
+                    {product.discount_price ? (
+                      <>
+                        <span
+                          style={{
+                            textDecoration: 'line-through',
+                            color: 'red',
+                            marginRight: '10px',
+                          }}
+                        >
+                          {product.selling_price}
+                        </span>
+                        <span>{product.discount_price}</span>
+                      </>
+                    ) : (
+                      <span>{product.selling_price}</span>
+                    )}
+                  </td>
+                  <td>
+                    {(product.discount_price ? product.discount_price : product.selling_price) *
+                      product.quantity}
+                  </td>
+
                   {/* Multiply and return as integer */}
                   <td>
                     <input
@@ -1450,9 +1485,12 @@ function Transections() {
                     <input
                       type="number"
                       value={
-                        product.selling_price * product.quantity -
-                        (product.selling_price * product.quantity * product.discount) / 100
-                      } // Calculate as integer
+                        product.discount_price
+                          ? product.discount_price * product.quantity -
+                            (product.discount_price * product.quantity * product.discount) / 100
+                          : product.selling_price * product.quantity -
+                            (product.selling_price * product.quantity * product.discount) / 100
+                      } // Calculate based on discount_price or selling_price
                       onChange={(e) => {
                         const netAmount = parseInt(e.target.value) || 0 // Ensure netAmount is an integer
                         setTableData((prevData) => {
@@ -1464,6 +1502,7 @@ function Transections() {
                       className="no-spinner"
                     />
                   </td>
+
                   <td>
                     <button
                       onClick={() =>

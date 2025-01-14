@@ -14,15 +14,15 @@ import {
   CInputGroupText,
   CRow,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
 import { Network, Urls } from '../../../api-config'
 import useAuth from '../../../hooks/useAuth'
+import 'font-awesome/css/font-awesome.min.css' // Import Font Awesome CSS
 
 const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [showPassword, setShowPassword] = useState(false) // State for toggling password visibility
 
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -43,13 +43,17 @@ const Login = () => {
     const { token, System_role } = response.data
 
     localStorage.setItem('authToken', token)
-    const sysRoles = JSON.stringify(response.data.System_role || []) // Corrected the property name
+    const sysRoles = JSON.stringify(response.data.System_role || [])
 
     login(token, System_role)
 
     // Store in localStorage
     localStorage.setItem('SysRoles', sysRoles)
     navigate('/dashboard/')
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword) // Toggle the visibility of the password
   }
 
   return (
@@ -88,7 +92,7 @@ const Login = () => {
                     {error && <p className="text-danger text-center">{error}</p>}
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
-                        <CIcon icon={cilUser} />
+                        <i className="fa fa-user" /> {/* Font Awesome User Icon */}
                       </CInputGroupText>
                       <CFormInput
                         placeholder="Username"
@@ -100,16 +104,23 @@ const Login = () => {
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
+                        <i className="fa fa-lock" /> {/* Font Awesome Lock Icon */}
                       </CInputGroupText>
                       <CFormInput
-                        type="password"
+                        type={showPassword ? 'text' : 'password'} // Conditionally show password
                         placeholder="Password"
                         autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="border-primary"
                       />
+                      <CInputGroupText
+                        onClick={togglePasswordVisibility}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>{' '}
+                        {/* Font Awesome Eye Icon */}
+                      </CInputGroupText>
                     </CInputGroup>
                     <CRow>
                       <CCol xs={12}>

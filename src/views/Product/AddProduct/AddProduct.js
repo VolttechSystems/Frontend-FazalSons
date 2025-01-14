@@ -71,6 +71,7 @@ const AddProduct = () => {
   const [nextTab, setNextTab] = useState(null)
   const [isCategoryDialogOpen, setCategoryDialogOpen] = React.useState(false)
   const [error, setError] = useState('')
+  const [showSubCategoryDropdown, setShowSubCategoryDropdown] = useState(false)
 
   // Function to handle button click and open the dialog
   const handleButtonClick = () => {
@@ -310,7 +311,18 @@ const AddProduct = () => {
       const response = await axios.get(
         `http://195.26.253.123/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`,
       )
-      setSubCategories(response.data) // Populate subcategories
+      const subCategoryData = response.data
+      setSubCategories(subCategoryData) // Set the subcategories
+
+      // Check if subcategories are found, and show the subcategory dropdown if they exist
+      if (subCategoryData.length > 0) {
+        setShowSubCategoryDropdown(true) // Show the dropdown
+      } else {
+        setShowSubCategoryDropdown(false) // Hide the dropdown if no subcategories are found
+      }
+
+      console.log('Subcategories:', subCategoryData) // Debug log for subcategories
+      console.log('Show Subcategory Dropdown:', showSubCategoryDropdown) // Debug log for dropdown visibility
 
       // Fetch related attributes dynamically for the selected category
       fetchAttributes(categoryId, '') // Pass categoryId and empty subcategoryId to fetch category-specific attributes
@@ -509,9 +521,20 @@ const AddProduct = () => {
       ...formData,
       [name]: value,
     })
+
     // Perform validation for Selling Price
     if (name === 'selling_price' && Number(value) <= Number(formData.cost_price)) {
       setError('Selling Price must be greater than Cost Price')
+    }
+    // Perform validation for Discount Price
+    else if (name === 'discount_price') {
+      if (Number(value) <= Number(formData.cost_price)) {
+        setError('Discount Price must be greater than Cost Price')
+      } else if (Number(value) >= Number(formData.selling_price)) {
+        setError('Discount Price must be less than Selling Price')
+      } else {
+        setError('')
+      }
     } else {
       setError('')
     }
@@ -691,7 +714,6 @@ const AddProduct = () => {
       }
     } catch (error) {
       console.error('Error publishing product:', error)
-      alert('An error occurred while publishing the product.')
     }
     fetchProductList()
   }
@@ -756,7 +778,6 @@ const AddProduct = () => {
               OK
             </Button>
           </DialogActions>
-                
         </Dialog>
       )}
 
@@ -891,34 +912,36 @@ const AddProduct = () => {
                       ))}
                   </select>
                 </label>
-                <Link to="/Category/AddCategories">
+                <Link to="/Product/Category">
                   <button style={{ height: '100%', padding: '8px' }}>+</button>
                 </Link>
               </div>
 
               {/* Subcategory Dropdown */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-                <label style={{ flex: 1, fontWeight: 'bold' }}>
-                  Subcategory
-                  <select
-                    value={selectedsubCategory}
-                    onChange={handleSubCategoryChange}
-                    disabled={!selectedCategory}
-                    style={{ width: '100%', padding: '8px' }}
-                  >
-                    <option value="">Select Subcategory</option>
-                    {Array.isArray(subcategories) &&
-                      subcategories.map((subCategory) => (
-                        <option key={subCategory.id} value={subCategory.id}>
-                          {subCategory.sub_category_name}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <Link to="/SubCat/AddSubCat">
-                  <button style={{ height: '100%', padding: '8px' }}>+</button>
-                </Link>
-              </div>
+              {showSubCategoryDropdown && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+                  <label style={{ flex: 1, fontWeight: 'bold' }}>
+                    Subcategory
+                    <select
+                      value={selectedsubCategory}
+                      onChange={handleSubCategoryChange}
+                      disabled={!selectedCategory}
+                      style={{ width: '100%', padding: '8px' }}
+                    >
+                      <option value="">Select Subcategory</option>
+                      {Array.isArray(subcategories) &&
+                        subcategories.map((subCategory) => (
+                          <option key={subCategory.id} value={subCategory.id}>
+                            {subCategory.sub_category_name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <Link to="/SubCat/AddSubCat">
+                    <button style={{ height: '100%', padding: '8px' }}>+</button>
+                  </Link>
+                </div>
+              )}
 
               {/* Brands Dropdown */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
