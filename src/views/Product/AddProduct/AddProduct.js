@@ -41,6 +41,7 @@ const AddProduct = () => {
     category: '',
     sub_category: '',
     brand: '',
+    image: null,
   }
 
   const [formData, setFormData] = useState(initialFormData)
@@ -141,6 +142,13 @@ const AddProduct = () => {
     } else {
       // Directly change the tab if no confirmation is needed
       setActiveTab(tabIndex)
+    }
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setFormData({ ...formData, image: file })
     }
   }
 
@@ -519,58 +527,116 @@ const AddProduct = () => {
     console.log(selectedBrandId)
   }
 
+  // const handleAdd = async (e) => {
+  //   e.preventDefault()
+
+  //   // Manually format color as a string (e.g., "[ 'Baby pink' ]")
+  //   const colorString = `[ '${formData.color.join("', '")}' ]`
+
+  //   const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
+  //     return selectedVariations[attribute] // Wrap each selection in an array
+  //   })
+
+  //   const newProduct = {
+  //     product_name: formData.product_name,
+  //     sku: formData.sku,
+  //     season: formData.season,
+  //     description: formData.description,
+  //     notes: formData.notes,
+  //     color: colorString, // color as a string (e.g., "[ 'Baby blue', 'Baby pink' ]")
+  //     attribute: formData.attribute, // Selected attributes
+  //     variations: JSON.stringify(variationsFormatted), // Variations formatted as array of arrays
+  //     cost_price: formData.cost_price,
+  //     selling_price: formData.selling_price,
+  //     discount_price: formData.discount_price,
+  //     wholesale_price: formData.wholesale_price,
+  //     retail_price: formData.retail_price,
+  //     token_price: formData.token_price,
+  //     outlet: formData.outlet, // Use the ID here, not the outlet_name
+  //     category: selectedCategory,
+  //     sub_category: selectedsubCategory,
+  //     brand: selectedBrand, // This will send the brand id as "3", "4", etc.
+  //   }
+  //   // try {
+  //   //   const response = await axios.post(
+  //   //     'http://195.26.253.123/pos/products/add_temp_product',
+  //   //     newProduct,
+  //   //   )
+  //   //   if (response.status === 200 || response.status === 201) {
+  //   //     alert('Product added successfully!')
+  //   //     fetchProductList()
+  //   //     resetForm()
+  //   //   } else {
+  //   //     alert('Failed to add the product. Please try again.')
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.error('Error adding product:', error)
+  //   //   alert('An error occurred while adding the product.')
+  //   // }
+
+  //   const response = await Network.post(Urls.addProduct, newProduct)
+  //   if (!response.ok) return console.log(response.data.error)
+  //   alert('Product added successfully!')
+  //   fetchProductList()
+  //   resetForm()
+  // }
+
   const handleAdd = async (e) => {
     e.preventDefault()
+
+    // Create a new FormData instance
+    const formDataPayload = new FormData()
 
     // Manually format color as a string (e.g., "[ 'Baby pink' ]")
     const colorString = `[ '${formData.color.join("', '")}' ]`
 
+    // Format variations
     const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
       return selectedVariations[attribute] // Wrap each selection in an array
     })
 
-    const newProduct = {
-      product_name: formData.product_name,
-      sku: formData.sku,
-      season: formData.season,
-      description: formData.description,
-      notes: formData.notes,
-      color: colorString, // color as a string (e.g., "[ 'Baby blue', 'Baby pink' ]")
-      attribute: formData.attribute, // Selected attributes
-      variations: JSON.stringify(variationsFormatted), // Variations formatted as array of arrays
-      cost_price: formData.cost_price,
-      selling_price: formData.selling_price,
-      discount_price: formData.discount_price,
-      wholesale_price: formData.wholesale_price,
-      retail_price: formData.retail_price,
-      token_price: formData.token_price,
-      outlet: formData.outlet, // Use the ID here, not the outlet_name
-      category: selectedCategory,
-      sub_category: selectedsubCategory,
-      brand: selectedBrand, // This will send the brand id as "3", "4", etc.
-    }
-    // try {
-    //   const response = await axios.post(
-    //     'http://195.26.253.123/pos/products/add_temp_product',
-    //     newProduct,
-    //   )
-    //   if (response.status === 200 || response.status === 201) {
-    //     alert('Product added successfully!')
-    //     fetchProductList()
-    //     resetForm()
-    //   } else {
-    //     alert('Failed to add the product. Please try again.')
-    //   }
-    // } catch (error) {
-    //   console.error('Error adding product:', error)
-    //   alert('An error occurred while adding the product.')
-    // }
+    // Append all fields to FormData
+    formDataPayload.append('product_name', formData.product_name)
+    formDataPayload.append('sku', formData.sku)
+    formDataPayload.append('season', formData.season)
+    formDataPayload.append('description', formData.description)
+    formDataPayload.append('notes', formData.notes)
+    formDataPayload.append('color', colorString) // color as a string
+    formDataPayload.append('attribute', JSON.stringify(formData.attribute)) // Convert attributes to JSON string
+    formDataPayload.append('variations', JSON.stringify(variationsFormatted)) // Convert variations to JSON string
+    formDataPayload.append('cost_price', formData.cost_price)
+    formDataPayload.append('selling_price', formData.selling_price)
+    formDataPayload.append('discount_price', formData.discount_price)
+    formDataPayload.append('wholesale_price', formData.wholesale_price)
+    formDataPayload.append('retail_price', formData.retail_price)
+    formDataPayload.append('token_price', formData.token_price)
+    formDataPayload.append('outlet', formData.outlet) // Use outlet ID
+    formDataPayload.append('category', selectedCategory)
+    formDataPayload.append('sub_category', selectedsubCategory)
+    formDataPayload.append('brand', selectedBrand)
 
-    const response = await Network.post(Urls.addProduct, newProduct)
-    if (!response.ok) return console.log(response.data.error)
-    alert('Product added successfully!')
-    fetchProductList()
-    resetForm()
+    // Append image if available
+    if (formData.image) {
+      formDataPayload.append('image', formData.image)
+    }
+    console.log(formData.image) // Check if the image is selected
+    try {
+      const response = await axios.post(
+        'http://195.26.253.123/pos/products/add_temp_product',
+        formDataPayload, // Use formDataPayload here
+      )
+
+      if (response.status === 200 || response.status === 201) {
+        alert('Product added successfully!')
+        fetchProductList()
+        resetForm()
+      } else {
+        alert('Failed to add the product. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error adding product:', error)
+      alert('An error occurred while adding the product.')
+    }
   }
 
   const handleEdit = async (id, e) => {
@@ -896,7 +962,7 @@ const AddProduct = () => {
               {/* Subcategory Dropdown */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                 <label style={{ flex: 1, fontWeight: 'bold' }}>
-                  Subcategory *
+                  Subcategory
                   <select
                     value={selectedsubCategory}
                     onChange={handleSubCategoryChange}
@@ -1070,6 +1136,11 @@ const AddProduct = () => {
                   onChange={handleChange}
                 />
               </label>
+              <label style={{ fontWeight: 'bold' }}>
+                Add Image (Optional)
+                <input type="file" name="image" onChange={handleImageChange} />
+              </label>
+
               {/* <button type="button" onClick={handleAdd}>Add Product</button> */}
 
               <button

@@ -1,6 +1,8 @@
 export default {
   login: 'accounts/login',
 
+  logout: 'accounts/logout',
+
   //Salesman
   addSalesman: 'transaction/add_salesman',
 

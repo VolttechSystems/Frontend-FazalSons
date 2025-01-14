@@ -107,6 +107,8 @@ const AddParentCategory = () => {
     //   setErrorMessage('Error saving Parent Category. Please try again.')
     // }
 
+    console.log('ParentCategoryData:', ParentCategoryData)
+
     if (id) {
       const url = id ? `${Urls.updateParentCategory}/${id}/` : Urls.addParentCategory
       const req = id ? 'put' : 'post'
