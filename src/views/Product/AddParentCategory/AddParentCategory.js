@@ -30,6 +30,10 @@ const AddParentCategory = () => {
 
   useEffect(() => {
     const fetchCategoryHeads = async () => {
+      const response = await Network.get(Urls.addHeadCategory)
+      if (!response.ok) return consoe.log(response.data.error)
+      setCategoryHeads(response.data)
+
       // try {
       //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
       //   setCategoryHeads(response.data);
@@ -37,29 +41,25 @@ const AddParentCategory = () => {
       //   console.error('Error fetching category heads:', error);
       //   setErrorMessage('Failed to fetch category heads.');
       // }
-
-      const response = await Network.get(Urls.addHeadCategory)
-      if (!response.ok) return consoe.log(response.data.error)
-      setCategoryHeads(response.data)
     }
 
     const fetchParentCategoryDetails = async () => {
-      if (id) {
-        // try {
-        //   const response = await axios.get(
-        //     `http://195.26.253.123/pos/products/action_parent_category/${id}/`,
-        //   )
-        //   const data = response.data
-        //   setCategoryHead(data.hc_name)
-        //   setPCname(data.pc_name)
-        //   setShortForm(data.symbol)
-        //   setDescription(data.description)
-        //   setStatus(data.status)
-        // } catch (error) {
-        //   console.error('Error fetching parent category details:', error)
-        //   setErrorMessage('Failed to fetch category details.')
-        // }
+      // try {
+      //   const response = await axios.get(
+      //     `http://195.26.253.123/pos/products/action_parent_category/${id}/`,
+      //   )
+      //   const data = response.data
+      //   setCategoryHead(data.hc_name)
+      //   setPCname(data.pc_name)
+      //   setShortForm(data.symbol)
+      //   setDescription(data.description)
+      //   setStatus(data.status)
+      // } catch (error) {
+      //   console.error('Error fetching parent category details:', error)
+      //   setErrorMessage('Failed to fetch category details.')
+      // }
 
+      if (id) {
         const response = await Network.get(`${Urls.updateParentCategory}/${id}/`)
         if (!response.ok) return console.log(response.data.error)
         const data = response.data
@@ -76,16 +76,6 @@ const AddParentCategory = () => {
   }, [id])
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    const ParentCategoryData = {
-      hc_name: hc_name,
-      pc_name: pc_name,
-      symbol: symbol,
-      description: description,
-      status: status,
-    }
-
     // try {
     //   if (id) {
     //     await axios.put(
@@ -107,16 +97,25 @@ const AddParentCategory = () => {
     //   setErrorMessage('Error saving Parent Category. Please try again.')
     // }
 
+    e.preventDefault()
+
+    const ParentCategoryData = {
+      hc_name: hc_name,
+      pc_name: pc_name,
+      symbol: symbol,
+      description: description,
+      status: status,
+    }
+
     console.log('ParentCategoryData:', ParentCategoryData)
 
-    if (id) {
-      const url = id ? `${Urls.updateParentCategory}/${id}/` : Urls.addParentCategory
-      const req = id ? 'put' : 'post'
+    const url = id ? `${Urls.updateParentCategory}/${id}/` : Urls.addParentCategory
+    const req = id ? 'put' : 'post'
 
-      const response = await Network[req](url, ParentCategoryData)
-      if (!response.ok) return consoe.log(response.data.error)
-      alert(id ? 'Parent Category updated successfully!' : 'Parent Category added successfully!')
-    }
+    const response = await Network[req](url, ParentCategoryData)
+    if (!response.ok) return console.log(response.data.error) // Fix the typo from `consoe` to `console`
+
+    alert(id ? 'Parent Category updated successfully!' : 'Parent Category added successfully!')
     navigate('/Product/ParentCategory')
   }
 

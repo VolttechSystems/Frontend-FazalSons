@@ -620,6 +620,7 @@ const AddProduct = () => {
       formDataPayload.append('image', formData.image)
     }
     console.log(formData.image) // Check if the image is selected
+
     try {
       const response = await axios.post(
         'http://195.26.253.123/pos/products/add_temp_product',
@@ -637,72 +638,7 @@ const AddProduct = () => {
       console.error('Error adding product:', error)
       alert('An error occurred while adding the product.')
     }
-  }
-
-  const handleEdit = async (id, e) => {
-    const productToEdit = productList.find((product) => product.id === id)
-    if (productToEdit) {
-      setFormData({
-        product_name: productToEdit.product_name || '',
-        outlet_name: productToEdit.outlet_name || 'Fazal Sons',
-        sku: productToEdit.sku || '',
-        head_category: productToEdit.head_category || '',
-        parent_category: productToEdit.parent_category || '',
-        category: productToEdit.category || '',
-        season: productToEdit.season || '',
-        description: productToEdit.description || '',
-        color: productToEdit.color ? productToEdit.color.split(',') : [],
-        cost_price: productToEdit.cost_price || '',
-        selling_price: productToEdit.selling_price || '',
-        discount_price: productToEdit.discount_price || '',
-        wholesale_price: productToEdit.wholesale_price || '',
-        retail_price: productToEdit.retail_price || '',
-        token_price: productToEdit.token_price || '',
-        brand_name: productToEdit.brand_name || '',
-      })
-
-      setEditMode(true)
-
-      setEditProductId(id)
-      e.preventDefault()
-    } else {
-      console.error('Product not found:', id)
-    }
-  }
-
-  const handleUpdate = async () => {
-    if (editProductId) {
-      const updatedProductData = {
-        ...formData,
-        color: formData.color.join(','),
-        size: formData.size.join(','),
-        used_for_inventory: formData.used_for_inventory ? 'Yes' : 'No',
-      }
-
-      try {
-        const response = await axios.put(
-          `http://195.26.253.123/pos/products/action_temp_product/${editProductId}/`,
-          updatedProductData,
-        )
-        if (response.status === 200 || response.status === 201) {
-          const updatedProductList = productList.map((product) =>
-            product.id === editProductId ? { ...product, ...updatedProductData } : product,
-          )
-          setProductList(updatedProductList)
-
-          // Success Toast
-          toast.success('Product updated successfully!')
-        } else {
-          // Failure Toast
-          toast.error('Failed to update the product. Please try again.')
-        }
-      } catch (error) {
-        console.error('Error updating product:', error)
-
-        // Error Toast
-        toast.error('An error occurred while updating the product.')
-      }
-    }
+    fetchProductList()
     resetForm()
   }
 
@@ -757,6 +693,7 @@ const AddProduct = () => {
       console.error('Error publishing product:', error)
       alert('An error occurred while publishing the product.')
     }
+    fetchProductList()
   }
 
   const openCategoryDialog = () => setCategoryDialogOpen(true)
@@ -1180,13 +1117,13 @@ const AddProduct = () => {
                       {/* <td>{product.retail_price}</td> */}
                       {/* <td>{product.token_price}</td> */}
                       <td>
-                        <button
+                        {/* <button
                           onClick={() => handleEdit(product.id)}
                           style={{ marginRight: '8px' }}
                         >
                           {' '}
                           <FontAwesomeIcon icon={faEdit} />
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => handleDelete(product.id)}
                           style={{ marginRight: '8px' }}
