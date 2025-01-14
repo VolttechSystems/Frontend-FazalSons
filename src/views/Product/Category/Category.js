@@ -99,6 +99,20 @@ const AddCategories = () => {
     fetchInitialData()
   }, [])
 
+  const fetchCategories = async () => {
+    try {
+      const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
+      setCategories(categoriesResponse.data)
+    } catch (error) {
+      console.error('Error fetching Categories:', error)
+    }
+  }
+
+  useEffect(() => {
+    // Fetch initial data when the component mounts
+    fetchCategories()
+  }, [])
+
   // Fetch Attribute Types
   useEffect(() => {
     const fetchAttTypes = async () => {
@@ -304,71 +318,26 @@ const AddCategories = () => {
       pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
       attribute_group: selectedAttributes.map((attr) => attr.split(':')[1]), // Extract only the attribute_id
     }
-    console.log(payload)
 
-    // try {
-    //   if (editMode) {
-    //     // PUT request to update category
-    //     const response = await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload)
-    //     // Update the category list with the new data
-    //     const updatedCategories = categories.map((cat) =>
-    //       cat.id === editCategoryId ? response.data : cat,
-    //     )
-    //     if (response) {
-    //       setCategories((prev) => prev, ...response.data)
-    //       setTableData((prev) => prev, ...response.data)
-    //     }
+    try {
+      if (editMode) {
+        // Update existing category
+        await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload)
+        setMessage('Category updated successfully.')
+      } else {
+        // Add new category
+        await axios.post(API_ADD_CATEGORIES, payload)
+        setMessage('Category added successfully.')
+      }
 
-    //     setMessage('Category updated successfully.')
-    //   } else {
-    //     // POST request to add new category
-    //     const response = await axios.post(API_ADD_CATEGORIES, payload)
-    //     const newCategory = response.data
-    //     if (newCategory) {
-    //       setCategories((prev) => [...prev, ...response.data])
-    //       setTableData((prev) => [...prev, ...response.data])
-    //       setMessage('Category added successfully.')
-    //     }
-    //   }
-
-    //   // Reset form and exit edit mode
-    //   setFormData({
-    //     headCategory: '',
-    //     pc_name: '',
-    //     category_name: '',
-    //     symbol: '',
-    //     description: '',
-    //     addSubCategory: false,
-    //     status: 'active',
-    //     attType: [],
-    //     attribute_group: [],
-    //     attribute_id: '',
-    //   })
-
-    //   setEditMode(false)
-    //   setEditCategoryId(null)
-    // } catch (error) {
-    //   console.error('Error submitting category:', error)
-    //   setMessage('Failed to submit category. Please try again.')
-    // }
-
-    const response = editMode
-      ? await Network.put(`${Urls.updateCategory}/${editCategoryId}`, payload)
-      : await Network.post(Urls.addCategory, payload)
-    const updatedCategories = categories.map((cat) =>
-      cat.id === editCategoryId ? response.data : cat,
-    )
-    if (response) {
-      setCategories((prev) => prev, ...response.data)
-      setTableData((prev) => prev, ...response.data)
+      // Refetch categories to refresh the table
+      fetchCategories()
+    } catch (error) {
+      console.error('Error in handleSubmit:', error)
+      setMessage('Failed to submit category.')
     }
-    setMessage('Category updated successfully.')
-    const newCategory = response.data
-    if (newCategory) {
-      setCategories((prev) => [...prev, ...response.data])
-      setTableData((prev) => [...prev, ...response.data])
-      setMessage('Category added successfully.')
-    }
+
+    // Reset form and exit edit mode
     setFormData({
       headCategory: '',
       pc_name: '',
@@ -439,12 +408,13 @@ const AddCategories = () => {
       )
       const data = responses.flatMap((res) => res.data)
       setTableData(data)
-
       setEditMode(true)
       setEditCategoryId(categoryData.id) // Store the ID for updating
+      fetchCategories() // Refresh categories after editing
     } catch (error) {
       setMessage('Failed to fetch category details.')
     }
+    fetchCategories() // Refresh categories after editing
   }
 
   const handleDelete = async (categoryId) => {
@@ -452,6 +422,7 @@ const AddCategories = () => {
       await axios.delete(`${API_UPDATE_CATEGORY}/${categoryId}`)
       setCategories(categories.filter((category) => category.id !== categoryId))
       setMessage('Category deleted successfully.')
+      fetchCategories() // Refresh categories after editing
     } catch (error) {
       console.error('Error deleting category:', error)
       setMessage('Failed to delete category.')

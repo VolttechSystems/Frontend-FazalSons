@@ -602,9 +602,11 @@ function Transections() {
       }
     }
 
-    const fetchAllProducts = async () => {
+    const fetchAllProducts = async (outletId) => {
       try {
-        const response = await fetch('http://195.26.253.123/pos/transaction/all_product')
+        const response = await fetch(
+          `http://195.26.253.123/pos/transaction/all_product/${outletId}/`,
+        )
         const data = await response.json()
         if (Array.isArray(data)) {
           const groupedData = groupByProductName(data)
@@ -630,7 +632,7 @@ function Transections() {
     fetchSalesmen()
     fetchAdditionalFees()
     fetchDeliveryFees()
-    fetchAllProducts()
+    fetchAllProducts(outletId) // Pass outletId to fetchAllProducts
     fetchCustomer()
     fetchPayment()
     const interval = setInterval(() => {
