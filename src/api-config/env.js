@@ -1,6 +1,5 @@
-import { create } from 'apisauce';
-console.log(1, create);
-const apiClient = create({
+import apisauce from 'apisauce'
+const apiClient = apisauce.create({
   baseURL: 'http://195.26.253.123/pos/',
 });
 console.log(2, apiClient);
