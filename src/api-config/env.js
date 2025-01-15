@@ -1,4 +1,4 @@
-import { create } from 'apisauce'
+import { create } from 'apisauce';
 
 const apiClient = create({
   baseURL: 'http://195.26.253.123/pos/',
