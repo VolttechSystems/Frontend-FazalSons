@@ -3,6 +3,7 @@ import { create } from 'apisauce'
 const apiClient = create({
   baseURL: 'http://195.26.253.123/pos/',
 })
+console.log(apiClient);
 
 apiClient.addAsyncRequestTransform(async (request) => {
   const token = window.localStorage.getItem('authToken')
@@ -12,6 +13,7 @@ apiClient.addAsyncRequestTransform(async (request) => {
 
 export const multiPartConfig = async () => {
   const token = window.localStorage.getItem('authToken')
+  console.log('Token:', token);
 
   return {
     headers: {
