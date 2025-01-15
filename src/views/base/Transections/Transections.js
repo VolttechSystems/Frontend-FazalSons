@@ -189,13 +189,26 @@ function Transections() {
 
   // Calculate due amount
   useEffect(() => {
-    const calculatedDue = totalPaymentAfterDiscount - advancePayment
+    const totalPayment = tableData.reduce(
+      (acc, item) =>
+        acc +
+        (item.discount_price
+          ? item.discount_price * item.quantity
+          : item.selling_price * item.quantity),
+      0,
+    )
+    const calculatedDue = totalPayment - advancePayment
     setDueAmount(calculatedDue > 0 ? calculatedDue : 0) // Prevent negative values
-  }, [totalPaymentAfterDiscount, advancePayment])
+  }, [tableData, advancePayment])
 
   // Calculate total discount
   const totalDiscount = tableData.reduce(
-    (acc, item) => acc + (item.selling_price * item.quantity * item.discount) / 100,
+    (acc, item) =>
+      acc +
+      ((item.discount_price ? item.discount_price : item.selling_price) *
+        item.quantity *
+        item.discount) /
+        100,
     0,
   )
 
@@ -755,7 +768,9 @@ function Transections() {
     const payload = {
       sku: tableData.map((item) => item.sku), // SKU of the items
       quantity: tableData.map((item) => item.quantity), // Quantity of each item
-      rate: tableData.map((item) => item.selling_price), // Price of each item
+      rate: tableData.map((item) =>
+        item.discount_price ? item.discount_price : item.selling_price,
+      ), // Use discount price if available, else selling price
       item_discount: tableData.map((item) => item.discount), // Item discount
       cust_code: selectedCustomer, // Customer code
       overall_discount: '0', // Overall discount (can be updated as needed)
@@ -1529,13 +1544,27 @@ function Transections() {
                 <td className="summary-label">INVOICE</td>
                 <td className="summary-value">
                   {tableData
-                    .reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+                    .reduce(
+                      (acc, item) =>
+                        acc +
+                        (item.discount_price
+                          ? item.discount_price * item.quantity
+                          : item.selling_price * item.quantity),
+                      0,
+                    )
                     .toFixed(2)}
                 </td>
                 <td className="summary-label">GROSS</td>
                 <td className="summary-value">
                   {tableData
-                    .reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+                    .reduce(
+                      (acc, item) =>
+                        acc +
+                        (item.discount_price
+                          ? item.discount_price * item.quantity
+                          : item.selling_price * item.quantity),
+                      0,
+                    )
                     .toFixed(2)}
                 </td>
 
@@ -1556,9 +1585,17 @@ function Transections() {
                 <td className="summary-label">PURCHASE</td>
                 <td className="summary-value">
                   {tableData
-                    .reduce((acc, item) => acc + item.selling_price * item.quantity, 0)
+                    .reduce(
+                      (acc, item) =>
+                        acc +
+                        (item.discount_price
+                          ? item.discount_price * item.quantity
+                          : item.selling_price * item.quantity),
+                      0,
+                    )
                     .toFixed(2)}
                 </td>
+
                 <td className="summary-label">DISCOUNT</td>
                 <td className="summary-value">{totalDiscount.toFixed(2)}</td>
                 <td className="summary-label">DUE</td>
@@ -1639,14 +1676,21 @@ function Transections() {
 
             <div className="payment-total">
               <span className="total-amount">
-                {tableData
-                  .reduce(
+                {(
+                  tableData.reduce(
                     (acc, item) =>
                       acc +
-                      item.selling_price * item.quantity -
-                      (item.selling_price * item.quantity * item.discount) / 100,
+                      ((item.discount_price
+                        ? item.discount_price * item.quantity
+                        : item.selling_price * item.quantity) -
+                        ((item.discount_price
+                          ? item.discount_price * item.quantity
+                          : item.selling_price * item.quantity) *
+                          item.discount) /
+                          100),
                     0,
-                  )
+                  ) + selectedFees.reduce((acc, fee) => acc + (fee.fee_amount || 0), 0)
+                ) // Add additional fees
                   .toFixed(2)}
               </span>
 
