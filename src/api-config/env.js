@@ -1,14 +1,14 @@
 import { create } from 'apisauce';
-console.log(create);
+console.log(1, create);
 const apiClient = create({
-  baseURL: 'http://195.26.253.123/pos/',
+  baseURL: 'http://195.26.253.123/',
 })
-console.log(apiClient);
+console.log(2, apiClient);
 
 if (typeof window !== 'undefined') {
-  console.log(window.localStorage);
+  console.log(3, window.localStorage);
 } else {
-  console.log('window is undefined (likely SSR)');
+  console.log(4,'window is undefined (likely SSR)');
 }
 
 
