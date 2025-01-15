@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './AddOutlet.css'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const AddOutlet = () => {
   const [formData, setFormData] = useState({
@@ -45,10 +47,20 @@ const AddOutlet = () => {
         await axios.post('http://195.26.253.123/pos/products/add_outlet', formData)
       }
       // Fetch updated outlets list from the backend
+      toast.success('Outlet added successfully!') // Success toast for user registration
       fetchOutlets()
       setFormData({ outlet_code: '', outlet_name: '' })
     } catch (error) {
-      console.error('Error adding/updating outlet:', error)
+      if (error.response && error.response.data) {
+        // If username already exists, show specific error
+        if (error.response.data.outlet_name) {
+          toast.error(error.response.data.outlet_name[0]) // Show the error message
+        } else {
+          toast.error('Failed to add outlet. Please try again.')
+        }
+      } else {
+        toast.error('An error occurred while adding outlet.')
+      }
     }
   }
 
@@ -69,6 +81,19 @@ const AddOutlet = () => {
 
   return (
     <div className="outlet-container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+
       <form className="outlet-form" onSubmit={handleSubmit}>
         <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
         <div>

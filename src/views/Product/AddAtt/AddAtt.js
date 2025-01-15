@@ -13,6 +13,8 @@ import {
   Button,
 } from '@mui/material'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 class AddAtt extends Component {
   constructor(props) {
@@ -132,35 +134,43 @@ class AddAtt extends Component {
       variation: attribute.variations,
     }))
 
-    // try {
-    //   const response = await fetch(
-    //     "http://195.26.253.123/pos/products/variation_group/",
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify(payload),
-    //     }
-    //   );
-    //   const result = await response.json();
-    //   if (response.ok) {
-    //     alert("Data successfully submitted!");
-    //     this.fetchData();
-    //     console.log(result);
-    //   } else {
-    //     alert("Failed to submit data");
-    //     console.log(result);
-    //   }
-    // } catch (error) {
-    //   alert("Error submitting data");
-    //   console.log(error);
-    // }
+    try {
+      const response = await Network.post(Urls.addAttributes, payload)
 
-    const response = await Network.post(Urls.addAttributes, payload)
-    if (!response.ok) return consoe.log(response.data.error)
-    alert('Data successfully submitted!')
+      if (!response.ok) {
+        // Handle and display backend errors
+        const errorData = response.data
+        if (errorData && errorData.error) {
+          Object.keys(errorData.error).forEach((key) => {
+            const errorMessages = errorData.error[key]
+            if (Array.isArray(errorMessages)) {
+              errorMessages.forEach((message) => {
+                toast.error(`${key}: ${message}`)
+              })
+            } else {
+              toast.error(`${key}: ${errorMessages}`)
+            }
+          })
+        } else {
+          toast.error('Failed to submit data. Please check your input.')
+        }
+        return
+      }
+
+      // Success case
+      toast.success('Data successfully submitted!')
+      this.fetchData()
+    } catch (error) {
+      console.error('Error submitting data:', error)
+      toast.error('An error occurred while submitting data.')
+    }
+    this.setState({
+      editData: null,
+      attType: '',
+      attributes: [{ attributeName: '', variations: [] }],
+    })
     this.fetchData()
+    this.variationGroups()
   }
 
   handleEdit = (item) => {
@@ -244,21 +254,28 @@ class AddAtt extends Component {
       JSON.stringify(payload),
     )
     if (!response.ok) return consoe.log(response.data.error)
-    alert('Data successfully updated!')
-    this.fetchData()
+    toast.success('Attribute updated successfully!')
+
     this.setState({
       editData: null,
       attType: '',
       attributes: [{ attributeName: '', variations: [] }],
     })
+    this.fetchData()
     this.variationGroups()
   }
 
   handleDelete = async (attId) => {
     const response = await Network.delete(`${Urls.updateVariationGroup}${attId}`)
     if (!response.ok) return console.log(response.data.error)
-    alert('Data successfully deleted!')
-    this.variationGroups() // Fetch attribute types when component mounts
+    toast.success('Attribute deleted successfully!')
+    this.setState({
+      editData: null,
+      attType: '',
+      attributes: [{ attributeName: '', variations: [] }],
+    })
+    this.fetchData()
+    this.variationGroups()
   }
 
   render() {
@@ -267,6 +284,18 @@ class AddAtt extends Component {
     return (
       <div style={{ padding: '20px' }}>
         <h1>{editData ? 'Edit Attribute' : 'Add Attributes'}</h1>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
 
         {/* Attribute Type Dropdown */}
         <div style={{ marginBottom: '20px' }}>

@@ -13,6 +13,8 @@ import {
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const AddBrands = () => {
   const [brandName, setBrandName] = useState('')
@@ -52,6 +54,7 @@ const AddBrands = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     const brandData = {
       brand_name: brandName,
       symbol: symbol,
@@ -59,32 +62,39 @@ const AddBrands = () => {
       status: status,
     }
 
-    // const response = await Network.post(Urls.addBrand, brandData)
-    // if (!response.ok) return consoe.log(response.data.error)
-    // alert('Brand added successfully!')
-    // navigate('/Product/Brands')
-
     const url = id ? `${Urls.updateBrand}/${id}/` : Urls.addBrand
     const req = id ? 'put' : 'post'
 
-    const response = await Network[req](url, brandData)
-    if (!response.ok) return console.log(response.data.error)
-    alert(id ? 'Brand updated successfully!' : 'Brand added successfully!')
-    navigate('/Product/Brands')
+    try {
+      const response = await Network[req](url, brandData)
 
-    // try {
-    //   if (id) {
-    //     await axios.put(`http://195.26.253.123/pos/products/action_brand/${id}/`, brandData)
-    //     alert('Brand updated successfully!')
-    //   } else {
-    //     await axios.post('http://195.26.253.123/pos/products/add_brand', brandData)
-    //     alert('Brand added successfully!')
-    //   }
-    //   navigate('/Product/Brands')
-    // } catch (error) {
-    //   console.error('Error saving the brand:', error)
-    //   setErrorMessage('Error saving the brand. Please try again.')
-    // }
+      if (!response.ok) {
+        // Handle and display backend errors
+        const errorData = response.data
+        if (errorData) {
+          Object.keys(errorData).forEach((key) => {
+            const errorMessages = errorData[key]
+            if (Array.isArray(errorMessages)) {
+              errorMessages.forEach((message) => {
+                toast.error(`${key}: ${message}`)
+              })
+            } else {
+              toast.error(`${key}: ${errorMessages}`)
+            }
+          })
+        } else {
+          toast.error('Failed to process the request. Please check your input.')
+        }
+        return
+      }
+      toast.success('Brand added successfully!')
+      // Success case
+      toast.success(id ? 'Brand updated successfully!' : 'Brand added successfully!')
+      navigate('/Product/Brands')
+    } catch (error) {
+      console.error('Error processing the request:', error)
+      toast.error('An error occurred while processing the request.')
+    }
   }
 
   return (
@@ -95,6 +105,18 @@ const AddBrands = () => {
           <Link to="/Product/Brands">
             <CButton color="primary">Brands</CButton>
           </Link>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
         </div>
       </CCardHeader>
       <CCardBody>

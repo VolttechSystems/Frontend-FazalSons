@@ -23,6 +23,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { faPrint, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons'
 import AppSidebar from '/src/components/AppSidebar.js' // Your sidebar component
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 // import Transections from '/Transections.js';
 
 function Transections() {
@@ -791,21 +793,32 @@ function Transections() {
         body: JSON.stringify(payload),
       })
 
-      // Handling response
       if (response.ok) {
         const result = await response.json()
-        setAlertMessage('Transaction added successfully!')
-        setVisible(true)
+        toast.success('Transaction added successfully!')
       } else {
         const errorData = await response.json()
         console.error('API Error Response:', errorData)
-        setAlertMessage('Failed to add transaction! Please check your input.')
-        setVisible(true)
+
+        // Display backend errors
+        if (errorData) {
+          Object.keys(errorData).forEach((key) => {
+            const errorMessages = errorData[key]
+            if (Array.isArray(errorMessages)) {
+              errorMessages.forEach((message) => {
+                toast.error(`${key}: ${message}`)
+              })
+            } else {
+              toast.error(`${key}: ${errorMessages}`)
+            }
+          })
+        } else {
+          toast.error('Failed to add transaction! Please check your input.')
+        }
       }
     } catch (error) {
       console.error('Error adding transaction:', error)
-      setAlertMessage('An error occurred while processing the payment.')
-      setVisible(true)
+      toast.error('An error occurred while processing the payment.')
     }
   }
 
@@ -902,6 +915,19 @@ function Transections() {
       className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}
     >
       <div className={`transactions-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+
         <header className="t-header">
           {/* <h1 className="t-logo">FAZAL SONS</h1> */}
           <div className="t-header-info">

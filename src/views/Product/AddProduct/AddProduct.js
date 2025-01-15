@@ -6,7 +6,7 @@ import Tabs from '@mui/material/Tabs'
 import axios from 'axios'
 import Select from 'react-select'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { toast } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import {
   Dialog,
@@ -85,7 +85,7 @@ const AddProduct = () => {
       axios
         .delete('http://195.26.253.123/pos/products/all-temp-product-delete')
         .then((response) => {
-          console.log('All products deleted successfully')
+          toast.success('All products deleted successfully!')
           // Clear the product list (update the state to empty)
           setProductList([])
           setActiveTab(nextTab)
@@ -651,7 +651,7 @@ const AddProduct = () => {
       )
 
       if (response.status === 200 || response.status === 201) {
-        alert('Product added successfully!')
+        toast.success('Product added successfully!')
         fetchProductList()
         resetForm()
       } else {
@@ -659,8 +659,26 @@ const AddProduct = () => {
       }
     } catch (error) {
       console.error('Error adding product:', error)
-      alert('An error occurred while adding the product.')
+
+      // Check if the error contains response data
+      if (error.response && error.response.data) {
+        // Handle specific field errors
+        Object.keys(error.response.data).forEach((key) => {
+          const errorMessages = error.response.data[key]
+          if (Array.isArray(errorMessages)) {
+            errorMessages.forEach((message) => {
+              toast.error(`${key}: ${message}`)
+            })
+          } else {
+            toast.error(`${key}: ${errorMessages}`)
+          }
+        })
+      } else {
+        // Handle general errors
+        toast.error('An error occurred while adding the product.')
+      }
     }
+
     fetchProductList()
     resetForm()
   }
@@ -672,13 +690,13 @@ const AddProduct = () => {
       )
       if (response.status === 200 || response.status === 204) {
         setProductList((prevList) => prevList.filter((product) => product.id !== id))
-        alert('Product deleted successfully!')
+        toast.success('Product deleted successfully!')
       } else {
         console.error('Failed to delete the product')
       }
     } catch (error) {
       console.error('Error deleting product:', error)
-      alert('Error deleting the product. Please try again.')
+      toast.error('Failed to delete the product. Please try again.')
     }
   }
 
@@ -707,10 +725,10 @@ const AddProduct = () => {
     try {
       const response = await axios.post('http://195.26.253.123/pos/products/add_product')
       if (response.status === 201 || response.status === 200) {
-        alert('Product published successfully!')
+        toast.success('Product published successfully!')
         history.push('/Product/AllProducts')
       } else {
-        alert('Failed to publish the product. Please try again.')
+        toast.error('Failed to publish the product. Please try again.')
       }
     } catch (error) {
       console.error('Error publishing product:', error)
@@ -723,6 +741,18 @@ const AddProduct = () => {
 
   return (
     <div className="add-product-form">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <h2>Product Information</h2>
 
       <div style={{ marginBottom: '16px' }}>

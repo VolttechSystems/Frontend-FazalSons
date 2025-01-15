@@ -16,6 +16,8 @@ import {
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const Loader = () => {
   return (
@@ -80,13 +82,14 @@ const Brands = () => {
     // }
     const response = await Network.delete(`${Urls.updateBrand}/${id}/`)
     if (!response.ok) return console.log(response.data.error)
-    alert('Brand deleted successfully!')
+    toast.success('Brand deleted successfully!')
     fetchBrands() // Refresh the brands list after deletion
   }
 
   const handleEdit = (id) => {
     console.log('Editing brand with ID:', id)
     navigate(`/Product/AddBrands/${id}`)
+    toast.success('Brand updated successfully!')
   }
 
   // Handle search
@@ -127,6 +130,18 @@ const Brands = () => {
             Add Brand
           </CButton>
         </Link>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         <div className="d-flex">
           <input
             type="text"

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Select from 'react-select'
 import axios from 'axios'
 import './RegisterUser.css'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 function RegisterUser() {
   const [systemRoles, setSystemRoles] = useState([])
@@ -35,7 +37,9 @@ function RegisterUser() {
           value: role.id,
           label: role.sys_role_name,
         }))
+
         setSystemRoles(roles)
+        toast.success('System roles fetched successfully!') // Show success toast
       })
       .catch((error) => console.log('Error fetching system roles:', error))
 
@@ -161,6 +165,7 @@ function RegisterUser() {
       .then((response) => {
         console.log('User registered successfully:', response)
         fetchUsers() // Refresh user list after successful submission
+        toast.success('User registered successfully!') // Success toast for user registration
         setFormData({
           first_name: '',
           last_name: '',
@@ -174,7 +179,21 @@ function RegisterUser() {
           outlet: [], // Reset outlet selection
         })
       })
-      .catch((error) => console.log('Error registering user:', error))
+      .catch((error) => {
+        // Check if the error response has a specific message for username already exists
+        if (error.response && error.response.data) {
+          // If username already exists, show specific error
+          if (error.response.data.username) {
+            toast.error(error.response.data.username[0]) // Show the error message
+          } else {
+            toast.error('Failed to register user. Please try again.')
+          }
+        } else {
+          toast.error('An error occurred while registering the user.')
+        }
+
+        console.log('Error registering user:', error) // Log the error for debugging
+      })
   }
 
   // Handle user delete
@@ -192,6 +211,18 @@ function RegisterUser() {
 
   return (
     <div className="container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       {passwordChangeMessage && (
         <div className="alert alert-success" role="alert">
           {passwordChangeMessage}

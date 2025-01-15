@@ -119,7 +119,7 @@ const AddSubCat = () => {
   const fetchsubCategories = async () => {
     try {
       const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
-      setsubCategories(subcategoriesResponse.data)
+      setCategories(subcategoriesResponse.data)
     } catch (error) {
       console.error('Error fetching Categories:', error)
     }
@@ -352,33 +352,51 @@ const AddSubCat = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // const attributeGroup = Array.isArray(formData.attribute_name)
+    //   ? formData.attribute_name
+    //   : formData.attribute_name
+    //       .split(',')
+    //       .map((item) => item.trim());
     const payload = {
+      //category_name: formData.category_name,
       sub_category_name: formData.sub_category_name,
       symbol: formData.symbol,
       description: formData.description,
       status: formData.status,
+      // pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
       category: formData.category_name ? parseInt(formData.category_name, 10) : null,
       attribute_group: selectedAttributes.map((attr) => attr.split(':')[1]), // Extract only the attribute_id
     }
-
     console.log(payload)
 
     try {
       if (editMode) {
-        // PUT request to update subcategory
+        // PUT request to update category
         const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editsubCategoryId}`, payload)
 
-        if (response.status === 200) {
-          setMessage('Sub Category updated successfully.')
-          fetchsubCategories() // Ensure categories are refreshed
+        // Update the category list with the new data
+        const updatedsubCategories = subcategories.map((cat) =>
+          cat.id === editsubCategoryId ? response.data : cat,
+        )
+        if (response) {
+          setsubCategories((prev) => prev, ...response.data)
+          setTableData((prev) => prev, ...response.data)
         }
-      } else {
-        // POST request to add a new subcategory
-        const response = await axios.post(API_ADD_SUBCATEGORIES, payload)
 
-        if (response.status === 201) {
-          setMessage('Sub Category added successfully.')
-          fetchsubCategories() // Ensure categories are refreshed
+        setMessage('Sub Category updated successfully.')
+        fetchsubCategories()
+      } else {
+        // POST request to add new subcategory
+        const response = await axios.post(API_ADD_SUBCATEGORIES, payload)
+        const newsubCategory = response.data
+        // setsubCategories((prevsubCategories) => [...prevsubCategories, newsubCategory]);
+        // setTableData((prevData) => [...prevData, newsubCategory]);
+        // setMessage("subcategory added successfully.");
+
+        if (newsubCategory) {
+          setsubCategories((prev) => [...prev, ...response.data])
+          setTableData((prev) => [...prev, ...response.data])
+          setMessage('Category added successfully.')
         }
       }
 
@@ -398,6 +416,7 @@ const AddSubCat = () => {
       })
       setEditMode(false)
       setEditsubCategoryId(null)
+      fetchsubCategories()
     } catch (error) {
       console.error('Error submitting subcategory:', error)
       setMessage('Failed to submit subcategory. Please try again.')
@@ -456,6 +475,7 @@ const AddSubCat = () => {
       )
       const data = responses.flatMap((res) => res.data)
       setTableData(data)
+
       setEditMode(true)
       setEditsubCategoryId(subcategoryData.id) // Store the ID for updating
       fetchsubCategories()
@@ -463,6 +483,7 @@ const AddSubCat = () => {
       console.error('Error fetching subcategory for edit:', error)
       setMessage('Failed to fetch subcategory details.')
     }
+    fetchsubCategories()
   }
 
   const handleDelete = async (subcategoryId) => {
