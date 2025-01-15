@@ -1,9 +1,16 @@
 import { create } from 'apisauce';
-
+console.log(create);
 const apiClient = create({
   baseURL: 'http://195.26.253.123/pos/',
 })
 console.log(apiClient);
+
+if (typeof window !== 'undefined') {
+  console.log(window.localStorage);
+} else {
+  console.log('window is undefined (likely SSR)');
+}
+
 
 apiClient.addAsyncRequestTransform(async (request) => {
   const token = window.localStorage.getItem('authToken')

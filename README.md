@@ -137,7 +137,7 @@ coreui-free-react-admin-template
 ├── ...
 ├── package.json
 ├── ...
-└── vite.config.mjs  # vite config
+└── config.mjs  # vite config
 ```
 
 ## Documentation
