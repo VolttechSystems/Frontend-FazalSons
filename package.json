@@ -49,7 +49,8 @@
     "react-select": "^5.8.1",
     "react-toastify": "^10.0.6",
     "redux": "5.0.1",
-    "simplebar-react": "^3.2.6"
+    "simplebar-react": "^3.2.6",
+    "sql.js": "^1.12.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
