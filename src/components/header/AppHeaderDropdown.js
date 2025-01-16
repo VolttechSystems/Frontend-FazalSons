@@ -48,6 +48,7 @@ const AppHeaderDropdown = () => {
         // Clear localStorage
         localStorage.removeItem('authToken')
         localStorage.removeItem('SysRoles') // Clear roles or any other stored items
+        localStorage.removeItem('outlets') // Clear outlets or any other stored items
       }
 
       // Redirect to the login page

@@ -26,11 +26,14 @@ const AppSidebar = () => {
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
   const { systemRoles } = useAuth()
-  console.log({ systemRoles })
+  // const { useroutlets } = useAuth()
+  // console.log({ systemRoles })
+  // console.log({ useroutlets })
 
   // Function to filter navigation items based on permissions
   const filterNavItems = (navItems) => {
     const permissions = systemRoles.length > 0 ? systemRoles[0].permissions : []
+    // const userOutlets = useroutlets.map((outlet) => outlet.outlet_name) // Get an array of outlet names for comparison
 
     return navItems.filter((item) => {
       if (permissions.some((permission) => permission.permission_name === item.key)) {

@@ -16,31 +16,41 @@ import {
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { Network, Urls } from '../../../api-config'
+import useAuth from '../../../hooks/useAuth'
 
 const POSTable2 = () => {
   const [outlets, setOutlets] = useState([]) // State to store outlets data
   const [loading, setLoading] = useState(true) // State for loading indicator
+  const { userOutlets } = useAuth()
 
   useEffect(() => {
     // Fetch outlets data from the API
-    const fetchOutlets = async () => {
-      // try {
-      //   const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/');
-      //   setOutlets(response.data); // Assuming the response data is an array of outlets
-      //   setLoading(false);
-      // } catch (error) {
-      //   console.error('Error fetching outlets:', error);
-      //   setLoading(false);
-      // }
-
-      const response = await Network.get(Urls.fetchtheOutlets)
-      if (!response.ok) return console.log(response.data.error)
-      setOutlets(response.data)
-      setLoading(false)
-    }
 
     fetchOutlets()
   }, [])
+
+  // Fetch outlets data from the API
+  const fetchOutlets = async () => {
+    setLoading(true)
+    const response = await Network.get(Urls.fetchAllOutlets)
+    setLoading(false)
+    if (!response.ok) {
+      return console.error('Failed to fetch outlets:', response.data.error)
+    }
+
+    const outlets = response.data
+      .map((outlet) => {
+        if (userOutlets.some((o) => o.id === outlet.id)) {
+          return outlet
+        }
+        return null
+      })
+      .filter((outlet) => outlet !== null)
+
+    setOutlets(outlets) // Assuming the response data is an array of outlets
+  }
+
+  console.log({ userOutlets })
 
   return (
     <CRow>

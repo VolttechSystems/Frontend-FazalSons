@@ -40,15 +40,17 @@ const Login = () => {
 
     if (!response.ok) return setError(response.data.error)
 
-    const { token, System_role } = response.data
+    const { token, System_role, outlet } = response.data
 
     localStorage.setItem('authToken', token)
-    const sysRoles = JSON.stringify(response.data.System_role || [])
+    const sysRoles = JSON.stringify(System_role || [])
+    const outlet_user = JSON.stringify(outlet || [])
 
-    login(token, System_role)
+    login(token, System_role, outlet)
 
     // Store in localStorage
     localStorage.setItem('SysRoles', sysRoles)
+    localStorage.setItem('outlets', outlet_user)
     navigate('/dashboard/')
   }
 

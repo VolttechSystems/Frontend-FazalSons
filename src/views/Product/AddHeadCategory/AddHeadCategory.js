@@ -20,6 +20,8 @@ import {
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const AddHeadCategory = () => {
   const [hc_name, setHCname] = useState('')
@@ -66,23 +68,44 @@ const AddHeadCategory = () => {
     //   console.error('Error adding/editing Head Category :', error)
     // }
 
-    const isEditing = editingIndex
+    // Determine if editing or adding
+    const isEditing = editingIndex !== null
 
     const url = isEditing
       ? `${Urls.updateHeadCategory}/${types[editingIndex].id}/`
       : Urls.addHeadCategory
+
     const req = isEditing ? 'put' : 'post'
 
-    console.log
-    const response = await Network[req](url, requestData)
-    if (!response.ok) return console.log(response.data.error)
-    alert(isEditing ? 'Head Category updated successfully!' : 'Category added successfully!')
-    setEditingIndex(null)
-    setHCname('')
-    setStatus('active')
-    setSymbol('')
-    setDescription('')
-    fetchHeadCategory()
+    try {
+      // Make the API call
+      const response = await Network[req](url, requestData)
+
+      // Handle API response errors
+      if (!response.ok) {
+        throw new Error(response.data.error || 'Head Category with this name already exists!')
+      }
+
+      // Display success toast message
+      toast.success(
+        isEditing ? 'Head Category updated successfully!' : 'Head Category added successfully!',
+      )
+
+      // Reset form and state
+      setEditingIndex(null)
+      setHCname('')
+      setStatus('active')
+      setSymbol('')
+      setDescription('')
+
+      // Refresh the HeadCategory list
+      fetchHeadCategory()
+    } catch (error) {
+      console.error('Error:', error.message)
+
+      // Display error message using toast
+      toast.error(error.message || 'An unexpected error occurred')
+    }
   }
 
   // Function to handle edit button click
@@ -101,6 +124,7 @@ const AddHeadCategory = () => {
     const id = types[index].id // Assuming each type has a unique `id`
     try {
       await axios.delete(`http://195.26.253.123/pos/products/action_head_category/${id}/`)
+      toast.success('Head Category head deleted successfully!')
       fetchHeadCategory()
     } catch (error) {
       console.error('Error deleting category head:', error)
@@ -120,6 +144,18 @@ const AddHeadCategory = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
               <CRow className="mb-3">
                 <CFormLabel htmlFor="hc_name" className="col-sm-2 col-form-label">
                   Head Category Name

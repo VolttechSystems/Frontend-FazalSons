@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './CommissionReport.css'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const CommissionReport = () => {
   const [outlets, setOutlets] = useState([])
@@ -62,16 +64,51 @@ const CommissionReport = () => {
   const handleEndDateChange = (event) => {
     setEndDate(event.target.value)
   }
+  // const handleGenerateReport = async () => {
+  //   if (selectedOutlet && selectedSalesman && startDate && endDate) {
+  //     // Convert the start and end dates to YYYY-MM-DD format (already in correct format)
+  //     const formattedStartDate = startDate
+  //     const formattedEndDate = endDate
+
+  //     // Validate the date format
+  //     const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/
+  //     if (!dateRegex.test(formattedStartDate) || !dateRegex.test(formattedEndDate)) {
+  //       alert('Invalid date format. Use YYYY-MM-DD.')
+  //       return
+  //     }
+
+  //     // Construct the API endpoint
+  //     const endpoint = `${Urls.commissionReport}${selectedOutlet}/${selectedSalesman}/${formattedStartDate}/${formattedEndDate}/`
+
+  //     try {
+  //       // Fetch commission report
+  //       const response = await Network.get(endpoint)
+
+  //       // Check for valid response data
+  //       if (!response || !response.data) {
+  //         console.error('Error: Invalid response structure', response)
+  //         return
+  //       }
+
+  //       setCommissionData(response.data)
+  //     } catch (error) {
+  //       console.error('Error fetching commission report:', error)
+  //     }
+  //   } else {
+  //     alert('Please select all fields')
+  //   }
+  // }
+
   const handleGenerateReport = async () => {
     if (selectedOutlet && selectedSalesman && startDate && endDate) {
-      // Convert the start and end dates to YYYY-MM-DD format (already in correct format)
+      // Convert the start and end dates to YYYY-MM-DD format
       const formattedStartDate = startDate
       const formattedEndDate = endDate
 
       // Validate the date format
       const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/
       if (!dateRegex.test(formattedStartDate) || !dateRegex.test(formattedEndDate)) {
-        alert('Invalid date format. Use YYYY-MM-DD.')
+        toast.error('Invalid date format. Use YYYY-MM-DD.')
         return
       }
 
@@ -83,23 +120,57 @@ const CommissionReport = () => {
         const response = await Network.get(endpoint)
 
         // Check for valid response data
-        if (!response || !response.data) {
+        if (response && response.data) {
+          if (response.data.length === 0) {
+            toast.warning('No data available for the selected criteria.')
+          } else {
+            setCommissionData(response.data)
+            toast.success('Report generated successfully.')
+          }
+        } else {
+          toast.error('Error: Invalid response structure.')
           console.error('Error: Invalid response structure', response)
-          return
         }
-
-        setCommissionData(response.data)
       } catch (error) {
         console.error('Error fetching commission report:', error)
+
+        // Handle backend errors with toast
+        if (error.response && error.response.data) {
+          const errorData = error.response.data
+          Object.keys(errorData).forEach((key) => {
+            const errorMessages = errorData[key]
+            if (Array.isArray(errorMessages)) {
+              errorMessages.forEach((message) => {
+                toast.error(`${key}: ${message}`)
+              })
+            } else {
+              toast.error(`${key}: ${errorMessages}`)
+            }
+          })
+        } else {
+          toast.error('An unexpected error occurred while generating the report.')
+        }
       }
     } else {
-      alert('Please select all fields')
+      toast.error('Please select all fields.')
     }
   }
 
   return (
     <div className="report-container">
       <h1 className="heading">Commission Report</h1>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
 
       <div className="dropdowns">
         <div className="dropdown-wrapper">

@@ -22,8 +22,8 @@ export default {
   //UpdateHeadCategory
   updateHeadCategory: 'products/action_head_category',
 
-  //FetchOulets
-  fetchtheOutlets: 'products/fetch_all_outlet/',
+  // //FetchOulets
+  // fetchtheOutlets: 'products/fetch_all_outlet/',
 
   //FetchAllProducts
   fetchAllProducts: 'products/show_product/',
@@ -64,8 +64,10 @@ export default {
 
   fetchHeadtoParentCategory: 'products/fetch_head_to_parent_category/',
 
-  //outletwisesaleman
+  //outlet
   outletWiseSalesman: 'report/outlet_wise_salesman/',
+  fetchAllOutlets: 'products/fetch_all_outlet/',
+  fetchtheOutlets: 'products/fetch_all_outlet/',
 
   //commissionreport
   commissionReport: 'report/salesman_commission_report/',

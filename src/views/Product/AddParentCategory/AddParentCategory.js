@@ -15,6 +15,8 @@ import {
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const AddParentCategory = () => {
   const [categoryHeads, setCategoryHeads] = useState([])
@@ -109,14 +111,32 @@ const AddParentCategory = () => {
 
     console.log('ParentCategoryData:', ParentCategoryData)
 
+    // Determine whether to use POST (add) or PUT (update)
     const url = id ? `${Urls.updateParentCategory}/${id}/` : Urls.addParentCategory
     const req = id ? 'put' : 'post'
 
-    const response = await Network[req](url, ParentCategoryData)
-    if (!response.ok) return console.log(response.data.error) // Fix the typo from `consoe` to `console`
+    try {
+      // Make the API request
+      const response = await Network[req](url, ParentCategoryData)
 
-    alert(id ? 'Parent Category updated successfully!' : 'Parent Category added successfully!')
-    navigate('/Product/ParentCategory')
+      // Check if the response is not okay
+      if (!response.ok) {
+        throw new Error(response.data.error || 'parent category with this pc name already exists')
+      }
+
+      // Show success toast message
+      toast.success(
+        id ? 'Parent Category updated successfully!' : 'Parent Category added successfully!',
+      )
+
+      // Redirect to the ParentCategory page
+      navigate('/Product/ParentCategory')
+    } catch (error) {
+      console.error('Error:', error.message)
+
+      // Display the error message using toast
+      toast.error(error.message || 'An unexpected error occurred')
+    }
   }
 
   const handleAddCategoryHead = () => {
@@ -129,6 +149,18 @@ const AddParentCategory = () => {
         <CCard className="mb-4">
           <CCardHeader>
             <strong>{id ? 'Edit Parent Category' : 'Add Parent Category'}</strong>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={true}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+            />
             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
               <Link to="/Product/ParentCategory">
                 <CButton color="primary">Parent Category</CButton>
