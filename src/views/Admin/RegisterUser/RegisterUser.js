@@ -39,7 +39,6 @@ function RegisterUser() {
         }))
 
         setSystemRoles(roles)
-        toast.success('System roles fetched successfully!') // Show success toast
       })
       .catch((error) => console.log('Error fetching system roles:', error))
 

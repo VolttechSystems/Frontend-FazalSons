@@ -229,6 +229,15 @@ const DaySale = () => {
                   </Typography>
                 ))}
                 <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
+                  Additional Fees
+                </Typography>
+                {detailData.additional_fee.map((additionalfee, index) => (
+                  <Typography key={index} sx={{ marginBottom: 1 }}>
+                    <strong>Method:</strong> {additionalfee.fee_method}, <strong>Fee:</strong>{' '}
+                    {additionalfee.fee}
+                  </Typography>
+                ))}
+                <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
                   Returns
                 </Typography>
                 {detailData.returns.length > 0 ? (

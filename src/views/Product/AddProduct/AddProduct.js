@@ -19,6 +19,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { Network, Urls } from '../../../api-config'
+import useAuth from '../../../hooks/useAuth'
 
 const AddProduct = () => {
   const initialFormData = {
@@ -72,6 +73,7 @@ const AddProduct = () => {
   const [isCategoryDialogOpen, setCategoryDialogOpen] = React.useState(false)
   const [error, setError] = useState('')
   const [showSubCategoryDropdown, setShowSubCategoryDropdown] = useState(false)
+  const { userOutlets } = useAuth()
 
   // Function to handle button click and open the dialog
   const handleButtonClick = () => {
@@ -130,6 +132,7 @@ const AddProduct = () => {
       console.error('Error fetching attributes:', error)
     }
   }
+
   const handleTabChange = (tabIndex) => {
     if (tabIndex === 1 && !selectedCategory) {
       openCategoryDialog()
@@ -489,22 +492,31 @@ const AddProduct = () => {
     setProductList(response.data)
   }
 
-  // Function to fetch outlets from API
   useEffect(() => {
-    const fetchOutlets = async () => {
-      //   try {
-      //     const response = await axios.get('http://195.26.253.123/pos/products/fetch_all_outlet/')
-      //     setOutlets(response.data) // Assuming the response data is an array
-      //   } catch (error) {
-      //     console.error('Error fetching outlets:', error)
-      //   }
-      const response = await Network.get(Urls.fetchtheOutlets)
-      if (!response.ok) return consoe.log(response.data.error)
-      setOutlets(response.data)
-    }
+    // Fetch outlets data from the API
 
     fetchOutlets()
   }, [])
+
+  // Fetch outlets data from the API
+  const fetchOutlets = async () => {
+    const response = await Network.get(Urls.fetchAllOutlets)
+
+    if (!response.ok) {
+      return console.error('Failed to fetch outlets:', response.data.error)
+    }
+
+    const outlets = response.data
+      .map((outlet) => {
+        if (userOutlets.some((o) => o.id === outlet.id)) {
+          return outlet
+        }
+        return null
+      })
+      .filter((outlet) => outlet !== null)
+
+    setOutlets(outlets) // Assuming the response data is an array of outlets
+  }
 
   const handleMultiSelectChange = (selectedOptions, name) => {
     const values = selectedOptions ? selectedOptions.map((option) => option.value) : []

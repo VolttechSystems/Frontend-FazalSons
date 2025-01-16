@@ -41,12 +41,6 @@ const _nav = [
         to: '/base/POS',
         key: 'Transaction', // Permission key for this item
       },
-      {
-        component: CNavItem,
-        name: 'Register Systems',
-        to: '/base/RegisterSystem',
-        key: 'Transaction', // Permission key for this item
-      },
     ],
   },
   {

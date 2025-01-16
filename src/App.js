@@ -21,6 +21,7 @@ const App = () => {
   const storedTheme = useSelector((state) => state.theme)
   const [token, setToken] = useState(null)
   const [systemRoles, setSystemRoles] = useState([])
+  const [userOutlets, setuserOutlets] = useState([])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])
@@ -39,14 +40,19 @@ const App = () => {
   useEffect(() => {
     const token = localStorage.getItem('authToken')
     const sysRoles = localStorage.getItem('SysRoles')
+    const outlet_user = localStorage.getItem('outlets')
+
     if (token) {
       setToken(token)
       setSystemRoles(JSON.parse(sysRoles))
+      setuserOutlets(JSON.parse(outlet_user))
     }
   }, [])
 
   return (
-    <AuthContext.Provider value={{ token, setToken, systemRoles, setSystemRoles }}>
+    <AuthContext.Provider
+      value={{ token, setToken, systemRoles, setSystemRoles, userOutlets, setuserOutlets }}
+    >
       <HashRouter>
         <Suspense
           fallback={

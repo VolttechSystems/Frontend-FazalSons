@@ -15,6 +15,8 @@ import {
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const ParentCategory = () => {
   const [pc, setParentcategory] = useState([])
@@ -63,28 +65,29 @@ const ParentCategory = () => {
     const headcat = hc.find((attr) => attr.hc_name_id === categoryHeadName)
     return headcat ? headcat.hc_name : 'Category Head not found'
   }
-
   const handleDelete = async (id) => {
-    // if (window.confirm('Are you sure you want to delete this Parent Category?')) {
-    //   try {
-    //     await axios.delete(`http://195.26.253.123/pos/products/action_parent_category/${id}/`)
-    //     alert('Parent Category deleted successfully!')
-    //     fetchBrands() // Refresh the brands list after deletion
-    //   } catch (error) {
-    //     console.error('Error deleting Parent Category:', error)
-    //     alert('Failed to delete Parent Category.')
-    //   }
-    // }
+    try {
+      const response = await Network.delete(`${Urls.updateParentCategory}/${id}/`)
+      if (!response.ok) {
+        console.log(response.data.error)
+        toast.error('Failed to delete Parent Category.')
+        return
+      }
 
-    const response = await Network.delete(`${Urls.updateParentCategory}/${id}/`)
-    if (!response.ok) return console.log(response.data.error)
-    alert('Parent Category deleted successfully!')
-    fetchBrands()
+      toast.success('Parent Category deleted successfully!')
+
+      // Update the state to remove the deleted category
+      setParentcategory((prev) => prev.filter((parent) => parent.id !== id))
+    } catch (error) {
+      console.error('Error deleting Parent Category:', error)
+      toast.error('Failed to delete Parent Category.')
+    }
   }
 
   const handleEdit = (id) => {
     console.log('Editing Parent Category with ID:', id)
     navigate(`/Product/AddParentCategory/${id}`)
+    toast.success('Parent Category updated successfully!')
   }
 
   return (
@@ -96,6 +99,18 @@ const ParentCategory = () => {
           </CButton>
         </Link>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <CCol xs={12}>
         <CCard className="mb-3">
           <CCardHeader>

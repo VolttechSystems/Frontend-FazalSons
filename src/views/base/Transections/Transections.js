@@ -758,6 +758,21 @@ function Transections() {
     }, {})
   }
 
+  const resetForm = () => {
+    // Reset form fields and states
+    setSelectedFees([]) // Clear selected fees
+    setSelectedPayments([]) // Clear selected payment methods
+    setTableData([]) // Reset table data
+    setSelectedCustomer('') // Clear selected customer
+    setAdvancePayment('') // Clear advance payment amount
+    setSelectedSalesman('') // Clear selected salesman
+    setSalesmen([]) // Clear salesmen list
+    setCustomer([]) // Clear customer list
+    setnewProducts([]) // Clear new products list
+    setProducts([]) // Clear products list
+    setProductDetails({}) // Clear product details
+  }
+
   const handlePayment = async () => {
     // Create arrays for fee codes and amounts
     const feeCodes = selectedFees.map((fee) => fee.fee_code) // Create an array for fee codes
@@ -796,6 +811,7 @@ function Transections() {
       if (response.ok) {
         const result = await response.json()
         toast.success('Transaction added successfully!')
+        resetForm() // Reset the form after successful transaction
       } else {
         const errorData = await response.json()
         console.error('API Error Response:', errorData)
@@ -852,14 +868,6 @@ function Transections() {
       })
     )
   }
-
-  // const toggleFullScreen = () => {
-  //     if (!document.fullscreenElement) {
-  //         document.documentElement.requestFullscreen();
-  //     } else if (document.exitFullscreen) {
-  //         document.exitFullscreen();
-  //     }
-  // };
 
   // Function to handle button click and show alert
   const handleButtonClick = (message) => {

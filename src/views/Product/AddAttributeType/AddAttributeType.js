@@ -20,6 +20,8 @@ import {
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const AddAttributeType = () => {
   const [attributeType, setAttributeType] = useState('')
@@ -66,24 +68,43 @@ const AddAttributeType = () => {
     //   console.error('Error adding/editing attribute type:', error)
     // }
 
-    const isEditing = editingIndex
+    // Determine if editing or adding
+    const isEditing = editingIndex !== null
 
     const url = isEditing
       ? `${Urls.updateAttributeType}/${types[editingIndex].id}/`
       : Urls.addAttributeTypes
+
     const req = isEditing ? 'put' : 'post'
 
-    console.log
-    const response = await Network[req](url, requestData)
-    if (!response.ok) return console.log(response.data.error)
-    alert(
-      isEditing ? 'Attribute Types updated successfully!' : 'Attribute Types added successfully!',
-    )
-    setAttributeType('')
-    setStatus('active') // Reset to default status
-    fetchAttributeTypes()
-  }
+    try {
+      // Make the API call
+      const response = await Network[req](url, requestData)
 
+      // Handle API response errors
+      if (!response.ok) {
+        throw new Error(response.data.error || 'Attribute Type with this name already exists!')
+      }
+
+      // Display success toast message
+      toast.success(
+        isEditing ? 'Attribute Type updated successfully!' : 'Attribute Type added successfully!',
+      )
+
+      // Reset form fields
+      setAttributeType('')
+      setStatus('active') // Reset to default status
+      setEditingIndex(null) // Reset editing index
+
+      // Refresh the attribute types list
+      fetchAttributeTypes()
+    } catch (error) {
+      console.error('Error:', error.message)
+
+      // Display error message using toast
+      toast.error(error.message || 'An unexpected error occurred')
+    }
+  }
   // Function to handle edit button click
   const handleEdit = (index) => {
     const selectedType = types[index]
@@ -104,7 +125,7 @@ const AddAttributeType = () => {
 
     const response = await Network.delete(`${Urls.updateAttributeType}/${id}/`)
     if (!response.ok) return console.log(response.data.error)
-    alert('Attribute Types deleted successfully!')
+    toast.success('Attribute Type deleted successfully!')
     fetchAttributeTypes()
   }
 
@@ -121,6 +142,18 @@ const AddAttributeType = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
               <CRow className="mb-3">
                 <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">
                   Attribute Type
@@ -171,7 +204,7 @@ const AddAttributeType = () => {
                 <CButton color="primary" type="submit">
                   {editingIndex !== null ? 'Update' : 'Add'}
                 </CButton>
-                <CButton color="secondary" onClick={() => navigate('/Product/AddAttributes')}>
+                <CButton color="secondary" onClick={() => navigate('/Product/AddAtt')}>
                   Go to Attributes
                 </CButton>
               </div>
