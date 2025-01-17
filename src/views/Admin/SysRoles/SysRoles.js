@@ -204,6 +204,7 @@ import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './SysRole.css'
+import { Network, Urls } from '../../../api-config'
 
 const SysRoles = () => {
   const [permissions, setPermissions] = useState([])
@@ -213,69 +214,117 @@ const SysRoles = () => {
   const [roles, setRoles] = useState([])
   const [editingRoleId, setEditingRoleId] = useState(null)
 
-  useEffect(() => {
-    axios
-      .get('http://195.26.253.123/pos/accounts/get-all-permissions/')
-      .then((response) => {
-        const permissionOptions = response.data.map((permission) => ({
-          value: permission.id,
-          label: permission.permission_name,
-        }))
-        setPermissions(permissionOptions)
-      })
-      .catch((error) => {
-        console.error('Error fetching permissions:', error)
-        toast.error('Failed to fetch permissions.')
-      })
+  // useEffect(() => {
+  //   axios
+  //     .get('http://195.26.253.123/pos/accounts/get-all-permissions/')
+  //     .then((response) => {
+  //       const permissionOptions = response.data.map((permission) => ({
+  //         value: permission.id,
+  //         label: permission.permission_name,
+  //       }))
+  //       setPermissions(permissionOptions)
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching permissions:', error)
+  //       toast.error('Failed to fetch permissions.')
+  //     })
 
-    fetchRoles()
+  //   fetchRoles()
+  // }, [])
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      const response = await Network.get(Urls.getAllPermissions)
+      if (!response.ok) return console.log('Error fetching permissions:', response.data.error)
+
+      const permissionOptions = response.data.map((permission) => ({
+        value: permission.id,
+        label: permission.permission_name,
+      }))
+      setPermissions(permissionOptions)
+    }
+
+    fetchPermissions()
+    fetchRoles() // Fetch roles as well
   }, [])
 
-  const fetchRoles = () => {
-    axios
-      .get('http://195.26.253.123/pos/accounts/add-system-role/')
-      .then((response) => {
-        setRoles(response.data)
-      })
-      .catch((error) => {
-        console.error('Error fetching roles:', error)
-        toast.error('Failed to fetch roles.')
-      })
+  // const fetchRoles = () => {
+  //   axios
+  //     .get('http://195.26.253.123/pos/accounts/add-system-role/')
+  //     .then((response) => {
+  //       setRoles(response.data)
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching roles:', error)
+  //       toast.error('Failed to fetch roles.')
+  //     })
+  // }
+
+  const fetchRoles = async () => {
+    const response = await Network.get(Urls.addSystemRoles)
+    if (!response.ok) return console.log('Error fetching roles:', response.data.error)
+
+    setRoles(response.data)
   }
 
+  // const handleAddOrEditRole = async () => {
+  //   try {
+  //     const selectedPermissionIDs = selectedPermissions.map((permission) => permission.value)
+
+  //     const requestData = {
+  //       sys_role_name: roleName,
+  //       status: status.toLowerCase(),
+  //       permissions: selectedPermissionIDs,
+  //     }
+
+  //     if (editingRoleId) {
+  //       await axios.put(
+  //         `http://195.26.253.123/pos/accounts/action-system-role/${editingRoleId}/`,
+  //         requestData,
+  //       )
+  //       toast.success('Role updated successfully!')
+  //     } else {
+  //       await axios.post('http://195.26.253.123/pos/accounts/add-system-role/', requestData)
+  //       toast.success('Role added successfully!')
+  //     }
+
+  //     fetchRoles()
+  //     clearForm()
+  //   } catch (error) {
+  //     console.error('Error adding/updating role:', error)
+  //     if (error.response && error.response.data) {
+  //       Object.keys(error.response.data).forEach((key) => {
+  //         toast.error(`${key}: ${error.response.data[key][0]}`)
+  //       })
+  //     } else {
+  //       toast.error('Failed to add/update role.')
+  //     }
+  //   }
+  // }
+
   const handleAddOrEditRole = async () => {
-    try {
-      const selectedPermissionIDs = selectedPermissions.map((permission) => permission.value)
+    const selectedPermissionIDs = selectedPermissions.map((permission) => permission.value)
 
-      const requestData = {
-        sys_role_name: roleName,
-        status: status.toLowerCase(),
-        permissions: selectedPermissionIDs,
-      }
-
-      if (editingRoleId) {
-        await axios.put(
-          `http://195.26.253.123/pos/accounts/action-system-role/${editingRoleId}/`,
-          requestData,
-        )
-        toast.success('Role updated successfully!')
-      } else {
-        await axios.post('http://195.26.253.123/pos/accounts/add-system-role/', requestData)
-        toast.success('Role added successfully!')
-      }
-
-      fetchRoles()
-      clearForm()
-    } catch (error) {
-      console.error('Error adding/updating role:', error)
-      if (error.response && error.response.data) {
-        Object.keys(error.response.data).forEach((key) => {
-          toast.error(`${key}: ${error.response.data[key][0]}`)
-        })
-      } else {
-        toast.error('Failed to add/update role.')
-      }
+    const requestData = {
+      sys_role_name: roleName,
+      status: status.toLowerCase(),
+      permissions: selectedPermissionIDs,
     }
+
+    const url = editingRoleId ? `${Urls.updateSystemRoles}/${editingRoleId}/` : Urls.addSystemRoles
+
+    const method = editingRoleId ? 'put' : 'post'
+
+    const response = await Network[method](url, requestData)
+
+    if (!response.ok) {
+      console.log('Error adding/updating role:', response.data.error)
+      return toast.error('Failed to add/update role.')
+    }
+
+    toast.success(editingRoleId ? 'Role updated successfully!' : 'Role added successfully!')
+    fetchRoles()
+    clearForm()
   }
 
   const handleEdit = (role) => {
@@ -290,17 +339,28 @@ const SysRoles = () => {
     setSelectedPermissions(preselectedPermissions)
   }
 
+  // const handleDelete = async (id) => {
+  //   if (window.confirm('Are you sure you want to delete this role?')) {
+  //     try {
+  //       await axios.delete(`http://195.26.253.123/pos/accounts/action-system-role/${id}/`)
+  //       toast.success('Role deleted successfully!')
+  //       fetchRoles()
+  //     } catch (error) {
+  //       console.error('Error deleting role:', error)
+  //       toast.error('Failed to delete role.')
+  //     }
+  //   }
+  // }
+
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this role?')) {
-      try {
-        await axios.delete(`http://195.26.253.123/pos/accounts/action-system-role/${id}/`)
-        toast.success('Role deleted successfully!')
-        fetchRoles()
-      } catch (error) {
-        console.error('Error deleting role:', error)
-        toast.error('Failed to delete role.')
-      }
+    const response = await Network.delete(`${Urls.updateSystemRoles}/${id}/`)
+    if (!response.ok) {
+      console.log('Error deleting role:', response.data.error)
+      return toast.error('Failed to delete role.')
     }
+
+    toast.success('Role deleted successfully!')
+    fetchRoles()
   }
 
   const clearForm = () => {

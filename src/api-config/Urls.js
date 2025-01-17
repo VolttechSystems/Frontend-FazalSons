@@ -5,6 +5,7 @@ export default {
 
   //Salesman
   addSalesman: 'transaction/add_salesman',
+  updateSalesman: 'transaction/action_salesman',
 
   //brands
   addBrand: 'products/add_brand',
@@ -27,6 +28,7 @@ export default {
 
   // //FetchOulets
   // fetchtheOutlets: 'products/fetch_all_outlet/',
+  addOutlets: 'products/add_outlet',
 
   //FetchAllProducts
   fetchAllProducts: 'products/show_product/',
@@ -71,6 +73,19 @@ export default {
   outletWiseSalesman: 'report/outlet_wise_salesman/',
   fetchAllOutlets: 'products/fetch_all_outlet/',
   fetchtheOutlets: 'products/fetch_all_outlet/',
+
+  //get All Permissions
+  getAllPermissions: 'accounts/get-all-permissions/',
+  //system Roles
+  addSystemRoles: 'accounts/add-system-role/',
+  updateSystemRoles: 'accounts/action-system-role',
+  fetchSystemRoles: 'accounts/fetch-system-role/',
+
+  //registerUser
+  registerUser: 'accounts/register_user/',
+  deleteUser: 'accounts/delete_user',
+  //password Change user
+  passwordChange: 'accounts/admin-change-password/',
 
   //commissionreport
   commissionReport: 'report/salesman_commission_report/',

@@ -250,18 +250,30 @@ const Salesman = () => {
 
   // Fetch outlets
   // Fetch outlets
+  // const fetchOutlets = async () => {
+  //   try {
+  //     const response = await axios.get('http://195.26.253.123/pos/products/add_outlet')
+  //     const outletOptions = response.data.map((outlet) => ({
+  //       value: outlet.id,
+  //       label: outlet.outlet_name,
+  //       outlet_code: outlet.outlet_code, // Include outlet_code here
+  //     }))
+  //     setOutlets(outletOptions)
+  //   } catch (error) {
+  //     console.error('Error fetching outlets:', error)
+  //   }
+  // }
+
   const fetchOutlets = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_outlet')
-      const outletOptions = response.data.map((outlet) => ({
-        value: outlet.id,
-        label: outlet.outlet_name,
-        outlet_code: outlet.outlet_code, // Include outlet_code here
-      }))
-      setOutlets(outletOptions)
-    } catch (error) {
-      console.error('Error fetching outlets:', error)
-    }
+    const response = await Network.get(Urls.addOutlets) // Use Network.get with the appropriate URL
+    if (!response.ok) return console.log(response.data.error) // Log error if the response is not successful
+
+    const outletOptions = response.data.map((outlet) => ({
+      value: outlet.id,
+      label: outlet.outlet_name,
+      outlet_code: outlet.outlet_code, // Include outlet_code here
+    }))
+    setOutlets(outletOptions) // Update the state with the transformed outlet options
   }
 
   // Handle multi-select change for outlets
@@ -274,6 +286,40 @@ const Salesman = () => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+
+  //   // Prepare the selected outlets to contain only their IDs (values)
+  //   const selectedOutlets = formData.outlet.map((outlet) => outlet.value) // Only outlet IDs
+
+  //   const dataToSend = {
+  //     CheckBoxValue: showCommissions ? 'true' : 'false',
+  //     salesman_name: formData.salesman_name,
+  //     wholesale_commission: !showCommissions ? String(formData.wholesale_commission) : '',
+  //     retail_commission: !showCommissions ? String(formData.retail_commission) : '',
+  //     token_commission: !showCommissions ? String(formData.token_commission) : '',
+  //     outlet: selectedOutlets, // Send outlet IDs only
+  //   }
+
+  //   console.log('Selected Outlets:', selectedOutlets)
+  //   console.log('Data to Send:', dataToSend)
+
+  //   try {
+  //     if (editingSalesmanId) {
+  //       await axios.put(
+  //         `http://195.26.253.123/pos/transaction/action_salesman/${editingSalesmanId}/`,
+  //         dataToSend,
+  //       )
+  //     } else {
+  //       await axios.post('http://195.26.253.123/pos/transaction/add_salesman', dataToSend)
+  //     }
+  //     fetchSalesmen() // Refresh the list
+  //     resetForm()
+  //   } catch (error) {
+  //     console.error('Error submitting data:', error)
+  //   }
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -294,14 +340,12 @@ const Salesman = () => {
     console.log('Data to Send:', dataToSend)
 
     try {
-      if (editingSalesmanId) {
-        await axios.put(
-          `http://195.26.253.123/pos/transaction/action_salesman/${editingSalesmanId}/`,
-          dataToSend,
-        )
-      } else {
-        await axios.post('http://195.26.253.123/pos/transaction/add_salesman', dataToSend)
-      }
+      const response = editingSalesmanId
+        ? await Network.put(`${Urls.updateSalesman}/${editingSalesmanId}/`, dataToSend)
+        : await Network.post(Urls.addSalesman, dataToSend)
+
+      if (!response.ok) return console.log('Error submitting data:', response.data.error)
+
       fetchSalesmen() // Refresh the list
       resetForm()
     } catch (error) {
@@ -339,13 +383,20 @@ const Salesman = () => {
     setShowCommissions(true)
   }
 
+  // const handleDelete = async (id) => {
+  //   try {
+  //     await axios.delete(`http://195.26.253.123/pos/transaction/action_salesman/${id}/`)
+  //     setSalesmen(salesmen.filter((salesman) => salesman.id !== id))
+  //   } catch (error) {
+  //     console.error('Error deleting salesman:', error)
+  //   }
+  // }
+
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://195.26.253.123/pos/transaction/action_salesman/${id}/`)
-      setSalesmen(salesmen.filter((salesman) => salesman.id !== id))
-    } catch (error) {
-      console.error('Error deleting salesman:', error)
-    }
+    const response = await Network.delete(`${Urls.updateSalesman}/${id}/`)
+    if (!response.ok) return console.log('Error deleting salesman:', response.data.error)
+
+    setSalesmen((prevSalesmen) => prevSalesmen.filter((salesman) => salesman.id !== id))
   }
 
   return (
