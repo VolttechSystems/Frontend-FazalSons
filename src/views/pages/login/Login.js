@@ -40,9 +40,10 @@ const Login = () => {
 
     if (!response.ok) return setError(response.data.error)
 
-    const { token, System_role, outlet } = response.data
+    const { token, System_role, outlet, username: loggedInUsername } = response.data
 
     localStorage.setItem('authToken', token)
+    localStorage.setItem('username', loggedInUsername) // Store the logged-in username
     const sysRoles = JSON.stringify(System_role || [])
     const outlet_user = JSON.stringify(outlet || [])
 

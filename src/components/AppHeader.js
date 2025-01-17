@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -34,6 +34,14 @@ const AppHeader = () => {
 
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    // Fetch the username from localStorage
+    const loggedInUsername = localStorage.getItem('username')
+    setUsername(loggedInUsername || 'Guest') // Default to 'Guest' if no username
+    console.log('----------------------', loggedInUsername)
+  }, [])
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -125,6 +133,11 @@ const AppHeader = () => {
               </CDropdownItem>
             </CDropdownMenu>
           </CDropdown> */}
+          <CHeaderNav className="ms-auto">
+            <span className="me-3">
+              Welcome, <strong>{username}</strong>
+            </span>
+          </CHeaderNav>
 
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
