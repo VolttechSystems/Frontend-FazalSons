@@ -81,22 +81,40 @@ const AddProduct = () => {
   }
 
   // Function to handle dialog close (Delete all products on "OK")
-  const handleDialogClose = (confirmDelete) => {
+  // const handleDialogClose = (confirmDelete) => {
+  //   if (confirmDelete) {
+  //     // API call to delete all TEMPORARY products
+  //     axios
+  //       .delete('http://195.26.253.123/pos/products/all-temp-product-delete')
+  //       .then((response) => {
+  //         toast.success('All products deleted successfully!')
+  //         // Clear the product list (update the state to empty)
+  //         setProductList([])
+  //         setActiveTab(nextTab)
+  //       })
+  //       .catch((error) => {
+  //         console.error('There was an error deleting the products:', error)
+  //       })
+  //   }
+  //   setIsDialogOpen(false) // Close the dialog
+  // }
+
+  const handleDialogClose = async (confirmDelete) => {
     if (confirmDelete) {
-      // API call to delete all products
-      axios
-        .delete('http://195.26.253.123/pos/products/all-temp-product-delete')
-        .then((response) => {
-          toast.success('All products deleted successfully!')
-          // Clear the product list (update the state to empty)
-          setProductList([])
-          setActiveTab(nextTab)
-        })
-        .catch((error) => {
-          console.error('There was an error deleting the products:', error)
-        })
+      try {
+        const response = await Network.delete(Urls.deleteTempProduct) // Updated to use Network.delete
+        if (!response.ok) {
+          console.log(response.data.error)
+          return
+        }
+        toast.success('All products deleted successfully!') // Notify the user of success
+        setProductList([]) // Clear the product list
+        setActiveTab(nextTab) // Move to the next tab
+      } catch (error) {
+        console.error('There was an error deleting the products:', error)
+      }
     }
-    setIsDialogOpen(false) // Close the dialog
+    setIsDialogOpen(false) // Close the dialog
   }
 
   useEffect(() => {
@@ -203,14 +221,19 @@ const AddProduct = () => {
   }, [])
 
   // Fetch Head Categories
+  // const fetchHeadCategories = async () => {
+  //   try {
+  //     const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
+  //     setHeadCategories(response.data)
+  //   } catch (error) {
+  //     console.error('Error fetching head categories:', error)
+  //     //setError('Failed to load head categories. Please try again later.');
+  //   }
+  // }
   const fetchHeadCategories = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
-      setHeadCategories(response.data)
-    } catch (error) {
-      console.error('Error fetching head categories:', error)
-      //setError('Failed to load head categories. Please try again later.');
-    }
+    const response = await Network.get(Urls.addHeadCategory)
+    if (!response.ok) return console.log(response.data.error)
+    setHeadCategories(response.data)
   }
 
   const handleHeadCategoryChange = async (e) => {
@@ -695,16 +718,33 @@ const AddProduct = () => {
     resetForm()
   }
 
+  // const handleDelete = async (id) => {
+  //   try {
+  //     const response = await axios.delete(
+  //       `http://195.26.253.123/pos/products/action_temp_product/${id}/`,
+  //     )
+  //     if (response.status === 200 || response.status === 204) {
+  //       setProductList((prevList) => prevList.filter((product) => product.id !== id))
+  //       toast.success('Product deleted successfully!')
+  //     } else {
+  //       console.error('Failed to delete the product')
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deleting product:', error)
+  //     toast.error('Failed to delete the product. Please try again.')
+  //   }
+  // }
+
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(
-        `http://195.26.253.123/pos/products/action_temp_product/${id}/`,
-      )
-      if (response.status === 200 || response.status === 204) {
-        setProductList((prevList) => prevList.filter((product) => product.id !== id))
+      const response = await Network.delete(`${Urls.actionTempProduct}/${id}/`) // Updated to use Network.delete
+      if (response.ok) {
+        // Check if the response is successful
+        setProductList((prevList) => prevList.filter((product) => product.id !== id)) // Remove the deleted product from the list
         toast.success('Product deleted successfully!')
       } else {
         console.error('Failed to delete the product')
+        toast.error('Failed to delete the product. Please try again.')
       }
     } catch (error) {
       console.error('Error deleting product:', error)
@@ -731,21 +771,40 @@ const AddProduct = () => {
     setEditProductId(null)
   }
 
+  // const handlePublish = async () => {
+  //   console.log('Publishing with data:', formData)
+
+  //   try {
+  //     const response = await axios.post('http://195.26.253.123/pos/products/add_product')
+  //     if (response.status === 201 || response.status === 200) {
+  //       toast.success('Product published successfully!')
+  //       history.push('/Product/AllProducts')
+  //     } else {
+  //       toast.error('Failed to publish the product. Please try again.')
+  //     }
+  //   } catch (error) {
+  //     console.error('Error publishing product:', error)
+  //   }
+  //   fetchProductList()
+  // }
+
   const handlePublish = async () => {
     console.log('Publishing with data:', formData)
 
     try {
-      const response = await axios.post('http://195.26.253.123/pos/products/add_product')
-      if (response.status === 201 || response.status === 200) {
+      const response = await Network.post(Urls.publishProduct, formData) // Updated to use Network.post with formData
+      if (response.ok) {
+        // Check if the response is successful
         toast.success('Product published successfully!')
-        history.push('/Product/AllProducts')
+        history.push('/Product/AllProducts') // Navigate to the All Products page
       } else {
         toast.error('Failed to publish the product. Please try again.')
       }
     } catch (error) {
       console.error('Error publishing product:', error)
+      toast.error('Failed to publish the product. Please try again.')
     }
-    fetchProductList()
+    fetchProductList() // Refresh the product list
   }
 
   const openCategoryDialog = () => setCategoryDialogOpen(true)
