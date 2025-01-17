@@ -41,6 +41,18 @@ const _nav = [
         to: '/base/POS',
         key: 'Transaction', // Permission key for this item
       },
+      {
+        component: CNavItem,
+        name: 'Salesman',
+        to: '/Admin/Salesman',
+        key: 'Admin',
+      },
+      {
+        component: CNavItem,
+        name: 'Additional Fee',
+        to: '/Admin/AdditionalFee',
+        key: 'Admin',
+      },
     ],
   },
   {
@@ -49,12 +61,6 @@ const _nav = [
     key: 'Admin',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Salesman',
-        to: '/Admin/Salesman',
-        key: 'Admin',
-      },
       {
         component: CNavItem,
         name: 'System Roles',
@@ -73,12 +79,7 @@ const _nav = [
         to: '/Admin/AddOutlet',
         key: 'Admin',
       },
-      {
-        component: CNavItem,
-        name: 'Additional Fee',
-        to: '/Admin/AdditionalFee',
-        key: 'Admin',
-      },
+
       {
         component: CNavItem,
         name: 'Payment Methods',
