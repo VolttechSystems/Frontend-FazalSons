@@ -792,19 +792,20 @@ const AddProduct = () => {
     console.log('Publishing with data:', formData)
 
     try {
-      const response = await Network.post(Urls.publishProduct, formData) // Updated to use Network.post with formData
-      if (response.ok) {
-        // Check if the response is successful
+      const url = Urls.publishProduct
+      const response = await Network.post(url) // Assuming `formData` contains the product data
+
+      if (response.status === 201 || response.status === 200) {
         toast.success('Product published successfully!')
-        history.push('/Product/AllProducts') // Navigate to the All Products page
+        // history.push('/Product/AllProducts')
       } else {
         toast.error('Failed to publish the product. Please try again.')
       }
     } catch (error) {
       console.error('Error publishing product:', error)
-      toast.error('Failed to publish the product. Please try again.')
+      toast.error('An error occurred while publishing the product. Please try again later.')
     }
-    fetchProductList() // Refresh the product list
+    fetchProductList()
   }
 
   const openCategoryDialog = () => setCategoryDialogOpen(true)

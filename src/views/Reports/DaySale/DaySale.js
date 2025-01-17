@@ -38,29 +38,60 @@ const DaySale = () => {
     fetchOutlets()
   }, [])
 
+  // useEffect(() => {
+  //   if (selectedOutlet) {
+  //     axios
+  //       .get(`http://195.26.253.123/pos/report/all_outlet_dates/${selectedOutlet}/`)
+  //       .then((response) => setDates(response.data.dates || []))
+  //       .catch(() => setError('Failed to fetch dates. Please try again later.'))
+  //   }
+  // }, [selectedOutlet])
+
   useEffect(() => {
     if (selectedOutlet) {
-      axios
-        .get(`http://195.26.253.123/pos/report/all_outlet_dates/${selectedOutlet}/`)
+      const url = `${Urls.ProfitReportDates}/${selectedOutlet}/`
+
+      Network.get(url)
         .then((response) => setDates(response.data.dates || []))
         .catch(() => setError('Failed to fetch dates. Please try again later.'))
     }
   }, [selectedOutlet])
 
+  // useEffect(() => {
+  //   if (selectedOutlet && selectedDate) {
+  //     axios
+  //       .get(
+  //         `http://195.26.253.123/pos/report/daily_sale_report/${selectedOutlet}/${selectedDate}/`,
+  //       )
+  //       .then((response) => setReportData(response.data || []))
+  //       .catch(() => setError('Failed to fetch report data. Please try again later.'))
+  //   }
+  // }, [selectedOutlet, selectedDate])
+
   useEffect(() => {
     if (selectedOutlet && selectedDate) {
-      axios
-        .get(
-          `http://195.26.253.123/pos/report/daily_sale_report/${selectedOutlet}/${selectedDate}/`,
-        )
+      const url = `${Urls.dailySaleReport}/${selectedOutlet}/${selectedDate}/`
+
+      Network.get(url)
         .then((response) => setReportData(response.data || []))
         .catch(() => setError('Failed to fetch report data. Please try again later.'))
     }
   }, [selectedOutlet, selectedDate])
 
+  // const fetchDetailData = (invoiceCode) => {
+  //   axios
+  //     .get(`http://195.26.253.123/pos/report/daily_sale_report_detail/${invoiceCode}/`)
+  //     .then((response) => {
+  //       setDetailData(response.data)
+  //       setShowModal(true)
+  //     })
+  //     .catch(() => setError('Failed to fetch detailed report data.'))
+  // }
+
   const fetchDetailData = (invoiceCode) => {
-    axios
-      .get(`http://195.26.253.123/pos/report/daily_sale_report_detail/${invoiceCode}/`)
+    const url = `${Urls.dailySaleReportDetail}/${invoiceCode}/`
+
+    Network.get(url)
       .then((response) => {
         setDetailData(response.data)
         setShowModal(true)

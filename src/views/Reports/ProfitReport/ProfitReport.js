@@ -20,14 +20,28 @@ const ProfitReport = () => {
     fetchOutlets()
   }, [])
 
+  // const handleOutletChange = (event) => {
+  //   const outletId = event.target.value
+  //   setSelectedOutlet(outletId)
+
+  //   // Fetch dates for the selected outlet
+  //   axios
+  //     .get(`http://195.26.253.123/pos/report/all_outlet_dates/${outletId}/`)
+  //     .then((response) => {
+  //       setDates(response.data.dates)
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching dates:', error)
+  //     })
+  // }
+
   // Fetch available dates when outlet is selected
   const handleOutletChange = (event) => {
     const outletId = event.target.value
     setSelectedOutlet(outletId)
 
     // Fetch dates for the selected outlet
-    axios
-      .get(`http://195.26.253.123/pos/report/all_outlet_dates/${outletId}/`)
+    Network.get(`${Urls.ProfitReportDates}/${outletId}/`)
       .then((response) => {
         setDates(response.data.dates)
       })
@@ -37,13 +51,28 @@ const ProfitReport = () => {
   }
 
   // Fetch profit report when both outlet and date are selected
+  // const handleDateChange = (event) => {
+  //   const selectedDate = event.target.value
+  //   setSelectedDate(selectedDate)
+
+  //   if (selectedOutlet && selectedDate) {
+  //     axios
+  //       .get(`http://195.26.253.123/pos/report/profit_report/${selectedOutlet}/${selectedDate}/`)
+  //       .then((response) => {
+  //         setReportData(response.data)
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching profit report:', error)
+  //       })
+  //   }
+  // }
+
   const handleDateChange = (event) => {
     const selectedDate = event.target.value
     setSelectedDate(selectedDate)
 
     if (selectedOutlet && selectedDate) {
-      axios
-        .get(`http://195.26.253.123/pos/report/profit_report/${selectedOutlet}/${selectedDate}/`)
+      Network.get(`${Urls.getProfitReport}/${selectedOutlet}/${selectedDate}/`)
         .then((response) => {
           setReportData(response.data)
         })

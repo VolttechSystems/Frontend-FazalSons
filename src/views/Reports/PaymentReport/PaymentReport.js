@@ -31,13 +31,24 @@ const PaymentReport = () => {
     fetchOutlets()
   }, [])
 
+  // useEffect(() => {
+  //   if (selectedOutlet && selectedDate) {
+  //     // Fetch payment method report
+  //     axios
+  //       .get(
+  //         `http://195.26.253.123/pos/report/payment-method-report/${selectedOutlet}/${selectedDate}/`,
+  //       )
+  //       .then((response) => setReportData(response.data || []))
+  //       .catch(() => setError('Failed to fetch payment method report. Please try again later.'))
+  //   }
+  // }, [selectedOutlet, selectedDate])
+
   useEffect(() => {
     if (selectedOutlet && selectedDate) {
       // Fetch payment method report
-      axios
-        .get(
-          `http://195.26.253.123/pos/report/payment-method-report/${selectedOutlet}/${selectedDate}/`,
-        )
+      const url = `${Urls.paymentMethodReport}/${selectedOutlet}/${selectedDate}/`
+
+      Network.get(url)
         .then((response) => setReportData(response.data || []))
         .catch(() => setError('Failed to fetch payment method report. Please try again later.'))
     }

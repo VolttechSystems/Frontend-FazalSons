@@ -1,66 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './Payment.css';
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import './Payment.css'
+import { Network, Urls } from '../../../api-config'
 
 const Payment = () => {
   const [formData, setFormData] = useState({
     pm_name: '',
-  });
+  })
 
-  const [payments, setPayments] = useState([]);
-  const [editingPaymentId, setEditingPayment] = useState(null);
+  const [payments, setPayments] = useState([])
+  const [editingPaymentId, setEditingPayment] = useState(null)
 
   useEffect(() => {
     // Fetch existing payment methods when the component mounts
-    fetchPayments();
-  }, []);
+    fetchPayments()
+  }, [])
+
+  // const fetchPayments = async () => {
+  //   try {
+  //     const response = await axios.get('http://195.26.253.123/pos/transaction/add_payment');
+  //     setPayments(response.data); // Adjust based on the response structure
+  //   } catch (error) {
+  //     console.error('Error fetching payment methods:', error);
+  //   }
+  // };
 
   const fetchPayments = async () => {
     try {
-      const response = await axios.get('http://195.26.253.123/pos/transaction/add_payment');
-      setPayments(response.data); // Adjust based on the response structure
+      const response = await Network.get(Urls.addpayment)
+      if (!response.ok) {
+        console.error('Error fetching payment methods:', response.data.error)
+        return
+      }
+      setPayments(response.data) // Adjust based on the response structure
     } catch (error) {
-      console.error('Error fetching payment methods:', error);
+      console.error('Network error fetching payment methods:', error)
     }
-  };
+  }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+  //   try {
+  //     if (editingPaymentId) {
+  //       // Update existing payment method
+  //       await axios.put(
+  //         `http://195.26.253.123/pos/transaction/action_payment/${editingPaymentId}/`,
+  //         formData,
+  //       )
+  //       setPayments(
+  //         payments.map((payment) => (payment.id === editingPaymentId ? formData : payment)),
+  //       )
+  //       setEditingPayment(null)
+  //     } else {
+  //       // Add new payment method
+  //       await axios.post('http://195.26.253.123/pos/transaction/add_payment', formData)
+  //       setPayments([...payments, formData])
+  //     }
+  //     setFormData({ pm_name: '' })
+  //   } catch (error) {
+  //     console.error('Error adding/updating payment method:', error)
+  //   }
+  // }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
       if (editingPaymentId) {
         // Update existing payment method
-        await axios.put(`http://195.26.253.123/pos/transaction/action_payment/${editingPaymentId}/`, formData);
-        setPayments(payments.map(payment => (payment.id === editingPaymentId ? formData : payment)));
-        setEditingPayment(null);
+        await Network.put(`${Urls.actionPayment}/${editingPaymentId}/`, formData)
+        setPayments(
+          payments.map((payment) => (payment.id === editingPaymentId ? formData : payment)),
+        )
+        setEditingPayment(null)
       } else {
         // Add new payment method
-        await axios.post('http://195.26.253.123/pos/transaction/add_payment', formData);
-        setPayments([...payments, formData]);
+        await Network.post(Urls.addpayment, formData)
+        setPayments([...payments, formData])
       }
-      setFormData({ pm_name: '' });
+      setFormData({ pm_name: '' })
     } catch (error) {
-      console.error('Error adding/updating payment method:', error);
+      console.error('Error adding/updating payment method:', error)
     }
-  };
+  }
 
   const handleEdit = (payment) => {
-    setFormData(payment);
-    setEditingPayment(payment.id);
-  };
+    setFormData(payment)
+    setEditingPayment(payment.id)
+  }
+
+  // const handleDelete = async (id) => {
+  //   try {
+  //     await axios.delete(`http://195.26.253.123/pos/transaction/action_payment/${id}/`)
+  //     setPayments(payments.filter((payment) => payment.id !== id)) // Remove deleted payment method from the state
+  //   } catch (error) {
+  //     console.error('Error deleting payment method:', error)
+  //   }
+  // }
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://195.26.253.123/pos/transaction/action_payment/${id}/`);
-      setPayments(payments.filter(payment => payment.id !== id)); // Remove deleted payment method from the state
+      await Network.delete(`${Urls.actionPayment}/${id}/`)
+      setPayments(payments.filter((payment) => payment.id !== id)) // Remove deleted payment method from the state
     } catch (error) {
-      console.error('Error deleting payment method:', error);
+      console.error('Error deleting payment method:', error)
     }
-  };
+  }
 
   return (
     <div className="container">
@@ -76,48 +125,49 @@ const Payment = () => {
             required
           />
         </div>
-        <button type="submit">{editingPaymentId ? 'Update Payment Method' : 'Add Payment Method'}</button>
+        <button type="submit">
+          {editingPaymentId ? 'Update Payment Method' : 'Add Payment Method'}
+        </button>
       </form>
 
       {/* Payment Methods Table */}
       {payments.length > 0 && (
         <table className="payment-methods-table">
-        <thead className="payment-methods-header">
-          <tr>
-            <th>ID</th>
-            <th>Payment Method Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {payments.map((payment) => (
-            <tr key={payment.id}>
-              <td>{payment.id}</td>
-              <td>{payment.pm_name}</td>
-              <td>
-                <button
-                  className="payment-edit-button"
-                  type="button"
-                  onClick={() => handleEdit(payment)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="payment-delete-button"
-                  type="button"
-                  onClick={() => handleDelete(payment.id)}
-                >
-                  Delete
-                </button>
-              </td>
+          <thead className="payment-methods-header">
+            <tr>
+              <th>ID</th>
+              <th>Payment Method Name</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      
+          </thead>
+          <tbody>
+            {payments.map((payment) => (
+              <tr key={payment.id}>
+                <td>{payment.id}</td>
+                <td>{payment.pm_name}</td>
+                <td>
+                  <button
+                    className="payment-edit-button"
+                    type="button"
+                    onClick={() => handleEdit(payment)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="payment-delete-button"
+                    type="button"
+                    onClick={() => handleDelete(payment.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Payment;
+export default Payment

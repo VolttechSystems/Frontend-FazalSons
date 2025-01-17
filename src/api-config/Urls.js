@@ -32,6 +32,10 @@ export default {
 
   //FetchAllProducts
   fetchAllProducts: 'products/show_product/',
+  getProduct: 'products/get_product',
+
+  //AddStock
+  addStock: 'products/add_stock',
 
   //ShowAllProductDetails
   ShowAllProductDetails: 'products/shows_all_product_detail/',
@@ -87,6 +91,22 @@ export default {
   //password Change user
   passwordChange: 'accounts/admin-change-password/',
 
-  //commissionreport
+  //addPayment
+  addpayment: 'transaction/add_payment',
+  actionPayment: 'transaction/action_payment',
+
+  //additional FEE
+  addAdditionalFee: 'transaction/add_additional_fee',
+  updateAdditionalFee: 'transaction/action_additional_fee',
+
+  //REPORTS
+  ProfitReportDates: 'report/all_outlet_dates',
+  ProfitReport: 'report/profit_report/',
   commissionReport: 'report/salesman_commission_report/',
+  salesReport: 'report/sales_report',
+  dailySaleReport: 'report/daily_sale_report',
+  dailySaleReportDetail: 'report/daily_sale_report_detail',
+  productWiseReturns: 'report/product-wise-returns',
+  productWiseReturnsDetail: 'report/product-wise-returns-detail',
+  paymentMethodReport: 'report/payment-method-report',
 }

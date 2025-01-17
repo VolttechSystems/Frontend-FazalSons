@@ -22,14 +22,30 @@ const SaleReport = () => {
   }, [])
 
   // Fetch the sales report based on the selected dates and outlet
+  // useEffect(() => {
+  //   if (startDate && endDate && selectedOutlet) {
+  //     const formattedStartDate = new Date(startDate).toISOString().split('T')[0] // Format to yyyy-mm-dd
+  //     const formattedEndDate = new Date(endDate).toISOString().split('T')[0] // Format to yyyy-mm-dd
+  //     const url = `http://195.26.253.123/pos/report/sales_report/${selectedOutlet}/${formattedStartDate}/${formattedEndDate}/`
+
+  //     axios
+  //       .get(url)
+  //       .then((response) => {
+  //         setReportData(response.data) // Assuming the response is an array of report data
+  //       })
+  //       .catch((error) => {
+  //         console.error('There was an error fetching the report data!', error)
+  //       })
+  //   }
+  // }, [startDate, endDate, selectedOutlet]) // The effect runs whenever startDate, endDate, or selectedOutlet changes
+
   useEffect(() => {
     if (startDate && endDate && selectedOutlet) {
       const formattedStartDate = new Date(startDate).toISOString().split('T')[0] // Format to yyyy-mm-dd
       const formattedEndDate = new Date(endDate).toISOString().split('T')[0] // Format to yyyy-mm-dd
-      const url = `http://195.26.253.123/pos/report/sales_report/${selectedOutlet}/${formattedStartDate}/${formattedEndDate}/`
+      const url = `${Urls.salesReport}/${selectedOutlet}/${formattedStartDate}/${formattedEndDate}/`
 
-      axios
-        .get(url)
+      Network.get(url)
         .then((response) => {
           setReportData(response.data) // Assuming the response is an array of report data
         })

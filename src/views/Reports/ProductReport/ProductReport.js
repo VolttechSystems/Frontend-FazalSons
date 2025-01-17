@@ -39,25 +39,39 @@ const ProductReport = () => {
 
   useEffect(() => {
     if (selectedOutlet && selectedDate) {
-      // Fetch product-wise returns
-      axios
-        .get(
-          `http://195.26.253.123/pos/report/product-wise-returns/${selectedOutlet}/${selectedDate}/`,
-        )
+      const url = `${Urls.productWiseReturns}/${selectedOutlet}/${selectedDate}/`
+
+      Network.get(url)
         .then((response) => setReportData(response.data || []))
         .catch(() => setError('Failed to fetch product-wise returns. Please try again later.'))
     }
   }, [selectedOutlet, selectedDate])
 
+  // const fetchDetailData = (invoiceCode) => {
+  //   axios
+  //     .get(`http://195.26.253.123/pos/report/product-wise-return-detail/${invoiceCode}/`)
+  //     .then((response) => {
+  //       const data = response.data
+  //       if (Array.isArray(data) && data.length > 0) {
+  //         setDetailData({
+  //           items: data,
+  //         })
+  //       } else {
+  //         setDetailData({ items: [] }) // Handle no data case
+  //       }
+  //       setShowModal(true)
+  //     })
+  //     .catch(() => setError('Failed to fetch detailed report data.'))
+  // }
+
   const fetchDetailData = (invoiceCode) => {
-    axios
-      .get(`http://195.26.253.123/pos/report/product-wise-return-detail/${invoiceCode}/`)
+    const url = `${Urls.productWiseReturnsDetail}/${invoiceCode}/`
+
+    Network.get(url)
       .then((response) => {
         const data = response.data
         if (Array.isArray(data) && data.length > 0) {
-          setDetailData({
-            items: data,
-          })
+          setDetailData({ items: data })
         } else {
           setDetailData({ items: [] }) // Handle no data case
         }
