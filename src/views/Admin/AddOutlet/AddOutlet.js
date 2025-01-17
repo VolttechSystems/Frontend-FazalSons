@@ -173,28 +173,17 @@ const AddOutlet = () => {
     });
   }, []);
 
-
-  // const syncDataWithServer = async (db) => {
-  //   const stmt = db.prepare('SELECT * FROM outlets');
-  //   const dataToSync = [];
-    
-  //   while (stmt.step()) {
-  //     const outlet = stmt.getAsObject();
-  //     dataToSync.push(outlet);
-  //   }
-  //   stmt.free();
-  
-  //   if (dataToSync.length > 0) {
-  //     try {
-  //       const response = await axios.post('http://195.26.253.123/pos/products/sync-outlets/', dataToSync);
-  //       if (response.status === 200) {
-  //         console.log('Data synced successfully.');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error syncing data with server:', error);
-  //     }
-  //   }
-  // };
+  const createTables = (db) => {
+    // Create tables if they don't exist
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS outlets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        outlet_code TEXT,
+        outlet_name TEXT
+      );
+    `;
+    db.run(createTableQuery);
+  };
 
 
   const syncDataWithServer = async (db) => {
@@ -250,8 +239,6 @@ const AddOutlet = () => {
   };
   
 
-
-
   useEffect(() => {
     const handleOnline = () => {
       console.log('Online - syncing data...');
@@ -269,56 +256,45 @@ const AddOutlet = () => {
   
   
 
-
-  const createTables = (db) => {
-    // Create tables if they don't exist
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS outlets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        outlet_code TEXT,
-        outlet_name TEXT
-      );
-    `;
-    db.run(createTableQuery);
-  };
-
-  // const fetchOutletsFromDb = async (db) => {
-  //   // Fetch outlets from SQLite database (IndexedDB)
-  //   const stmt = db.prepare('SELECT * FROM outlets');
-  //   const localData = [];
-  //   while (stmt.step()) {
-  //     localData.push(stmt.getAsObject());
-  //   }
-  
-  //   // Fetch outlets from the online database
-  //   try {
-  //     const response = await axios.get('http://195.26.253.123/pos/products/add_outlet');
-  //     const onlineData = response.data; // Assume the API returns a JSON array of outlets
-  
-  //     // Combine local data and online data
-  //     const combinedData = [...onlineData, ...localData];
-  
-  //     // Update state with combined data
-  //     setOutlets(combinedData);
-  //   } catch (error) {
-  //     console.error('Error fetching online data:', error);
-  
-  //     // If online fetch fails, show only local data
-  //     setOutlets(localData);
-  //   }
-  // };
-  
-
-  const fetchOutletsFromDb = (db) => {
-    // Fetch outlets from SQLite database
+  const fetchOutletsFromDb = async (db) => {
+    // Fetch outlets from SQLite database (IndexedDB)
     const stmt = db.prepare('SELECT * FROM outlets');
-    const data = [];
+    const localData = [];
     while (stmt.step()) {
-      data.push(stmt.getAsObject());
+      localData.push(stmt.getAsObject());
     }
-    setOutlets(data);
+    stmt.free();
+  
+    try {
+      // Fetch outlets from the online database
+      const response = await axios.get('http://195.26.253.123/pos/products/add_outlet');
+      const onlineData = response.data; // Assume the API returns a JSON array of outlets
+  
+      // Combine local data and online data without duplicates
+      const combinedData = [...onlineData];
+  
+      localData.forEach((localOutlet) => {
+        // Check if the outlet exists in the online data
+        const existsInOnlineData = onlineData.some(
+          (onlineOutlet) => onlineOutlet.outlet_code === localOutlet.outlet_code
+        );
+  
+        if (!existsInOnlineData) {
+          combinedData.push(localOutlet);
+        }
+      });
+  
+      // Update state with the combined data
+      setOutlets(combinedData);
+    } catch (error) {
+      console.error('Error fetching online data:', error);
+  
+      // If online fetch fails, show only local data
+      setOutlets(localData);
+    }
   };
-
+  
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -356,43 +332,7 @@ const AddOutlet = () => {
   };
   
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     if (editingOutletId) {
-  //       // Update existing outlet in SQLite DB
-  //       const updateQuery = `
-  //         UPDATE outlets 
-  //         SET outlet_code = ?, outlet_name = ? 
-  //         WHERE id = ?
-  //       `;
-  //       db.run(updateQuery, [formData.outlet_code, formData.outlet_name, editingOutletId]);
-  //       setEditingOutlet(null);
-  //     } else {
-  //       // Insert new outlet into SQLite DB
-  //       const insertQuery = `
-  //         INSERT INTO outlets (outlet_code, outlet_name) 
-  //         VALUES (?, ?)
-  //       `;
-  //       db.run(insertQuery, [formData.outlet_code, formData.outlet_name]);
-  //     }
-  //     // Fetch updated outlets list from the SQLite database
-  //     fetchOutletsFromDb(db);
-  //     setFormData({ outlet_code: '', outlet_name: '' });
-
-  //     // Save the updated database to IndexedDB
-  //     saveDatabaseToIndexedDB(db);
-  //   } catch (error) {
-  //     console.error('Error adding/updating outlet:', error);
-  //   }
-  // };
-
-  // const handleEdit = (outlet) => {
-  //   setFormData(outlet);
-  //   setEditingOutlet(outlet.id);
-  // };
-
-
+ 
   const handleDelete = async (id) => {
     try {
       // Step 1: Delete from the online database
@@ -408,40 +348,32 @@ const AddOutlet = () => {
       }
   
       // Step 2: Delete from IndexedDB (local database)
-      const deleteQuery = 'DELETE FROM outlets WHERE id = ?';
-      db.run(deleteQuery, [id]);
+      if (db) {
+        const deleteQuery = 'DELETE FROM outlets WHERE id = ?';
+        db.run(deleteQuery, [id]);
   
-      // Save updated database to IndexedDB
-      saveDatabaseToIndexedDB(db);
+        // Save updated database to IndexedDB
+        saveDatabaseToIndexedDB(db);
   
-      // Step 3: Fetch updated data
-      fetchOutletsFromDb(db);
+        // Step 3: Fetch updated data
+        fetchOutletsFromDb(db);
+  
+        console.log(`Deleted outlet with id ${id} from local database`);
+      } else {
+        console.error('Database instance is not available');
+      }
     } catch (error) {
       console.error('Error deleting outlet:', error);
     }
   };
   
-
-  // const handleDelete = async (id) => {
-  //   try {
-  //     // Delete outlet from SQLite DB
-  //     const deleteQuery = 'DELETE FROM outlets WHERE id = ?';
-  //     db.run(deleteQuery, [id]);
-  //     // Fetch updated outlets list from the SQLite database
-  //     fetchOutletsFromDb(db);
-
-  //     // Save the updated database to IndexedDB
-  //     saveDatabaseToIndexedDB(db);
-  //   } catch (error) {
-  //     console.error('Error deleting outlet:', error);
-  //   }
-  // };
+  
 
   const saveDatabaseToIndexedDB = (db) => {
     // Export the SQLite database as binary data (ArrayBuffer)
     const binaryData = db.export();
 
-    const request = indexedDB.open('SQLiteDatabase', 1);  // Ensure the version is '1'
+    const request = indexedDB.open('SQLiteDatabase', 1);  
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
@@ -484,7 +416,7 @@ const AddOutlet = () => {
       getRequest.onsuccess = (e) => {
         const binaryData = e.target.result;
         if (binaryData) {
-          const newDb = new SQL.Database(binaryData);  // Use SQL from the argument
+          const newDb = new SQL.Database(binaryData);  
           setDb(newDb);
           fetchOutletsFromDb(newDb);
         }
