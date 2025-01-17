@@ -12,6 +12,9 @@ export default {
 
   //AddProduct
   addProduct: 'products/add_temp_product',
+  deleteTempProduct: 'products/all-temp-product-delete',
+  actionTempProduct: 'products/action_temp_product',
+  publishProduct: 'products/add_product',
 
   //AddAtt
   addAttributes: 'products/variation_group/',

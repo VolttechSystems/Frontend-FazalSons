@@ -20,6 +20,7 @@ function RegisterUser() {
     is_active: true,
     system_roles: [],
     outlet: [], // Updated to handle multiple outlets
+    is_superuser: false,
   })
   const [userList, setUserList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
@@ -176,6 +177,7 @@ function RegisterUser() {
           is_active: true,
           system_roles: [],
           outlet: [], // Reset outlet selection
+          is_superuser: false,
         })
       })
       .catch((error) => {
