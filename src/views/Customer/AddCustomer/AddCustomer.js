@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './AddCustomer.css'
+import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const AddCustomer = () => {
   const [formData, setFormData] = useState({
@@ -45,30 +48,42 @@ const AddCustomer = () => {
   }, [])
 
   const fetchCustomers = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/add_customer`)
-      setCustomers(response.data)
-    } catch (error) {
-      console.error('Error fetching customers:', error)
-    }
+    // try {
+    //   const response = await axios.get(`${apiUrl}/add_customer`)
+    //   setCustomers(response.data)
+    // } catch (error) {
+    //   console.error('Error fetching customers:', error)
+    // }
+
+    const response = await Network.get(Urls.addCustomer)
+    if (!response.ok) return console.log(response.data.error)
+    setCustomers(response.data)
   }
 
   const fetchCustomerChannels = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/add_customer_channel`)
-      setCustomerChannels(response.data)
-    } catch (error) {
-      console.error('Error fetching customer channels:', error)
-    }
+    // try {
+    //   const response = await axios.get(`${apiUrl}/add_customer_channel`)
+    //   setCustomerChannels(response.data)
+    // } catch (error) {
+    //   console.error('Error fetching customer channels:', error)
+    // }
+
+    const response = await Network.get(Urls.addCustomerChannel)
+    if (!response.ok) return console.log(response.data.error)
+    setCustomerChannels(response.data)
   }
 
   const fetchCustomerTypes = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/add_customer_type`)
-      setCustomerTypes(response.data)
-    } catch (error) {
-      console.error('Error fetching customer types:', error)
-    }
+    // try {
+    //   const response = await axios.get(`${apiUrl}/add_customer_type`)
+    //   setCustomerTypes(response.data)
+    // } catch (error) {
+    //   console.error('Error fetching customer types:', error)
+    // }
+
+    const response = await Network.get(Urls.addCustomerType)
+    if (!response.ok) return console.log(response.data.error)
+    setCustomerTypes(response.data)
   }
 
   const handleChange = (e) => {
@@ -78,48 +93,94 @@ const AddCustomer = () => {
       [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value,
     })
   }
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+  //   try {
+  //     if (editingCustomerId) {
+  //       await axios.put(`${apiUrl}/action_customer/${editingCustomerId}/`, formData)
+  //       alert('Customer updated successfully')
+  //     } else {
+  //       await axios.post(`${apiUrl}/add_customer`, formData)
+  //       alert('Customer added successfully')
+  //     }
+
+  //     setFormData({
+  //       dateTime: '',
+  //       customer_channel: '',
+  //       customerType: '',
+  //       first_name: '',
+  //       last_name: '',
+  //       display_name: '',
+  //       gender: '',
+  //       company_name: '',
+  //       email: '',
+  //       mobile_no: '',
+  //       international_no: '',
+  //       landline_no: '',
+  //       password: '',
+  //       address: '',
+  //       shippingAddressSameAsMain: false,
+  //       shipping_address: '',
+  //       city: '',
+  //       zip_code: '',
+  //       province: '',
+  //       country: '',
+  //       internal_note: '',
+  //       image: null,
+  //       online_access: 'No',
+  //       status: 'active',
+  //     })
+  //     setEditingCustomerId(null)
+  //     fetchCustomers()
+  //   } catch (error) {
+  //     console.error('Error saving customer:', error)
+  //   }
+  // }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    try {
-      if (editingCustomerId) {
-        await axios.put(`${apiUrl}/action_customer/${editingCustomerId}/`, formData)
-        alert('Customer updated successfully')
-      } else {
-        await axios.post(`${apiUrl}/add_customer`, formData)
-        alert('Customer added successfully')
-      }
 
-      setFormData({
-        dateTime: '',
-        customer_channel: '',
-        customerType: '',
-        first_name: '',
-        last_name: '',
-        display_name: '',
-        gender: '',
-        company_name: '',
-        email: '',
-        mobile_no: '',
-        international_no: '',
-        landline_no: '',
-        password: '',
-        address: '',
-        shippingAddressSameAsMain: false,
-        shipping_address: '',
-        city: '',
-        zip_code: '',
-        province: '',
-        country: '',
-        internal_note: '',
-        image: null,
-        online_access: 'No',
-        status: 'active',
-      })
-      setEditingCustomerId(null)
-      fetchCustomers()
-    } catch (error) {
-      console.error('Error saving customer:', error)
+    if (editingCustomerId) {
+      const response = await Network.put(`${Urls.actionCustomer}/${editingCustomerId}/`, formData)
+      if (!response.ok) return console.log(response.data.error)
+
+      toast.success('Customer updated successfully!')
+    } else {
+      const response = await Network.post(Urls.addCustomer, formData)
+      if (!response.ok) return console.log(response.data.error)
+
+      toast.success('Customer added successfully!')
     }
+
+    setFormData({
+      dateTime: '',
+      customer_channel: '',
+      customerType: '',
+      first_name: '',
+      last_name: '',
+      display_name: '',
+      gender: '',
+      company_name: '',
+      email: '',
+      mobile_no: '',
+      international_no: '',
+      landline_no: '',
+      password: '',
+      address: '',
+      shippingAddressSameAsMain: false,
+      shipping_address: '',
+      city: '',
+      zip_code: '',
+      province: '',
+      country: '',
+      internal_note: '',
+      image: null,
+      online_access: 'No',
+      status: 'active',
+    })
+
+    setEditingCustomerId(null)
+    fetchCustomers()
   }
 
   const handleEdit = (customer) => {
@@ -131,20 +192,35 @@ const AddCustomer = () => {
   }
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`${apiUrl}/action_customer/${id}/`)
-      alert('Customer deleted successfully')
-      fetchCustomers()
-    } catch (error) {
-      console.error('Error deleting customer:', error)
-    }
+    // try {
+    //   await axios.delete(`${apiUrl}/action_customer/${id}/`)
+    //   alert('Customer deleted successfully')
+    //   fetchCustomers()
+    // } catch (error) {
+    //   console.error('Error deleting customer:', error)
+    // }
+
+    const response = await Network.delete(`${Urls.actionCustomer}/${id}/`)
+    if (!response.ok) return console.log(response.data.error)
+    toast.success('Customer deleted successfully!')
   }
 
   return (
     <div>
       <form onSubmit={handleSubmit}>
         <h3>{editingCustomerId ? 'Edit Customer' : 'Add Customer'}</h3>
-
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         {/* Date & Time */}
         <div>
           <label>Date & Time:</label>

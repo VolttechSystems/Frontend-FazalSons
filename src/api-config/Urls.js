@@ -35,10 +35,12 @@ export default {
   getProduct: 'products/get_product',
 
   //AddStock
-  addStock: 'products/add_stock',
+  addStock: 'stock/add_stock',
 
   //ShowAllProductDetails
   ShowAllProductDetails: 'products/shows_all_product_detail/',
+  actionProducts: 'products/action_products',
+  actionProductsagain: 'products/action_product',
 
   //FetchBarcodesofproducts
   FetchBarcodesofproducts: 'products/barcode_product_data/',
@@ -109,4 +111,12 @@ export default {
   productWiseReturns: 'report/product-wise-returns',
   productWiseReturnsDetail: 'report/product-wise-returns-detail',
   paymentMethodReport: 'report/payment-method-report',
+
+  //Customer
+  addCustomer: 'customer/add_customer',
+  addCustomerChannel: 'customer/add_customer_channel',
+  addCustomerType: 'customer/add_customer_type',
+  actionCustomer: 'customer/action_customer',
+  actionCustomerChannel: 'customer/action_customer_channel',
+  actionCustomerType: 'customer/action_customer_type',
 }

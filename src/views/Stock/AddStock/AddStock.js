@@ -40,6 +40,22 @@ const AddStock = () => {
   }
 
   // Fetch products based on the selected outlet
+  // const fetchProductList = async (outletId) => {
+  //   if (!outletId) {
+  //     setProductList([])
+  //     return
+  //   }
+
+  //   try {
+  //     const response = await axios.get(
+  //       `http://195.26.253.123/pos/products/get_product/${outletId}/`,
+  //     )
+  //     setProductList(response.data)
+  //   } catch (error) {
+  //     console.error('Error fetching product list:', error)
+  //   }
+  // }
+
   const fetchProductList = async (outletId) => {
     if (!outletId) {
       setProductList([])
@@ -47,26 +63,50 @@ const AddStock = () => {
     }
 
     try {
-      const response = await axios.get(
-        `http://195.26.253.123/pos/products/get_product/${outletId}/`,
-      )
-      setProductList(response.data)
+      const response = await Network.get(`${Urls.getProduct}/${outletId}/`)
+
+      setProductList(response.data || [])
     } catch (error) {
       console.error('Error fetching product list:', error)
     }
   }
 
   // Fetch stock data when the selected product changes
+  // const fetchStockData = async () => {
+  //   if (!selectedProduct) {
+  //     setStockData([])
+  //     return
+  //   }
+  //   try {
+  //     const encodedProductName = encodeURIComponent(selectedProduct)
+  //     const response = await axios.get(
+  //       `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`,
+  //     )
+  //     if (Array.isArray(response.data) && response.data.length > 0) {
+  //       const stockWithOriginal = response.data.map((item) => ({
+  //         ...item,
+  //         original_quantity: item.avail_quantity, // Store original stock value
+  //       }))
+  //       setStockData(stockWithOriginal)
+  //     } else {
+  //       setStockData([])
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching stock data:', error)
+  //   }
+  // }
+
   const fetchStockData = async () => {
     if (!selectedProduct) {
       setStockData([])
       return
     }
+
     try {
       const encodedProductName = encodeURIComponent(selectedProduct)
-      const response = await axios.get(
-        `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`,
-      )
+      const url = `${Urls.addStock}/${encodedProductName}/`
+      const response = await Network.get(url)
+
       if (Array.isArray(response.data) && response.data.length > 0) {
         const stockWithOriginal = response.data.map((item) => ({
           ...item,
@@ -141,6 +181,48 @@ const AddStock = () => {
       alert(`Error: ${error.response ? error.response.data : error.message}`)
     }
   }
+
+  // const handleSubmit = async () => {
+  //   const updatedItems = stockData
+  //     .filter((item) => updatedStock[item.sku] !== undefined)
+  //     .map((item) => ({
+  //       sku: item.sku,
+  //       avail_quantity: updatedStock[item.sku].toString(),
+  //     }))
+
+  //   if (updatedItems.length === 0) {
+  //     alert('No changes made to stock!')
+  //     return
+  //   }
+
+  //   try {
+  //     // Using URLs.ADDSTOCK for the API call
+  //     // const url = `${Urls.addStock}/${selectedProduct}/`
+  //     await Network.put(`${Urls.addStock}/${selectedProduct}/`, updatedItems, { headers: { 'Content-Type': 'application/json' } })
+
+  //     toast.success('Stock updated successfully!')
+
+  //     const updatedStockData = stockData.map((item) => {
+  //       const updatedItem = updatedItems.find((updated) => updated.sku === item.sku)
+  //       if (updatedItem) {
+  //         return {
+  //           ...item,
+  //           avail_quantity: (
+  //             parseInt(item.original_quantity) + parseInt(updatedStock[item.sku] || 0)
+  //           ).toString(), // Add the updated stock to the original stock
+  //         }
+  //       }
+  //       return item
+  //     })
+
+  //     setStockData(updatedStockData)
+  //     setUpdatedStock({})
+  //     fetchStockData()
+  //   } catch (error) {
+  //     console.error('Error updating stock:', error)
+  //     alert(`Error: ${error.response ? error.response.data : error.message}`)
+  //   }
+  // }
 
   return (
     <div className="container">

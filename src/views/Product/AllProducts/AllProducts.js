@@ -3,6 +3,10 @@ import axios from 'axios'
 import Barcode from 'react-barcode'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import './AllProducts.css'
+import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
 import {
   Button,
   Dialog,
@@ -18,7 +22,6 @@ import {
 } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { Network, Urls } from '../../../api-config'
 
 const Loader = () => (
   <div className="text-center my-5">
@@ -86,16 +89,21 @@ const AllProducts = () => {
   }, [outletId])
 
   const handleDelete = async (sku) => {
-    if (window.confirm('Are you sure you want to delete this Product?')) {
-      try {
-        await axios.delete(`http://195.26.253.123/pos/products/action_product/${sku}/`)
-        alert('Product deleted successfully!')
-        fetchProducts() // Refresh products after deletion
-      } catch (error) {
-        console.error('Error deleting Product:', error)
-        alert('Failed to delete Product.')
-      }
-    }
+    // if (window.confirm('Are you sure you want to delete this Product?')) {
+    //   try {
+    //     await axios.delete(`http://195.26.253.123/pos/products/action_product/${sku}/`)
+    //     alert('Product deleted successfully!')
+    //     fetchProducts() // Refresh products after deletion
+    //   } catch (error) {
+    //     console.error('Error deleting Product:', error)
+    //     alert('Failed to delete Product.')
+    //   }
+
+    const response = await Network.delete(`${Urls.actionProducts}/${sku}/`)
+    if (!response.ok) return console.log(response.data.error)
+    toast.success('Product deleted successfully!')
+    fetchProducts() // Refresh products after deletion
+    toast.error('Product deletion cancelled.')
   }
 
   const handleEdit = (id) => {
@@ -112,6 +120,18 @@ const AllProducts = () => {
       {loading && <Loader />}
       {error && <p className="text-danger">{error}</p>}
       <h2>ALL PRODUCTS</h2>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <table>
         <thead>
           <tr>
