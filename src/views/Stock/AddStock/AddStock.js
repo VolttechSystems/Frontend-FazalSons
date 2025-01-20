@@ -5,6 +5,7 @@ import { Network, Urls } from '../../../api-config'
 import useAuth from '../../../hooks/useAuth'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { Autocomplete, TextField } from '@mui/material'
 
 const AddStock = () => {
   const [stockData, setStockData] = useState([])
@@ -39,23 +40,6 @@ const AddStock = () => {
     setOutlets(outlets)
   }
 
-  // Fetch products based on the selected outlet
-  // const fetchProductList = async (outletId) => {
-  //   if (!outletId) {
-  //     setProductList([])
-  //     return
-  //   }
-
-  //   try {
-  //     const response = await axios.get(
-  //       `http://195.26.253.123/pos/products/get_product/${outletId}/`,
-  //     )
-  //     setProductList(response.data)
-  //   } catch (error) {
-  //     console.error('Error fetching product list:', error)
-  //   }
-  // }
-
   const fetchProductList = async (outletId) => {
     if (!outletId) {
       setProductList([])
@@ -70,31 +54,6 @@ const AddStock = () => {
       console.error('Error fetching product list:', error)
     }
   }
-
-  // Fetch stock data when the selected product changes
-  // const fetchStockData = async () => {
-  //   if (!selectedProduct) {
-  //     setStockData([])
-  //     return
-  //   }
-  //   try {
-  //     const encodedProductName = encodeURIComponent(selectedProduct)
-  //     const response = await axios.get(
-  //       `http://195.26.253.123/pos/stock/add_stock/${encodedProductName}/`,
-  //     )
-  //     if (Array.isArray(response.data) && response.data.length > 0) {
-  //       const stockWithOriginal = response.data.map((item) => ({
-  //         ...item,
-  //         original_quantity: item.avail_quantity, // Store original stock value
-  //       }))
-  //       setStockData(stockWithOriginal)
-  //     } else {
-  //       setStockData([])
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching stock data:', error)
-  //   }
-  // }
 
   const fetchStockData = async () => {
     if (!selectedProduct) {
@@ -182,48 +141,6 @@ const AddStock = () => {
     }
   }
 
-  // const handleSubmit = async () => {
-  //   const updatedItems = stockData
-  //     .filter((item) => updatedStock[item.sku] !== undefined)
-  //     .map((item) => ({
-  //       sku: item.sku,
-  //       avail_quantity: updatedStock[item.sku].toString(),
-  //     }))
-
-  //   if (updatedItems.length === 0) {
-  //     alert('No changes made to stock!')
-  //     return
-  //   }
-
-  //   try {
-  //     // Using URLs.ADDSTOCK for the API call
-  //     // const url = `${Urls.addStock}/${selectedProduct}/`
-  //     await Network.put(`${Urls.addStock}/${selectedProduct}/`, updatedItems, { headers: { 'Content-Type': 'application/json' } })
-
-  //     toast.success('Stock updated successfully!')
-
-  //     const updatedStockData = stockData.map((item) => {
-  //       const updatedItem = updatedItems.find((updated) => updated.sku === item.sku)
-  //       if (updatedItem) {
-  //         return {
-  //           ...item,
-  //           avail_quantity: (
-  //             parseInt(item.original_quantity) + parseInt(updatedStock[item.sku] || 0)
-  //           ).toString(), // Add the updated stock to the original stock
-  //         }
-  //       }
-  //       return item
-  //     })
-
-  //     setStockData(updatedStockData)
-  //     setUpdatedStock({})
-  //     fetchStockData()
-  //   } catch (error) {
-  //     console.error('Error updating stock:', error)
-  //     alert(`Error: ${error.response ? error.response.data : error.message}`)
-  //   }
-  // }
-
   return (
     <div className="container">
       <h2>Stock Management</h2>
@@ -240,7 +157,7 @@ const AddStock = () => {
         theme="colored"
       />
       {/* Outlet Dropdown */}
-      <div className="select-container">
+      {/* <div className="select-container">
         <select onChange={(e) => setSelectedOutlet(e.target.value)} value={selectedOutlet}>
           <option value="">Select Outlet</option>
           {outlets.map((outlet) => (
@@ -249,18 +166,36 @@ const AddStock = () => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      <div className="select-container-wrapper">
+        {/* Autocomplete for Outlet selection */}
+        <div className="select-container">
+          <Autocomplete
+            options={outlets}
+            getOptionLabel={(option) => option.outlet_name}
+            value={outlets.find((outlet) => outlet.id === selectedOutlet) || null}
+            onChange={(event, newValue) => setSelectedOutlet(newValue ? newValue.id : null)}
+            renderInput={(params) => <TextField {...params} label="Choose Outlet" />}
+            disableClearable
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
+        </div>
 
-      {/* Product Dropdown */}
-      <div className="select-container">
-        <select onChange={(e) => setSelectedProduct(e.target.value)} value={selectedProduct}>
-          <option value="">Select Product</option>
-          {productList.map((product) => (
-            <option key={product.product_code} value={product.product_code}>
-              {product.product_name}
-            </option>
-          ))}
-        </select>
+        {/* Autocomplete for Product selection */}
+        <div className="select-container">
+          <Autocomplete
+            options={productList}
+            getOptionLabel={(option) => option.product_name}
+            value={productList.find((product) => product.product_code === selectedProduct) || null}
+            onChange={(event, newValue) =>
+              setSelectedProduct(newValue ? newValue.product_code : '')
+            }
+            renderInput={(params) => <TextField {...params} label="Choose Product" />}
+            disableClearable
+            isOptionEqualToValue={(option, value) => option.product_code === value.product_code}
+            disabled={!selectedOutlet} // Disable the product dropdown if no outlet is selected
+          />
+        </div>
       </div>
 
       {/* Stock Table */}

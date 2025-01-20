@@ -24,11 +24,24 @@ h2 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Style for the select-container to make the dropdowns wider */
 .select-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
+  width: 48%; /* Makes each dropdown 48% width */
+  margin: 10px 1%; /* Adds margin for spacing between dropdowns */
 }
+
+/* Container for the dropdowns to be side by side */
+.select-container-wrapper {
+  display: flex; /* Flexbox to arrange items side by side */
+  justify-content: space-between; /* Space between the dropdowns */
+  margin: 20px 0; /* Margin between rows */
+}
+
+/* Ensure the dropdowns take full width within the container */
+.MuiAutocomplete-root .MuiTextField-root {
+  width: 100%; /* Make the TextField inside the Autocomplete 100% width */
+}
+
 
 select {
   padding: 10px;

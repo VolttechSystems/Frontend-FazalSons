@@ -57,6 +57,20 @@ const _nav = [
   },
   {
     component: CNavGroup,
+    name: 'Super Admin',
+    key: 'SuperAdmin',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Shops',
+        to: '/SuperAdmin/Shops',
+        key: 'SuperAdmin',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
     name: 'Admin',
     key: 'Admin',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,

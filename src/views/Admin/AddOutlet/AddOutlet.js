@@ -9,6 +9,10 @@ const AddOutlet = () => {
   const [formData, setFormData] = useState({
     outlet_code: '',
     outlet_name: '',
+    address: '',
+    outlet_mobile: '',
+    manager_name: '',
+    contact_number: '',
   })
 
   const [outlets, setOutlets] = useState([])
@@ -20,12 +24,6 @@ const AddOutlet = () => {
   }, [])
 
   const fetchOutlets = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_outlet') // Replace with the actual endpoint for fetching outlets
-    //   setOutlets(response.data) // Adjust based on the response structure
-    // } catch (error) {
-    //   console.error('Error fetching outlets:', error)
-    // }
     const response = await Network.get(Urls.addOutlets)
     if (!response.ok) return consoe.log(response.data.error)
     setOutlets(response.data) // Adjust based on the response structure
@@ -35,38 +33,6 @@ const AddOutlet = () => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-  //   try {
-  //     if (editingOutletId) {
-  //       // Update existing outlet
-  //       await axios.put(
-  //         `http://195.26.253.123/pos/products/action_outlet/${editingOutletId}/`,
-  //         formData,
-  //       )
-  //       setEditingOutlet(null)
-  //     } else {
-  //       // Add new outlet
-  //       await axios.post('http://195.26.253.123/pos/products/add_outlet', formData)
-  //     }
-  //     // Fetch updated outlets list from the backend
-  //     toast.success('Outlet added successfully!') // Success toast for user registration
-  //     fetchOutlets()
-  //     setFormData({ outlet_code: '', outlet_name: '' })
-  //   } catch (error) {
-  //     if (error.response && error.response.data) {
-  //       // If username already exists, show specific error
-  //       if (error.response.data.outlet_name) {
-  //         toast.error(error.response.data.outlet_name[0]) // Show the error message
-  //       } else {
-  //         toast.error('Failed to add outlet. Please try again.')
-  //       }
-  //     } else {
-  //       toast.error('An error occurred while adding outlet.')
-  //     }
-  //   }
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -87,7 +53,14 @@ const AddOutlet = () => {
       // Fetch updated outlets list from the backend
       toast.success('Outlet added successfully!') // Success toast for user feedback
       fetchOutlets() // Refetch the updated outlets
-      setFormData({ outlet_code: '', outlet_name: '' }) // Reset the form
+      setFormData({
+        outlet_code: '',
+        outlet_name: '',
+        address: '',
+        outlet_mobile: '',
+        manager_name: '',
+        contact_number: '',
+      })
     } catch (error) {
       if (error.response && error.response.data) {
         // If there's a specific error message from the backend
@@ -108,14 +81,6 @@ const AddOutlet = () => {
   }
 
   const handleDelete = async (id) => {
-    // try {
-    //   await axios.delete(`http://195.26.253.123/pos/products/action_outlet/${id}/`)
-    //   // Fetch updated outlets list after deletion
-    //   fetchOutlets()
-    // } catch (error) {
-    //   console.error('Error deleting outlet:', error)
-    // }
-
     const response = await Network.delete(`${Urls.actionOutlet}/${id}/`)
     if (!response.ok) return console.log(response.data.error)
 
@@ -162,6 +127,46 @@ const AddOutlet = () => {
             required
           />
         </div>
+        <div>
+          <label>Address:</label>
+          <input
+            className="outlet-form-input"
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Outlet Mobile:</label>
+          <input
+            className="outlet-form-input"
+            type="text"
+            name="outlet_mobile"
+            value={formData.outlet_mobile}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Manager Name:</label>
+          <input
+            className="outlet-form-input"
+            type="text"
+            name="manager_name"
+            value={formData.manager_name}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Contact Number:</label>
+          <input
+            className="outlet-form-input"
+            type="text"
+            name="contact_number"
+            value={formData.contact_number}
+            onChange={handleChange}
+          />
+        </div>
         <button className="outlet-form-button" type="submit">
           {editingOutletId ? 'Update Outlet' : 'Add Outlet'}
         </button>
@@ -174,6 +179,10 @@ const AddOutlet = () => {
             <tr>
               <th>Outlet Code</th>
               <th>Outlet Name</th>
+              <th>Address</th>
+              <th>Outlet Mobile</th>
+              <th>Manager Name</th>
+              <th>Contact Number</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -182,6 +191,10 @@ const AddOutlet = () => {
               <tr key={outlet.id}>
                 <td className="outlet-table-cell">{outlet.outlet_code}</td>
                 <td className="outlet-table-cell">{outlet.outlet_name}</td>
+                <td className="outlet-table-cell">{outlet.address}</td>
+                <td className="outlet-table-cell">{outlet.outlet_mobile}</td>
+                <td className="outlet-table-cell">{outlet.manager_name}</td>
+                <td className="outlet-table-cell">{outlet.contact_number}</td>
                 <td className="outlet-table-cell outlet-table-actions">
                   <button className="E-button" type="button" onClick={() => handleEdit(outlet)}>
                     Edit

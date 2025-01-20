@@ -93,6 +93,49 @@ function Transections() {
   const { outletId } = useParams() // Get the outletId from the URL parameter
   const [loading, setLoading] = useState([])
   const [sku, setSku] = useState('')
+  const [showCustomerModal, setShowCustomerModal] = useState(false)
+  const [customerForm, setCustomerForm] = useState({
+    display_name: '',
+    mobile_no: '',
+    address: '',
+  })
+
+  const resetCustomerForm = () => {
+    setCustomerForm({
+      display_name: '',
+      mobile_no: '',
+      address: '',
+    })
+
+    // Close the modal
+    setShowCustomerModal(false)
+  }
+
+  // Handle form submission (add customer)
+  const handleAddCustomer = async () => {
+    try {
+      const response = await axios.post(
+        'http://195.26.253.123/pos/transaction/add-customer-in-pos',
+        customerForm,
+      )
+
+      if (response.data) {
+        toast.success('Customer Added Successfully!') // Success message
+
+        // Reset the form and close the modal
+        resetCustomerForm()
+      } else {
+        toast.error('Failed to add customer')
+      }
+    } catch (error) {
+      console.error('Error adding customer:', error)
+      toast.error('Error adding customer')
+    }
+  }
+
+  useEffect(() => {
+    console.log('customerForm changed:', customerForm) // Logs when customerForm state changes
+  }, [customerForm])
 
   const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
@@ -394,6 +437,15 @@ function Transections() {
     )
   }
 
+  // Handle form input changes (for customer details form)
+  const handleCustomerInputChange = (e) => {
+    const { name, value } = e.target
+    setCustomerForm((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+  }
+
   // Remove Fee
   const handleRemoveFee = (id) => {
     setSelectedFees((prevFees) => prevFees.filter((fee) => fee.id !== id))
@@ -649,6 +701,7 @@ function Transections() {
     fetchDeliveryFees()
     fetchAllProducts(outletId) // Pass outletId to fetchAllProducts
     fetchCustomer()
+
     fetchPayment()
     const interval = setInterval(() => {
       setCurrentDateTime(new Date())
@@ -1388,6 +1441,7 @@ function Transections() {
           {alertMessage}
         </CAlert>
 
+        {/* CUSTOMER SECTION */}
         <section className="customer-section">
           <select className="customer-select" onChange={handleCustomerChange}>
             <option>Select Customer</option>
@@ -1397,9 +1451,60 @@ function Transections() {
               </option>
             ))}
           </select>
-          <Link to="/Customer/AddCustomer">
-            <button className="add-customer">+</button>
-          </Link>
+
+          <button
+            className="add-customer"
+            onClick={() => setShowCustomerModal(true)} // Open modal
+          >
+            +
+          </button>
+
+          {/* Modal */}
+          {showCustomerModal && (
+            <div className="customer-modal">
+              <div className="customer-modal-content">
+                <h3>Add Customer</h3>
+                <label>
+                  Display Name:
+                  <input
+                    type="text"
+                    name="display_name"
+                    value={customerForm.display_name}
+                    onChange={handleCustomerInputChange}
+                  />
+                </label>
+                <label>
+                  Mobile No:
+                  <input
+                    type="text"
+                    name="mobile_no"
+                    value={customerForm.mobile_no}
+                    onChange={handleCustomerInputChange}
+                  />
+                </label>
+                <label>
+                  Address:
+                  <input
+                    type="text"
+                    name="address"
+                    value={customerForm.address}
+                    onChange={handleCustomerInputChange}
+                  />
+                </label>
+                <div className="modal-buttons">
+                  <button className="modal-btn add-btn" onClick={handleAddCustomer}>
+                    Add
+                  </button>
+                  <button
+                    className="modal-btn cancel-btn"
+                    onClick={() => setShowCustomerModal(false)} // Close modal
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <select className="salesman-select" onChange={handleSalesmanChange}>
             <option>Select Salesman</option>
@@ -1412,7 +1517,6 @@ function Transections() {
           <Link to="/Admin/Salesman">
             <button className="add-customer">+</button>
           </Link>
-
           <input
             ref={inputRef}
             type="text"

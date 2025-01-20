@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Network, Urls } from '../../../api-config'
 import useAuth from '../../../hooks/useAuth'
+import { Autocomplete, TextField } from '@mui/material'
 
 function RegisterUser() {
   const [systemRoles, setSystemRoles] = useState([])
@@ -32,24 +33,6 @@ function RegisterUser() {
   const [passwordChangeMessage, setPasswordChangeMessage] = useState(null)
   const { userOutlets } = useAuth()
 
-  // Fetch system roles from API
-  // useEffect(() => {
-  //   axios
-  //     .get('http://195.26.253.123/pos/accounts/fetch-system-role/')
-  //     .then((response) => {
-  //       const roles = response.data.map((role) => ({
-  //         value: role.id,
-  //         label: role.sys_role_name,
-  //       }))
-
-  //       setSystemRoles(roles)
-  //     })
-  //     .catch((error) => console.log('Error fetching system roles:', error))
-
-  //   // Fetch existing users from backend
-  //   fetchUsers()
-  // }, [])
-
   useEffect(() => {
     const fetchSystemRoles = async () => {
       const response = await Network.get(Urls.fetchSystemRoles)
@@ -71,38 +54,6 @@ function RegisterUser() {
     fetchUsers() // Fetch existing users from backend
   }, [])
 
-  // const fetchOutlets = async () => {
-  //   try {
-  //     const response = await axios.get('http://195.26.253.123/pos/products/add_outlet')
-  //     const outletOptions = response.data.map((outlet) => ({
-  //       value: outlet.id,
-  //       label: outlet.outlet_name,
-  //       outlet_code: outlet.outlet_code, // Include outlet_code here
-  //     }))
-  //     setOutlets(outletOptions)
-  //   } catch (error) {
-  //     console.error('Error fetching outlets:', error)
-  //   }
-  // }
-
-  // const fetchOutlets = async () => {
-  //   const response = await Network.get(Urls.addOutlets)
-
-  //   if (!response.ok) {
-  //     console.error('Error fetching outlets:', response.data.error)
-  //     return
-  //   }
-
-  //   const outletOptions = response.data.map((outlet) => ({
-  //     value: outlet.id,
-  //     label: outlet.outlet_name,
-  //     outlet_code: outlet.outlet_code, // Include outlet_code here
-  //   }))
-
-  //   setOutlets(outletOptions)
-  // }
-
-  // Fetch outlets data from the API
   const fetchOutlets = async () => {
     try {
       const response = await Network.get(Urls.fetchAllOutlets)
@@ -137,20 +88,6 @@ function RegisterUser() {
     fetchOutlets() // Fetch outlets separately
   }, [])
 
-  // const fetchUsers = () => {
-  //   axios
-  //     .get('http://195.26.253.123/pos/accounts/register_user/')
-  //     .then((response) => {
-  //       console.log('Fetched Users Data:', response.data) // Debug log
-  //       if (Array.isArray(response.data)) {
-  //         setUserList(response.data) // Directly use response.data as it is an array
-  //       } else {
-  //         console.error('Unexpected data format:', response.data)
-  //       }
-  //     })
-  //     .catch((error) => console.log('Error fetching users:', error))
-  // }
-
   const fetchUsers = () => {
     Network.get(Urls.registerUser)
       .then((response) => {
@@ -171,38 +108,6 @@ function RegisterUser() {
     setSelectedUser({ username: user.username, user_id: user.id, system_roles: user.system_roles })
     setShowEditModal(true)
   }
-
-  // const handlePasswordChange = () => {
-  //   const payload = {
-  //     user_id: selectedUser.user_id,
-  //     new_password: newPassword,
-  //   }
-
-  //   axios
-  //     .post('http://195.26.253.123/pos/accounts/admin-change-password/', payload)
-  //     .then((response) => {
-  //       // Log the entire response to make sure the message is in the response
-  //       console.log('Response from backend:', response)
-
-  //       // Check if message exists in response.data
-  //       if (response.data && response.data.message) {
-  //         setPasswordChangeMessage(response.data.message)
-  //       } else {
-  //         console.log('No message found in response data')
-  //       }
-
-  //       // Reset the modal and password fields after success
-  //       setShowEditModal(false)
-  //       setNewPassword('')
-  //       setNewPasswordErrors([]) // Reset errors on success
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error changing password:', error)
-  //       if (error.response && error.response.data) {
-  //         setNewPasswordErrors(error.response.data.new_password || []) // Set errors if available
-  //       }
-  //     })
-  // }
 
   const handlePasswordChange = () => {
     const payload = {
@@ -266,58 +171,6 @@ function RegisterUser() {
     })
   }
 
-  // Handle form submission
-  // const handleSubmit = (e) => {
-  //   e.preventDefault()
-
-  //   // Prepare the form data for submission
-  //   const { outlet, ...restFormData } = formData
-
-  //   // Only outlet IDs should be sent in the payload
-  //   const selectedOutlets = outlet.map((outlet) => outlet.value) // Extract the outlet IDs
-
-  //   const payload = {
-  //     ...restFormData,
-  //     outlet: selectedOutlets, // Send only the outlet IDs in the payload
-  //   }
-
-  //   axios
-  //     .post('http://195.26.253.123/pos/accounts/register_user', payload)
-  //     .then((response) => {
-  //       console.log('User registered successfully:', response)
-  //       fetchUsers() // Refresh user list after successful submission
-  //       toast.success('User registered successfully!') // Success toast for user registration
-  //       setFormData({
-  //         first_name: '',
-  //         last_name: '',
-  //         username: '',
-  //         password: '',
-  //         email: '',
-  //         phone_number: '',
-  //         is_staff: false,
-  //         is_active: true,
-  //         system_roles: [],
-  //         outlet: [], // Reset outlet selection
-  //         is_superuser: false,
-  //       })
-  //     })
-  //     .catch((error) => {
-  //       // Check if the error response has a specific message for username already exists
-  //       if (error.response && error.response.data) {
-  //         // If username already exists, show specific error
-  //         if (error.response.data.username) {
-  //           toast.error(error.response.data.username[0]) // Show the error message
-  //         } else {
-  //           toast.error('Failed to register user. Please try again.')
-  //         }
-  //       } else {
-  //         toast.error('An error occurred while registering the user.')
-  //       }
-
-  //       console.log('Error registering user:', error) // Log the error for debugging
-  //     })
-  // }
-
   const handleSubmit = (e) => {
     e.preventDefault()
 
@@ -367,19 +220,6 @@ function RegisterUser() {
         console.log('Error registering user:', error) // Log the error for debugging
       })
   }
-
-  // Handle user delete
-  // const handleDelete = (userId) => {
-  //   if (window.confirm('Are you sure you want to delete this user?')) {
-  //     axios
-  //       .delete(`http://195.26.253.123/pos/accounts/delete_user/${userId}`)
-  //       .then((response) => {
-  //         console.log('User deleted successfully:', response)
-  //         fetchUsers() // Refresh the user list
-  //       })
-  //       .catch((error) => console.error('Error deleting user:', error))
-  //   }
-  // }
 
   const handleDelete = (userId) => {
     Network.delete(`${Urls.deleteUser}/${userId}`)

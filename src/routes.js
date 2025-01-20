@@ -65,6 +65,9 @@ const RegisterUser = React.lazy(() => import('./views/Admin/RegisterUser/Registe
 //Payment
 const Payment = React.lazy(() => import('./views/Admin/Payment/Payment'))
 
+//SuperAdmin
+const Shops = React.lazy(() => import('./views/SuperAdmin/Shops/Shops'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/pages/unauthorized', name: 'unauthorized', element: unauthorized },
@@ -246,6 +249,14 @@ const routes = [
     element: 'SysRoles',
     element: (props) => <AuthGuard element={SysRoles} requiredPermission="Admin" {...props} />,
   }, // SysRoles
+
+  //SuperAdmin
+  {
+    path: '/SuperAdmin/Shops',
+    name: 'Shops',
+    element: 'Shops',
+    element: (props) => <AuthGuard element={Shops} requiredPermission="SuperAdmin" {...props} />,
+  }, // Shops
   {
     path: '/Admin/RegisterUser',
     name: 'RegisterUser',

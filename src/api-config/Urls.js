@@ -127,4 +127,7 @@ export default {
   actionCustomer: 'customer/action_customer',
   actionCustomerChannel: 'customer/action_customer_channel',
   actionCustomerType: 'customer/action_customer_type',
+
+  //shops
+  addShops: 'admin/add_shop',
 }
