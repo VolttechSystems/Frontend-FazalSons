@@ -123,6 +123,34 @@ const AddProduct = () => {
     }
   }, [selectedCategory, selectedsubCategory]) // Re-fetch when either category or subcategory changes
 
+  // const fetchAttributes = async (categoryId, subCategoryId) => {
+  //   if (!categoryId) {
+  //     console.error('Category ID is undefined or null')
+  //     return // Prevent making the request if categoryId is invalid
+  //   }
+
+  //   // Use the appropriate URL based on whether subCategoryId is provided
+  //   const url = subCategoryId
+  //     ? `http://195.26.253.123/pos/products/fetch_subcategories/${encodeURIComponent(subCategoryId)}`
+  //     : `http://195.26.253.123/pos/products/fetch_categories/${encodeURIComponent(categoryId)}`
+
+  //   try {
+  //     const response = await axios.get(url)
+  //     const data = response.data
+
+  //     // Transform data for multi-select dropdown
+  //     const options = data.map((item) => ({
+  //       value: item.attribute,
+  //       label: item.attribute,
+  //       variations: item.variation, // Optional: Handle variations if needed
+  //     }))
+
+  //     setAttributes(options) // Populate attributes dropdown
+  //   } catch (error) {
+  //     console.error('Error fetching attributes:', error)
+  //   }
+  // }
+
   const fetchAttributes = async (categoryId, subCategoryId) => {
     if (!categoryId) {
       console.error('Category ID is undefined or null')
@@ -131,11 +159,12 @@ const AddProduct = () => {
 
     // Use the appropriate URL based on whether subCategoryId is provided
     const url = subCategoryId
-      ? `http://195.26.253.123/pos/products/fetch_subcategories/${encodeURIComponent(subCategoryId)}`
-      : `http://195.26.253.123/pos/products/fetch_categories/${encodeURIComponent(categoryId)}`
+      ? `${Urls.fetchSubcategories}/${encodeURIComponent(subCategoryId)}`
+      : `${Urls.fetchCategories}/${encodeURIComponent(categoryId)}`
 
     try {
-      const response = await axios.get(url)
+      // Use Network.get
+      const response = await Network.get(url)
       const data = response.data
 
       // Transform data for multi-select dropdown
@@ -251,19 +280,25 @@ const AddProduct = () => {
     setSelectedsubCategory('')
 
     if (headCategoryId) {
-      try {
-        const response = await axios.get(
-          `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
-        )
-        console.log('Parent Categories:', response.data)
-        setParentCategories(response.data) // Populate parent categories
-      } catch (error) {
-        console.error(
-          `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
-          error,
-        )
-        // Optional: Display error message to user
-      }
+      // try {
+      //   const response = await axios.get(
+      //     `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
+      //   )
+      //   console.log('Parent Categories:', response.data)
+      //   setParentCategories(response.data) // Populate parent categories
+      // } catch (error) {
+      //   console.error(
+      //     `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
+      //     error,
+      //   )
+      //   // Optional: Display error message to user
+      // }
+
+      const response = await Network.get(`${Urls.fetchHeadtoParentCategory}${headCategoryId}/`)
+      console.log('Parent Categories:', response.data)
+      setParentCategories(response.data) // Populate parent categories
+    } else {
+      console.error('Head Category ID is missing!')
     }
   }
 
@@ -302,14 +337,19 @@ const AddProduct = () => {
     setSelectedsubCategory('')
     setAttributes([]) // Reset attributes
 
-    try {
-      const response = await axios.get(
-        `http://195.26.253.123/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`,
-      )
-      setCategories(response.data) // Populate categories
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-    }
+    // try {
+    //   const response = await axios.get(
+    //     `http://195.26.253.123/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`,
+    //   )
+    //   setCategories(response.data) // Populate categories
+    // } catch (error) {
+    //   console.error('Error fetching categories:', error)
+    // }
+
+    const response = await Network.get(
+      `${Urls.fetchParenttoCategory}${encodeURIComponent(parentCategoryId)}/`,
+    )
+    setCategories(response.data) // Populate categories
   }
 
   // Fetch Subcategories based on selected Category
@@ -333,28 +373,47 @@ const AddProduct = () => {
     setSelectedsubCategory('')
     setAttributes([]) // Reset attributes
 
-    try {
-      const response = await axios.get(
-        `http://195.26.253.123/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`,
-      )
-      const subCategoryData = response.data
-      setSubCategories(subCategoryData) // Set the subcategories
+    // try {
+    //   const response = await axios.get(
+    //     `http://195.26.253.123/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`,
+    //   )
+    //   const subCategoryData = response.data
+    //   setSubCategories(subCategoryData) // Set the subcategories
 
-      // Check if subcategories are found, and show the subcategory dropdown if they exist
-      if (subCategoryData.length > 0) {
-        setShowSubCategoryDropdown(true) // Show the dropdown
-      } else {
-        setShowSubCategoryDropdown(false) // Hide the dropdown if no subcategories are found
-      }
+    //   // Check if subcategories are found, and show the subcategory dropdown if they exist
+    //   if (subCategoryData.length > 0) {
+    //     setShowSubCategoryDropdown(true) // Show the dropdown
+    //   } else {
+    //     setShowSubCategoryDropdown(false) // Hide the dropdown if no subcategories are found
+    //   }
 
-      console.log('Subcategories:', subCategoryData) // Debug log for subcategories
-      console.log('Show Subcategory Dropdown:', showSubCategoryDropdown) // Debug log for dropdown visibility
+    //   console.log('Subcategories:', subCategoryData) // Debug log for subcategories
+    //   console.log('Show Subcategory Dropdown:', showSubCategoryDropdown) // Debug log for dropdown visibility
 
-      // Fetch related attributes dynamically for the selected category
-      fetchAttributes(categoryId, '') // Pass categoryId and empty subcategoryId to fetch category-specific attributes
-    } catch (error) {
-      console.error('Error fetching subcategories or attributes:', error)
+    //   // Fetch related attributes dynamically for the selected category
+    //   fetchAttributes(categoryId, '') // Pass categoryId and empty subcategoryId to fetch category-specific attributes
+    // } catch (error) {
+    //   console.error('Error fetching subcategories or attributes:', error)
+    // }
+
+    const response = await Network.get(
+      `${Urls.fetchCategorytoSubCategory}/${encodeURIComponent(categoryId)}/`,
+    )
+    const subCategoryData = response.data
+    setSubCategories(subCategoryData) // Set the subcategories
+
+    // Check if subcategories are found, and show the subcategory dropdown if they exist
+    if (subCategoryData.length > 0) {
+      setShowSubCategoryDropdown(true) // Show the dropdown
+    } else {
+      setShowSubCategoryDropdown(false) // Hide the dropdown if no subcategories are found
     }
+
+    console.log('Subcategories:', subCategoryData) // Debug log for subcategories
+    console.log('Show Subcategory Dropdown:', showSubCategoryDropdown) // Debug log
+
+    // Fetch related attributes dynamically for the selected category
+    fetchAttributes(categoryId, '') // Pass categoryId and empty subcategoryId to fetch category-specific attributes
   }
 
   const handleSubCategoryChange = async (e) => {
@@ -471,24 +530,43 @@ const AddProduct = () => {
 
   // const BASE_URL = 'http://195.26.253.123/pos';
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [headResponse, parentResponse] = await Promise.all([
+  //         axios.get('http://195.26.253.123/pos/products/add_head_category'),
+  //         axios.get('http://195.26.253.123/pos/products/add_parent_category/'),
+
+  //         // axios.get('http://195.26.253.123/pos/products/add_brand'),
+  //       ])
+
+  //       //const brandsData = brandResponse.data.results || [];
+  //       // Set states with fetched data
+  //       // setBrands(Array.isArray(brandResponse.data.results) ? brandResponse.data.results : [])
+  //       setHeadCategories(headResponse.data)
+  //       setParentCategories(parentResponse.data)
+  //     } catch (error) {
+  //       console.error('Error fetching categories:', error)
+  //     } finally {
+  //     }
+  //   }
+
+  //   fetchData()
+  // }, [])
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [headResponse, parentResponse] = await Promise.all([
-          axios.get('http://195.26.253.123/pos/products/add_head_category'),
-          axios.get('http://195.26.253.123/pos/products/add_parent_category/'),
-
-          // axios.get('http://195.26.253.123/pos/products/add_brand'),
+          Network.get(`${Urls.addHeadCategory}`),
+          Network.get(`${Urls.addParentCategory}`),
         ])
 
-        //const brandsData = brandResponse.data.results || [];
         // Set states with fetched data
-        // setBrands(Array.isArray(brandResponse.data.results) ? brandResponse.data.results : [])
         setHeadCategories(headResponse.data)
         setParentCategories(parentResponse.data)
       } catch (error) {
         console.error('Error fetching categories:', error)
-      } finally {
       }
     }
 
@@ -717,6 +795,88 @@ const AddProduct = () => {
     fetchProductList()
     resetForm()
   }
+
+  // const handleAdd = async (e) => {
+  //   e.preventDefault()
+
+  //   // Create a new FormData instance
+  //   const formDataPayload = new FormData()
+
+  //   // Manually format color as a string (e.g., "[ 'Baby pink' ]")
+  //   const colorString = `[ '${formData.color.join("', '")}' ]`
+
+  //   // Format variations
+  //   const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
+  //     return selectedVariations[attribute] // Wrap each selection in an array
+  //   })
+
+  //   // Append all fields to FormData
+  //   formDataPayload.append('product_name', formData.product_name)
+  //   formDataPayload.append('sku', formData.sku)
+  //   formDataPayload.append('season', formData.season)
+  //   formDataPayload.append('description', formData.description)
+  //   formDataPayload.append('notes', formData.notes)
+  //   formDataPayload.append('color', colorString) // color as a string
+  //   formDataPayload.append('attribute', JSON.stringify(formData.attribute)) // Convert attributes to JSON string
+  //   formDataPayload.append('variations', JSON.stringify(variationsFormatted)) // Convert variations to JSON string
+  //   formDataPayload.append('cost_price', formData.cost_price)
+  //   formDataPayload.append('selling_price', formData.selling_price)
+  //   formDataPayload.append('discount_price', formData.discount_price)
+  //   formDataPayload.append('wholesale_price', formData.wholesale_price)
+  //   formDataPayload.append('retail_price', formData.retail_price)
+  //   formDataPayload.append('token_price', formData.token_price)
+  //   formDataPayload.append('outlet', formData.outlet) // Use outlet ID
+  //   formDataPayload.append('category', selectedCategory)
+  //   formDataPayload.append('sub_category', selectedsubCategory)
+  //   formDataPayload.append('brand', selectedBrand)
+
+  //   // Append image if available
+  //   if (formData.image) {
+  //     formDataPayload.append('image', formData.image)
+  //   }
+  //   console.log(formData.image) // Check if the image is selected
+
+  //   try {
+  //     const response = await Network.post(
+  //       `${Urls.addProduct}`, // Replace with your URL configuration
+  //       formDataPayload,
+  //       {
+  //         headers: { 'Content-Type': 'multipart/form-data' }, // Ensure multipart headers
+  //       },
+  //     )
+
+  //     if (response.status === 200 || response.status === 201) {
+  //       toast.success('Product added successfully!')
+  //       fetchProductList()
+  //       resetForm()
+  //     } else {
+  //       alert('Failed to add the product. Please try again.')
+  //     }
+  //   } catch (error) {
+  //     console.error('Error adding product:', error)
+
+  //     // Check if the error contains response data
+  //     if (error.response && error.response.data) {
+  //       // Handle specific field errors
+  //       Object.keys(error.response.data).forEach((key) => {
+  //         const errorMessages = error.response.data[key]
+  //         if (Array.isArray(errorMessages)) {
+  //           errorMessages.forEach((message) => {
+  //             toast.error(`${key}: ${message}`)
+  //           })
+  //         } else {
+  //           toast.error(`${key}: ${errorMessages}`)
+  //         }
+  //       })
+  //     } else {
+  //       // Handle general errors
+  //       toast.error('An error occurred while adding the product.')
+  //     }
+  //   }
+
+  //   fetchProductList()
+  //   resetForm()
+  // }
 
   // const handleDelete = async (id) => {
   //   try {

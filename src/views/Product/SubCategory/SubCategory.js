@@ -3,6 +3,7 @@ import axios from 'axios'
 import './SubCategory.css'
 import Select from 'react-select'
 import { Link } from 'react-router-dom'
+import { Network, Urls } from '../../../api-config'
 
 const AddSubCat = () => {
   const [formData, setFormData] = useState({
@@ -50,9 +51,76 @@ const AddSubCat = () => {
   const API_FETCH_SUBCATEGORIES = 'http://195.26.253.123/pos/products/add_subcategories'
 
   // Fetch initial data and categories list
+  // useEffect(() => {
+  //   const fetchInitialData = async () => {
+  //     try {
+  //       const [
+  //         headResponse,
+  //         parentResponse,
+  //         attTypesResponse,
+  //         categoriesResponse,
+  //         subcategoriesResponse,
+  //       ] = await Promise.all([
+  //         axios.get(API_HEAD_CATEGORIES),
+  //         axios.get(API_PARENT_CATEGORIES),
+  //         axios.get(API_ATT_TYPES),
+  //         axios.get(API_FETCH_CATEGORIES),
+  //         axios.get(API_FETCH_SUBCATEGORIES),
+  //       ])
+
+  //       setHeadCategories(headResponse.data)
+  //       setParentCategories(parentResponse.data)
+  //       setAttTypes(attTypesResponse.data)
+  //       setCategories(categoriesResponse.data)
+  //       setsubCategories(subcategoriesResponse.data)
+  //     } catch (error) {
+  //       console.error('Error in fetchInitialData:', error)
+
+  //       // Log each endpoint individually
+  //       try {
+  //         const headResponse = await axios.get(API_HEAD_CATEGORIES)
+  //         setHeadCategories(headResponse.data)
+  //       } catch (headError) {
+  //         console.error('Error fetching Head Categories:', headError)
+  //       }
+
+  //       try {
+  //         const parentResponse = await axios.get(API_PARENT_CATEGORIES)
+  //         setParentCategories(parentResponse.data)
+  //       } catch (parentError) {
+  //         console.error('Error fetching Parent Categories:', parentError)
+  //       }
+
+  //       try {
+  //         const attTypesResponse = await axios.get(API_ATT_TYPES)
+  //         setAttTypes(attTypesResponse.data)
+  //       } catch (attError) {
+  //         console.error('Error fetching Attribute Types:', attError)
+  //       }
+
+  //       try {
+  //         const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
+  //         setCategories(categoriesResponse.data)
+  //       } catch (categoriesError) {
+  //         console.error('Error fetching Categories:', categoriesError)
+  //       }
+
+  //       try {
+  //         const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
+  //         setsubCategories(subcategoriesResponse.data)
+  //       } catch (subcategoriesError) {
+  //         console.error('Error fetching Categories:', subcategoriesError)
+  //       }
+  //     }
+  //   }
+
+  //   fetchInitialData()
+  // }, [])
+
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
+        // Use Promise.all to fetch all endpoints simultaneously
         const [
           headResponse,
           parentResponse,
@@ -60,13 +128,14 @@ const AddSubCat = () => {
           categoriesResponse,
           subcategoriesResponse,
         ] = await Promise.all([
-          axios.get(API_HEAD_CATEGORIES),
-          axios.get(API_PARENT_CATEGORIES),
-          axios.get(API_ATT_TYPES),
-          axios.get(API_FETCH_CATEGORIES),
-          axios.get(API_FETCH_SUBCATEGORIES),
+          Network.get(Urls.addHeadCategory),
+          Network.get(Urls.addParentCategory),
+          Network.get(Urls.addAttributeTypes),
+          Network.get(Urls.addCategory),
+          Network.get(Urls.addSubCategories),
         ])
 
+        // Update state with fetched data
         setHeadCategories(headResponse.data)
         setParentCategories(parentResponse.data)
         setAttTypes(attTypesResponse.data)
@@ -75,40 +144,39 @@ const AddSubCat = () => {
       } catch (error) {
         console.error('Error in fetchInitialData:', error)
 
-        // Log each endpoint individually
+        // Attempt to fetch each endpoint individually in case of failure
         try {
-          const headResponse = await axios.get(API_HEAD_CATEGORIES)
+          const headResponse = await Network.get(Urls.addHeadCategory)
           setHeadCategories(headResponse.data)
         } catch (headError) {
           console.error('Error fetching Head Categories:', headError)
         }
 
         try {
-          const parentResponse = await axios.get(API_PARENT_CATEGORIES)
+          const parentResponse = await Network.get(Urls.addParentCategory)
           setParentCategories(parentResponse.data)
         } catch (parentError) {
           console.error('Error fetching Parent Categories:', parentError)
         }
 
         try {
-          const attTypesResponse = await axios.get(API_ATT_TYPES)
+          const attTypesResponse = await Network.get(Urls.addAttributeTypes)
           setAttTypes(attTypesResponse.data)
         } catch (attError) {
           console.error('Error fetching Attribute Types:', attError)
         }
 
         try {
-          const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
+          const categoriesResponse = await Network.get(Urls.addCategory)
           setCategories(categoriesResponse.data)
         } catch (categoriesError) {
           console.error('Error fetching Categories:', categoriesError)
         }
-
         try {
-          const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
+          const subcategoriesResponse = await Network.get(Urls.addSubCategories)
           setsubCategories(subcategoriesResponse.data)
         } catch (subcategoriesError) {
-          console.error('Error fetching Categories:', subcategoriesError)
+          console.error('Error fetching Sub Categories:', subcategoriesError)
         }
       }
     }
@@ -117,12 +185,16 @@ const AddSubCat = () => {
   }, [])
 
   const fetchsubCategories = async () => {
-    try {
-      const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
-      setCategories(subcategoriesResponse.data)
-    } catch (error) {
-      console.error('Error fetching Categories:', error)
-    }
+    // try {
+    //   const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
+    //   setCategories(subcategoriesResponse.data)
+    // } catch (error) {
+    //   console.error('Error fetching Categories:', error)
+    // }
+
+    const response = await Network.get(Urls.addSubCategories)
+    if (!response.ok) return consoe.log(response.data.error)
+    setCategories(subcategoriesResponse.data)
   }
 
   useEffect(() => {
@@ -133,12 +205,16 @@ const AddSubCat = () => {
   // Fetch Attribute Types
   useEffect(() => {
     const fetchAttTypes = async () => {
-      try {
-        const response = await axios.get(API_ATT_TYPES)
-        setAttTypes(response.data)
-      } catch (error) {
-        console.error('Error fetching Attribute Types:', error)
-      }
+      // try {
+      //   const response = await axios.get(API_ATT_TYPES)
+      //   setAttTypes(response.data)
+      // } catch (error) {
+      //   console.error('Error fetching Attribute Types:', error)
+      // }
+
+      const response = await Network.get(Urls.addAttributeTypes)
+      if (!response.ok) return console.log(response.data.error)
+      setAttTypes(response.data)
     }
     fetchAttTypes()
   }, [])
@@ -149,13 +225,17 @@ const AddSubCat = () => {
 
   // Fetch Head Categories
   const fetchHeadCategories = async () => {
-    try {
-      const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
-      setHeadCategories(response.data)
-    } catch (error) {
-      console.error('Error fetching head categories:', error)
-      //setError('Failed to load head categories. Please try again later.');
-    }
+    // try {
+    //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
+    //   setHeadCategories(response.data)
+    // } catch (error) {
+    //   console.error('Error fetching head categories:', error)
+    //   //setError('Failed to load head categories. Please try again later.');
+    // }
+
+    const response = await Network.get(Urls.addHeadCategory)
+    if (!response.ok) return console.log(response.data.error)
+    setHeadCategories(response.data)
   }
 
   const handleHeadCategoryChange = async (e) => {
@@ -176,19 +256,24 @@ const AddSubCat = () => {
     setSelectedParentCategory('')
 
     if (headCategoryId) {
-      try {
-        const response = await axios.get(
-          `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
-        )
-        console.log('Parent Categories:', response.data)
-        setParentCategories(response.data) // Populate parent categories
-      } catch (error) {
-        console.error(
-          `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
-          error,
-        )
-        // Optional: Display error message to user
-      }
+      // try {
+      //   const response = await axios.get(
+      //     `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
+      //   )
+      //   console.log('Parent Categories:', response.data)
+      //   setParentCategories(response.data) // Populate parent categories
+      // } catch (error) {
+      //   console.error(
+      //     `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
+      //     error,
+      //   )
+      //   // Optional: Display error message to user
+      // }
+
+      const response = await Network.get(`${Urls.fetchHeadtoParentCategory}${headCategoryId}/`)
+      if (!response.ok) return console.log(response.data.error)
+      console.log('Parent Categories:', response.data)
+      setParentCategories(response.data)
     }
   }
 
@@ -212,20 +297,25 @@ const AddSubCat = () => {
     setSelectedCategory('') // Reset any previously selected category
 
     if (parentCategoryId) {
-      try {
-        // Fetch categories based on parent category
-        const response = await axios.get(
-          `http://195.26.253.123/pos/products/fetch_parent_to_category/${parentCategoryId}/`,
-        )
-        console.log('Categories:', response.data) // Log fetched categories
-        setCategories(response.data) // Populate the categories dropdown
-      } catch (error) {
-        console.error(
-          `Error fetching categories for Parent Category ID: ${parentCategoryId}`,
-          error,
-        )
-        // Optional: Display an error message to the user
-      }
+      // try {
+      //   // Fetch categories based on parent category
+      //   const response = await axios.get(
+      //     `http://195.26.253.123/pos/products/fetch_parent_to_category/${parentCategoryId}/`,
+      //   )
+      //   console.log('Categories:', response.data) // Log fetched categories
+      //   setCategories(response.data) // Populate the categories dropdown
+      // } catch (error) {
+      //   console.error(
+      //     `Error fetching categories for Parent Category ID: ${parentCategoryId}`,
+      //     error,
+      //   )
+      //   // Optional: Display an error message to the user
+      // }
+
+      const response = await Network.get(`${Urls.fetchParenttoCategory}${parentCategoryId}/`)
+      if (!response.ok) return console.log(response.data.error)
+      console.log('Categories:', response.data) // Log fetched categories
+      setCategories(response.data)
     }
   }
 
@@ -236,8 +326,12 @@ const AddSubCat = () => {
         try {
           console.log('Selected Attribute Types:', formData.attType)
 
+          // const responses = await Promise.all(
+          //   formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)),
+          // )
+
           const responses = await Promise.all(
-            formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)),
+            formData.attType.map((typeId) => Network.get(`${Urls.fetchVariationGroup}/${typeId}`)),
           )
 
           const data = responses.flatMap((res) => res.data)
@@ -271,8 +365,12 @@ const AddSubCat = () => {
     if (formData.attType.length > 0) {
       const fetchGroups = async () => {
         try {
+          // const responses = await Promise.all(
+          //   formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)),
+          // )
+
           const responses = await Promise.all(
-            formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)),
+            formData.attType.map((typeId) => Network.get(`${Urls.fetchVariationGroup}/${typeId}`)),
           )
           const data = responses.flatMap((res) => res.data)
           setTableData(data)
@@ -372,7 +470,11 @@ const AddSubCat = () => {
     try {
       if (editMode) {
         // PUT request to update category
-        const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editsubCategoryId}`, payload)
+        // const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editsubCategoryId}`, payload)
+        const response = await Network.put(
+          `${Urls.updateSubCategory}/${editsubCategoryId}`,
+          payload,
+        )
 
         // Update the category list with the new data
         const updatedsubCategories = subcategories.map((cat) =>
@@ -387,7 +489,8 @@ const AddSubCat = () => {
         fetchsubCategories()
       } else {
         // POST request to add new subcategory
-        const response = await axios.post(API_ADD_SUBCATEGORIES, payload)
+        // const response = await axios.post(API_ADD_SUBCATEGORIES, payload)
+        const response = await Network.post(Urls.addSubCategories, payload)
         const newsubCategory = response.data
         // setsubCategories((prevsubCategories) => [...prevsubCategories, newsubCategory]);
         // setTableData((prevData) => [...prevData, newsubCategory]);
@@ -426,7 +529,8 @@ const AddSubCat = () => {
   const handleEdit = async (subcategory) => {
     try {
       // Fetch category details from API
-      const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${subcategory.id}`)
+      // const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${subcategory.id}`)
+      const response = await Network.get(`${Urls.updateSubCategory}/${subcategory.id}`)
       const subcategoryData = response.data
       console.log({ subcategoryData })
       console.log(subcategoryData.att_type, 'att_type data')
@@ -470,10 +574,15 @@ const AddSubCat = () => {
 
       setSelectedGroup(transformArray)
 
+      // const responses = await Promise.all(
+      //   subcategoryData.att_type.map((id) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)),
+      // )
+
       const responses = await Promise.all(
-        subcategoryData.att_type.map((id) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)),
+        subcategoryData.att_type.map((id) => Network.get(`${Urls.fetchVariationGroup}/${id.id}`)),
       )
       const data = responses.flatMap((res) => res.data)
+      fetchsubCategories()
       setTableData(data)
 
       setEditMode(true)
@@ -487,8 +596,18 @@ const AddSubCat = () => {
   }
 
   const handleDelete = async (subcategoryId) => {
+    // try {
+    //   await axios.delete(`${API_UPDATE_SUBCATEGORY}/${subcategoryId}`)
+    //   setsubCategories(subcategories.filter((subcategory) => subcategory.id !== subcategoryId))
+    //   setMessage('subcategory deleted successfully.')
+    //   fetchsubCategories()
+    // } catch (error) {
+    //   console.error('Error deleting subcategory:', error)
+    //   setMessage('Failed to delete subcategory.')
+    // }
+
     try {
-      await axios.delete(`${API_UPDATE_SUBCATEGORY}/${subcategoryId}`)
+      await Network.delete(`${Urls.updateSubCategory}/${subcategoryId}`)
       setsubCategories(subcategories.filter((subcategory) => subcategory.id !== subcategoryId))
       setMessage('subcategory deleted successfully.')
       fetchsubCategories()

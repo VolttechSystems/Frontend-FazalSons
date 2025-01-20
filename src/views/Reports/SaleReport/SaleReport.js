@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './SaleReport.css'
 import { Network, Urls } from '../../../api-config'
+import useAuth from '../../../hooks/useAuth'
+import Autocomplete from '@mui/material/Autocomplete'
+import { TextField } from '@mui/material'
 
 const SaleReport = () => {
   const [startDate, setStartDate] = useState('')
@@ -9,17 +12,42 @@ const SaleReport = () => {
   const [reportData, setReportData] = useState([])
   const [outlets, setOutlets] = useState([]) // State to hold outlet data
   const [selectedOutlet, setSelectedOutlet] = useState('') // State to store selected outlet
+  const { userOutlets } = useAuth()
 
   // Fetch outlets for the dropdown
-  useEffect(() => {
-    const fetchOutlets = async () => {
-      const response = await Network.get(Urls.fetchtheOutlets)
-      if (!response.ok) return consoe.log(response.data.error)
-      setOutlets(response.data)
-    }
+  // useEffect(() => {
+  //   const fetchOutlets = async () => {
+  //     const response = await Network.get(Urls.fetchtheOutlets)
+  //     if (!response.ok) return consoe.log(response.data.error)
+  //     setOutlets(response.data)
+  //   }
 
+  //   fetchOutlets()
+  // }, [])
+
+  // Fetch outlets on component mount
+  useEffect(() => {
     fetchOutlets()
   }, [])
+
+  const fetchOutlets = async () => {
+    const response = await Network.get(Urls.fetchAllOutlets)
+
+    if (!response.ok) {
+      return console.error('Failed to fetch outlets:', response.data.error)
+    }
+
+    const outlets = response.data
+      .map((outlet) => {
+        if (userOutlets.some((o) => o.id === outlet.id)) {
+          return outlet
+        }
+        return null
+      })
+      .filter((outlet) => outlet !== null)
+
+    setOutlets(outlets)
+  }
 
   // Fetch the sales report based on the selected dates and outlet
   // useEffect(() => {
@@ -61,9 +89,8 @@ const SaleReport = () => {
 
       <div className="dropdowns">
         {/* Outlet Dropdown */}
-        <div className="dropdown">
-          <label htmlFor="outlet">Outlet</label>
-          <select
+
+        {/* <select
             id="outlet"
             className="dropdown"
             value={selectedOutlet}
@@ -75,8 +102,19 @@ const SaleReport = () => {
                 {outlet.outlet_name}
               </option>
             ))}
-          </select>
-        </div>
+          </select> */}
+        <Autocomplete
+          value={outlets.find((outlet) => outlet.id === selectedOutlet) || null} // Find the outlet object based on selected id
+          onChange={(event, newValue) => {
+            // Store only the outlet ID (when an outlet is selected)
+            setSelectedOutlet(newValue ? newValue.id : null)
+          }}
+          options={outlets}
+          getOptionLabel={(option) => option.outlet_name}
+          renderInput={(params) => <TextField {...params} label="Select Outlet" />}
+          fullWidth
+          disableClearable
+        />
 
         {/* Start Date Picker */}
         <div className="date-wrapper">

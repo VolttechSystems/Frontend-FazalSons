@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Network, Urls } from '../../../api-config'
+import useAuth from '../../../hooks/useAuth'
+
 import {
   Button,
   Dialog,
@@ -16,7 +18,9 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TextField,
 } from '@mui/material'
+import Autocomplete from '@mui/material/Autocomplete'
 
 const DaySale = () => {
   const [outlets, setOutlets] = useState([])
@@ -27,25 +31,30 @@ const DaySale = () => {
   const [detailData, setDetailData] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [error, setError] = useState('')
+  const { userOutlets } = useAuth()
 
   useEffect(() => {
-    const fetchOutlets = async () => {
-      const response = await Network.get(Urls.fetchtheOutlets)
-      if (!response.ok) return consoe.log(response.data.error)
-      setOutlets(response.data)
-    }
-
     fetchOutlets()
   }, [])
 
-  // useEffect(() => {
-  //   if (selectedOutlet) {
-  //     axios
-  //       .get(`http://195.26.253.123/pos/report/all_outlet_dates/${selectedOutlet}/`)
-  //       .then((response) => setDates(response.data.dates || []))
-  //       .catch(() => setError('Failed to fetch dates. Please try again later.'))
-  //   }
-  // }, [selectedOutlet])
+  const fetchOutlets = async () => {
+    const response = await Network.get(Urls.fetchAllOutlets)
+
+    if (!response.ok) {
+      return console.error('Failed to fetch outlets:', response.data.error)
+    }
+
+    const outlets = response.data
+      .map((outlet) => {
+        if (userOutlets.some((o) => o.id === outlet.id)) {
+          return outlet
+        }
+        return null
+      })
+      .filter((outlet) => outlet !== null)
+
+    setOutlets(outlets)
+  }
 
   useEffect(() => {
     if (selectedOutlet) {
@@ -57,17 +66,6 @@ const DaySale = () => {
     }
   }, [selectedOutlet])
 
-  // useEffect(() => {
-  //   if (selectedOutlet && selectedDate) {
-  //     axios
-  //       .get(
-  //         `http://195.26.253.123/pos/report/daily_sale_report/${selectedOutlet}/${selectedDate}/`,
-  //       )
-  //       .then((response) => setReportData(response.data || []))
-  //       .catch(() => setError('Failed to fetch report data. Please try again later.'))
-  //   }
-  // }, [selectedOutlet, selectedDate])
-
   useEffect(() => {
     if (selectedOutlet && selectedDate) {
       const url = `${Urls.dailySaleReport}/${selectedOutlet}/${selectedDate}/`
@@ -77,16 +75,6 @@ const DaySale = () => {
         .catch(() => setError('Failed to fetch report data. Please try again later.'))
     }
   }, [selectedOutlet, selectedDate])
-
-  // const fetchDetailData = (invoiceCode) => {
-  //   axios
-  //     .get(`http://195.26.253.123/pos/report/daily_sale_report_detail/${invoiceCode}/`)
-  //     .then((response) => {
-  //       setDetailData(response.data)
-  //       setShowModal(true)
-  //     })
-  //     .catch(() => setError('Failed to fetch detailed report data.'))
-  // }
 
   const fetchDetailData = (invoiceCode) => {
     const url = `${Urls.dailySaleReportDetail}/${invoiceCode}/`
@@ -125,7 +113,7 @@ const DaySale = () => {
         </Typography>
         {error && <Typography sx={{ color: 'red', marginBottom: 2 }}>{error}</Typography>}
         <Box sx={{ display: 'flex', gap: 3, marginBottom: 3 }}>
-          <Select
+          {/* <Select
             value={selectedOutlet}
             onChange={(e) => setSelectedOutlet(e.target.value)}
             displayEmpty
@@ -142,8 +130,22 @@ const DaySale = () => {
                 {outlet.outlet_name}
               </MenuItem>
             ))}
-          </Select>
-          <Select
+          </Select> */}
+          {/* Autocomplete for Outlet with search feature */}
+          <Autocomplete
+            value={outlets.find((outlet) => outlet.id === selectedOutlet) || null} // Find the outlet object based on selected id
+            onChange={(event, newValue) => {
+              // Store only the outlet ID (when an outlet is selected)
+              setSelectedOutlet(newValue ? newValue.id : null)
+            }}
+            options={outlets}
+            getOptionLabel={(option) => option.outlet_name}
+            renderInput={(params) => <TextField {...params} label="Select Outlet" />}
+            fullWidth
+            disableClearable
+          />
+
+          {/* <Select
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
             displayEmpty
@@ -160,7 +162,17 @@ const DaySale = () => {
                 {date}
               </MenuItem>
             ))}
-          </Select>
+          </Select> */}
+          {/* Autocomplete for Date with search feature */}
+          <Autocomplete
+            value={selectedDate}
+            onChange={(event, newValue) => setSelectedDate(newValue)}
+            options={dates}
+            getOptionLabel={(option) => option}
+            renderInput={(params) => <TextField {...params} label="Select Date" />}
+            fullWidth
+            disableClearable
+          />
         </Box>
         {reportData.length > 0 && (
           <Table sx={{ backgroundColor: '#fff', borderRadius: 1 }}>

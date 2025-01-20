@@ -47,17 +47,71 @@ const AddCategories = () => {
   const API_FETCH_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories'
 
   // Fetch initial data and categories list
+  // useEffect(() => {
+  //   const fetchInitialData = async () => {
+  //     try {
+  //       const [headResponse, parentResponse, attTypesResponse, categoriesResponse] =
+  //         await Promise.all([
+  //           axios.get(API_HEAD_CATEGORIES),
+  //           axios.get(API_PARENT_CATEGORIES),
+  //           axios.get(API_ATT_TYPES),
+  //           axios.get(API_FETCH_CATEGORIES),
+  //         ])
+
+  //       setHeadCategories(headResponse.data)
+  //       setParentCategories(parentResponse.data)
+  //       setAttTypes(attTypesResponse.data)
+  //       setCategories(categoriesResponse.data)
+  //     } catch (error) {
+  //       console.error('Error in fetchInitialData:', error)
+
+  //       // Log each endpoint individually
+  //       try {
+  //         const headResponse = await axios.get(API_HEAD_CATEGORIES)
+  //         setHeadCategories(headResponse.data)
+  //       } catch (headError) {
+  //         console.error('Error fetching Head Categories:', headError)
+  //       }
+
+  //       try {
+  //         const parentResponse = await axios.get(API_PARENT_CATEGORIES)
+  //         setParentCategories(parentResponse.data)
+  //       } catch (parentError) {
+  //         console.error('Error fetching Parent Categories:', parentError)
+  //       }
+
+  //       try {
+  //         const attTypesResponse = await axios.get(API_ATT_TYPES)
+  //         setAttTypes(attTypesResponse.data)
+  //       } catch (attError) {
+  //         console.error('Error fetching Attribute Types:', attError)
+  //       }
+
+  //       try {
+  //         const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
+  //         setCategories(categoriesResponse.data)
+  //       } catch (categoriesError) {
+  //         console.error('Error fetching Categories:', categoriesError)
+  //       }
+  //     }
+  //   }
+
+  //   fetchInitialData()
+  // }, [])
+
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
+        // Use Promise.all to fetch all endpoints simultaneously
         const [headResponse, parentResponse, attTypesResponse, categoriesResponse] =
           await Promise.all([
-            axios.get(API_HEAD_CATEGORIES),
-            axios.get(API_PARENT_CATEGORIES),
-            axios.get(API_ATT_TYPES),
-            axios.get(API_FETCH_CATEGORIES),
+            Network.get(Urls.addHeadCategory),
+            Network.get(Urls.addParentCategory),
+            Network.get(Urls.addAttributeTypes),
+            Network.get(Urls.addCategory),
           ])
 
+        // Update state with fetched data
         setHeadCategories(headResponse.data)
         setParentCategories(parentResponse.data)
         setAttTypes(attTypesResponse.data)
@@ -65,30 +119,30 @@ const AddCategories = () => {
       } catch (error) {
         console.error('Error in fetchInitialData:', error)
 
-        // Log each endpoint individually
+        // Attempt to fetch each endpoint individually in case of failure
         try {
-          const headResponse = await axios.get(API_HEAD_CATEGORIES)
+          const headResponse = await Network.get(Urls.addHeadCategory)
           setHeadCategories(headResponse.data)
         } catch (headError) {
           console.error('Error fetching Head Categories:', headError)
         }
 
         try {
-          const parentResponse = await axios.get(API_PARENT_CATEGORIES)
+          const parentResponse = await Network.get(Urls.addParentCategory)
           setParentCategories(parentResponse.data)
         } catch (parentError) {
           console.error('Error fetching Parent Categories:', parentError)
         }
 
         try {
-          const attTypesResponse = await axios.get(API_ATT_TYPES)
+          const attTypesResponse = await Network.get(Urls.addAttributeTypes)
           setAttTypes(attTypesResponse.data)
         } catch (attError) {
           console.error('Error fetching Attribute Types:', attError)
         }
 
         try {
-          const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
+          const categoriesResponse = await Network.get(Urls.addCategory)
           setCategories(categoriesResponse.data)
         } catch (categoriesError) {
           console.error('Error fetching Categories:', categoriesError)
@@ -100,12 +154,16 @@ const AddCategories = () => {
   }, [])
 
   const fetchCategories = async () => {
-    try {
-      const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
-      setCategories(categoriesResponse.data)
-    } catch (error) {
-      console.error('Error fetching Categories:', error)
-    }
+    // try {
+    //   const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
+    //   setCategories(categoriesResponse.data)
+    // } catch (error) {
+    //   console.error('Error fetching Categories:', error)
+    // }
+
+    const response = await Network.get(Urls.addCategory)
+    if (!response.ok) return consoe.log(response.data.error)
+    setCategories(response.data)
   }
 
   useEffect(() => {
@@ -306,9 +364,59 @@ const AddCategories = () => {
     console.log({ selectedGroup })
   }, [selectedGroup])
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+
+  //   const payload = {
+  //     category_name: formData.category_name,
+  //     symbol: formData.symbol,
+  //     subcategory_option: formData.addSubCategory ? 'True' : 'false',
+  //     description: formData.description,
+  //     status: formData.status,
+  //     pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
+  //     attribute_group: selectedAttributes.map((attr) => attr.split(':')[1]), // Extract only the attribute_id
+  //   }
+
+  //   try {
+  //     if (editMode) {
+  //       // Update existing category
+  //       await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload)
+  //       setMessage('Category updated successfully.')
+  //     } else {
+  //       // Add new category
+  //       await axios.post(API_ADD_CATEGORIES, payload)
+  //       setMessage('Category added successfully.')
+  //     }
+
+  //     // Refetch categories to refresh the table
+  //     fetchCategories()
+  //   } catch (error) {
+  //     console.error('Error in handleSubmit:', error)
+  //     setMessage('Failed to submit category.')
+  //   }
+
+  //   // Reset form and exit edit mode
+  //   setFormData({
+  //     headCategory: '',
+  //     pc_name: '',
+  //     category_name: '',
+  //     symbol: '',
+  //     description: '',
+  //     addSubCategory: false,
+  //     status: 'active',
+  //     attType: [],
+  //     attribute_group: [],
+  //     attribute_id: '',
+  //   })
+
+  //   setEditMode(false)
+  //   setEditCategoryId(null)
+  // }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // Prepare the payload
     const payload = {
       category_name: formData.category_name,
       symbol: formData.symbol,
@@ -322,11 +430,11 @@ const AddCategories = () => {
     try {
       if (editMode) {
         // Update existing category
-        await axios.put(`${API_UPDATE_CATEGORY}/${editCategoryId}`, payload)
+        await Network.put(`${Urls.updateCategory}/${editCategoryId}`, payload)
         setMessage('Category updated successfully.')
       } else {
         // Add new category
-        await axios.post(API_ADD_CATEGORIES, payload)
+        await Network.post(Urls.addCategory, payload)
         setMessage('Category added successfully.')
       }
 
@@ -358,9 +466,13 @@ const AddCategories = () => {
   const handleEdit = async (category) => {
     try {
       // Fetch category details from API
-      // await Network.put(`${Urls.updateCategory}/${editCategoryId}`, payload)
-      const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`)
+
+      // const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`)
+      // const categoryData = response.data
+
+      const response = await Network.get(`${Urls.updateCategory}/${category.id}`)
       const categoryData = response.data
+
       //console.log(categoryData[0].category_name, 'bb');
       console.log({ categoryData })
       console.log(categoryData.att_type, 'att_type data')
@@ -403,8 +515,11 @@ const AddCategories = () => {
 
       setSelectedGroup(transformArray)
 
+      // const responses = await Promise.all(
+      //   categoryData.att_type.map((id) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)),
+      // )
       const responses = await Promise.all(
-        categoryData.att_type.map((id) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)),
+        categoryData.att_type.map((id) => Network.get(`${Urls.fetchVariationGroup}/${id.id}`)),
       )
       const data = responses.flatMap((res) => res.data)
       setTableData(data)
@@ -418,15 +533,21 @@ const AddCategories = () => {
   }
 
   const handleDelete = async (categoryId) => {
-    try {
-      await axios.delete(`${API_UPDATE_CATEGORY}/${categoryId}`)
-      setCategories(categories.filter((category) => category.id !== categoryId))
-      setMessage('Category deleted successfully.')
-      fetchCategories() // Refresh categories after editing
-    } catch (error) {
-      console.error('Error deleting category:', error)
-      setMessage('Failed to delete category.')
-    }
+    // try {
+    //   await axios.delete(`${API_UPDATE_CATEGORY}/${categoryId}`)
+    //   setCategories(categories.filter((category) => category.id !== categoryId))
+    //   setMessage('Category deleted successfully.')
+    //   fetchCategories() // Refresh categories after editing
+    // } catch (error) {
+    //   console.error('Error deleting category:', error)
+    //   setMessage('Failed to delete category.')
+    // }
+
+    const response = await Network.delete(`${Urls.updateCategory}/${categoryId}`)
+    if (!response.ok) return console.log(response.data.error)
+    setCategories(categories.filter((category) => category.id !== categoryId))
+    setMessage('Category deleted successfully.')
+    fetchCategories() // Refresh categories after editing
   }
 
   return (

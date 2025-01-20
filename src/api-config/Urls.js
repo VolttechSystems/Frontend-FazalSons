@@ -29,6 +29,7 @@ export default {
   // //FetchOulets
   // fetchtheOutlets: 'products/fetch_all_outlet/',
   addOutlets: 'products/add_outlet',
+  actionOutlet: 'products/action_outlet',
 
   //FetchAllProducts
   fetchAllProducts: 'products/show_product/',
@@ -44,9 +45,15 @@ export default {
 
   //FetchBarcodesofproducts
   FetchBarcodesofproducts: 'products/barcode_product_data/',
+  fetchSubcategories: 'products/fetch_subcategories',
+  fetchCategories: 'products/fetch_categories',
+  fetchHeadtoParentCategory: 'products/fetch_head_to_parent_category',
+  fetchParenttoCategory: 'products/fetch_parent_to_category/',
+  fetchCategorytoSubCategory: 'products/fetch_category_to_sub_category',
+  addSubCategories: 'products/add_subcategories',
 
   //AddHeadCategory
-  addParentCategory: 'products/add_parent_category',
+  addParentCategory: 'products/add_parent_category/',
 
   //UpdateHeadCategory
   updateParentCategory: 'products/action_parent_category',
@@ -67,6 +74,7 @@ export default {
 
   //UpdateCategories
   updateCategory: 'products/action_categories',
+  updateSubCategory: 'products/action_subcategories',
 
   //fetchVariationGroup
   fetchVariationGroup: 'products/fetch_variations_group',
