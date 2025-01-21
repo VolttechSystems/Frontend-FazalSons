@@ -48,18 +48,19 @@ const AddOutlet = () => {
     e.preventDefault()
 
     try {
+      const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
       const payload = {
         ...formData,
-        shop: parseInt(localStorage.getItem('shop_id')), // Add shop_id to the payload
+        shop: parseInt(shopId), // Add shop_id to the payload
       }
 
       if (editingOutletId) {
         // Update existing outlet
-        await Network.put(`${Urls.actionOutlet}/${editingOutletId}/`, payload)
+        await Network.put(`${Urls.actionOutlet}/${shopId}/${editingOutletId}/`, payload)
         setEditingOutlet(null)
       } else {
         // Add new outlet
-        await Network.post(`${Urls.addOutlets}/${payload.shop}/`, payload) // Use shop_id in the URL as well
+        await Network.post(`${Urls.addOutlets}/${payload.shop}/`, payload)
       }
 
       toast.success('Outlet saved successfully!')
@@ -89,7 +90,8 @@ const AddOutlet = () => {
 
   const handleDelete = async (id) => {
     try {
-      await Network.delete(`${Urls.actionOutlet}/${id}/`)
+      const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
+      await Network.delete(`${Urls.actionOutlet}/${shopId}/${id}/`)
       toast.success('Outlet deleted successfully!')
       fetchOutlets()
     } catch (error) {
