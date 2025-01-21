@@ -76,28 +76,6 @@ const AddProduct = () => {
   const { userOutlets } = useAuth()
 
   // Function to handle button click and open the dialog
-  const handleButtonClick = () => {
-    setIsDialogOpen(true)
-  }
-
-  // Function to handle dialog close (Delete all products on "OK")
-  // const handleDialogClose = (confirmDelete) => {
-  //   if (confirmDelete) {
-  //     // API call to delete all TEMPORARY products
-  //     axios
-  //       .delete('http://195.26.253.123/pos/products/all-temp-product-delete')
-  //       .then((response) => {
-  //         toast.success('All products deleted successfully!')
-  //         // Clear the product list (update the state to empty)
-  //         setProductList([])
-  //         setActiveTab(nextTab)
-  //       })
-  //       .catch((error) => {
-  //         console.error('There was an error deleting the products:', error)
-  //       })
-  //   }
-  //   setIsDialogOpen(false) // Close the dialog
-  // }
 
   const handleDialogClose = async (confirmDelete) => {
     if (confirmDelete) {
@@ -122,34 +100,6 @@ const AddProduct = () => {
       fetchAttributes(selectedCategory, selectedsubCategory) // Fetch attributes when category or subcategory is selected
     }
   }, [selectedCategory, selectedsubCategory]) // Re-fetch when either category or subcategory changes
-
-  // const fetchAttributes = async (categoryId, subCategoryId) => {
-  //   if (!categoryId) {
-  //     console.error('Category ID is undefined or null')
-  //     return // Prevent making the request if categoryId is invalid
-  //   }
-
-  //   // Use the appropriate URL based on whether subCategoryId is provided
-  //   const url = subCategoryId
-  //     ? `http://195.26.253.123/pos/products/fetch_subcategories/${encodeURIComponent(subCategoryId)}`
-  //     : `http://195.26.253.123/pos/products/fetch_categories/${encodeURIComponent(categoryId)}`
-
-  //   try {
-  //     const response = await axios.get(url)
-  //     const data = response.data
-
-  //     // Transform data for multi-select dropdown
-  //     const options = data.map((item) => ({
-  //       value: item.attribute,
-  //       label: item.attribute,
-  //       variations: item.variation, // Optional: Handle variations if needed
-  //     }))
-
-  //     setAttributes(options) // Populate attributes dropdown
-  //   } catch (error) {
-  //     console.error('Error fetching attributes:', error)
-  //   }
-  // }
 
   const fetchAttributes = async (categoryId, subCategoryId) => {
     if (!categoryId) {
@@ -249,16 +199,6 @@ const AddProduct = () => {
     fetchHeadCategories()
   }, [])
 
-  // Fetch Head Categories
-  // const fetchHeadCategories = async () => {
-  //   try {
-  //     const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
-  //     setHeadCategories(response.data)
-  //   } catch (error) {
-  //     console.error('Error fetching head categories:', error)
-  //     //setError('Failed to load head categories. Please try again later.');
-  //   }
-  // }
   const fetchHeadCategories = async () => {
     const response = await Network.get(Urls.addHeadCategory)
     if (!response.ok) return console.log(response.data.error)
@@ -280,20 +220,6 @@ const AddProduct = () => {
     setSelectedsubCategory('')
 
     if (headCategoryId) {
-      // try {
-      //   const response = await axios.get(
-      //     `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
-      //   )
-      //   console.log('Parent Categories:', response.data)
-      //   setParentCategories(response.data) // Populate parent categories
-      // } catch (error) {
-      //   console.error(
-      //     `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
-      //     error,
-      //   )
-      //   // Optional: Display error message to user
-      // }
-
       const response = await Network.get(`${Urls.fetchHeadtoParentCategory}${headCategoryId}/`)
       console.log('Parent Categories:', response.data)
       setParentCategories(response.data) // Populate parent categories
@@ -304,14 +230,6 @@ const AddProduct = () => {
 
   useEffect(() => {
     const fetchBrands = async () => {
-      // try {
-      //   const response = await axios.get('http://195.26.253.123/pos/products/add_brand')
-      //   const brandsData = response.data.results || []
-      //   setBrands(Array.isArray(brandsData) ? brandsData : [])
-      // } catch (error) {
-      //   console.error('Error fetching brands:', error)
-      // }
-
       const response = await Network.get(Urls.addBrand)
       if (!response.ok) return consoe.log(response.data.error)
       const brandsData = response.data.results || []
@@ -336,15 +254,6 @@ const AddProduct = () => {
     setSelectedCategory('')
     setSelectedsubCategory('')
     setAttributes([]) // Reset attributes
-
-    // try {
-    //   const response = await axios.get(
-    //     `http://195.26.253.123/pos/products/fetch_parent_to_category/${encodeURIComponent(parentCategoryId)}/`,
-    //   )
-    //   setCategories(response.data) // Populate categories
-    // } catch (error) {
-    //   console.error('Error fetching categories:', error)
-    // }
 
     const response = await Network.get(
       `${Urls.fetchParenttoCategory}${encodeURIComponent(parentCategoryId)}/`,
@@ -372,29 +281,6 @@ const AddProduct = () => {
     setSubCategories([]) // Reset subcategories
     setSelectedsubCategory('')
     setAttributes([]) // Reset attributes
-
-    // try {
-    //   const response = await axios.get(
-    //     `http://195.26.253.123/pos/products/fetch_category_to_sub_category/${encodeURIComponent(categoryId)}/`,
-    //   )
-    //   const subCategoryData = response.data
-    //   setSubCategories(subCategoryData) // Set the subcategories
-
-    //   // Check if subcategories are found, and show the subcategory dropdown if they exist
-    //   if (subCategoryData.length > 0) {
-    //     setShowSubCategoryDropdown(true) // Show the dropdown
-    //   } else {
-    //     setShowSubCategoryDropdown(false) // Hide the dropdown if no subcategories are found
-    //   }
-
-    //   console.log('Subcategories:', subCategoryData) // Debug log for subcategories
-    //   console.log('Show Subcategory Dropdown:', showSubCategoryDropdown) // Debug log for dropdown visibility
-
-    //   // Fetch related attributes dynamically for the selected category
-    //   fetchAttributes(categoryId, '') // Pass categoryId and empty subcategoryId to fetch category-specific attributes
-    // } catch (error) {
-    //   console.error('Error fetching subcategories or attributes:', error)
-    // }
 
     const response = await Network.get(
       `${Urls.fetchCategorytoSubCategory}/${encodeURIComponent(categoryId)}/`,
@@ -528,32 +414,6 @@ const AddProduct = () => {
     { value: 'XXL', label: 'XXL' },
   ]
 
-  // const BASE_URL = 'http://195.26.253.123/pos';
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [headResponse, parentResponse] = await Promise.all([
-  //         axios.get('http://195.26.253.123/pos/products/add_head_category'),
-  //         axios.get('http://195.26.253.123/pos/products/add_parent_category/'),
-
-  //         // axios.get('http://195.26.253.123/pos/products/add_brand'),
-  //       ])
-
-  //       //const brandsData = brandResponse.data.results || [];
-  //       // Set states with fetched data
-  //       // setBrands(Array.isArray(brandResponse.data.results) ? brandResponse.data.results : [])
-  //       setHeadCategories(headResponse.data)
-  //       setParentCategories(parentResponse.data)
-  //     } catch (error) {
-  //       console.error('Error fetching categories:', error)
-  //     } finally {
-  //     }
-  //   }
-
-  //   fetchData()
-  // }, [])
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -575,19 +435,9 @@ const AddProduct = () => {
 
   useEffect(() => {
     fetchProductList()
-    // fetchSubCategories();
-    // fetchParentCategories();
-    // fetchCategories();
   }, [])
 
   const fetchProductList = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_temp_product')
-    //   setProductList(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching products:', error)
-    // }
-
     const response = await Network.get(Urls.addProduct)
     if (!response.ok) return console.log(response.data.error)
     setProductList(response.data)
@@ -662,60 +512,6 @@ const AddProduct = () => {
     }))
     console.log(selectedBrandId)
   }
-
-  // const handleAdd = async (e) => {
-  //   e.preventDefault()
-
-  //   // Manually format color as a string (e.g., "[ 'Baby pink' ]")
-  //   const colorString = `[ '${formData.color.join("', '")}' ]`
-
-  //   const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
-  //     return selectedVariations[attribute] // Wrap each selection in an array
-  //   })
-
-  //   const newProduct = {
-  //     product_name: formData.product_name,
-  //     sku: formData.sku,
-  //     season: formData.season,
-  //     description: formData.description,
-  //     notes: formData.notes,
-  //     color: colorString, // color as a string (e.g., "[ 'Baby blue', 'Baby pink' ]")
-  //     attribute: formData.attribute, // Selected attributes
-  //     variations: JSON.stringify(variationsFormatted), // Variations formatted as array of arrays
-  //     cost_price: formData.cost_price,
-  //     selling_price: formData.selling_price,
-  //     discount_price: formData.discount_price,
-  //     wholesale_price: formData.wholesale_price,
-  //     retail_price: formData.retail_price,
-  //     token_price: formData.token_price,
-  //     outlet: formData.outlet, // Use the ID here, not the outlet_name
-  //     category: selectedCategory,
-  //     sub_category: selectedsubCategory,
-  //     brand: selectedBrand, // This will send the brand id as "3", "4", etc.
-  //   }
-  //   // try {
-  //   //   const response = await axios.post(
-  //   //     'http://195.26.253.123/pos/products/add_temp_product',
-  //   //     newProduct,
-  //   //   )
-  //   //   if (response.status === 200 || response.status === 201) {
-  //   //     alert('Product added successfully!')
-  //   //     fetchProductList()
-  //   //     resetForm()
-  //   //   } else {
-  //   //     alert('Failed to add the product. Please try again.')
-  //   //   }
-  //   // } catch (error) {
-  //   //   console.error('Error adding product:', error)
-  //   //   alert('An error occurred while adding the product.')
-  //   // }
-
-  //   const response = await Network.post(Urls.addProduct, newProduct)
-  //   if (!response.ok) return console.log(response.data.error)
-  //   alert('Product added successfully!')
-  //   fetchProductList()
-  //   resetForm()
-  // }
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -796,105 +592,6 @@ const AddProduct = () => {
     resetForm()
   }
 
-  // const handleAdd = async (e) => {
-  //   e.preventDefault()
-
-  //   // Create a new FormData instance
-  //   const formDataPayload = new FormData()
-
-  //   // Manually format color as a string (e.g., "[ 'Baby pink' ]")
-  //   const colorString = `[ '${formData.color.join("', '")}' ]`
-
-  //   // Format variations
-  //   const variationsFormatted = Object.keys(selectedVariations).map((attribute) => {
-  //     return selectedVariations[attribute] // Wrap each selection in an array
-  //   })
-
-  //   // Append all fields to FormData
-  //   formDataPayload.append('product_name', formData.product_name)
-  //   formDataPayload.append('sku', formData.sku)
-  //   formDataPayload.append('season', formData.season)
-  //   formDataPayload.append('description', formData.description)
-  //   formDataPayload.append('notes', formData.notes)
-  //   formDataPayload.append('color', colorString) // color as a string
-  //   formDataPayload.append('attribute', JSON.stringify(formData.attribute)) // Convert attributes to JSON string
-  //   formDataPayload.append('variations', JSON.stringify(variationsFormatted)) // Convert variations to JSON string
-  //   formDataPayload.append('cost_price', formData.cost_price)
-  //   formDataPayload.append('selling_price', formData.selling_price)
-  //   formDataPayload.append('discount_price', formData.discount_price)
-  //   formDataPayload.append('wholesale_price', formData.wholesale_price)
-  //   formDataPayload.append('retail_price', formData.retail_price)
-  //   formDataPayload.append('token_price', formData.token_price)
-  //   formDataPayload.append('outlet', formData.outlet) // Use outlet ID
-  //   formDataPayload.append('category', selectedCategory)
-  //   formDataPayload.append('sub_category', selectedsubCategory)
-  //   formDataPayload.append('brand', selectedBrand)
-
-  //   // Append image if available
-  //   if (formData.image) {
-  //     formDataPayload.append('image', formData.image)
-  //   }
-  //   console.log(formData.image) // Check if the image is selected
-
-  //   try {
-  //     const response = await Network.post(
-  //       `${Urls.addProduct}`, // Replace with your URL configuration
-  //       formDataPayload,
-  //       {
-  //         headers: { 'Content-Type': 'multipart/form-data' }, // Ensure multipart headers
-  //       },
-  //     )
-
-  //     if (response.status === 200 || response.status === 201) {
-  //       toast.success('Product added successfully!')
-  //       fetchProductList()
-  //       resetForm()
-  //     } else {
-  //       alert('Failed to add the product. Please try again.')
-  //     }
-  //   } catch (error) {
-  //     console.error('Error adding product:', error)
-
-  //     // Check if the error contains response data
-  //     if (error.response && error.response.data) {
-  //       // Handle specific field errors
-  //       Object.keys(error.response.data).forEach((key) => {
-  //         const errorMessages = error.response.data[key]
-  //         if (Array.isArray(errorMessages)) {
-  //           errorMessages.forEach((message) => {
-  //             toast.error(`${key}: ${message}`)
-  //           })
-  //         } else {
-  //           toast.error(`${key}: ${errorMessages}`)
-  //         }
-  //       })
-  //     } else {
-  //       // Handle general errors
-  //       toast.error('An error occurred while adding the product.')
-  //     }
-  //   }
-
-  //   fetchProductList()
-  //   resetForm()
-  // }
-
-  // const handleDelete = async (id) => {
-  //   try {
-  //     const response = await axios.delete(
-  //       `http://195.26.253.123/pos/products/action_temp_product/${id}/`,
-  //     )
-  //     if (response.status === 200 || response.status === 204) {
-  //       setProductList((prevList) => prevList.filter((product) => product.id !== id))
-  //       toast.success('Product deleted successfully!')
-  //     } else {
-  //       console.error('Failed to delete the product')
-  //     }
-  //   } catch (error) {
-  //     console.error('Error deleting product:', error)
-  //     toast.error('Failed to delete the product. Please try again.')
-  //   }
-  // }
-
   const handleDelete = async (id) => {
     try {
       const response = await Network.delete(`${Urls.actionTempProduct}/${id}/`) // Updated to use Network.delete
@@ -930,23 +627,6 @@ const AddProduct = () => {
     setEditMode(false)
     setEditProductId(null)
   }
-
-  // const handlePublish = async () => {
-  //   console.log('Publishing with data:', formData)
-
-  //   try {
-  //     const response = await axios.post('http://195.26.253.123/pos/products/add_product')
-  //     if (response.status === 201 || response.status === 200) {
-  //       toast.success('Product published successfully!')
-  //       history.push('/Product/AllProducts')
-  //     } else {
-  //       toast.error('Failed to publish the product. Please try again.')
-  //     }
-  //   } catch (error) {
-  //     console.error('Error publishing product:', error)
-  //   }
-  //   fetchProductList()
-  // }
 
   const handlePublish = async () => {
     console.log('Publishing with data:', formData)
@@ -1068,7 +748,7 @@ const AddProduct = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                 <label style={{ flex: 1, fontWeight: 'bold' }}>
                   Outlet Name:
-                  <select
+                  {/* <select
                     name="outlet"
                     value={formData.outlet}
                     onChange={handleChange}
@@ -1087,7 +767,37 @@ const AddProduct = () => {
                     ) : (
                       <option disabled>Loading outlets...</option>
                     )}
-                  </select>
+                  </select> */}
+                  <Select
+                    options={
+                      Array.isArray(outlets) && outlets.length > 0
+                        ? outlets.map((outlet) => ({
+                            value: outlet.id,
+                            label: outlet.outlet_name,
+                          }))
+                        : []
+                    } // Map options to value-label pairs
+                    value={
+                      formData.outlet
+                        ? {
+                            value: formData.outlet,
+                            label: outlets.find((o) => o.id === formData.outlet)?.outlet_name,
+                          }
+                        : null
+                    } // Set the selected value
+                    onChange={(selectedOption) => {
+                      handleChange({ target: { name: 'outlet', value: selectedOption?.value } })
+                    }} // Update formData using handleChange
+                    isClearable
+                    placeholder={
+                      Array.isArray(outlets) && outlets.length > 0
+                        ? 'Select Outlet'
+                        : 'Loading outlets...' // Show "Loading outlets..." when data is unavailable
+                    }
+                    styles={{
+                      container: (base) => ({ ...base, width: '100%' }), // Full width
+                    }}
+                  />
                 </label>
 
                 <Link to="/Admin/AddOutlet">
@@ -1382,10 +1092,7 @@ const AddProduct = () => {
                     <th>Color</th>
                     <th>Cost</th>
                     <th>Selling</th>
-                    {/* <th>Discount</th> */}
-                    {/* <th>Wholesale</th> */}
-                    {/* <th>Retail</th> */}
-                    {/* <th>Token</th> */}
+
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -1397,18 +1104,8 @@ const AddProduct = () => {
                       <td>{product.color || '-'}</td>
                       <td>{product.cost_price}</td>
                       <td>{product.selling_price}</td>
-                      {/* <td>{product.discount_price}</td> */}
-                      {/* <td>{product.wholesale_price}</td> */}
-                      {/* <td>{product.retail_price}</td> */}
-                      {/* <td>{product.token_price}</td> */}
+
                       <td>
-                        {/* <button
-                          onClick={() => handleEdit(product.id)}
-                          style={{ marginRight: '8px' }}
-                        >
-                          {' '}
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button> */}
                         <button
                           onClick={() => handleDelete(product.id)}
                           style={{ marginRight: '8px' }}

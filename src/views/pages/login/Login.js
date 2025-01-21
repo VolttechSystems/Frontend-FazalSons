@@ -40,11 +40,12 @@ const Login = () => {
 
     if (!response.ok) return setError(response.data.error)
 
-    const { token, System_role, outlet, username: loggedInUsername, shop } = response.data
+    const { token, System_role, outlet, username: loggedInUsername, shop, shop_id } = response.data
 
     localStorage.setItem('authToken', token)
     localStorage.setItem('username', loggedInUsername) // Store the logged-in username
     localStorage.setItem('shop', shop) // Store the shop name in localStorage
+    localStorage.setItem('shop_id', shop_id) // Store the shop id in localStorage
     const sysRoles = JSON.stringify(System_role || [])
     const outlet_user = JSON.stringify(outlet || [])
 

@@ -276,6 +276,7 @@ function ShopUser() {
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Username</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Email</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Phone Number</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Shop</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Is Active</th>
             <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
               Actions
@@ -289,9 +290,11 @@ function ShopUser() {
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.username}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.email}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.phone_number}</td>
+                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.shop}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                   {user.is_active ? 'Yes' : 'No'}
                 </td>
+
                 <td style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
                   {/* Delete button */}
                   <button

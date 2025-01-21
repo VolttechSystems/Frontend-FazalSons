@@ -18,15 +18,25 @@ const AddOutlet = () => {
   const [outlets, setOutlets] = useState([])
   const [editingOutletId, setEditingOutlet] = useState(null)
 
+  // Get shop_id from local storage
+  const shopId = localStorage.getItem('shop_id')
+
   useEffect(() => {
-    // Fetch existing outlets when the component mounts
     fetchOutlets()
   }, [])
 
   const fetchOutlets = async () => {
-    const response = await Network.get(Urls.addOutlets)
-    if (!response.ok) return consoe.log(response.data.error)
-    setOutlets(response.data) // Adjust based on the response structure
+    try {
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.addOutlets}/${shopId}/`)
+      if (response.status === 200) {
+        setOutlets(response.data)
+      } else {
+        console.error('Failed to fetch outlets:', response.data.error)
+      }
+    } catch (error) {
+      console.error('Error fetching outlets:', error)
+    }
   }
 
   const handleChange = (e) => {
@@ -38,21 +48,22 @@ const AddOutlet = () => {
     e.preventDefault()
 
     try {
+      const payload = {
+        ...formData,
+        shop: parseInt(localStorage.getItem('shop_id')), // Add shop_id to the payload
+      }
+
       if (editingOutletId) {
         // Update existing outlet
-        await Network.put(
-          `${Urls.actionOutlet}/${editingOutletId}/`, // Assuming `Urls.actionOutlet` is the base URL for action_outlet
-          formData,
-        )
+        await Network.put(`${Urls.actionOutlet}/${editingOutletId}/`, payload)
         setEditingOutlet(null)
       } else {
         // Add new outlet
-        await Network.post(Urls.addOutlets, formData) // Assuming `Urls.addOutlet` is the base URL for add_outlet
+        await Network.post(`${Urls.addOutlets}/${payload.shop}/`, payload) // Use shop_id in the URL as well
       }
 
-      // Fetch updated outlets list from the backend
-      toast.success('Outlet added successfully!') // Success toast for user feedback
-      fetchOutlets() // Refetch the updated outlets
+      toast.success('Outlet saved successfully!')
+      fetchOutlets()
       setFormData({
         outlet_code: '',
         outlet_name: '',
@@ -62,15 +73,11 @@ const AddOutlet = () => {
         contact_number: '',
       })
     } catch (error) {
-      if (error.response && error.response.data) {
-        // If there's a specific error message from the backend
-        if (error.response.data.outlet_name) {
-          toast.error(error.response.data.outlet_name[0]) // Show the specific error message
-        } else {
-          toast.error('Failed to add outlet. Please try again.')
-        }
+      console.error('Error saving outlet:', error)
+      if (error.response?.data) {
+        toast.error(error.response.data.message || 'Failed to save outlet.')
       } else {
-        toast.error('An error occurred while adding outlet.')
+        toast.error('An unexpected error occurred.')
       }
     }
   }
@@ -81,11 +88,14 @@ const AddOutlet = () => {
   }
 
   const handleDelete = async (id) => {
-    const response = await Network.delete(`${Urls.actionOutlet}/${id}/`)
-    if (!response.ok) return console.log(response.data.error)
-
-    toast.success('Outlet deleted successfully!')
-    fetchOutlets()
+    try {
+      await Network.delete(`${Urls.actionOutlet}/${id}/`)
+      toast.success('Outlet deleted successfully!')
+      fetchOutlets()
+    } catch (error) {
+      console.error('Error deleting outlet:', error)
+      toast.error('Failed to delete outlet.')
+    }
   }
 
   return (
@@ -172,7 +182,6 @@ const AddOutlet = () => {
         </button>
       </form>
 
-      {/* Outlet Table */}
       {outlets.length > 0 && (
         <table className="outlet-table">
           <thead className="outlet-table-header">
