@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Network, Urls } from '../../../api-config'
+import { Autocomplete, TextField } from '@mui/material'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 function ShopUser() {
   const [formData, setFormData] = useState({
@@ -27,6 +30,7 @@ function ShopUser() {
       }
     } catch (error) {
       console.error('Error fetching shops:', error)
+      toast.error('Failed to fetch shops.')
     }
   }
 
@@ -39,6 +43,7 @@ function ShopUser() {
       }
     } catch (error) {
       console.error('Error fetching users:', error)
+      toast.error('Failed to fetch users.')
     }
   }
 
@@ -63,7 +68,6 @@ function ShopUser() {
     try {
       const response = await Network.post(Urls.addShopUser, formData)
       if (response.status === 201) {
-        setMessage('Shop user added successfully!')
         setFormData({
           username: '',
           password: '',
@@ -80,12 +84,16 @@ function ShopUser() {
 
         // Option 2: Add new user directly (if API response includes the new user data)
         // setUsers((prevUsers) => [...prevUsers, response.data]);
+
+        toast.success('Shop user added successfully!')
       } else {
         setMessage('Failed to add shop user. Please try again.')
+        toast.error('Failed to add shop user.')
       }
     } catch (error) {
       console.error('Error submitting data:', error)
       setMessage('Error submitting data. Please check your inputs.')
+      toast.error('Error submitting data. Please check your inputs.')
     } finally {
       setLoading(false)
     }
@@ -94,6 +102,18 @@ function ShopUser() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1 style={{ color: '#333', textAlign: 'center' }}>Create Shop User</h1>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
 
       <div
         style={{
@@ -151,33 +171,37 @@ function ShopUser() {
           <option value="false">False</option>
         </select>
 
-        {/* Shop dropdown */}
+        {/* Shop dropdown using Autocomplete */}
         <label style={{ display: 'block', marginBottom: '5px' }}>Shop:</label>
-        <select
+        <Autocomplete
           name="shop"
-          value={formData.shop}
-          onChange={handleChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
+          value={shops.find((shop) => shop.id === formData.shop) || null}
+          onChange={(event, newValue) => {
+            handleChange({
+              target: { name: 'shop', value: newValue ? newValue.id : '' },
+            })
           }}
-        >
-          <option value="" disabled>
-            Select a shop
-          </option>
-          {shops.length > 0 ? (
-            shops.map((shop) => (
-              <option key={shop.id} value={shop.id}>
-                {shop.name}
-              </option>
-            ))
-          ) : (
-            <option value="">Loading...</option>
+          options={shops}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              fullWidth
+              style={{
+                backgroundColor: 'white', // White background
+                width: '100%',
+                padding: '8px',
+                marginBottom: '20px', // Increased space below the field
+              }}
+              InputProps={{
+                ...params.InputProps,
+                disableUnderline: true, // Disable the underline that can cause double borders
+              }}
+            />
           )}
-        </select>
+          disableClearable
+        />
 
         {/* Submit button */}
         <button
@@ -200,7 +224,6 @@ function ShopUser() {
         {message && <p style={{ marginTop: '10px', color: 'blue' }}>{message}</p>}
       </div>
 
-      {/* User Table */}
       {/* User Table */}
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
         <thead style={{ backgroundColor: '#007bff', color: 'white' }}>

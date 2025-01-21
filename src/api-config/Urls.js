@@ -131,4 +131,5 @@ export default {
   //shops
   addShops: 'admin/add_shop',
   addShopUser: 'admin/shop-admin-user',
+  actionShops: 'admin/action_shop',
 }

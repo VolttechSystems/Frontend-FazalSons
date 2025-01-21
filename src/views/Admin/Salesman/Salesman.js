@@ -426,16 +426,45 @@ const Salesman = () => {
             placeholder="Select outlets"
           />
         </div> */}
-          <Autocomplete
-            multiple
-            name="outlet"
-            options={outlets} // Make sure the options are the full outlet objects
-            value={formData.outlet} // Ensure this is an array of selected outlet objects
-            onChange={handleOutletChange} // Handle change
-            renderInput={(params) => <TextField {...params} label="Select Outlet" />}
-            isOptionEqualToValue={(option, value) => option.id === value.id} // Compare based on id
-          />
         </div>
+        <label style={{ display: 'block', marginBottom: '5px' }}>Outlet:</label>
+        <Autocomplete
+          multiple
+          name="outlet"
+          options={outlets} // Ensure options are full outlet objects
+          value={formData.outlet} // Ensure this is an array of selected outlet objects
+          onChange={handleOutletChange} // Handle change
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              fullWidth
+              style={{
+                backgroundColor: 'white',
+                marginBottom: '20px', // Space below the field
+              }}
+              InputProps={{
+                ...params.InputProps,
+                style: {
+                  border: 'none', // Ensure no border
+                  boxShadow: 'none', // Remove shadow
+                  outline: 'none', // Remove outline
+                  padding: '0', // Remove padding
+                },
+                disableUnderline: true, // Disable underline
+              }}
+              sx={{
+                '& .MuiInputBase-root': {
+                  border: 'none !important', // Remove any border applied by MUI
+                  boxShadow: 'none !important', // Remove shadow
+                  outline: 'none !important', // Remove outline
+                  padding: '0 !important', // Ensure no extra space
+                },
+              }}
+            />
+          )}
+          isOptionEqualToValue={(option, value) => option.id === value.id} // Compare by id
+        />
+
         <button type="submit" className="salesman-submit-btn">
           {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
         </button>
