@@ -216,7 +216,11 @@ import React, { useState, useEffect } from 'react'
 import Select from 'react-select' // Import react-select
 import axios from 'axios'
 import './Salesman.css'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { Network, Urls } from '../../../api-config'
+import Autocomplete from '@mui/material/Autocomplete'
+import TextField from '@mui/material/TextField'
 
 const Salesman = () => {
   const [formData, setFormData] = useState({
@@ -248,22 +252,6 @@ const Salesman = () => {
     }
   }
 
-  // Fetch outlets
-  // Fetch outlets
-  // const fetchOutlets = async () => {
-  //   try {
-  //     const response = await axios.get('http://195.26.253.123/pos/products/add_outlet')
-  //     const outletOptions = response.data.map((outlet) => ({
-  //       value: outlet.id,
-  //       label: outlet.outlet_name,
-  //       outlet_code: outlet.outlet_code, // Include outlet_code here
-  //     }))
-  //     setOutlets(outletOptions)
-  //   } catch (error) {
-  //     console.error('Error fetching outlets:', error)
-  //   }
-  // }
-
   const fetchOutlets = async () => {
     const response = await Network.get(Urls.addOutlets) // Use Network.get with the appropriate URL
     if (!response.ok) return console.log(response.data.error) // Log error if the response is not successful
@@ -277,49 +265,15 @@ const Salesman = () => {
   }
 
   // Handle multi-select change for outlets
-  const handleOutletChange = (selectedOptions) => {
-    const selectedOutlets = selectedOptions ? selectedOptions : []
-    setFormData({ ...formData, outlet: selectedOutlets }) // Save full outlet objects in the state
+  const handleOutletChange = (event, selectedOptions) => {
+    const selectedOutlets = selectedOptions ? selectedOptions : [] // Handle cases where no option is selected
+    setFormData({ ...formData, outlet: selectedOutlets }) // Save the full outlet objects in the state
   }
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-
-  //   // Prepare the selected outlets to contain only their IDs (values)
-  //   const selectedOutlets = formData.outlet.map((outlet) => outlet.value) // Only outlet IDs
-
-  //   const dataToSend = {
-  //     CheckBoxValue: showCommissions ? 'true' : 'false',
-  //     salesman_name: formData.salesman_name,
-  //     wholesale_commission: !showCommissions ? String(formData.wholesale_commission) : '',
-  //     retail_commission: !showCommissions ? String(formData.retail_commission) : '',
-  //     token_commission: !showCommissions ? String(formData.token_commission) : '',
-  //     outlet: selectedOutlets, // Send outlet IDs only
-  //   }
-
-  //   console.log('Selected Outlets:', selectedOutlets)
-  //   console.log('Data to Send:', dataToSend)
-
-  //   try {
-  //     if (editingSalesmanId) {
-  //       await axios.put(
-  //         `http://195.26.253.123/pos/transaction/action_salesman/${editingSalesmanId}/`,
-  //         dataToSend,
-  //       )
-  //     } else {
-  //       await axios.post('http://195.26.253.123/pos/transaction/add_salesman', dataToSend)
-  //     }
-  //     fetchSalesmen() // Refresh the list
-  //     resetForm()
-  //   } catch (error) {
-  //     console.error('Error submitting data:', error)
-  //   }
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -343,7 +297,7 @@ const Salesman = () => {
       const response = editingSalesmanId
         ? await Network.put(`${Urls.updateSalesman}/${editingSalesmanId}/`, dataToSend)
         : await Network.post(Urls.addSalesman, dataToSend)
-
+      toast.success('Salesman added successfully!')
       if (!response.ok) return console.log('Error submitting data:', response.data.error)
 
       fetchSalesmen() // Refresh the list
@@ -383,17 +337,9 @@ const Salesman = () => {
     setShowCommissions(true)
   }
 
-  // const handleDelete = async (id) => {
-  //   try {
-  //     await axios.delete(`http://195.26.253.123/pos/transaction/action_salesman/${id}/`)
-  //     setSalesmen(salesmen.filter((salesman) => salesman.id !== id))
-  //   } catch (error) {
-  //     console.error('Error deleting salesman:', error)
-  //   }
-  // }
-
   const handleDelete = async (id) => {
     const response = await Network.delete(`${Urls.updateSalesman}/${id}/`)
+    toast.success('Salesman deleted successfully!')
     if (!response.ok) return console.log('Error deleting salesman:', response.data.error)
 
     setSalesmen((prevSalesmen) => prevSalesmen.filter((salesman) => salesman.id !== id))
@@ -403,6 +349,18 @@ const Salesman = () => {
     <div className="container">
       <form onSubmit={handleSubmit}>
         <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
 
         <div>
           <label>Salesman Name: *</label>
@@ -457,7 +415,7 @@ const Salesman = () => {
         )}
 
         <div>
-          <label>Outlet:</label>
+          {/* <label>Outlet:</label>
 
           <Select
             isMulti
@@ -467,8 +425,17 @@ const Salesman = () => {
             value={formData.outlet} // formData.outlet should be an array of full outlet objects
             placeholder="Select outlets"
           />
+        </div> */}
+          <Autocomplete
+            multiple
+            name="outlet"
+            options={outlets} // Make sure the options are the full outlet objects
+            value={formData.outlet} // Ensure this is an array of selected outlet objects
+            onChange={handleOutletChange} // Handle change
+            renderInput={(params) => <TextField {...params} label="Select Outlet" />}
+            isOptionEqualToValue={(option, value) => option.id === value.id} // Compare based on id
+          />
         </div>
-
         <button type="submit" className="salesman-submit-btn">
           {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
         </button>

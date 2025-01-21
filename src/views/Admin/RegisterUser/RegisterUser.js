@@ -376,6 +376,20 @@ function RegisterUser() {
             value={formData.outlet} // formData.outlet should be an array of full outlet objects
             placeholder="Select outlets"
           />
+
+          {/* <Autocomplete
+            multiple
+            name="outlet"
+            options={outlets.map((outlet) => ({
+              value: outlet.id,
+              label: outlet.outlet_name,
+              outlet_code: outlet.outlet_code, // Include other outlet data if needed
+            }))}
+            onChange={handleOutletChange}
+            value={formData.outlet} // formData.outlet should be an array of full outlet objects
+            renderInput={(params) => <TextField {...params} label="Select Outlet" />}
+            isOptionEqualToValue={(option, value) => option.id === value.id} // Compare based on id
+          /> */}
         </div>
 
         <button className="addUser-button1" type="submit">

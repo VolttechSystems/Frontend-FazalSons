@@ -67,6 +67,12 @@ const _nav = [
         to: '/SuperAdmin/Shops',
         key: 'SuperAdmin',
       },
+      {
+        component: CNavItem,
+        name: 'Shop User',
+        to: '/SuperAdmin/ShopUser',
+        key: 'SuperAdmin',
+      },
     ],
   },
   {

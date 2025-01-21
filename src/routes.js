@@ -67,6 +67,7 @@ const Payment = React.lazy(() => import('./views/Admin/Payment/Payment'))
 
 //SuperAdmin
 const Shops = React.lazy(() => import('./views/SuperAdmin/Shops/Shops'))
+const ShopUser = React.lazy(() => import('./views/SuperAdmin/ShopUser/ShopUser'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -257,6 +258,13 @@ const routes = [
     element: 'Shops',
     element: (props) => <AuthGuard element={Shops} requiredPermission="SuperAdmin" {...props} />,
   }, // Shops
+
+  {
+    path: '/SuperAdmin/ShopUser',
+    name: 'ShopUser',
+    element: 'ShopUser',
+    element: (props) => <AuthGuard element={ShopUser} requiredPermission="SuperAdmin" {...props} />,
+  }, // ShopUser
   {
     path: '/Admin/RegisterUser',
     name: 'RegisterUser',
