@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -26,6 +26,7 @@ const AppSidebar = () => {
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
   const { systemRoles } = useAuth()
+  const [shopName, setShopName] = useState('')
   // const { useroutlets } = useAuth()
   // console.log({ systemRoles })
   // console.log({ useroutlets })
@@ -47,6 +48,13 @@ const AppSidebar = () => {
     return filterNavItems(navigation)
   }, [systemRoles])
 
+  useEffect(() => {
+    const storedShop = localStorage.getItem('shop')
+    if (storedShop) {
+      setShopName(storedShop)
+    }
+  }, [])
+
   return (
     <CSidebar
       className="border-end"
@@ -58,19 +66,6 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
-      {/* <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/">
-          <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
-          <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
-        </CSidebarBrand>
-        <CCloseButton
-          className="d-lg-none"
-          dark
-          onClick={() => dispatch({ type: 'set', sidebarShow: false })}
-        />
-      
-    </CSidebarHeader> */}
-
       <CSidebarHeader className="border-bottom">
         <CSidebarHeader className="border-bottom">
           <CSidebarBrand to="/" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
@@ -85,7 +80,7 @@ const AppSidebar = () => {
                 textDecoration: 'none !important', // Remove underline
               }}
             >
-              Fazal Sons
+              {shopName || 'Fazal Sons'} {/* Display the dynamic shop name or fallback */}
             </span>
             <span
               className="sidebar-brand-narrow"
@@ -98,7 +93,7 @@ const AppSidebar = () => {
                 textDecoration: 'none !important', // Remove underline
               }}
             >
-              FS
+              {shopName ? shopName.substring(0, 2).toUpperCase() : 'FS'} {/* Narrow display */}
             </span>
           </CSidebarBrand>
         </CSidebarHeader>

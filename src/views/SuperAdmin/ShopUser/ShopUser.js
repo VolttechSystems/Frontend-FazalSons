@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 function ShopUser() {
+  // State to manage form data
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -16,21 +17,23 @@ function ShopUser() {
     shop: '',
   })
 
+  // State to manage shop list, user list, loading state, and messages
   const [shops, setShops] = useState([])
-  const [users, setUsers] = useState([]) // Holds the user data
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false) // Toggle password visibility
 
   // Fetch shops from the API
   const fetchShops = async () => {
     try {
       const response = await Network.get(Urls.addShops)
       if (response && response.data) {
-        setShops(response.data.results || [])
+        setShops(response.data.results || []) // Populate shops data
       }
     } catch (error) {
       console.error('Error fetching shops:', error)
-      toast.error('Failed to fetch shops.')
+      toast.error('Failed to fetch shops.') // Show error notification
     }
   }
 
@@ -39,14 +42,15 @@ function ShopUser() {
     try {
       const response = await Network.get(Urls.addShopUser)
       if (response && response.data) {
-        setUsers(response.data || []) // Assuming the data is an array
+        setUsers(response.data || []) // Populate users data
       }
     } catch (error) {
       console.error('Error fetching users:', error)
-      toast.error('Failed to fetch users.')
+      toast.error('Failed to fetch users.') // Show error notification
     }
   }
 
+  // Fetch data on component mount
   useEffect(() => {
     fetchShops()
     fetchUsers()
@@ -57,14 +61,14 @@ function ShopUser() {
     const { name, value } = e.target
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: value, // Update form data dynamically based on input name
     }))
   }
 
   // Submit form data to the API
   const handleSubmit = async () => {
-    setLoading(true)
-    setMessage('')
+    setLoading(true) // Start loading state
+    setMessage('') // Reset any previous messages
     try {
       const response = await Network.post(Urls.addShopUser, formData)
       if (response.status === 201) {
@@ -77,25 +81,37 @@ function ShopUser() {
           email: '',
           is_active: '',
           shop: '',
-        })
-
-        // Option 1: Fetch updated users from the API
-        fetchUsers()
-
-        // Option 2: Add new user directly (if API response includes the new user data)
-        // setUsers((prevUsers) => [...prevUsers, response.data]);
-
-        toast.success('Shop user added successfully!')
+        }) // Reset form fields
+        fetchUsers() // Refresh user list
+        toast.success('Shop user added successfully!') // Show success notification
       } else {
-        setMessage('Failed to add shop user. Please try again.')
-        toast.error('Failed to add shop user.')
+        setMessage('Failed to add shop user. Please try again.') // Show error message
+        toast.error('Failed to add shop user.') // Show error notification
       }
     } catch (error) {
       console.error('Error submitting data:', error)
-      setMessage('Error submitting data. Please check your inputs.')
-      toast.error('Error submitting data. Please check your inputs.')
+      setMessage('Error submitting data. Please check your inputs.') // Update error message
+      toast.error('Error submitting data. Please check your inputs.') // Show error notification
     } finally {
-      setLoading(false)
+      setLoading(false) // Stop loading state
+    }
+  }
+
+  // Handle delete user
+  const handleDelete = async (userId) => {
+    try {
+      const response = await Network.delete(
+        `http://195.26.253.123/pos/accounts/delete_user/${userId}`,
+      )
+      if (response.status === 204) {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)) // Remove user from list
+        toast.success('User deleted successfully!') // Show success notification
+      } else {
+        toast.error('Failed to delete user.') // Show error notification
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      toast.error('Error deleting user.') // Show error notification
     }
   }
 
@@ -115,6 +131,7 @@ function ShopUser() {
         theme="colored"
       />
 
+      {/* Form Section */}
       <div
         style={{
           marginBottom: '20px',
@@ -123,10 +140,8 @@ function ShopUser() {
           borderRadius: '5px',
         }}
       >
-        {/* Input fields */}
         {[
           { label: 'Username', name: 'username', type: 'text' },
-          { label: 'Password', name: 'password', type: 'password' },
           { label: 'Phone Number', name: 'phone_number', type: 'text' },
           { label: 'First Name', name: 'first_name', type: 'text' },
           { label: 'Last Name', name: 'last_name', type: 'text' },
@@ -150,7 +165,39 @@ function ShopUser() {
           </div>
         ))}
 
-        {/* Is Active dropdown */}
+        {/* Password Input Section */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }}
+            />
+            {/* Toggle password visibility */}
+            <i
+              onClick={() => setShowPassword(!showPassword)}
+              className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                cursor: 'pointer',
+              }}
+            ></i>
+          </div>
+        </div>
+
+        {/* Dropdown for is_active */}
         <label style={{ display: 'block', marginBottom: '5px' }}>Is Active:</label>
         <select
           name="is_active"
@@ -171,7 +218,7 @@ function ShopUser() {
           <option value="false">False</option>
         </select>
 
-        {/* Shop dropdown using Autocomplete */}
+        {/* Shop selection using Autocomplete */}
         <label style={{ display: 'block', marginBottom: '5px' }}>Shop:</label>
         <Autocomplete
           name="shop"
@@ -189,21 +236,21 @@ function ShopUser() {
               {...params}
               fullWidth
               style={{
-                backgroundColor: 'white', // White background
+                backgroundColor: 'white',
                 width: '100%',
                 padding: '8px',
-                marginBottom: '20px', // Increased space below the field
+                marginBottom: '20px',
               }}
               InputProps={{
                 ...params.InputProps,
-                disableUnderline: true, // Disable the underline that can cause double borders
+                disableUnderline: true,
               }}
             />
           )}
           disableClearable
         />
 
-        {/* Submit button */}
+        {/* Submit Button */}
         <button
           type="button"
           onClick={handleSubmit}
@@ -219,8 +266,6 @@ function ShopUser() {
         >
           {loading ? 'Submitting...' : 'Add User'}
         </button>
-
-        {/* Message */}
         {message && <p style={{ marginTop: '10px', color: 'blue' }}>{message}</p>}
       </div>
 
@@ -232,6 +277,9 @@ function ShopUser() {
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Email</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Phone Number</th>
             <th style={{ border: '1px solid #ccc', padding: '8px' }}>Is Active</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -243,6 +291,22 @@ function ShopUser() {
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.phone_number}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                   {user.is_active ? 'Yes' : 'No'}
+                </td>
+                <td style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                  {/* Delete button */}
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    style={{
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      padding: '5px 10px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import './login.css'
+
 import {
   CButton,
   CCard,
@@ -40,10 +40,11 @@ const Login = () => {
 
     if (!response.ok) return setError(response.data.error)
 
-    const { token, System_role, outlet, username: loggedInUsername } = response.data
+    const { token, System_role, outlet, username: loggedInUsername, shop } = response.data
 
     localStorage.setItem('authToken', token)
     localStorage.setItem('username', loggedInUsername) // Store the logged-in username
+    localStorage.setItem('shop', shop) // Store the shop name in localStorage
     const sysRoles = JSON.stringify(System_role || [])
     const outlet_user = JSON.stringify(outlet || [])
 
