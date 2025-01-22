@@ -158,7 +158,8 @@ const PaymentReport = () => {
   }, [])
 
   const fetchOutlets = async () => {
-    const response = await Network.get(Urls.fetchAllOutlets)
+    const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
+    const response = await Network.get(`${Urls.addOutlets}/${shopId}/`)
 
     if (!response.ok) {
       return console.error('Failed to fetch outlets:', response.data.error)

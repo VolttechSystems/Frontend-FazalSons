@@ -230,10 +230,27 @@ const AddProduct = () => {
 
   useEffect(() => {
     const fetchBrands = async () => {
-      const response = await Network.get(Urls.addBrand)
-      if (!response.ok) return consoe.log(response.data.error)
-      const brandsData = response.data.results || []
-      setBrands(Array.isArray(brandsData) ? brandsData : [])
+      try {
+        const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
+
+        if (!shopId) {
+          console.error('Shop ID is missing. Please log in again.')
+          return
+        }
+
+        // Include shop_id in the API request URL
+        const response = await Network.get(`${Urls.addBrand}/${shopId}/`)
+
+        if (!response.ok) {
+          console.error('Failed to fetch brands:', response.data?.error || 'Unknown error')
+          return
+        }
+
+        const brandsData = response.data.results || []
+        setBrands(Array.isArray(brandsData) ? brandsData : [])
+      } catch (error) {
+        console.error('Error fetching brands:', error)
+      }
     }
 
     fetchBrands()
@@ -451,22 +468,35 @@ const AddProduct = () => {
 
   // Fetch outlets data from the API
   const fetchOutlets = async () => {
-    const response = await Network.get(Urls.fetchAllOutlets)
+    try {
+      const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
 
-    if (!response.ok) {
-      return console.error('Failed to fetch outlets:', response.data.error)
+      if (!shopId) {
+        console.error('Shop ID is missing. Please log in again.')
+        return
+      }
+
+      // Use the shop_id in the API endpoint
+      const response = await Network.get(`${Urls.fetchAllOutlets}${shopId}/`)
+
+      if (!response.ok) {
+        console.error('Failed to fetch outlets:', response.data?.error || 'Unknown error')
+        return
+      }
+
+      const outlets = response.data
+        .map((outlet) => {
+          if (userOutlets.some((o) => o.id === outlet.id)) {
+            return outlet
+          }
+          return null
+        })
+        .filter((outlet) => outlet !== null)
+
+      setOutlets(outlets) // Assuming the response data is an array of outlets
+    } catch (error) {
+      console.error('Error fetching outlets:', error)
     }
-
-    const outlets = response.data
-      .map((outlet) => {
-        if (userOutlets.some((o) => o.id === outlet.id)) {
-          return outlet
-        }
-        return null
-      })
-      .filter((outlet) => outlet !== null)
-
-    setOutlets(outlets) // Assuming the response data is an array of outlets
   }
 
   const handleMultiSelectChange = (selectedOptions, name) => {
@@ -820,10 +850,7 @@ const AddProduct = () => {
 
               {/* Head Category Dropdown */}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-                <label style={{ flex: 1, fontWeight: 'bold' }}>
-                  Head Category *
-                  <select
+              {/* <select
                     onChange={handleHeadCategoryChange}
                     style={{ width: '100%', padding: '8px' }} // Full width for dropdown
                   >
@@ -831,9 +858,36 @@ const AddProduct = () => {
                     {headCategories.map((headCategory) => (
                       <option key={headCategory.id} value={headCategory.id}>
                         {headCategory.hc_name} {/* Display the name but pass the ID */}
-                      </option>
+              {/* </option>
                     ))}
-                  </select>
+                  </select>  */}
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+                <label style={{ flex: 1, fontWeight: 'bold' }}>
+                  Head Category *
+                  <Select
+                    options={headCategories.map((headCategory) => ({
+                      value: headCategory.id,
+                      label: headCategory.hc_name,
+                    }))} // Map headCategories to value-label pairs
+                    value={
+                      headCategories.find((hc) => hc.id === selectedHeadCategory)
+                        ? {
+                            value: selectedHeadCategory,
+                            label: headCategories.find((hc) => hc.id === selectedHeadCategory)
+                              ?.hc_name,
+                          }
+                        : null
+                    } // Set the selected value
+                    onChange={(selectedOption) =>
+                      handleHeadCategoryChange({ target: { value: selectedOption?.value } })
+                    } // Simulate native event for existing logic
+                    isClearable
+                    placeholder="Select Head Category"
+                    styles={{
+                      container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
+                    }}
+                  />
                 </label>
                 <Link to="/Product/AddHeadCategory">
                   <button style={{ height: '100%', padding: '8px' }}>+</button>{' '}
@@ -845,7 +899,7 @@ const AddProduct = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                 <label style={{ flex: 1, fontWeight: 'bold' }}>
                   Parent Category *
-                  <select
+                  {/* <select
                     value={selectedParentCategory}
                     onChange={handleParentCategoryChange}
                     disabled={!selectedHeadCategory}
@@ -858,7 +912,35 @@ const AddProduct = () => {
                           {parentCategory.pc_name}
                         </option>
                       ))}
-                  </select>
+                  </select> */}
+                  <Select
+                    options={
+                      Array.isArray(parentCategories)
+                        ? parentCategories.map((parentCategory) => ({
+                            value: parentCategory.id,
+                            label: parentCategory.pc_name,
+                          }))
+                        : []
+                    } // Map parentCategories to value-label pairs
+                    value={
+                      parentCategories.find((pc) => pc.id === selectedParentCategory)
+                        ? {
+                            value: selectedParentCategory,
+                            label: parentCategories.find((pc) => pc.id === selectedParentCategory)
+                              ?.pc_name,
+                          }
+                        : null
+                    } // Set the selected value
+                    onChange={(selectedOption) =>
+                      handleParentCategoryChange({ target: { value: selectedOption?.value } })
+                    } // Simulate native event for existing logic
+                    isClearable
+                    isDisabled={!selectedHeadCategory} // Disable if no head category is selected
+                    placeholder="Select Parent Category"
+                    styles={{
+                      container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
+                    }}
+                  />
                 </label>
                 <Link to="/Product/AddParentCategory">
                   <button style={{ height: '100%', padding: '8px' }}>+</button>
@@ -869,7 +951,7 @@ const AddProduct = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                 <label style={{ flex: 1, fontWeight: 'bold' }}>
                   Category *
-                  <select
+                  {/* <select
                     value={selectedCategory}
                     onChange={handleCategoryChange}
                     disabled={!selectedParentCategory}
@@ -882,7 +964,35 @@ const AddProduct = () => {
                           {category.category_name}
                         </option>
                       ))}
-                  </select>
+                  </select> */}
+                  <Select
+                    options={
+                      Array.isArray(categories)
+                        ? categories.map((category) => ({
+                            value: category.id,
+                            label: category.category_name,
+                          }))
+                        : []
+                    } // Map categories to value-label pairs
+                    value={
+                      categories.find((cat) => cat.id === selectedCategory)
+                        ? {
+                            value: selectedCategory,
+                            label: categories.find((cat) => cat.id === selectedCategory)
+                              ?.category_name,
+                          }
+                        : null
+                    } // Set the selected value
+                    onChange={(selectedOption) =>
+                      handleCategoryChange({ target: { value: selectedOption?.value } })
+                    } // Simulate native event for existing logic
+                    isClearable
+                    isDisabled={!selectedParentCategory} // Disable if no parent category is selected
+                    placeholder="Select Category"
+                    styles={{
+                      container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
+                    }}
+                  />
                 </label>
                 <Link to="/Product/Category">
                   <button style={{ height: '100%', padding: '8px' }}>+</button>
@@ -894,7 +1004,7 @@ const AddProduct = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                   <label style={{ flex: 1, fontWeight: 'bold' }}>
                     Subcategory
-                    <select
+                    {/* <select
                       value={selectedsubCategory}
                       onChange={handleSubCategoryChange}
                       disabled={!selectedCategory}
@@ -907,7 +1017,35 @@ const AddProduct = () => {
                             {subCategory.sub_category_name}
                           </option>
                         ))}
-                    </select>
+                    </select> */}
+                    <Select
+                      options={
+                        Array.isArray(subcategories)
+                          ? subcategories.map((subCategory) => ({
+                              value: subCategory.id,
+                              label: subCategory.sub_category_name,
+                            }))
+                          : []
+                      } // Map subcategories to value-label pairs
+                      value={
+                        subcategories.find((sub) => sub.id === selectedsubCategory)
+                          ? {
+                              value: selectedsubCategory,
+                              label: subcategories.find((sub) => sub.id === selectedsubCategory)
+                                ?.sub_category_name,
+                            }
+                          : null
+                      } // Set the selected value
+                      onChange={(selectedOption) =>
+                        handleSubCategoryChange({ target: { value: selectedOption?.value } })
+                      } // Simulate native event for existing logic
+                      isClearable
+                      isDisabled={!selectedCategory} // Disable if no category is selected
+                      placeholder="Select Subcategory"
+                      styles={{
+                        container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
+                      }}
+                    />
                   </label>
                   <Link to="/SubCat/AddSubCat">
                     <button style={{ height: '100%', padding: '8px' }}>+</button>
@@ -919,7 +1057,7 @@ const AddProduct = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
                 <label style={{ flex: 1, fontWeight: 'bold' }}>
                   Brands (optional)
-                  <select
+                  {/* <select
                     value={selectedBrand}
                     onChange={handleBrandChange}
                     style={{ width: '100%', padding: '8px' }}
@@ -931,7 +1069,33 @@ const AddProduct = () => {
                           {branddata.brand_name}
                         </option>
                       ))}
-                  </select>
+                  </select> */}
+                  <Select
+                    options={
+                      Array.isArray(brands)
+                        ? brands.map((branddata) => ({
+                            value: branddata.id,
+                            label: branddata.brand_name,
+                          }))
+                        : []
+                    } // Map brands to value-label pairs
+                    value={
+                      brands.find((brand) => brand.id === selectedBrand)
+                        ? {
+                            value: selectedBrand,
+                            label: brands.find((brand) => brand.id === selectedBrand)?.brand_name,
+                          }
+                        : null
+                    } // Set the selected value
+                    onChange={(selectedOption) =>
+                      handleBrandChange({ target: { value: selectedOption?.value } })
+                    } // Simulate native event for existing logic
+                    isClearable
+                    placeholder="Select a Brand"
+                    styles={{
+                      container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
+                    }}
+                  />
                 </label>
                 <Link to="/Product/AddBrands">
                   <button style={{ height: '100%', padding: '8px' }}>+</button>

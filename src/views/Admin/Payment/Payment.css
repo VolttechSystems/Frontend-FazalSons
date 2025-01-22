@@ -78,10 +78,7 @@
   background-color: #f9f9f9; /* Light gray for alternate rows */
 }
 
-.payment-methods-table tr:hover {
-  background-color: #e9ecef; /* Slightly darker gray on hover */
-  border: 1px solid #ccc; /* Highlight border on hover */
-}
+
 /* Edit Button Styling */
 .payment-edit-button {
   padding: 8px 15px;

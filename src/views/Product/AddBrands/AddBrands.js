@@ -29,24 +29,30 @@ const AddBrands = () => {
     // Fetch brand details for editing
     if (id) {
       const fetchBrandDetails = async () => {
-        // try {
-        //   const response = await axios.get(`http://195.26.253.123/pos/products/action_brand/${id}/`)
-        //   const brand = response.data
-        //   setBrandName(brand.brand_name)
-        //   setSymbol(brand.symbol)
-        //   setDescription(brand.description)
-        //   setStatus(brand.status)
-        // } catch (error) {
-        //   console.error('Failed to fetch brand for editing:', error)
-        //   setErrorMessage('Failed to load brand details.')
-        // }
-        const response = await Network.get(`${Urls.updateBrand}/${id}/`)
-        if (!response.ok) return console.log(response.data.error)
-        const brand = response.data
-        setBrandName(brand.brand_name)
-        setSymbol(brand.symbol)
-        setDescription(brand.description)
-        setStatus(brand.status)
+        try {
+          const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
+
+          if (!shopId) {
+            toast.error('Shop ID is missing. Please log in again.')
+            return
+          }
+
+          // Adjusted URL to include shop_id
+          const response = await Network.get(`${Urls.updateBrand}/${shopId}/${id}/`)
+
+          if (response.status === 200) {
+            const brand = response.data
+            setBrandName(brand.brand_name)
+            setSymbol(brand.symbol)
+            setDescription(brand.description)
+            setStatus(brand.status)
+          } else {
+            toast.error('Failed to fetch brand details.')
+          }
+        } catch (error) {
+          console.error('Error fetching brand details:', error)
+          toast.error('An error occurred while fetching brand details.')
+        }
       }
       fetchBrandDetails()
     }
@@ -55,14 +61,23 @@ const AddBrands = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // Get shop_id from local storage
+    const shopId = localStorage.getItem('shop_id')
+
+    if (!shopId) {
+      toast.error('Shop ID is missing. Please log in again.')
+      return
+    }
+
     const brandData = {
       brand_name: brandName,
       symbol: symbol,
       description: description,
       status: status,
+      shop: parseInt(shopId), // Include shop_id in the payload
     }
 
-    const url = id ? `${Urls.updateBrand}/${id}/` : Urls.addBrand
+    const url = id ? `${Urls.updateBrand}/${shopId}/${id}/` : `${Urls.addBrand}/${shopId}/`
     const req = id ? 'put' : 'post'
 
     try {
@@ -87,7 +102,7 @@ const AddBrands = () => {
         }
         return
       }
-      toast.success('Brand added successfully!')
+
       // Success case
       toast.success(id ? 'Brand updated successfully!' : 'Brand added successfully!')
       navigate('/Product/Brands')

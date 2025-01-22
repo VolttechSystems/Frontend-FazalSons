@@ -56,7 +56,9 @@ function RegisterUser() {
 
   const fetchOutlets = async () => {
     try {
-      const response = await Network.get(Urls.fetchAllOutlets)
+      const shopId = localStorage.getItem('shop_id') // Assuming the shop ID is stored as 'shopId'
+
+      const response = await Network.get(`${Urls.fetchAllOutlets}${shopId}/`)
 
       if (!response.ok) {
         console.error('Failed to fetch outlets:', response.data.error)

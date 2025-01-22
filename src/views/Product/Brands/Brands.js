@@ -39,57 +39,67 @@ const Brands = () => {
   const itemsPerPage = 5 // Number of items to display per page
   const [searchInput, setSearchInput] = useState('') // State for search input
   const navigate = useNavigate()
+  const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
 
   useEffect(() => {
     fetchBrands()
   }, [currentPage])
 
   const fetchBrands = async () => {
-    // try {
-    //   const response = await axios.get(
-    //     `http://195.26.253.123/pos/products/add_brand?page=${currentPage}&limit=${itemsPerPage}`,
-    //   )
-    //   const brandsData = response.data.results || []
-    //   setBrands(Array.isArray(brandsData) ? brandsData : [])
-    //   setOriginalBrands(Array.isArray(brandsData) ? brandsData : []) // Save original data
-    //   setTotalCount(response.data.count) // Total number of brands for pagination
-    //   setLoading(false)
-    // } catch (error) {
-    //   console.error('Error fetching brands:', error)
-    //   setError('Failed to fetch brands.')
-    //   setLoading(false)
-    // }
+    try {
+      if (!shopId) {
+        setError('Shop ID is missing. Please log in again.')
+        setLoading(false)
+        return
+      }
 
-    const response = await Network.get(`${Urls.addBrand}?page=${currentPage}&limit=${itemsPerPage}`)
-    if (!response.ok) return console.log(response.data.error)
-    const brandsData = response.data.results || []
-    setBrands(Array.isArray(brandsData) ? brandsData : [])
-    setOriginalBrands(Array.isArray(brandsData) ? brandsData : []) // Save original data
-    setTotalCount(response.data.count) // Total number of brands for pagination
-    setLoading(false)
+      // Adjusted URL to include shop_id in the path
+      const response = await Network.get(
+        `${Urls.addBrand}/${shopId}/?page=${currentPage}&limit=${itemsPerPage}`,
+      )
+
+      if (response.status === 200) {
+        const brandsData = response.data.results || []
+        setBrands(Array.isArray(brandsData) ? brandsData : [])
+        setOriginalBrands(Array.isArray(brandsData) ? brandsData : []) // Save original data
+        setTotalCount(response.data.count) // Total number of brands for pagination
+      } else {
+        setError('Failed to fetch brands.')
+      }
+    } catch (error) {
+      console.error('Error fetching brands:', error)
+      setError('An error occurred while fetching brands.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDelete = async (id) => {
-    // if (window.confirm('Are you sure you want to delete this brand?')) {
-    //   try {
-    //     await axios.delete(`http://195.26.253.123/pos/products/action_brand/${id}/`)
-    //     alert('Brand deleted successfully!')
-    //     fetchBrands() // Refresh the brands list after deletion
-    //   } catch (error) {
-    //     console.error('Error deleting brand:', error)
-    //     alert('Failed to delete brand.')
-    //   }
-    // }
-    const response = await Network.delete(`${Urls.updateBrand}/${id}/`)
-    if (!response.ok) return console.log(response.data.error)
-    toast.success('Brand deleted successfully!')
-    fetchBrands() // Refresh the brands list after deletion
+    try {
+      if (!shopId) {
+        toast.error('Shop ID is missing. Please log in again.')
+        return
+      }
+
+      const response = await Network.delete(`${Urls.updateBrand}/${shopId}/${id}/`)
+      if (response.status === 204) {
+        toast.success('Brand deleted successfully!')
+        fetchBrands()
+      } else {
+        toast.error('Failed to delete brand.')
+      }
+    } catch (error) {
+      console.error('Error deleting brand:', error)
+      toast.error('An error occurred while deleting the brand.')
+    }
   }
 
   const handleEdit = (id) => {
-    console.log('Editing brand with ID:', id)
+    if (!shopId) {
+      toast.error('Shop ID is missing. Please log in again.')
+      return
+    }
     navigate(`/Product/AddBrands/${id}`)
-    toast.success('Brand updated successfully!')
   }
 
   // Handle search

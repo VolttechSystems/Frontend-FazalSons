@@ -47,24 +47,47 @@ const AddOutlet = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    console.log('Submitting the form...')
+
     try {
-      const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
+      const shopId = localStorage.getItem('shop_id')
+      console.log('Shop ID:', shopId)
+
       const payload = {
         ...formData,
         shop: parseInt(shopId), // Add shop_id to the payload
       }
 
+      console.log('Payload:', payload)
+
+      let response
+
       if (editingOutletId) {
-        // Update existing outlet
-        await Network.put(`${Urls.actionOutlet}/${shopId}/${editingOutletId}/`, payload)
-        setEditingOutlet(null)
+        console.log('Updating an outlet...')
+        response = await Network.put(`${Urls.actionOutlet}/${shopId}/${editingOutletId}/`, payload)
+        console.log('Update Response:', response)
+
+        if (response.ok && response.status === 200) {
+          toast.success('Outlet updated successfully!')
+          setEditingOutlet(null)
+        } else {
+          // Handle error explicitly if the response is not successful
+          handleApiError(response)
+        }
       } else {
-        // Add new outlet
-        await Network.post(`${Urls.addOutlets}/${payload.shop}/`, payload)
+        console.log('Adding a new outlet...')
+        response = await Network.post(`${Urls.addOutlets}/${payload.shop}/`, payload)
+        console.log('Add Response:', response)
+
+        if (response.ok && response.status === 201) {
+          toast.success('Outlet added successfully!')
+        } else {
+          // Handle error explicitly if the response is not successful
+          handleApiError(response)
+        }
       }
 
-      toast.success('Outlet saved successfully!')
-      fetchOutlets()
+      fetchOutlets() // Refresh outlet list
       setFormData({
         outlet_code: '',
         outlet_name: '',
@@ -74,12 +97,26 @@ const AddOutlet = () => {
         contact_number: '',
       })
     } catch (error) {
-      console.error('Error saving outlet:', error)
-      if (error.response?.data) {
-        toast.error(error.response.data.message || 'Failed to save outlet.')
-      } else {
-        toast.error('An unexpected error occurred.')
-      }
+      console.error('Unexpected error:', error)
+      toast.error('An unexpected error occurred. Please try again.')
+    }
+
+    console.log('Form submission completed.')
+  }
+
+  // Helper function to handle API errors
+  const handleApiError = (response) => {
+    console.error('API Error:', response)
+
+    if (response.data?.non_field_errors) {
+      // Handle specific backend validation errors
+      toast.error(response.data.non_field_errors.join(', '))
+    } else if (response.data?.message) {
+      // Handle general error message
+      toast.error(response.data.message)
+    } else {
+      // Generic fallback error
+      toast.error('An error occurred while saving the outlet.')
     }
   }
 
@@ -118,7 +155,7 @@ const AddOutlet = () => {
       <form className="outlet-form" onSubmit={handleSubmit}>
         <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
         <div>
-          <label>Outlet Code:</label>
+          <label>Code:</label>
           <input
             className="outlet-form-input"
             type="text"
@@ -129,7 +166,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Outlet Name:</label>
+          <label>Name:</label>
           <input
             className="outlet-form-input"
             type="text"
@@ -150,7 +187,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Outlet Mobile:</label>
+          <label>Mobile:</label>
           <input
             className="outlet-form-input"
             type="text"
@@ -170,7 +207,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Contact Number:</label>
+          <label>Phone No.:</label>
           <input
             className="outlet-form-input"
             type="text"

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './Payment.css'
 import { Network, Urls } from '../../../api-config'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const Payment = () => {
   const [formData, setFormData] = useState({
@@ -11,30 +13,24 @@ const Payment = () => {
   const [payments, setPayments] = useState([])
   const [editingPaymentId, setEditingPayment] = useState(null)
 
+  // Fetch shop_id from local storage
+  const shopId = localStorage.getItem('shop_id')
+
   useEffect(() => {
-    // Fetch existing payment methods when the component mounts
     fetchPayments()
   }, [])
 
-  // const fetchPayments = async () => {
-  //   try {
-  //     const response = await axios.get('http://195.26.253.123/pos/transaction/add_payment');
-  //     setPayments(response.data); // Adjust based on the response structure
-  //   } catch (error) {
-  //     console.error('Error fetching payment methods:', error);
-  //   }
-  // };
-
   const fetchPayments = async () => {
     try {
-      const response = await Network.get(Urls.addpayment)
-      if (!response.ok) {
-        console.error('Error fetching payment methods:', response.data.error)
-        return
+      const response = await Network.get(`${Urls.addpayment}/${shopId}/`)
+      if (response.status === 200) {
+        setPayments(response.data)
+      } else {
+        toast.error(`Error fetching payment methods: ${response.data.error}`)
       }
-      setPayments(response.data) // Adjust based on the response structure
     } catch (error) {
-      console.error('Network error fetching payment methods:', error)
+      toast.error('Network error while fetching payment methods.')
+      console.error('Error fetching payment methods:', error)
     }
   }
 
@@ -43,47 +39,43 @@ const Payment = () => {
     setFormData({ ...formData, [name]: value })
   }
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-  //   try {
-  //     if (editingPaymentId) {
-  //       // Update existing payment method
-  //       await axios.put(
-  //         `http://195.26.253.123/pos/transaction/action_payment/${editingPaymentId}/`,
-  //         formData,
-  //       )
-  //       setPayments(
-  //         payments.map((payment) => (payment.id === editingPaymentId ? formData : payment)),
-  //       )
-  //       setEditingPayment(null)
-  //     } else {
-  //       // Add new payment method
-  //       await axios.post('http://195.26.253.123/pos/transaction/add_payment', formData)
-  //       setPayments([...payments, formData])
-  //     }
-  //     setFormData({ pm_name: '' })
-  //   } catch (error) {
-  //     console.error('Error adding/updating payment method:', error)
-  //   }
-  // }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      const payload = {
+        ...formData,
+        shop: parseInt(shopId), // Include shop_id in the payload
+      }
+
       if (editingPaymentId) {
         // Update existing payment method
-        await Network.put(`${Urls.actionPayment}/${editingPaymentId}/`, formData)
-        setPayments(
-          payments.map((payment) => (payment.id === editingPaymentId ? formData : payment)),
+        const response = await Network.put(
+          `${Urls.actionPayment}/${shopId}/${editingPaymentId}/`,
+          payload,
         )
+        if (response.status === 200) {
+          toast.success('Payment method updated successfully!')
+          fetchPayments() // Refresh list
+        } else {
+          toast.error(`Error updating payment method: ${response.data.error}`)
+        }
         setEditingPayment(null)
       } else {
         // Add new payment method
-        await Network.post(Urls.addpayment, formData)
-        setPayments([...payments, formData])
+        const response = await Network.post(`${Urls.addpayment}/${shopId}/`, payload)
+        if (response.status === 201) {
+          toast.success('Payment method added successfully!')
+          fetchPayments() // Refresh list
+        } else {
+          toast.error(`The fields shop, pm_name must make a unique set: ${response.data.error}`)
+        }
       }
+
+      // Clear the form
       setFormData({ pm_name: '' })
     } catch (error) {
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred.'
+      toast.error(errorMessage)
       console.error('Error adding/updating payment method:', error)
     }
   }
@@ -91,28 +83,41 @@ const Payment = () => {
   const handleEdit = (payment) => {
     setFormData(payment)
     setEditingPayment(payment.id)
+    toast.info('Edit mode activated.')
   }
-
-  // const handleDelete = async (id) => {
-  //   try {
-  //     await axios.delete(`http://195.26.253.123/pos/transaction/action_payment/${id}/`)
-  //     setPayments(payments.filter((payment) => payment.id !== id)) // Remove deleted payment method from the state
-  //   } catch (error) {
-  //     console.error('Error deleting payment method:', error)
-  //   }
-  // }
 
   const handleDelete = async (id) => {
     try {
-      await Network.delete(`${Urls.actionPayment}/${id}/`)
-      setPayments(payments.filter((payment) => payment.id !== id)) // Remove deleted payment method from the state
+      const response = await Network.delete(`${Urls.actionPayment}/${shopId}/${id}/`)
+      if (response.status === 204) {
+        toast.success('Payment method deleted successfully!')
+        setPayments(payments.filter((payment) => payment.id !== id)) // Remove from state
+      } else {
+        toast.error(`Error deleting payment method: ${response.data.error}`)
+      }
     } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || 'An unexpected error occurred while deleting.'
+      toast.error(errorMessage)
       console.error('Error deleting payment method:', error)
     }
   }
 
   return (
     <div className="container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+
       <form onSubmit={handleSubmit}>
         <h2>{editingPaymentId ? 'Edit Payment Method' : 'Add New Payment Method'}</h2>
         <div>

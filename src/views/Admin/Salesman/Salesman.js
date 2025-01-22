@@ -219,8 +219,6 @@ import './Salesman.css'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Network, Urls } from '../../../api-config'
-import Autocomplete from '@mui/material/Autocomplete'
-import TextField from '@mui/material/TextField'
 
 const Salesman = () => {
   const [formData, setFormData] = useState({
@@ -253,7 +251,8 @@ const Salesman = () => {
   }
 
   const fetchOutlets = async () => {
-    const response = await Network.get(Urls.addOutlets) // Use Network.get with the appropriate URL
+    const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
+    const response = await Network.get(`${Urls.addOutlets}/${shopId}/`)
     if (!response.ok) return console.log(response.data.error) // Log error if the response is not successful
 
     const outletOptions = response.data.map((outlet) => ({
@@ -265,9 +264,9 @@ const Salesman = () => {
   }
 
   // Handle multi-select change for outlets
-  const handleOutletChange = (event, selectedOptions) => {
-    const selectedOutlets = selectedOptions ? selectedOptions : [] // Handle cases where no option is selected
-    setFormData({ ...formData, outlet: selectedOutlets }) // Save the full outlet objects in the state
+  const handleOutletChange = (selectedOptions) => {
+    // Save the selected options (or an empty array if none are selected) in the state
+    setFormData({ ...formData, outlet: selectedOptions || [] })
   }
 
   const handleChange = (e) => {
@@ -415,59 +414,28 @@ const Salesman = () => {
         )}
 
         <div>
-          {/* <label>Outlet:</label>
+          <label>Outlet:</label>
 
           <Select
             isMulti
             name="outlet"
-            options={outlets} // options should be the full outlet objects
-            onChange={handleOutletChange}
-            value={formData.outlet} // formData.outlet should be an array of full outlet objects
+            options={outlets} // Array of { value: <id>, label: <name> }
+            onChange={handleOutletChange} // Pass selected options directly
+            value={formData.outlet} // Current selected outlets
             placeholder="Select outlets"
+            styles={{
+              container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
+            }}
           />
-        </div> */}
         </div>
-        <label style={{ display: 'block', marginBottom: '5px' }}>Outlet:</label>
-        <Autocomplete
-          multiple
-          name="outlet"
-          options={outlets} // Ensure options are full outlet objects
-          value={formData.outlet} // Ensure this is an array of selected outlet objects
-          onChange={handleOutletChange} // Handle change
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              fullWidth
-              style={{
-                backgroundColor: 'white',
-                marginBottom: '20px', // Space below the field
-              }}
-              InputProps={{
-                ...params.InputProps,
-                style: {
-                  border: 'none', // Ensure no border
-                  boxShadow: 'none', // Remove shadow
-                  outline: 'none', // Remove outline
-                  padding: '0', // Remove padding
-                },
-                disableUnderline: true, // Disable underline
-              }}
-              sx={{
-                '& .MuiInputBase-root': {
-                  border: 'none !important', // Remove any border applied by MUI
-                  boxShadow: 'none !important', // Remove shadow
-                  outline: 'none !important', // Remove outline
-                  padding: '0 !important', // Ensure no extra space
-                },
-              }}
-            />
-          )}
-          isOptionEqualToValue={(option, value) => option.id === value.id} // Compare by id
-        />
 
-        <button type="submit" className="salesman-submit-btn">
-          {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
-        </button>
+        <div style={{ marginTop: '16px' }}>
+          {' '}
+          {/* Added margin to create space */}
+          <button type="submit" className="salesman-submit-btn">
+            {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
+          </button>
+        </div>
       </form>
 
       <table className="salesman-table">

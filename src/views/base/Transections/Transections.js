@@ -643,12 +643,42 @@ function Transections() {
       }
     }
 
+    // const fetchPayment = async () => {
+    //   try {
+    //     const response = await fetch('http://195.26.253.123/pos/transaction/add_payment')
+    //     const data = await response.json()
+    //     if (data && Array.isArray(data)) {
+    //       setPaymentMethods(data)
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching payment methods:', error)
+    //   }
+    // }
     const fetchPayment = async () => {
       try {
-        const response = await fetch('http://195.26.253.123/pos/transaction/add_payment')
+        // Retrieve shopId from localStorage
+        const shopId = localStorage.getItem('shop_id')
+
+        if (!shopId) {
+          console.error('Shop ID is missing in localStorage')
+          alert('Shop ID not found. Please log in again.')
+          return // Exit the function
+        }
+
+        // Include shopId in the API URL as a path parameter
+        const response = await fetch(`http://195.26.253.123/pos/transaction/add_payment/${shopId}/`)
+
+        if (!response.ok) {
+          console.error('Failed to fetch payment methods:', response.statusText)
+          return
+        }
+
         const data = await response.json()
+
         if (data && Array.isArray(data)) {
-          setPaymentMethods(data)
+          setPaymentMethods(data) // Update the state with payment methods
+        } else {
+          console.error('Unexpected response format:', data)
         }
       } catch (error) {
         console.error('Error fetching payment methods:', error)
