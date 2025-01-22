@@ -6,7 +6,6 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Network, Urls } from '../../../api-config'
 import useAuth from '../../../hooks/useAuth'
-import { Autocomplete, TextField } from '@mui/material'
 
 function RegisterUser() {
   const [systemRoles, setSystemRoles] = useState([])
@@ -19,7 +18,6 @@ function RegisterUser() {
     password: '',
     email: '',
     phone_number: '',
-    is_staff: false,
     is_active: true,
     system_roles: [],
     outlet: [], // Updated to handle multiple outlets
@@ -31,28 +29,33 @@ function RegisterUser() {
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordErrors, setNewPasswordErrors] = useState([]) // Declare the state for errors
   const [passwordChangeMessage, setPasswordChangeMessage] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10)
   const { userOutlets } = useAuth()
 
-  useEffect(() => {
-    const fetchSystemRoles = async () => {
-      const response = await Network.get(Urls.fetchSystemRoles)
+  const fetchSystemRoles = async () => {
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.fetchSystemRoles}${shopId}`)
+    // const response = await Network.get(Urls.fetchSystemRoles)
 
-      if (!response.ok) {
-        console.log('Error fetching system roles:', response.data.error)
-        return
-      }
-
-      const roles = response.data.map((role) => ({
-        value: role.id,
-        label: role.sys_role_name,
-      }))
-
-      setSystemRoles(roles)
+    if (!response.ok) {
+      console.log('Error fetching system roles:', response.data.error)
+      return
     }
 
+    const roles = response.data.map((role) => ({
+      value: role.id,
+      label: role.sys_role_name,
+    }))
+
+    setSystemRoles(roles)
+  }
+
+  useEffect(() => {
     fetchSystemRoles()
-    fetchUsers() // Fetch existing users from backend
-  }, [])
+    fetchUsers(currentPage)
+  }, [currentPage])
 
   const fetchOutlets = async () => {
     try {
@@ -90,19 +93,21 @@ function RegisterUser() {
     fetchOutlets() // Fetch outlets separately
   }, [])
 
-  const fetchUsers = () => {
-    Network.get(Urls.registerUser)
-      .then((response) => {
-        console.log('Fetched Users Data:', response.data) // Debug log
-        if (Array.isArray(response.data)) {
-          setUserList(response.data) // Directly use response.data as it is an array
-        } else {
-          console.error('Unexpected data format:', response.data)
-        }
-      })
-      .catch((error) => {
-        console.log('Error fetching users:', error)
-      })
+  const fetchUsers = async (page = 1) => {
+    const shopId = localStorage.getItem('shop_id')
+    try {
+      const response = await Network.get(
+        `${Urls.registerUser}${shopId}?page=${page}&pageSize=${pageSize}`,
+      )
+      if (response.ok) {
+        setUserList(response.data.results)
+        setTotalPages(Math.ceil(response.data.count / pageSize))
+      } else {
+        console.error('Error fetching users:', response.data.error)
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
   }
 
   const handleEditClick = (user) => {
@@ -173,25 +178,23 @@ function RegisterUser() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-
-    // Prepare the form data for submission
+    const shopId = localStorage.getItem('shop_id')
     const { outlet, ...restFormData } = formData
-
-    // Only outlet IDs should be sent in the payload
-    const selectedOutlets = outlet.map((outlet) => outlet.value) // Extract the outlet IDs
+    const selectedOutlets = outlet.map((outlet) => outlet.value)
 
     const payload = {
       ...restFormData,
-      outlet: selectedOutlets, // Send only the outlet IDs in the payload
+      outlet: selectedOutlets,
+      shop: shopId,
     }
 
-    Network.post(Urls.registerUser, payload)
-      .then((response) => {
-        console.log('User registered successfully:', response)
-        fetchUsers() // Refresh user list after successful submission
-        toast.success('User registered successfully!') // Success toast for user registration
+    try {
+      const response = await Network.post(`${Urls.registerUser}${shopId}/`, payload)
+      if (response.ok) {
+        toast.success('User registered successfully!')
+        fetchUsers(currentPage)
         setFormData({
           first_name: '',
           last_name: '',
@@ -199,32 +202,33 @@ function RegisterUser() {
           password: '',
           email: '',
           phone_number: '',
-          is_staff: false,
           is_active: true,
           system_roles: [],
-          outlet: [], // Reset outlet selection
+          outlet: [],
           is_superuser: false,
         })
-      })
-      .catch((error) => {
-        // Check if the error response has a specific message for username already exists
-        if (error.response && error.response.data) {
-          // If username already exists, show specific error
-          if (error.response.data.username) {
-            toast.error(error.response.data.username[0]) // Show the error message
-          } else {
-            toast.error('Failed to register user. Please try again.')
-          }
+      } else {
+        if (response.data.username) {
+          toast.error(response.data.username[0])
         } else {
-          toast.error('An error occurred while registering the user.')
+          toast.error('Failed to register user. Please try again.')
         }
+      }
+    } catch (error) {
+      console.error('Error registering user:', error)
+      toast.error('An error occurred while registering the user.')
+    }
+  }
 
-        console.log('Error registering user:', error) // Log the error for debugging
-      })
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
   }
 
   const handleDelete = (userId) => {
-    Network.delete(`${Urls.deleteUser}/${userId}`)
+    const shopId = localStorage.getItem('shop_id')
+    Network.delete(`${Urls.deleteUser}/${shopId}/${userId}/`)
       .then((response) => {
         console.log('User deleted successfully:', response)
         fetchUsers() // Refresh the user list
@@ -332,17 +336,6 @@ function RegisterUser() {
         </div>
         <div className="input-group">
           <label>
-            Is Staff
-            <input
-              type="checkbox"
-              name="is_staff"
-              checked={formData.is_staff}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-        <div className="input-group">
-          <label>
             Is Active
             <input
               type="checkbox"
@@ -378,20 +371,6 @@ function RegisterUser() {
             value={formData.outlet} // formData.outlet should be an array of full outlet objects
             placeholder="Select outlets"
           />
-
-          {/* <Autocomplete
-            multiple
-            name="outlet"
-            options={outlets.map((outlet) => ({
-              value: outlet.id,
-              label: outlet.outlet_name,
-              outlet_code: outlet.outlet_code, // Include other outlet data if needed
-            }))}
-            onChange={handleOutletChange}
-            value={formData.outlet} // formData.outlet should be an array of full outlet objects
-            renderInput={(params) => <TextField {...params} label="Select Outlet" />}
-            isOptionEqualToValue={(option, value) => option.id === value.id} // Compare based on id
-          /> */}
         </div>
 
         <button className="addUser-button1" type="submit">
@@ -414,43 +393,48 @@ function RegisterUser() {
         </thead>
 
         <tbody>
-          {userList.length > 0 ? (
-            userList.map((user, index) => (
-              <tr key={index}>
-                <td>{user.username}</td>
-                <td>{user.is_active ? 'Active' : 'Inactive'}</td>
-                <td>
-                  {user.system_roles.length > 0
-                    ? user.system_roles.map((role) => role.sys_role_name).join(', ')
-                    : 'No Roles'}
-                </td>
-                <td>
-                  {user.outlet.length > 0
-                    ? user.outlet.map((outlet) => outlet.outlet_name).join(', ')
-                    : 'No Outlet'}
-                </td>
-                <td>
-                  <button onClick={() => handleEditClick(user)} className="edit-button1">
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user.id)} // Pass user ID dynamically
-                    className="del-button1"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" style={{ textAlign: 'center' }}>
-                No users found
+          {userList.map((user) => (
+            <tr key={user.id}>
+              <td>{user.username}</td>
+              <td>{user.is_active ? 'Active' : 'Inactive'}</td>
+              <td>
+                {user.system_roles.map((role) => role.sys_role_name).join(', ') || 'No Roles'}
+              </td>
+              <td>{user.outlet.map((out) => out.outlet_name).join(', ') || 'No Outlets'}</td>
+              <td>
+                <button onClick={() => handleEditClick(user)} className="edit-button1">
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(user.id)} // Pass user ID dynamically
+                  className="del-button1"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
-          )}
+          ))}{' '}
         </tbody>
       </table>
+      <div
+        className="pagination"
+        style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+      >
+        <button
+          style={{ padding: '5px 10px', marginRight: '5px' }}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <button
+          style={{ padding: '5px 10px' }}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
       {showEditModal && selectedUser && (
         <div className="modal show">
           <div className="modal-content">

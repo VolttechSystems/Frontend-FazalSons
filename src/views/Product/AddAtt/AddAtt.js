@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import './AddAtt.css'
+import Select from 'react-select'
 
 import axios from 'axios'
 import { CButton } from '@coreui/react'
@@ -302,7 +303,7 @@ class AddAtt extends Component {
           <label htmlFor="attType" style={{ marginRight: '10px' }}>
             Attribute Type
           </label>
-          <select
+          {/* <select
             name="attType"
             id="attType"
             value={attType}
@@ -321,8 +322,43 @@ class AddAtt extends Component {
                 {type.att_type}
               </option>
             ))}
-          </select>
+          </select> */}
 
+          <Select
+            name="attType"
+            options={
+              this.state.attributeTypes?.map((type) => ({
+                value: type.id,
+                label: type.att_type,
+              })) || []
+            } // Convert attributeTypes to value/label pairs
+            value={
+              this.state.attType
+                ? {
+                    value: this.state.attType,
+                    label: this.state.attributeTypes?.find((type) => type.id === this.state.attType)
+                      ?.att_type,
+                  }
+                : null
+            } // Match the selected value
+            onChange={
+              (selectedOption) => this.setState({ attType: selectedOption?.value }) // Update the state when selection changes
+            }
+            placeholder="Select Attribute Type"
+            styles={{
+              container: (base) => ({
+                ...base,
+                marginRight: '10px',
+                width: '30%',
+              }),
+              control: (base) => ({
+                ...base,
+                padding: '5px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }),
+            }}
+          />
           <Link to="/Product/AddAttributeType">
             <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
           </Link>
