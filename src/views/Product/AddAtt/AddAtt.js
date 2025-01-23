@@ -1,18 +1,7 @@
 import React, { Component } from 'react'
 import './AddAtt.css'
 import Select from 'react-select'
-
-import axios from 'axios'
-import { CButton } from '@coreui/react'
 import { Link } from 'react-router-dom'
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from '@mui/material'
 import { Network, Urls } from '../../../api-config'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -29,8 +18,12 @@ class AddAtt extends Component {
         },
       ],
       apiData: [],
+      attributeTypes: [],
+      currentPage: 0, // Pagination starts from 0
+      totalPages: 1,
+      pageSize: 10, // Number of items per page
+      shopId: localStorage.getItem('shop_id') || '', // Shop ID from local storage
       editData: null, // Holds data for editing
-      attribute: [], // This is where the attributes are stored
     }
   }
 
@@ -49,26 +42,52 @@ class AddAtt extends Component {
   }
 
   fetchAttributeTypes = async () => {
-    const response = await Network.get(Urls.addAttributeTypes)
-    if (!response.ok) return console.log(response.data.error)
-    this.setState({ attributeTypes: response.data })
+    const { shopId } = this.state
+    try {
+      const response = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch attribute types')
+      }
+      const data = response.data.results || []
+      this.setState({
+        attributeTypes: data.map((type) => ({
+          value: type.id,
+          label: type.att_type,
+        })),
+      })
+    } catch (error) {
+      console.error('Error fetching attribute types:', error)
+      toast.error('Error fetching attribute types.')
+    }
   }
 
-  fetchData = async () => {
-    const response = await Network.get(Urls.variationGroup)
-    if (!response.ok) return console.log(response.data.error)
-    this.setState({ apiData: response.data })
+  fetchData = async (page = 0) => {
+    const { shopId, pageSize } = this.state
+    try {
+      const response = await Network.get(
+        `${Urls.variationGroup}${shopId}?Starting=${page}&limit=${pageSize}`,
+      )
+
+      console.log('Fetched Data:', response.data) // Debugging
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data')
+      }
+
+      this.setState({
+        apiData: response.data.results || [], // Populate the table with results
+        totalPages: Math.ceil(response.data.count / pageSize), // Calculate total pages for pagination
+      })
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast.error('Error fetching data.')
+    }
   }
 
   // Function to fetch attribute types from the API
   variationGroups = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_attribute_type');
-    //   setTypes(response.data); // Assuming the response data is an array of attribute types
-    // } catch (error) {
-    //   console.error('Error fetching attribute types:', error);
-    // }
-    const response = await Network.get(Urls.variationGroup)
+    const { shopId } = this.state
+    const response = await Network.get(`${Urls.variationGroup}${shopId}`)
     if (!response.ok) return consoe.log(response.data.error)
     setTypes(response.data)
   }
@@ -127,19 +146,25 @@ class AddAtt extends Component {
   }
 
   handleSubmit = async () => {
-    const { attType, attributes } = this.state
+    const { attType, attributes, shopId } = this.state
 
+    // Construct the payload
     const payload = attributes.map((attribute) => ({
       att_type: attType,
       attribute_name: attribute.attributeName,
       variation: attribute.variations,
+      shop_id: shopId, // Include shop ID
     }))
 
+    console.log('Payload:', payload) // Debugging
+
     try {
-      const response = await Network.post(Urls.addAttributes, payload)
+      // API call
+      const response = await Network.post(`${Urls.addAttributes}${shopId}`, payload)
+
+      console.log('API Response:', response.data) // Debugging
 
       if (!response.ok) {
-        // Handle and display backend errors
         const errorData = response.data
         if (errorData && errorData.error) {
           Object.keys(errorData.error).forEach((key) => {
@@ -160,18 +185,21 @@ class AddAtt extends Component {
 
       // Success case
       toast.success('Data successfully submitted!')
-      this.fetchData()
+      this.setState({
+        attType: '',
+        attributes: [{ attributeName: '', variations: [] }],
+      })
+      this.fetchData(this.state.currentPage)
     } catch (error) {
       console.error('Error submitting data:', error)
       toast.error('An error occurred while submitting data.')
     }
-    this.setState({
-      editData: null,
-      attType: '',
-      attributes: [{ attributeName: '', variations: [] }],
-    })
-    this.fetchData()
-    this.variationGroups()
+  }
+
+  handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < this.state.totalPages) {
+      this.setState({ currentPage: newPage }, () => this.fetchData(newPage))
+    }
   }
 
   handleEdit = (item) => {
@@ -202,7 +230,7 @@ class AddAtt extends Component {
   }
 
   handleUpdate = async () => {
-    const { editData, attType, attributes } = this.state
+    const { editData, attType, attributes, shopId } = this.state
 
     if (!editData || !editData.att_id) {
       alert('No valid item selected for update.')
@@ -219,39 +247,8 @@ class AddAtt extends Component {
     //console.log("Update Payload:", [attribute_name]);
     console.log('Update Payload:', JSON.stringify(payload))
 
-    // try {
-    //   const response = await fetch(
-    //     `http://195.26.253.123/pos/products/action_variations_group/${editData.att_id}`,
-    //     {
-    //       method: 'PUT',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify(payload),
-    //     },
-    //   )
-
-    //   const result = await response.json()
-    //   if (response.ok) {
-    //     alert('Data successfully updated!')
-    //     this.fetchData() // Refresh data after the update
-    //     this.setState({
-    //       editData: null,
-    //       attType: '',
-    //       attributes: [{ attributeName: '', variations: [] }],
-    //     })
-    //     console.log(result)
-    //   } else {
-    //     alert('Failed to update data')
-    //     console.log(result)
-    //   }
-    // } catch (error) {
-    //   alert('Error updating data')
-    //   console.log(error)
-    // }
-
     const response = await Network.put(
-      `${Urls.updateVariationGroup}${editData.att_id}`,
+      `${Urls.updateVariationGroup}/${shopId}/${editData.att_id}`,
       JSON.stringify(payload),
     )
     if (!response.ok) return consoe.log(response.data.error)
@@ -262,12 +259,13 @@ class AddAtt extends Component {
       attType: '',
       attributes: [{ attributeName: '', variations: [] }],
     })
-    this.fetchData()
+    this.fetchData(this.state.currentPage)
     this.variationGroups()
   }
 
   handleDelete = async (attId) => {
-    const response = await Network.delete(`${Urls.updateVariationGroup}${attId}`)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.delete(`${Urls.updateVariationGroup}/${shopId}/${attId}`)
     if (!response.ok) return console.log(response.data.error)
     toast.success('Attribute deleted successfully!')
     this.setState({
@@ -275,16 +273,16 @@ class AddAtt extends Component {
       attType: '',
       attributes: [{ attributeName: '', variations: [] }],
     })
-    this.fetchData()
+    this.fetchData(this.state.currentPage)
     this.variationGroups()
   }
 
   render() {
-    const { apiData, attributes, attType, editData } = this.state
+    const { apiData, attributes, attType, attributeTypes, currentPage, totalPages } = this.state
 
     return (
       <div style={{ padding: '20px' }}>
-        <h1>{editData ? 'Edit Attribute' : 'Add Attributes'}</h1>
+        <h1>{this.state.editData ? 'Edit Attribute' : 'Add Attributes'}</h1>
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -297,13 +295,12 @@ class AddAtt extends Component {
           pauseOnHover
           theme="colored"
         />
-
-        {/* Attribute Type Dropdown */}
+        {/* Attribute Type Dropdown
         <div style={{ marginBottom: '20px' }}>
           <label htmlFor="attType" style={{ marginRight: '10px' }}>
             Attribute Type
           </label>
-          {/* <select
+          <select
             name="attType"
             id="attType"
             value={attType}
@@ -322,40 +319,29 @@ class AddAtt extends Component {
                 {type.att_type}
               </option>
             ))}
-          </select> */}
+          </select>
 
+          <Link to="/Product/AddAttributeType">
+            <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
+          </Link>
+        </div> */}
+        {/* Attribute Type Dropdown */}
+        <div style={{ marginBottom: '20px' }}>
+          <label htmlFor="attType" style={{ marginRight: '10px' }}>
+            Attribute Type
+          </label>
           <Select
             name="attType"
-            options={
-              this.state.attributeTypes?.map((type) => ({
-                value: type.id,
-                label: type.att_type,
-              })) || []
-            } // Convert attributeTypes to value/label pairs
-            value={
-              this.state.attType
-                ? {
-                    value: this.state.attType,
-                    label: this.state.attributeTypes?.find((type) => type.id === this.state.attType)
-                      ?.att_type,
-                  }
-                : null
-            } // Match the selected value
-            onChange={
-              (selectedOption) => this.setState({ attType: selectedOption?.value }) // Update the state when selection changes
-            }
+            options={attributeTypes}
+            value={attributeTypes.find((type) => type.value === attType)}
+            onChange={(selectedOption) => this.setState({ attType: selectedOption?.value })}
             placeholder="Select Attribute Type"
+            isSearchable
             styles={{
               container: (base) => ({
                 ...base,
-                marginRight: '10px',
                 width: '30%',
-              }),
-              control: (base) => ({
-                ...base,
-                padding: '5px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
+                marginRight: '10px',
               }),
             }}
           />
@@ -363,8 +349,7 @@ class AddAtt extends Component {
             <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
           </Link>
         </div>
-
-        {/* Attribute Groups */}
+        Attribute Groups
         {attributes.map((attribute, attrIndex) => (
           <div key={attrIndex} style={{ marginBottom: '20px' }}>
             {/* Attribute Group Label and Input */}
@@ -390,7 +375,7 @@ class AddAtt extends Component {
 
             {/* Buttons for adding and removing attribute groups */}
             <div style={{ display: 'inline-block', marginLeft: '10px' }}>
-              {attrIndex === attributes.length - 1 && !editData && (
+              {attrIndex === attributes.length - 1 && !this.state.editData && (
                 <button className="add-attribute-button" onClick={this.addAttribute}>
                   + Add Attribute
                 </button>
@@ -473,9 +458,8 @@ class AddAtt extends Component {
             </div>
           </div>
         ))}
-
         <div>
-          {editData ? (
+          {this.state.editData ? (
             <button onClick={this.handleUpdate} style={{ marginTop: '20px' }}>
               Update
             </button>
@@ -485,7 +469,6 @@ class AddAtt extends Component {
             </button>
           )}
         </div>
-
         <h2 style={{ marginTop: '40px' }}>Attribute Groups</h2>
         <table border="1" style={{ width: '100%', textAlign: 'left' }}>
           <thead>
@@ -515,6 +498,40 @@ class AddAtt extends Component {
             ))}
           </tbody>
         </table>
+        <div
+          className="pagination"
+          style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+        >
+          <button
+            style={{
+              padding: '5px 8px',
+              marginRight: '5px',
+              backgroundColor: '#007BFF',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 0}
+          >
+            Previous
+          </button>
+          <button
+            style={{
+              padding: '5px 8px',
+              backgroundColor: '#007BFF',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages - 1}
+          >
+            Next
+          </button>
+        </div>
       </div>
     )
   }

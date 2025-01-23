@@ -1,181 +1,300 @@
-// src/views/pages/customerType/CustomerType.js
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { CButton } from '@coreui/react'
-import './CustomerType.css'
-import { Network, Urls } from '../../../api-config'
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Pagination,
+  Card,
+  CardContent,
+  CardHeader,
+} from '@mui/material'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { Network, Urls } from '../../../api-config'
 
-const CustomerChannel = () => {
+const CustomerType = () => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    code: '',
-    customer_channel: '',
+    customer_type: '',
+    shop: '',
   })
-  const [customer_type, setcustomertype] = useState([])
+  const [customerTypes, setCustomerTypes] = useState([])
   const [isEditing, setIsEditing] = useState(false)
   const [editId, setEditId] = useState(null)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10)
 
-  const baseUrl = 'http://195.26.253.123/pos/customer'
-
-  // Fetch channels on component load
   useEffect(() => {
-    fetchTypes()
-  }, [])
+    const shopId = localStorage.getItem('shop_id')
+    if (shopId) {
+      setFormData((prev) => ({ ...prev, shop: shopId }))
+    } else {
+      toast.error('Shop ID not found in local storage.')
+    }
+    fetchCustomerTypes(currentPage)
+  }, [currentPage])
 
-  const fetchTypes = async () => {
-    // try {
-    //   const response = await axios.get(`${baseUrl}/add_customer_type`)
-    //   setcustomertype(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching channels:', error)
-    // }
+  const fetchCustomerTypes = async (page = 0) => {
+    const shopId = localStorage.getItem('shop_id')
+    if (!shopId) {
+      toast.error('Shop ID not found in local storage.')
+      return
+    }
 
-    const response = await Network.get(Urls.addCustomerType)
-    if (!response.ok) return console.log(response.data.error)
-    setcustomertype(response.data)
+    try {
+      const response = await Network.get(
+        `${Urls.addCustomerType}/${shopId}?Starting=${page}&limit=${pageSize}`,
+      )
+      if (response.ok && response.data) {
+        setCustomerTypes(response.data)
+        setTotalPages(Math.ceil(response.data.count / pageSize))
+      } else {
+      }
+    } catch (error) {
+      console.error('Error fetching customer types:', error)
+      toast.error('Error fetching customer types.')
+    }
   }
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
 
-  // Handle form submission for adding/updating a type
-  // const handleAddOrUpdateType = async (e) => {
-  //   e.preventDefault()
-  //   try {
-  //     if (isEditing) {
-  //       await axios.put(`${baseUrl}/action_customer_type/${editId}/`, formData)
-  //       setcustomertype(
-  //         customer_type.map((customer_type) =>
-  //           customer_type.id === editId ? { ...customer_type, ...formData } : customer_type,
-  //         ),
-  //       )
-  //     } else {
-  //       const response = await axios.post(`${baseUrl}/add_customer_type`, formData)
-  //       setTypes([...customer_type, response.data])
-  //     }
-  //     setFormData({ customer_type: '' })
-  //     setIsEditing(false)
-  //     setEditId(null)
-  //   } catch (error) {
-  //     console.error('Error adding/updating customer type:', error)
-  //   }
-  // }
-
   const handleAddOrUpdateType = async (e) => {
     e.preventDefault()
 
-    if (isEditing) {
-      const response = await Network.put(`${Urls.actionCustomerType}/${editId}/`, formData)
-      if (!response.ok) return console.log(response.data.error)
-
-      setcustomertype(
-        customer_type.map((customer_type) =>
-          customer_type.id === editId ? { ...customer_type, ...formData } : customer_type,
-        ),
-      )
-    } else {
-      const response = await Network.post(Urls.addCustomerType, formData)
-      if (!response.ok) return console.log(response.data.error)
-
-      setcustomertype([...customer_type, response.data])
+    // Ensure shop ID is included in formData
+    const shopId = localStorage.getItem('shop_id')
+    if (!shopId) {
+      toast.error('Shop ID not found in local storage.')
+      return
     }
 
-    setFormData({ customer_type: '' })
+    const updatedFormData = { ...formData, shop: shopId }
+
+    try {
+      if (isEditing) {
+        const response = await Network.put(
+          `${Urls.actionCustomerType}/${shopId}/${editId}`,
+          updatedFormData,
+        )
+        if (response.ok) {
+          setCustomerTypes((prev) =>
+            prev.map((type) => (type.id === editId ? { ...type, ...updatedFormData } : type)),
+          )
+          toast.success('Customer Type updated successfully!')
+        } else {
+          toast.error('Error updating customer type.')
+        }
+      } else {
+        const response = await Network.post(`${Urls.addCustomerType}/${shopId}`, updatedFormData)
+        if (response.ok && response.data) {
+          setCustomerTypes((prev) => [response.data, ...prev])
+          toast.success('Customer Type added successfully!')
+        } else {
+          toast.error('Error adding customer type.')
+        }
+      }
+      resetForm()
+    } catch (error) {
+      console.error('Error adding/updating customer type:', error)
+      toast.error('Error adding/updating customer type.')
+    }
+  }
+
+  const handleEdit = (id) => {
+    const typeToEdit = customerTypes.find((type) => type.id === id)
+    if (typeToEdit) {
+      setFormData({
+        customer_type: typeToEdit.customer_type,
+        shop: localStorage.getItem('shop_id'), // Ensure shop ID is included
+      })
+      setIsEditing(true)
+      setEditId(id)
+    }
+  }
+
+  const resetForm = () => {
+    setFormData({
+      customer_type: '',
+      shop: localStorage.getItem('shop_id'), // Retain the shop ID when resetting the form
+    })
     setIsEditing(false)
     setEditId(null)
   }
 
-  // Handle edit button click
-  const handleEdit = (id) => {
-    const channelToEdit = customer_type.find((customer_type) => customer_type.id === id)
-    setFormData({ customer_type: channelToEdit.customer_type })
-    setIsEditing(true)
-    setEditId(id)
+  const handleDelete = async (id) => {
+    const shopId = localStorage.getItem('shop_id')
+    if (!shopId) {
+      toast.error('Shop ID not found in local storage.')
+      return
+    }
+
+    try {
+      const response = await Network.delete(`${Urls.actionCustomerType}/${shopId}/${id}`)
+      if (response.ok) {
+        setCustomerTypes((prev) => prev.filter((type) => type.id !== id))
+        toast.success('Customer Type deleted successfully.')
+      } else {
+        toast.error('Error deleting customer type.')
+      }
+    } catch (error) {
+      console.error('Error deleting customer type:', error)
+      toast.error('Error deleting customer type.')
+    }
   }
 
-  // Handle delete channel
-  const handleDelete = async (id) => {
-    // try {
-    //   await axios.delete(`${baseUrl}/action_customer_type/${id}/`)
-    //   setcustomertype(customer_type.filter((customer_type) => customer_type.id !== id))
-    // } catch (error) {
-    //   console.error('Error deleting channel:', error)
-    // }
-
-    const response = await Network.delete(`${Urls.actionCustomerType}/${id}/`)
-    if (!response.ok) return console.log(response.data.error)
-
-    setcustomertype(customer_type.filter((customer_type) => customer_type.id !== id))
-    toast.success('Customer Type deleted successfully.')
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page - 1)
   }
 
   return (
-    <div>
-      <Link to="/Customer/AddCustomer">
-        <CButton color="primary" className="me-md-2">
-          Back to Add Customer
-        </CButton>
-      </Link>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
+    <Card
+      sx={{
+        border: '1px solid #ddd',
+        maxWidth: 1100,
+        maxHeight: 550,
+        margin: '0 auto',
+        padding: 2,
+      }}
+    >
+      <CardHeader>
+        <Typography variant="h4" align="center" gutterBottom>
+          {isEditing ? 'Edit Customer Type' : 'Add Customer Type'}
+        </Typography>
+      </CardHeader>
+      <CardContent>
+        <Link to="/Customer/AddCustomer">
+          <Button variant="outlined" color="primary" sx={{ mb: 2 }}>
+            Back to Add Customer
+          </Button>
+        </Link>
 
-      <h2>{isEditing ? 'Edit' : 'Add'} Customer Type</h2>
-      <form onSubmit={handleAddOrUpdateType}>
-        <div>
-          <label>Type:</label>
-          <input
-            type="text"
-            name="customer_type"
-            value={formData.customer_type}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
 
-        <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
-      </form>
+        <Typography variant="h6" gutterBottom>
+          Customer Type
+        </Typography>
 
-      <h3>Customer Types</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customer_type.map((customer_type) => (
-            <tr key={customer_type.id}>
-              <td>{customer_type.id}</td>
-              <td>{customer_type.customer_type}</td>
-              <td>
-                <button onClick={() => handleEdit(customer_type.id)}>Edit</button>
-                <button onClick={() => handleDelete(customer_type.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        <form onSubmit={handleAddOrUpdateType}>
+          <Box mb={2}>
+            <TextField
+              label="Type"
+              name="customer_type"
+              value={formData.customer_type}
+              onChange={handleChange}
+              fullWidth
+              required
+            />
+          </Box>
+          <Button type="submit" variant="contained" color="primary">
+            {isEditing ? 'Update' : 'Add'}
+          </Button>
+        </form>
+
+        <Typography variant="h5" sx={{ mt: 4 }} gutterBottom>
+          Customer Types
+        </Typography>
+
+        <TableContainer component={Paper} sx={{ border: '1px solid #ddd' }}>
+          <Table
+            sx={{
+              borderCollapse: 'collapse',
+              tableLayout: 'fixed',
+              '& td, & th': { border: '1px solid #ddd', padding: '8px' },
+            }}
+          >
+            <TableHead sx={{ backgroundColor: '#1976d2' }}>
+              <TableRow>
+                <TableCell sx={{ color: '#fff', textAlign: 'center', width: '33%' }}>ID</TableCell>
+                <TableCell sx={{ color: '#fff', textAlign: 'center', width: '33%' }}>
+                  Type
+                </TableCell>
+                <TableCell sx={{ color: '#fff', textAlign: 'center', width: '33%' }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {customerTypes.length > 0 ? (
+                customerTypes.map((type) => (
+                  <TableRow key={type.id}>
+                    <TableCell align="center">{type.id}</TableCell>
+                    <TableCell align="center">{type.customer_type}</TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          onClick={() => handleEdit(type.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDelete(type.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    No customer types found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Pagination
+          count={totalPages}
+          page={currentPage + 1}
+          onChange={handlePageChange}
+          sx={{
+            mt: 2,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            '& .MuiPaginationItem-root': {
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              borderRadius: '50%',
+            },
+          }}
+        />
+      </CardContent>
+    </Card>
   )
 }
 
-export default CustomerChannel
+export default CustomerType

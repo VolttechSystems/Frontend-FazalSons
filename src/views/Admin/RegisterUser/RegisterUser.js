@@ -93,7 +93,7 @@ function RegisterUser() {
     fetchOutlets() // Fetch outlets separately
   }, [])
 
-  const fetchUsers = async (page = 1) => {
+  const fetchUsers = async (page = 0) => {
     const shopId = localStorage.getItem('shop_id')
     try {
       const response = await Network.get(
@@ -221,14 +221,13 @@ function RegisterUser() {
   }
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 0 && page <= totalPages) {
       setCurrentPage(page)
     }
   }
 
   const handleDelete = (userId) => {
-    const shopId = localStorage.getItem('shop_id')
-    Network.delete(`${Urls.deleteUser}/${shopId}/${userId}/`)
+    Network.delete(`${Urls.deleteUser}/${userId}`)
       .then((response) => {
         console.log('User deleted successfully:', response)
         fetchUsers() // Refresh the user list

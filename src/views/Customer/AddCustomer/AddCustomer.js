@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import './AddCustomer.css'
 import { Network, Urls } from '../../../api-config'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Select from 'react-select'
 
 const AddCustomer = () => {
   const [formData, setFormData] = useState({
-    dateTime: '',
     customer_channel: '',
     customerType: '',
-    first_name: '',
-    last_name: '',
     display_name: '',
     gender: '',
     company_name: '',
@@ -32,58 +29,64 @@ const AddCustomer = () => {
     image: null,
     online_access: 'no',
     status: 'active',
+    shop: '', // Add shop to formData
   })
 
   const [customers, setCustomers] = useState([])
   const [customerChannels, setCustomerChannels] = useState([])
   const [customerTypes, setCustomerTypes] = useState([])
   const [editingCustomerId, setEditingCustomerId] = useState(null)
+  const [currentPage, setCurrentPage] = useState(0) // Pagination start from 0
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10) // Items per page
   const navigate = useNavigate()
   const apiUrl = 'http://195.26.253.123/pos/customer'
 
   useEffect(() => {
-    fetchCustomers()
+    const shopId = localStorage.getItem('shop_id')
+    if (shopId) {
+      setFormData((prev) => ({ ...prev, shop: shopId })) // Set shop in formData
+    } else {
+    }
+    fetchCustomers(currentPage)
     fetchCustomerChannels()
     fetchCustomerTypes()
-  }, [])
+  }, [currentPage])
 
-  const fetchCustomers = async () => {
-    // try {
-    //   const response = await axios.get(`${apiUrl}/add_customer`)
-    //   setCustomers(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching customers:', error)
-    // }
-
-    const response = await Network.get(Urls.addCustomer)
+  const fetchCustomers = async (page = 0) => {
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(
+      `${Urls.addCustomer}/${shopId}?Starting=${page}&limit=${pageSize}`,
+    )
     if (!response.ok) return console.log(response.data.error)
-    setCustomers(response.data)
+    setCustomers(response.data.results) // Set existing customers
+    setTotalPages(Math.ceil(response.data.count / pageSize))
   }
 
   const fetchCustomerChannels = async () => {
-    // try {
-    //   const response = await axios.get(`${apiUrl}/add_customer_channel`)
-    //   setCustomerChannels(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching customer channels:', error)
-    // }
-
-    const response = await Network.get(Urls.addCustomerChannel)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.addCustomerChannel}/${shopId}`)
     if (!response.ok) return console.log(response.data.error)
-    setCustomerChannels(response.data)
+    // setCustomerChannels(response.data)
+    setCustomerChannels(
+      response.data.map((channel) => ({
+        value: channel.id,
+        label: channel.customer_channel,
+      })),
+    )
   }
 
   const fetchCustomerTypes = async () => {
-    // try {
-    //   const response = await axios.get(`${apiUrl}/add_customer_type`)
-    //   setCustomerTypes(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching customer types:', error)
-    // }
-
-    const response = await Network.get(Urls.addCustomerType)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.addCustomerType}/${shopId}`)
     if (!response.ok) return console.log(response.data.error)
-    setCustomerTypes(response.data)
+    // setCustomerTypes(response.data)
+    setCustomerTypes(
+      response.data.map((type) => ({
+        value: type.id,
+        label: type.customer_type,
+      })),
+    )
   }
 
   const handleChange = (e) => {
@@ -93,116 +96,108 @@ const AddCustomer = () => {
       [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value,
     })
   }
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-  //   try {
-  //     if (editingCustomerId) {
-  //       await axios.put(`${apiUrl}/action_customer/${editingCustomerId}/`, formData)
-  //       alert('Customer updated successfully')
-  //     } else {
-  //       await axios.post(`${apiUrl}/add_customer`, formData)
-  //       alert('Customer added successfully')
-  //     }
-
-  //     setFormData({
-  //       dateTime: '',
-  //       customer_channel: '',
-  //       customerType: '',
-  //       first_name: '',
-  //       last_name: '',
-  //       display_name: '',
-  //       gender: '',
-  //       company_name: '',
-  //       email: '',
-  //       mobile_no: '',
-  //       international_no: '',
-  //       landline_no: '',
-  //       password: '',
-  //       address: '',
-  //       shippingAddressSameAsMain: false,
-  //       shipping_address: '',
-  //       city: '',
-  //       zip_code: '',
-  //       province: '',
-  //       country: '',
-  //       internal_note: '',
-  //       image: null,
-  //       online_access: 'No',
-  //       status: 'active',
-  //     })
-  //     setEditingCustomerId(null)
-  //     fetchCustomers()
-  //   } catch (error) {
-  //     console.error('Error saving customer:', error)
-  //   }
-  // }
+  const handleSelectChange = (selectedOption, { name }) => {
+    setFormData({ ...formData, [name]: selectedOption ? selectedOption.value : '' })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    if (editingCustomerId) {
-      const response = await Network.put(`${Urls.actionCustomer}/${editingCustomerId}/`, formData)
-      if (!response.ok) return console.log(response.data.error)
-
-      toast.success('Customer updated successfully!')
-    } else {
-      const response = await Network.post(Urls.addCustomer, formData)
-      if (!response.ok) return console.log(response.data.error)
-
-      toast.success('Customer added successfully!')
+    const shopId = localStorage.getItem('shop_id')
+    if (!shopId) {
+      toast.error('Shop ID not found in local storage.')
+      return
     }
 
-    setFormData({
-      dateTime: '',
-      customer_channel: '',
-      customerType: '',
-      first_name: '',
-      last_name: '',
-      display_name: '',
-      gender: '',
-      company_name: '',
-      email: '',
-      mobile_no: '',
-      international_no: '',
-      landline_no: '',
-      password: '',
-      address: '',
-      shippingAddressSameAsMain: false,
-      shipping_address: '',
-      city: '',
-      zip_code: '',
-      province: '',
-      country: '',
-      internal_note: '',
-      image: null,
-      online_access: 'No',
-      status: 'active',
-    })
+    try {
+      let response
 
-    setEditingCustomerId(null)
-    fetchCustomers()
+      if (editingCustomerId) {
+        // Update existing customer
+        response = await Network.put(
+          `${Urls.actionCustomer}/${shopId}/${editingCustomerId}`,
+          formData,
+        )
+        if (response.ok && response.data) {
+          setCustomers((prev) =>
+            prev.map((customer) =>
+              customer.id === editingCustomerId ? { ...customer, ...response.data } : customer,
+            ),
+          )
+          toast.success('Customer updated successfully!')
+        } else {
+          toast.error('Error updating customer.')
+        }
+      } else {
+        // Add new customer
+        response = await Network.post(`${Urls.addCustomer}/${shopId}`, formData)
+        if (response.ok && response.data) {
+          setCustomers((prev) => [response.data, ...prev]) // Add new customer to top
+          toast.success('Customer added successfully!')
+        } else {
+          toast.error('Error adding customer.')
+        }
+      }
+
+      // Reset form and state
+      setFormData({
+        customer_channel: null, // Reset to null for react-select
+        customerType: null, // Reset to null for react-select
+        display_name: '',
+        gender: '',
+        company_name: '',
+        email: '',
+        mobile_no: '',
+        international_no: '',
+        landline_no: '',
+        password: '',
+        address: '',
+        shippingAddressSameAsMain: false,
+        shipping_address: '',
+        city: '',
+        zip_code: '',
+        province: '',
+        country: '',
+        internal_note: '',
+        image: null,
+        online_access: 'no',
+        status: 'active',
+        shop: shopId,
+      })
+      setEditingCustomerId(null)
+    } catch (error) {
+      console.error('Error submitting customer:', error)
+      toast.error('Error submitting customer.')
+    }
   }
 
+  // const handleEdit = (customer) => {
+  //   setFormData({
+  //     ...customer,
+  //     shippingAddressSameAsMain: customer.shipping_address === customer.address,
+  //   })
+  //   setEditingCustomerId(customer.id)
+  // }
   const handleEdit = (customer) => {
     setFormData({
       ...customer,
+      customer_channel: customer.customer_channel.id,
+      customerType: customer.customer_type.id,
       shippingAddressSameAsMain: customer.shipping_address === customer.address,
     })
     setEditingCustomerId(customer.id)
   }
 
   const handleDelete = async (id) => {
-    // try {
-    //   await axios.delete(`${apiUrl}/action_customer/${id}/`)
-    //   alert('Customer deleted successfully')
-    //   fetchCustomers()
-    // } catch (error) {
-    //   console.error('Error deleting customer:', error)
-    // }
-
-    const response = await Network.delete(`${Urls.actionCustomer}/${id}/`)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.delete(`${Urls.actionCustomer}/${shopId}/${id}`)
     if (!response.ok) return console.log(response.data.error)
     toast.success('Customer deleted successfully!')
+    fetchCustomers(currentPage)
+  }
+  const handlePageChange = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page)
+    }
   }
 
   return (
@@ -231,20 +226,51 @@ const AddCustomer = () => {
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Customer Channel: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="customer_channel"
-              value={formData.customer_channel}
-              onChange={handleChange}
-              required
-              style={{ flex: 1, padding: '8px' }}
-            >
-              <option value="">Select Channel</option>
-              {customerChannels.map((channel) => (
-                <option key={channel.id} value={channel.customer_channel}>
-                  {channel.customer_channel}
-                </option>
-              ))}
-            </select>
+              options={customerChannels} // Already transformed into value/label pairs
+              value={
+                customerChannels.find((channel) => channel.value === formData.customer_channel) ||
+                null
+              }
+              onChange={(selectedOption) =>
+                handleSelectChange(selectedOption, { name: 'customer_channel' })
+              }
+              placeholder="Select Channel"
+              isSearchable
+              isClearable
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  minHeight: '42px',
+                  height: '42px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  marginBottom: '-20px',
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px',
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px',
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px',
+                }),
+              }}
+            />
+
             <button
               style={{ padding: '8px' }}
               type="button"
@@ -255,24 +281,50 @@ const AddCustomer = () => {
           </div>
         </div>
 
-        {/* Customer Type */}
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Customer Type: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="customer_type"
-              value={formData.customer_type}
-              onChange={handleChange}
-              required
-              style={{ flex: 1, padding: '8px' }}
-            >
-              <option value="">Select Type</option>
-              {customerTypes.map((type) => (
-                <option key={type.id} value={type.customer_type}>
-                  {type.customer_type}
-                </option>
-              ))}
-            </select>
+              options={customerTypes} // Already transformed into value/label pairs
+              value={customerTypes.find((type) => type.value === formData.customer_type) || null}
+              onChange={(selectedOption) =>
+                handleSelectChange(selectedOption, { name: 'customer_type' })
+              }
+              placeholder="Select Type"
+              isSearchable
+              isClearable
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  minHeight: '42px',
+                  height: '42px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  marginBottom: '-20px',
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px',
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px',
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px',
+                }),
+              }}
+            />
             <button
               style={{ padding: '8px' }}
               type="button"
@@ -281,28 +333,6 @@ const AddCustomer = () => {
               +
             </button>
           </div>
-        </div>
-
-        {/* Full Name */}
-        <div>
-          <label>First Name: *</label>
-          <input
-            type="text"
-            name="first_name"
-            value={formData.first_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Last Name: *</label>
-          <input
-            type="text"
-            name="last_name"
-            value={formData.last_name}
-            onChange={handleChange}
-            required
-          />
         </div>
 
         {/* Display Name */}
@@ -497,9 +527,7 @@ const AddCustomer = () => {
             customers.map((customer) => (
               <tr key={customer.id}>
                 <td>{customer.id}</td>
-                <td>
-                  {customer.first_name} {customer.last_name}
-                </td>
+                <td>{customer.display_name}</td>
                 <td>{customer.email}</td>
                 <td>{customer.mobile_no}</td>
                 <td>{customer.status}</td>
@@ -516,6 +544,40 @@ const AddCustomer = () => {
           )}
         </tbody>
       </table>
+      <div
+        className="pagination"
+        style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+      >
+        <button
+          style={{
+            padding: '5px 8px',
+            marginRight: '5px',
+            backgroundColor: '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+        <button
+          style={{
+            padding: '5px 8px',
+            backgroundColor: '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages - 1}
+        >
+          Next
+        </button>
+      </div>
     </div>
   )
 }

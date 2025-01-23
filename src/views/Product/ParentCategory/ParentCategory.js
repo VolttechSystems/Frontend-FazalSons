@@ -23,34 +23,27 @@ const ParentCategory = () => {
   const [hc, setHeadcategory] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const itemsPerPage = 5 // Number of items to display per page
   const navigate = useNavigate()
+  const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
 
   useEffect(() => {
     const fetchParentcategory = async () => {
-      // try {
-      //   const response = await axios.get('http://195.26.253.123/pos/products/add_parent_category')
-      //   setParentcategory(response.data)
-      // } catch (error) {
-      //   console.error('Error fetching parent categories:', error)
-      //   setError('Failed to fetch parent categories.')
-      // }
-
-      const response = await Network.get(Urls.addParentCategory)
+      const response = await Network.get(
+        `${Urls.addParentCategory}${shopId}?page=${currentPage}&limit=${itemsPerPage}`,
+      )
       if (!response.ok) return consoe.log(response.data.error)
-      setParentcategory(response.data)
+      setParentcategory(response.data.results)
     }
 
     const fetchHeadcategory = async () => {
-      // try {
-      //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category') // Adjust to your actual API endpoint
-      //   setHeadcategory(response.data)
-      // } catch (error) {
-      //   console.error('Error fetching head categories:', error)
-      //   setError('Failed to fetch head categories.')
-      // }
-      const response = await Network.get(Urls.addHeadCategory)
+      const response = await Network.get(
+        `${Urls.addHeadCategory}${shopId}?page=${currentPage}&limit=${itemsPerPage}`,
+      )
       if (!response.ok) return consoe.log(response.data.error)
-      setHeadcategory(response.data)
+      setHeadcategory(response.data.results)
     }
 
     const fetchData = async () => {
@@ -59,7 +52,7 @@ const ParentCategory = () => {
     }
 
     fetchData()
-  }, [])
+  }, [currentPage])
 
   const getCategoryHead = (categoryHeadName) => {
     const headcat = hc.find((attr) => attr.hc_name_id === categoryHeadName)
@@ -67,7 +60,7 @@ const ParentCategory = () => {
   }
   const handleDelete = async (id) => {
     try {
-      const response = await Network.delete(`${Urls.updateParentCategory}/${id}/`)
+      const response = await Network.delete(`${Urls.updateParentCategory}/${shopId}/${id}/`)
       if (!response.ok) {
         console.log(response.data.error)
         toast.error('Failed to delete Parent Category.')
@@ -88,6 +81,19 @@ const ParentCategory = () => {
     console.log('Editing Parent Category with ID:', id)
     navigate(`/Product/AddParentCategory/${id}`)
     toast.success('Parent Category updated successfully!')
+  }
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+  const totalPages = Math.ceil(totalCount / itemsPerPage) // Calculate total pages
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
   }
 
   return (
@@ -157,6 +163,41 @@ const ParentCategory = () => {
                     </CTableRow>
                   ))}
                 </CTableBody>
+                <div
+                  className="pagination"
+                  style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+                >
+                  <CButton
+                    style={{
+                      padding: '5px 8px',
+                      marginRight: '5px',
+                      backgroundColor: '#007BFF',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={handlePrevious}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </CButton>
+                  <CButton
+                    style={{
+                      padding: '5px 8px',
+                      marginRight: '5px',
+                      backgroundColor: '#007BFF',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={handleNext}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </CButton>
+                </div>
               </CTable>
             )}
           </CCardBody>

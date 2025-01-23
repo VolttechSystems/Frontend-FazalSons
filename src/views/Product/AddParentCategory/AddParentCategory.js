@@ -26,43 +26,28 @@ const AddParentCategory = () => {
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState('active')
   const [errorMessage, setErrorMessage] = useState('')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10)
 
   const navigate = useNavigate()
   const { id } = useParams()
 
   useEffect(() => {
     const fetchCategoryHeads = async () => {
-      const response = await Network.get(Urls.addHeadCategory)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.addHeadCategory}${shopId}`)
       if (!response.ok) return consoe.log(response.data.error)
-      setCategoryHeads(response.data)
-
-      // try {
-      //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
-      //   setCategoryHeads(response.data);
-      // } catch (error) {
-      //   console.error('Error fetching category heads:', error);
-      //   setErrorMessage('Failed to fetch category heads.');
-      // }
+      setCategoryHeads(response.data.results)
     }
 
-    const fetchParentCategoryDetails = async () => {
-      // try {
-      //   const response = await axios.get(
-      //     `http://195.26.253.123/pos/products/action_parent_category/${id}/`,
-      //   )
-      //   const data = response.data
-      //   setCategoryHead(data.hc_name)
-      //   setPCname(data.pc_name)
-      //   setShortForm(data.symbol)
-      //   setDescription(data.description)
-      //   setStatus(data.status)
-      // } catch (error) {
-      //   console.error('Error fetching parent category details:', error)
-      //   setErrorMessage('Failed to fetch category details.')
-      // }
-
+    const fetchParentCategoryDetails = async (page = 0) => {
       if (id) {
-        const response = await Network.get(`${Urls.updateParentCategory}/${id}/`)
+        const shopId = localStorage.getItem('shop_id')
+        const starting = page // Map the page number to the Starting parameter
+        const response = await Network.get(
+          `${Urls.updateParentCategory}/${shopId}/${id}/?Starting=${starting}&limit=${pageSize}`,
+        )
         if (!response.ok) return console.log(response.data.error)
         const data = response.data
         setCategoryHead(data.hc_name)
@@ -70,36 +55,17 @@ const AddParentCategory = () => {
         setShortForm(data.symbol)
         setDescription(data.description)
         setStatus(data.status)
+        setTotalPages(Math.ceil(data.total_count / pageSize)) // Compute total pages if not provided
       }
     }
 
-    fetchCategoryHeads()
-    fetchParentCategoryDetails()
-  }, [id])
+    fetchCategoryHeads(currentPage)
+    fetchParentCategoryDetails(currentPage)
+  }, [id, currentPage])
 
   const handleSubmit = async (e) => {
-    // try {
-    //   if (id) {
-    //     await axios.put(
-    //       `http://195.26.253.123/pos/products/action_parent_category/${id}/`,
-    //       ParentCategoryData,
-    //     )
-    //     alert('Parent Category updated successfully!')
-    //   } else {
-    //     await axios.post(
-    //       'http://195.26.253.123/pos/products/add_parent_category',
-    //       ParentCategoryData,
-    //     )
-    //     alert('Parent Category added successfully!')
-    //   }
-
-    //   navigate('/Product/ParentCategory')
-    // } catch (error) {
-    //   console.error('There was an error saving the Parent Category!', error)
-    //   setErrorMessage('Error saving Parent Category. Please try again.')
-    // }
-
     e.preventDefault()
+    const shopId = localStorage.getItem('shop_id') // Retrieve shop_id from localStorag
 
     const ParentCategoryData = {
       hc_name: hc_name,
@@ -107,12 +73,15 @@ const AddParentCategory = () => {
       symbol: symbol,
       description: description,
       status: status,
+      shop: shopId,
     }
 
     console.log('ParentCategoryData:', ParentCategoryData)
 
     // Determine whether to use POST (add) or PUT (update)
-    const url = id ? `${Urls.updateParentCategory}/${id}/` : Urls.addParentCategory
+    const url = id
+      ? `${Urls.updateParentCategory}/${shopId}/${id}/`
+      : `${Urls.addParentCategory}${shopId}`
     const req = id ? 'put' : 'post'
 
     try {

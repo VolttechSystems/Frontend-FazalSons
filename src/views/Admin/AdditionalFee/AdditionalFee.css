@@ -88,9 +88,6 @@
   background-color: #f9f9f9;
 }
 
-.fee-table tbody tr:hover {
-  background-color: #e9ecef;
-}
 
 /* Button Styles for Actions */
 .edit-fee-button {

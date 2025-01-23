@@ -1,220 +1,5 @@
-// import React, { useState, useEffect } from 'react'
-// import axios from 'axios'
-// import './Salesman.css'
-// import { Network, Urls } from '../../../api-config'
-
-// const Salesman = () => {
-//   const [formData, setFormData] = useState({
-//     salesman_name: '',
-//     wholesale_commission: '',
-//     retail_commission: '',
-//     token_commission: '',
-//     outlet: '',
-//   })
-
-//   const [salesmen, setSalesmen] = useState([])
-//   const [outlets, setOutlets] = useState([]) // Outlet data
-//   const [editingSalesmanId, setEditingSalesmanId] = useState(null)
-//   const [showCommissions, setShowCommissions] = useState(true)
-
-//   useEffect(() => {
-//     fetchSalesmen()
-//     fetchOutlets() // Fetch outlets separately
-//   }, [])
-
-//   //AddSaleman
-//   const fetchSalesmen = async () => {
-//     const response = await Network.get(Urls.addSalesman)
-//     if (!response.ok) return consoe.log(response.data.error)
-//     setSalesmen(response.data)
-//   }
-
-//   const fetchOutlets = async () => {
-//     try {
-//       const response = await axios.get('http://195.26.253.123/pos/products/add_outlet')
-//       setOutlets(response.data)
-//     } catch (error) {
-//       console.error('Error fetching outlets:', error)
-//     }
-//   }
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target
-//     setFormData({ ...formData, [name]: value })
-//   }
-//   const handleSubmit = async (e) => {
-//     e.preventDefault()
-
-//     const dataToSend = {
-//       CheckBoxValue: showCommissions ? 'true' : 'false', // Include the checkbox value
-//       salesman_name: formData.salesman_name,
-//       wholesale_commission: !showCommissions ? String(formData.wholesale_commission) : '',
-//       retail_commission: !showCommissions ? String(formData.retail_commission) : '',
-//       token_commission: !showCommissions ? String(formData.token_commission) : '',
-//       outlet: formData.outlet, // Send the selected outlet ID
-//     }
-
-//     try {
-//       if (editingSalesmanId) {
-//         await axios.put(
-//           `http://195.26.253.123/pos/transaction/action_salesman/${editingSalesmanId}/`,
-//           dataToSend,
-//         )
-//       } else {
-//         await axios.post('http://195.26.253.123/pos/transaction/add_salesman', dataToSend)
-//       }
-//       fetchSalesmen() // Refresh the list
-//       resetForm()
-//     } catch (error) {
-//       console.error('Error submitting data:', error)
-//     }
-//   }
-
-//   const handleEdit = (salesman) => {
-//     setFormData({
-//       salesman_name: salesman.salesman_name,
-//       wholesale_commission: salesman.wholesale_commission || '',
-//       retail_commission: salesman.retail_commission || '',
-//       token_commission: salesman.token_commission || '',
-//       outlet: salesman.outlet || '', // Set outlet ID if available
-//     })
-//     setEditingSalesmanId(salesman.id)
-//     setShowCommissions(!!salesman.wholesale_commission)
-//   }
-
-//   const resetForm = () => {
-//     setFormData({
-//       salesman_name: '',
-//       wholesale_commission: '',
-//       retail_commission: '',
-//       token_commission: '',
-//       outlet: '',
-//     })
-//     setEditingSalesmanId(null)
-//     setShowCommissions(true)
-//   }
-
-//   const handleDelete = async (id) => {
-//     try {
-//       await axios.delete(`http://195.26.253.123/pos/transaction/action_salesman/${id}/`)
-//       setSalesmen(salesmen.filter((salesman) => salesman.id !== id))
-//     } catch (error) {
-//       console.error('Error deleting salesman:', error)
-//     }
-//   }
-
-//   return (
-//     <div className="container">
-//       <form onSubmit={handleSubmit}>
-//         <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
-
-//         <div>
-//           <label>Salesman Name: *</label>
-//           <input
-//             type="text"
-//             name="salesman_name"
-//             value={formData.salesman_name}
-//             onChange={handleChange}
-//             required
-//           />
-//         </div>
-
-//         <div>
-//           <label>Show Commission Fields:</label>
-//           <input
-//             type="checkbox"
-//             checked={showCommissions}
-//             onChange={() => setShowCommissions(!showCommissions)}
-//           />
-//         </div>
-
-//         {!showCommissions && (
-//           <>
-//             <div>
-//               <label>Wholesale Commission:</label>
-//               <input
-//                 type="number"
-//                 name="wholesale_commission"
-//                 value={formData.wholesale_commission}
-//                 onChange={handleChange}
-//               />
-//             </div>
-//             <div>
-//               <label>Retail Commission:</label>
-//               <input
-//                 type="number"
-//                 name="retail_commission"
-//                 value={formData.retail_commission}
-//                 onChange={handleChange}
-//               />
-//             </div>
-//             <div>
-//               <label>Token Commission:</label>
-//               <input
-//                 type="number"
-//                 name="token_commission"
-//                 value={formData.token_commission}
-//                 onChange={handleChange}
-//               />
-//             </div>
-//           </>
-//         )}
-
-//         <div>
-//           <label>Outlet:</label>
-//           <select name="outlet" value={formData.outlet} onChange={handleChange} required>
-//             <option value="">Select Outlet</option>
-//             {outlets.map((outlet) => (
-//               <option key={outlet.id} value={outlet.id}>
-//                 {outlet.outlet_name}
-//               </option>
-//             ))}
-//           </select>
-//         </div>
-
-//         <button type="submit" className="salesman-submit-btn">
-//           {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
-//         </button>
-//       </form>
-
-//       <table className="salesman-table">
-//         <thead className="salesman-table-header">
-//           <tr>
-//             <th>Salesman Name</th>
-//             <th>Wholesale Commission</th>
-//             <th>Retail Commission</th>
-//             <th>Token Commission</th>
-//             <th>Outlet</th>
-//             <th>Actions</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {salesmen.map((salesman) => (
-//             <tr key={salesman.id}>
-//               <td>{salesman.salesman_name}</td>
-//               <td>{salesman.wholesale_commission || 'N/A'}</td>
-//               <td>{salesman.retail_commission || 'N/A'}</td>
-//               <td>{salesman.token_commission || 'N/A'}</td>
-//               <td>
-//                 {outlets.find((outlet) => outlet.id === salesman.outlet)?.outlet_name || 'N/A'}
-//               </td>
-//               <td>
-//                 <button onClick={() => handleEdit(salesman)}>Edit</button>
-//                 <button onClick={() => handleDelete(salesman.id)}>Delete</button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   )
-// }
-
-// export default Salesman
-
 import React, { useState, useEffect } from 'react'
-import Select from 'react-select' // Import react-select
-import axios from 'axios'
+import Select from 'react-select'
 import './Salesman.css'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -226,46 +11,52 @@ const Salesman = () => {
     wholesale_commission: '',
     retail_commission: '',
     token_commission: '',
-    outlet: [], // Updated to handle multiple outlets
+    outlet: [],
+    shop: '',
   })
-
   const [salesmen, setSalesmen] = useState([])
-  const [outlets, setOutlets] = useState([]) // Outlet data
+  const [outlets, setOutlets] = useState([])
   const [editingSalesmanId, setEditingSalesmanId] = useState(null)
   const [showCommissions, setShowCommissions] = useState(true)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10)
 
   useEffect(() => {
-    fetchSalesmen()
-    fetchOutlets() // Fetch outlets separately
-  }, [])
+    fetchSalesmen(currentPage)
+    fetchOutlets()
+  }, [currentPage])
 
-  // Fetch salesmen
-  const fetchSalesmen = async () => {
+  const fetchSalesmen = async (page = 0) => {
     try {
-      const response = await Network.get(Urls.addSalesman)
-      if (!response.ok) return console.log(response.data.error)
-      setSalesmen(response.data)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(
+        `${Urls.addSalesman}/${shopId}?Starting=${page}&limit=${pageSize}`,
+      )
+      if (!response.ok) return console.error(response.data.error)
+      setSalesmen(response.data.results)
+      setTotalPages(Math.ceil(response.data.count / pageSize))
     } catch (error) {
       console.error('Error fetching salesmen:', error)
     }
   }
 
   const fetchOutlets = async () => {
-    const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
-    const response = await Network.get(`${Urls.addOutlets}/${shopId}/`)
-    if (!response.ok) return console.log(response.data.error) // Log error if the response is not successful
-
-    const outletOptions = response.data.map((outlet) => ({
-      value: outlet.id,
-      label: outlet.outlet_name,
-      outlet_code: outlet.outlet_code, // Include outlet_code here
-    }))
-    setOutlets(outletOptions) // Update the state with the transformed outlet options
+    const shopId = localStorage.getItem('shop_id')
+    try {
+      const response = await Network.get(`${Urls.addOutlets}/${shopId}/`)
+      if (!response.ok) return console.error(response.data.error)
+      const outletOptions = response.data.map((outlet) => ({
+        value: outlet.id,
+        label: outlet.outlet_name,
+      }))
+      setOutlets(outletOptions)
+    } catch (error) {
+      console.error('Error fetching outlets:', error)
+    }
   }
 
-  // Handle multi-select change for outlets
   const handleOutletChange = (selectedOptions) => {
-    // Save the selected options (or an empty array if none are selected) in the state
     setFormData({ ...formData, outlet: selectedOptions || [] })
   }
 
@@ -276,9 +67,8 @@ const Salesman = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    // Prepare the selected outlets to contain only their IDs (values)
-    const selectedOutlets = formData.outlet.map((outlet) => outlet.value) // Only outlet IDs
+    const shopId = localStorage.getItem('shop_id')
+    const selectedOutlets = formData.outlet.map((outlet) => outlet.value)
 
     const dataToSend = {
       CheckBoxValue: showCommissions ? 'true' : 'false',
@@ -286,39 +76,36 @@ const Salesman = () => {
       wholesale_commission: !showCommissions ? String(formData.wholesale_commission) : '',
       retail_commission: !showCommissions ? String(formData.retail_commission) : '',
       token_commission: !showCommissions ? String(formData.token_commission) : '',
-      outlet: selectedOutlets, // Send outlet IDs only
+      outlet: selectedOutlets,
+      shop: shopId,
     }
-
-    console.log('Selected Outlets:', selectedOutlets)
-    console.log('Data to Send:', dataToSend)
 
     try {
       const response = editingSalesmanId
-        ? await Network.put(`${Urls.updateSalesman}/${editingSalesmanId}/`, dataToSend)
-        : await Network.post(Urls.addSalesman, dataToSend)
-      toast.success('Salesman added successfully!')
-      if (!response.ok) return console.log('Error submitting data:', response.data.error)
-
-      fetchSalesmen() // Refresh the list
+        ? await Network.put(`${Urls.updateSalesman}/${shopId}/${editingSalesmanId}`, dataToSend)
+        : await Network.post(`${Urls.addSalesman}/${shopId}`, dataToSend)
+      toast.success(
+        editingSalesmanId ? 'Salesman updated successfully!' : 'Salesman added successfully!',
+      )
+      fetchSalesmen(currentPage)
       resetForm()
     } catch (error) {
       console.error('Error submitting data:', error)
+      toast.error('Error submitting data!')
     }
   }
 
   const handleEdit = (salesman) => {
-    // Map the salesman outlets to match the expected format for react-select
     const selectedOutlets = salesman.outlet.map((outlet) => ({
-      value: outlet.id, // Use outlet id as value
-      label: outlet.outlet_name, // Use outlet name as label
+      value: outlet.id,
+      label: outlet.outlet_name,
     }))
-
     setFormData({
       salesman_name: salesman.salesman_name,
       wholesale_commission: salesman.wholesale_commission || '',
       retail_commission: salesman.retail_commission || '',
       token_commission: salesman.token_commission || '',
-      outlet: selectedOutlets || [], // Set the mapped outlets here
+      outlet: selectedOutlets || [],
     })
     setEditingSalesmanId(salesman.id)
     setShowCommissions(!!salesman.wholesale_commission)
@@ -337,17 +124,26 @@ const Salesman = () => {
   }
 
   const handleDelete = async (id) => {
-    const response = await Network.delete(`${Urls.updateSalesman}/${id}/`)
-    toast.success('Salesman deleted successfully!')
-    if (!response.ok) return console.log('Error deleting salesman:', response.data.error)
+    const shopId = localStorage.getItem('shop_id')
+    try {
+      await Network.delete(`${Urls.updateSalesman}/${shopId}/${id}`)
+      toast.success('Salesman deleted successfully!')
+      fetchSalesmen(currentPage)
+    } catch (error) {
+      console.error('Error deleting salesman:', error)
+      toast.error('Error deleting salesman!')
+    }
+  }
 
-    setSalesmen((prevSalesmen) => prevSalesmen.filter((salesman) => salesman.id !== id))
+  const handlePageChange = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page)
+    }
   }
 
   return (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
-        <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
+    <div className="salesman-container">
+      <form className="salesman-form" onSubmit={handleSubmit}>
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -360,7 +156,7 @@ const Salesman = () => {
           pauseOnHover
           theme="colored"
         />
-
+        <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
         <div>
           <label>Salesman Name: *</label>
           <input
@@ -371,7 +167,6 @@ const Salesman = () => {
             required
           />
         </div>
-
         <div>
           <label>Show Commission Fields:</label>
           <input
@@ -380,7 +175,6 @@ const Salesman = () => {
             onChange={() => setShowCommissions(!showCommissions)}
           />
         </div>
-
         {!showCommissions && (
           <>
             <div>
@@ -412,34 +206,27 @@ const Salesman = () => {
             </div>
           </>
         )}
-
         <div>
           <label>Outlet:</label>
-
           <Select
             isMulti
             name="outlet"
-            options={outlets} // Array of { value: <id>, label: <name> }
-            onChange={handleOutletChange} // Pass selected options directly
-            value={formData.outlet} // Current selected outlets
+            options={outlets}
+            onChange={handleOutletChange}
+            value={formData.outlet}
             placeholder="Select outlets"
-            styles={{
-              container: (base) => ({ ...base, width: '100%' }), // Full width for dropdown
-            }}
           />
         </div>
-
-        <div style={{ marginTop: '16px' }}>
-          {' '}
-          {/* Added margin to create space */}
-          <button type="submit" className="salesman-submit-btn">
-            {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
-          </button>
-        </div>
+        <button type="submit" className="salesman-submit-btn">
+          {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
+        </button>
       </form>
 
       <table className="salesman-table">
-        <thead className="salesman-table-header">
+        <thead
+          className="salesman-table-header"
+          style={{ backgroundColor: '#007BFF', color: 'white' }}
+        >
           <tr>
             <th>Salesman Name</th>
             <th>Wholesale Commission</th>
@@ -469,6 +256,41 @@ const Salesman = () => {
           ))}
         </tbody>
       </table>
+
+      <div
+        className="pagination"
+        style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+      >
+        <button
+          style={{
+            padding: '5px 8px',
+            marginRight: '5px',
+            backgroundColor: '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+        <button
+          style={{
+            padding: '5px 8px',
+            backgroundColor: '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages - 1}
+        >
+          Next
+        </button>
+      </div>
     </div>
   )
 }

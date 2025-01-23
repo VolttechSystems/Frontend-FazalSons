@@ -39,7 +39,7 @@ const SysRoles = () => {
     }
   }
 
-  const fetchRoles = async (page = 1) => {
+  const fetchRoles = async (page = 0) => {
     const shopId = localStorage.getItem('shop_id') // Retrieve shop_id from localStorage
     if (!shopId) {
       console.error('Shop ID is missing in localStorage.')
@@ -117,7 +117,7 @@ const SysRoles = () => {
   }
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 0 && page <= totalPages) {
       setCurrentPage(page)
     }
   }
@@ -157,7 +157,18 @@ const SysRoles = () => {
 
   return (
     <div className="container">
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <h2>System Roles</h2>
 
       <div>

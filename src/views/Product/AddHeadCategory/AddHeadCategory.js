@@ -30,50 +30,34 @@ const AddHeadCategory = () => {
   const [description, setDescription] = useState('')
   const [types, setTypes] = useState([])
   const [editingIndex, setEditingIndex] = useState(null)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10)
   const navigate = useNavigate()
 
-  const fetchHeadCategory = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category');
-    //   setTypes(response.data);
-    // } catch (error) {
-    //   console.error('Error fetching category head:', error);
-    // }
-    const response = await Network.get(Urls.addHeadCategory)
+  const fetchHeadCategory = async (page = 0) => {
+    const shopId = localStorage.getItem('shop_id')
+    const starting = page // Map the page number to the Starting parameter
+    const response = await Network.get(
+      `${Urls.addHeadCategory}${shopId}?Starting=${starting}&limit=${pageSize}`,
+    )
+
     if (!response.ok) return consoe.log(response.data.error)
-    setTypes(response.data)
+    setTypes(response.data.results)
+    setTotalPages(Math.ceil(data.total_count / pageSize)) // Compute total pages if not provided
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const requestData = { hc_name: hc_name, symbol, description, status }
-
-    // try {
-    //   if (editingIndex !== null) {
-    //     await axios.put(
-    //       `http://195.26.253.123/pos/products/action_head_category/${types[editingIndex].id}/`,
-    //       requestData,
-    //     )
-    //     setEditingIndex(null)
-    //   } else {
-    //     await axios.post('http://195.26.253.123/pos/products/add_head_category', requestData)
-    //   }
-    //   // Reset the form
-    //   setHCname('')
-    //   setStatus('active')
-    //   setSymbol('')
-    //   setDescription('')
-    //   fetchHeadCategory()
-    // } catch (error) {
-    //   console.error('Error adding/editing Head Category :', error)
-    // }
+    const shopId = localStorage.getItem('shop_id') // Retrieve shop_id from localStorag
+    const requestData = { hc_name: hc_name, symbol, description, status, shop: shopId }
 
     // Determine if editing or adding
     const isEditing = editingIndex !== null
 
     const url = isEditing
-      ? `${Urls.updateHeadCategory}/${types[editingIndex].id}/`
-      : Urls.addHeadCategory
+      ? `${Urls.updateHeadCategory}/${shopId}/${types[editingIndex].id}`
+      : `${Urls.addHeadCategory}${shopId}`
 
     const req = isEditing ? 'put' : 'post'
 
@@ -99,7 +83,7 @@ const AddHeadCategory = () => {
       setDescription('')
 
       // Refresh the HeadCategory list
-      fetchHeadCategory()
+      fetchHeadCategory(currentPage)
     } catch (error) {
       console.error('Error:', error.message)
 
@@ -119,21 +103,38 @@ const AddHeadCategory = () => {
     setEditingIndex(index)
   }
 
+  const handlePageChange = (page) => {
+    if (page >= 0 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
   // Function to handle delete button click
   const handleDelete = async (index) => {
+    const shopId = localStorage.getItem('shop_id')
     const id = types[index].id // Assuming each type has a unique `id`
+    if (!shopId) {
+      console.error('Shop ID is missing in localStorage.')
+      return
+    }
+
     try {
-      await axios.delete(`http://195.26.253.123/pos/products/action_head_category/${id}/`)
-      toast.success('Head Category head deleted successfully!')
-      fetchHeadCategory()
+      const response = await Network.delete(`${Urls.updateHeadCategory}/${shopId}/${id}`)
+      if (!response.ok) {
+        console.error('Error deleting Head Category:', response.data.error)
+        return toast.error('Failed to delete Head Category.')
+      }
+
+      toast.success('Head Category deleted successfully!')
+      fetchHeadCategory(currentPage)
     } catch (error) {
-      console.error('Error deleting category head:', error)
+      console.error('Error deleting Head Category:', error)
     }
   }
 
   useEffect(() => {
-    fetchHeadCategory()
-  }, [])
+    fetchHeadCategory(currentPage)
+  }, [currentPage])
 
   return (
     <CRow>
@@ -268,6 +269,40 @@ const AddHeadCategory = () => {
                 ))}
               </CTableBody>
             </CTable>
+            <div
+              className="pagination"
+              style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+            >
+              <button
+                style={{
+                  padding: '5px 8px',
+                  marginRight: '5px',
+                  backgroundColor: '#007BFF',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+              >
+                Previous
+              </button>
+              <button
+                style={{
+                  padding: '5px 8px',
+                  backgroundColor: '#007BFF',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+              >
+                Next
+              </button>
+            </div>
           </CCardBody>
         </CCard>
       </CCol>

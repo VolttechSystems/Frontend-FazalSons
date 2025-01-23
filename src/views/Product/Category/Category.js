@@ -37,113 +37,52 @@ const AddCategories = () => {
   const [selectedParentCategory, setSelectedParentCategory] = useState('')
   const [selectedHeadCategory, setSelectedHeadCategory] = useState('')
 
-  const API_ADD_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories'
-  const API_HEAD_CATEGORIES = 'http://195.26.253.123/pos/products/add_head_category'
-  const API_PARENT_CATEGORIES = 'http://195.26.253.123/pos/products/add_parent_category'
-  const API_ATT_TYPES = 'http://195.26.253.123/pos/products/add_attribute_type'
-  const API_FETCH_VARIATIONS_GROUP = 'http://195.26.253.123/pos/products/fetch_variations_group'
-
-  const API_UPDATE_CATEGORY = 'http://195.26.253.123/pos/products/action_categories'
-  const API_FETCH_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories'
-
-  // Fetch initial data and categories list
-  // useEffect(() => {
-  //   const fetchInitialData = async () => {
-  //     try {
-  //       const [headResponse, parentResponse, attTypesResponse, categoriesResponse] =
-  //         await Promise.all([
-  //           axios.get(API_HEAD_CATEGORIES),
-  //           axios.get(API_PARENT_CATEGORIES),
-  //           axios.get(API_ATT_TYPES),
-  //           axios.get(API_FETCH_CATEGORIES),
-  //         ])
-
-  //       setHeadCategories(headResponse.data)
-  //       setParentCategories(parentResponse.data)
-  //       setAttTypes(attTypesResponse.data)
-  //       setCategories(categoriesResponse.data)
-  //     } catch (error) {
-  //       console.error('Error in fetchInitialData:', error)
-
-  //       // Log each endpoint individually
-  //       try {
-  //         const headResponse = await axios.get(API_HEAD_CATEGORIES)
-  //         setHeadCategories(headResponse.data)
-  //       } catch (headError) {
-  //         console.error('Error fetching Head Categories:', headError)
-  //       }
-
-  //       try {
-  //         const parentResponse = await axios.get(API_PARENT_CATEGORIES)
-  //         setParentCategories(parentResponse.data)
-  //       } catch (parentError) {
-  //         console.error('Error fetching Parent Categories:', parentError)
-  //       }
-
-  //       try {
-  //         const attTypesResponse = await axios.get(API_ATT_TYPES)
-  //         setAttTypes(attTypesResponse.data)
-  //       } catch (attError) {
-  //         console.error('Error fetching Attribute Types:', attError)
-  //       }
-
-  //       try {
-  //         const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
-  //         setCategories(categoriesResponse.data)
-  //       } catch (categoriesError) {
-  //         console.error('Error fetching Categories:', categoriesError)
-  //       }
-  //     }
-  //   }
-
-  //   fetchInitialData()
-  // }, [])
-
   useEffect(() => {
     const fetchInitialData = async () => {
+      const shopId = localStorage.getItem('shop_id')
       try {
         // Use Promise.all to fetch all endpoints simultaneously
         const [headResponse, parentResponse, attTypesResponse, categoriesResponse] =
           await Promise.all([
-            Network.get(Urls.addHeadCategory),
-            Network.get(Urls.addParentCategory),
-            Network.get(Urls.addAttributeTypes),
-            Network.get(Urls.addCategory),
+            Network.get(`${Urls.addHeadCategory}${shopId}`),
+            Network.get(`${Urls.addParentCategory}${shopId}`),
+            Network.get(`${Urls.addAttributeTypes}/${shopId}`),
+            Network.get(`${Urls.addCategory}/${shopId}`),
           ])
 
         // Update state with fetched data
-        setHeadCategories(headResponse.data)
-        setParentCategories(parentResponse.data)
-        setAttTypes(attTypesResponse.data)
-        setCategories(categoriesResponse.data)
+        setHeadCategories(headResponse.data.results)
+        setParentCategories(parentResponse.data.results)
+        setAttTypes(attTypesResponse.data.results)
+        setCategories(categoriesResponse.data.results)
       } catch (error) {
         console.error('Error in fetchInitialData:', error)
 
         // Attempt to fetch each endpoint individually in case of failure
         try {
-          const headResponse = await Network.get(Urls.addHeadCategory)
-          setHeadCategories(headResponse.data)
+          const headResponse = await Network.get(`${Urls.addHeadCategory}${shopId}`)
+          setHeadCategories(headResponse.data.results)
         } catch (headError) {
           console.error('Error fetching Head Categories:', headError)
         }
 
         try {
-          const parentResponse = await Network.get(Urls.addParentCategory)
-          setParentCategories(parentResponse.data)
+          const parentResponse = await Network.get(`${Urls.addParentCategory}${shopId}`)
+          setParentCategories(parentResponse.data.results)
         } catch (parentError) {
           console.error('Error fetching Parent Categories:', parentError)
         }
 
         try {
-          const attTypesResponse = await Network.get(Urls.addAttributeTypes)
-          setAttTypes(attTypesResponse.data)
+          const attTypesResponse = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
+          setAttTypes(attTypesResponse.data.results)
         } catch (attError) {
           console.error('Error fetching Attribute Types:', attError)
         }
 
         try {
-          const categoriesResponse = await Network.get(Urls.addCategory)
-          setCategories(categoriesResponse.data)
+          const categoriesResponse = await Network.get(`${Urls.addCategory}/${shopId}`)
+          setCategories(categoriesResponse.data.results)
         } catch (categoriesError) {
           console.error('Error fetching Categories:', categoriesError)
         }
@@ -154,16 +93,10 @@ const AddCategories = () => {
   }, [])
 
   const fetchCategories = async () => {
-    // try {
-    //   const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
-    //   setCategories(categoriesResponse.data)
-    // } catch (error) {
-    //   console.error('Error fetching Categories:', error)
-    // }
-
-    const response = await Network.get(Urls.addCategory)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.addCategory}/${shopId}`)
     if (!response.ok) return consoe.log(response.data.error)
-    setCategories(response.data)
+    setCategories(response.data.results)
   }
 
   useEffect(() => {
@@ -174,16 +107,10 @@ const AddCategories = () => {
   // Fetch Attribute Types
   useEffect(() => {
     const fetchAttTypes = async () => {
-      // try {
-      //   const response = await axios.get(API_ATT_TYPES)
-      //   setAttTypes(response.data)
-      // } catch (error) {
-      //   console.error('Error fetching Attribute Types:', error)
-      // }
-
-      const response = await Network.get(Urls.addAttributeTypes)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
       if (!response.ok) return consoe.log(response.data.error)
-      setAttTypes(response.data)
+      setAttTypes(response.data.results)
     }
     fetchAttTypes()
   }, [])
@@ -194,17 +121,11 @@ const AddCategories = () => {
 
   // Fetch Head Categories
   const fetchHeadCategories = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
-    //   setHeadCategories(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching head categories:', error)
-    //   //setError('Failed to load head categories. Please try again later.');
-    // }
+    const shopId = localStorage.getItem('shop_id')
 
-    const response = await Network.get(Urls.addHeadCategory)
+    const response = await Network.get(`${Urls.addHeadCategory}${shopId}`)
     if (!response.ok) return console.log(response.data.error)
-    setHeadCategories(response.data)
+    setHeadCategories(response.data.results)
   }
 
   const handleHeadCategoryChange = async (e) => {

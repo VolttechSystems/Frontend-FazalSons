@@ -17,7 +17,6 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Network, Urls } from '../../../api-config'
 import { ToastContainer, toast } from 'react-toastify'
@@ -28,52 +27,47 @@ const AddAttributeType = () => {
   const [status, setStatus] = useState('active') // Default status
   const [types, setTypes] = useState([])
   const [editingIndex, setEditingIndex] = useState(null)
+  const [currentPage, setCurrentPage] = useState(0) // Pagination start from 0
+  const [totalPages, setTotalPages] = useState(1)
+  const [pageSize] = useState(10) // Items per page
   const navigate = useNavigate()
 
+  const shopId = localStorage.getItem('shop_id')
+
+  if (!shopId) {
+    toast.error('Shop ID not found in local storage.')
+    return
+  }
+
   // Function to fetch attribute types from the API
-  const fetchAttributeTypes = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_attribute_type');
-    //   setTypes(response.data); // Assuming the response data is an array of attribute types
-    // } catch (error) {
-    //   console.error('Error fetching attribute types:', error);
-    // }
-    const response = await Network.get(Urls.addAttributeTypes)
-    if (!response.ok) return consoe.log(response.data.error)
-    setTypes(response.data)
+  const fetchAttributeTypes = async (page = 0) => {
+    try {
+      const response = await Network.get(
+        `${Urls.addAttributeTypes}/${shopId}?Starting=${page}&limit=${pageSize}`,
+      )
+      if (response.ok && response.data) {
+        setTypes(response.data.results)
+        setTotalPages(Math.ceil(response.data.count / pageSize))
+      } else {
+        toast.error('Failed to fetch attribute types.')
+      }
+    } catch (error) {
+      console.error('Error fetching attribute types:', error)
+      toast.error('Error fetching attribute types.')
+    }
   }
 
   // Function to handle form submission for adding/editing attribute types
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const requestData = { att_type: attributeType, status }
-
-    // try {
-    //   if (editingIndex !== null) {
-    //     // Edit existing attribute type
-    //     await axios.put(
-    //       `http://195.26.253.123/pos/products/action_attribute_type/${types[editingIndex].id}/`,
-    //       requestData,
-    //     )
-    //     setEditingIndex(null) // Reset editing index
-    //   } else {
-    //     // Add new attribute type
-    //     await axios.post('http://195.26.253.123/pos/products/add_attribute_type', requestData)
-    //   }
-    //   // Reset the form
-    //   setAttributeType('')
-    //   setStatus('active') // Reset to default status
-    //   fetchAttributeTypes() // Refetch attribute types after submission
-    // } catch (error) {
-    //   console.error('Error adding/editing attribute type:', error)
-    // }
+    const requestData = { att_type: attributeType, status, shop: shopId }
 
     // Determine if editing or adding
     const isEditing = editingIndex !== null
 
     const url = isEditing
-      ? `${Urls.updateAttributeType}/${types[editingIndex].id}/`
-      : Urls.addAttributeTypes
+      ? `${Urls.updateAttributeType}/${shopId}/${types[editingIndex].id}`
+      : `${Urls.addAttributeTypes}/${shopId}`
 
     const req = isEditing ? 'put' : 'post'
 
@@ -82,29 +76,34 @@ const AddAttributeType = () => {
       const response = await Network[req](url, requestData)
 
       // Handle API response errors
-      if (!response.ok) {
-        throw new Error(response.data.error || 'Attribute Type with this name already exists!')
+      if (response.ok && response.data) {
+        toast.success(
+          isEditing ? 'Attribute Type updated successfully!' : 'Attribute Type added successfully!',
+        )
+
+        if (isEditing) {
+          setTypes((prev) =>
+            prev.map((item, index) =>
+              index === editingIndex ? { ...item, ...response.data } : item,
+            ),
+          )
+        } else {
+          setTypes((prev) => [response.data, ...prev]) // Add new type to the top of the list
+        }
+
+        // Reset form fields
+        setAttributeType('')
+        setStatus('active') // Reset to default status
+        setEditingIndex(null) // Reset editing index
+      } else {
+        toast.error(response.data?.error || 'An unexpected error occurred.')
       }
-
-      // Display success toast message
-      toast.success(
-        isEditing ? 'Attribute Type updated successfully!' : 'Attribute Type added successfully!',
-      )
-
-      // Reset form fields
-      setAttributeType('')
-      setStatus('active') // Reset to default status
-      setEditingIndex(null) // Reset editing index
-
-      // Refresh the attribute types list
-      fetchAttributeTypes()
     } catch (error) {
-      console.error('Error:', error.message)
-
-      // Display error message using toast
-      toast.error(error.message || 'An unexpected error occurred')
+      console.error('Error:', error)
+      toast.error('An unexpected error occurred.')
     }
   }
+
   // Function to handle edit button click
   const handleEdit = (index) => {
     const selectedType = types[index]
@@ -116,21 +115,30 @@ const AddAttributeType = () => {
   // Function to handle delete button click
   const handleDelete = async (index) => {
     const id = types[index].id // Assuming each type has a unique `id`
-    // try {
-    //   await axios.delete(`http://195.26.253.123/pos/products/action_attribute_type/${id}/`)
-    //   fetchAttributeTypes() // Refetch attribute types after deletion
-    // } catch (error) {
-    //   console.error('Error deleting attribute type:', error)
-    // }
 
-    const response = await Network.delete(`${Urls.updateAttributeType}/${id}/`)
-    if (!response.ok) return console.log(response.data.error)
-    toast.success('Attribute Type deleted successfully!')
-    fetchAttributeTypes()
+    try {
+      const response = await Network.delete(`${Urls.updateAttributeType}/${shopId}/${id}`)
+      if (response.ok) {
+        toast.success('Attribute Type deleted successfully!')
+        fetchAttributeTypes(currentPage)
+      } else {
+        toast.error('Failed to delete attribute type.')
+      }
+    } catch (error) {
+      console.error('Error deleting attribute type:', error)
+      toast.error('Error deleting attribute type.')
+    }
+  }
+
+  const handlePageChange = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page)
+      fetchAttributeTypes(page)
+    }
   }
 
   useEffect(() => {
-    fetchAttributeTypes() // Fetch attribute types when component mounts
+    fetchAttributeTypes(currentPage) // Fetch attribute types when component mounts
   }, [])
 
   return (
@@ -142,18 +150,7 @@ const AddAttributeType = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={true}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-              />
+              <ToastContainer />
               <CRow className="mb-3">
                 <CFormLabel htmlFor="attributeType" className="col-sm-2 col-form-label">
                   Attribute Type
@@ -224,10 +221,19 @@ const AddAttributeType = () => {
                     <CTableDataCell>{item.att_type}</CTableDataCell>
                     <CTableDataCell>{item.status}</CTableDataCell>
                     <CTableDataCell>
-                      <CButton color="warning" onClick={() => handleEdit(index)}>
+                      <CButton
+                        color="warning"
+                        size="sm" // Makes the button smaller
+                        style={{ marginRight: '5px' }} // Adds space between the buttons
+                        onClick={() => handleEdit(index)}
+                      >
                         Edit
                       </CButton>
-                      <CButton color="danger" onClick={() => handleDelete(index)}>
+                      <CButton
+                        color="danger"
+                        size="sm" // Makes the button smaller
+                        onClick={() => handleDelete(index)}
+                      >
                         Delete
                       </CButton>
                     </CTableDataCell>
@@ -235,6 +241,42 @@ const AddAttributeType = () => {
                 ))}
               </CTableBody>
             </CTable>
+
+            {/* Pagination */}
+            <div
+              className="pagination"
+              style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+            >
+              <button
+                style={{
+                  padding: '5px 8px',
+                  marginRight: '5px',
+                  backgroundColor: '#007BFF',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+              >
+                Previous
+              </button>
+              <button
+                style={{
+                  padding: '5px 8px',
+                  backgroundColor: '#007BFF',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+              >
+                Next
+              </button>
+            </div>
           </CCardBody>
         </CCard>
       </CCol>

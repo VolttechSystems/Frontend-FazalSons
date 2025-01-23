@@ -1,12 +1,12 @@
 /* Container styles */
-.container {
+.salesman-container {
   width: 90%;
   margin: 0 auto;
   font-family: Arial, sans-serif;
 }
 
 /* Form styles */
-form {
+.salesman-form {
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
@@ -14,19 +14,19 @@ form {
   margin-bottom: 20px;
 }
 
-form h2 {
+.salesman-form h2 {
   color: #333;
   margin-bottom: 15px;
 }
 
-form label {
+.salesman-form label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
 
-form input[type="text"],
-form select {
+.salesman-form input[type="text"],
+.salesman-form select {
   width: 100%;
   padding: 8px;
   margin-bottom: 15px;
@@ -37,12 +37,12 @@ form select {
   background-color: #fff;
 }
 
-form select {
+.salesman-form select {
   cursor: pointer;
 }
 
-form input[type="text"]:focus,
-form select:focus {
+.salesman-form input[type="text"]:focus,
+.salesman-form select:focus {
   border-color: #51b86b;
   box-shadow: 0 0 4px rgba(81, 184, 107, 0.5);
   outline: none;
@@ -107,6 +107,7 @@ table button:last-child:hover {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 .salesman-submit-btn:hover {
@@ -130,13 +131,11 @@ table button:last-child:hover {
   background-color: #f2f2f2;
 }
 
-.salesman-table tbody tr:hover {
-  background-color: #e9ecef;
-}
+
 
 /* Styling for the table header */
 .salesman-table-header thead {
-  background-color: #007bff; /* Blue background */
+  background-color: #0056b3; /* Blue background */
   color: white; /* White font */
 }
 
