@@ -63,7 +63,7 @@
 
 .outlet-table-header th {
   padding: 10px;
-  text-align: left;
+  text-align: center;
   font-weight: bold;
   border: 1px solid #ddd;
   font-family: 'Times New Roman', serif;
@@ -117,6 +117,7 @@
 }
 .outlet-table-body td {
   font-family: 'Times New Roman', serif;
+  text-align: center;
 }
 
 label, button {
