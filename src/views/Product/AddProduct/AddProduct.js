@@ -43,6 +43,7 @@ const AddProduct = () => {
     sub_category: '',
     brand: '',
     image: null,
+    shop: '',
   }
 
   const [formData, setFormData] = useState(initialFormData)
@@ -78,9 +79,10 @@ const AddProduct = () => {
   // Function to handle button click and open the dialog
 
   const handleDialogClose = async (confirmDelete) => {
+    const shopId = localStorage.getItem('shop_id')
     if (confirmDelete) {
       try {
-        const response = await Network.delete(Urls.deleteTempProduct) // Updated to use Network.delete
+        const response = await Network.delete(`${Urls.deleteTempProduct}/${shopId}`) // Updated to use Network.delete
         if (!response.ok) {
           console.log(response.data.error)
           return
@@ -102,6 +104,7 @@ const AddProduct = () => {
   }, [selectedCategory, selectedsubCategory]) // Re-fetch when either category or subcategory changes
 
   const fetchAttributes = async (categoryId, subCategoryId) => {
+    const shopId = localStorage.getItem('shop_id')
     if (!categoryId) {
       console.error('Category ID is undefined or null')
       return // Prevent making the request if categoryId is invalid
@@ -109,8 +112,8 @@ const AddProduct = () => {
 
     // Use the appropriate URL based on whether subCategoryId is provided
     const url = subCategoryId
-      ? `${Urls.fetchSubcategories}/${encodeURIComponent(subCategoryId)}`
-      : `${Urls.fetchCategories}/${encodeURIComponent(categoryId)}`
+      ? `${Urls.fetchSubcategories}/${shopId}/${encodeURIComponent(subCategoryId)}`
+      : `${Urls.fetchCategories}/${shopId}/${encodeURIComponent(categoryId)}`
 
     try {
       // Use Network.get
@@ -200,12 +203,14 @@ const AddProduct = () => {
   }, [])
 
   const fetchHeadCategories = async () => {
-    const response = await Network.get(Urls.addHeadCategory)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.addHeadCategory}${shopId}`)
     if (!response.ok) return console.log(response.data.error)
-    setHeadCategories(response.data)
+    setHeadCategories(response.data.results)
   }
 
   const handleHeadCategoryChange = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     const headCategoryId = e.target.value // This will now hold the numeric ID
     console.log('Selected Head Category ID:', headCategoryId) // Logs the correct ID
 
@@ -220,8 +225,10 @@ const AddProduct = () => {
     setSelectedsubCategory('')
 
     if (headCategoryId) {
-      const response = await Network.get(`${Urls.fetchHeadtoParentCategory}${headCategoryId}/`)
-      console.log('Parent Categories:', response.data)
+      const response = await Network.get(
+        `${Urls.fetchHeadtoParentCategory}${shopId}/${headCategoryId}`,
+      )
+      console.log('Parent Categories:', response.data.results)
       setParentCategories(response.data) // Populate parent categories
     } else {
       console.error('Head Category ID is missing!')
@@ -258,6 +265,7 @@ const AddProduct = () => {
 
   // Fetch Categories based on selected Parent Category
   const handleParentCategoryChange = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     const parentCategoryId = e.target.value
 
     if (!parentCategoryId) {
@@ -273,13 +281,14 @@ const AddProduct = () => {
     setAttributes([]) // Reset attributes
 
     const response = await Network.get(
-      `${Urls.fetchParenttoCategory}${encodeURIComponent(parentCategoryId)}/`,
+      `${Urls.fetchParenttoCategory}${shopId}/${encodeURIComponent(parentCategoryId)}`,
     )
     setCategories(response.data) // Populate categories
   }
 
   // Fetch Subcategories based on selected Category
   const handleCategoryChange = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     const categoryId = e.target.value
     console.log({ categoryId })
     setFormData((prev) => ({
@@ -300,7 +309,7 @@ const AddProduct = () => {
     setAttributes([]) // Reset attributes
 
     const response = await Network.get(
-      `${Urls.fetchCategorytoSubCategory}/${encodeURIComponent(categoryId)}/`,
+      `${Urls.fetchCategorytoSubCategory}/${shopId}/${encodeURIComponent(categoryId)}`,
     )
     const subCategoryData = response.data
     setSubCategories(subCategoryData) // Set the subcategories
@@ -433,15 +442,16 @@ const AddProduct = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const shopId = localStorage.getItem('shop_id')
       try {
         const [headResponse, parentResponse] = await Promise.all([
-          Network.get(`${Urls.addHeadCategory}`),
-          Network.get(`${Urls.addParentCategory}`),
+          Network.get(`${Urls.addHeadCategory}${shopId}`),
+          Network.get(`${Urls.addParentCategory}${shopId}`),
         ])
 
         // Set states with fetched data
-        setHeadCategories(headResponse.data)
-        setParentCategories(parentResponse.data)
+        setHeadCategories(headResponse.data.results)
+        setParentCategories(parentResponse.data.results)
       } catch (error) {
         console.error('Error fetching categories:', error)
       }
@@ -455,7 +465,8 @@ const AddProduct = () => {
   }, [])
 
   const fetchProductList = async () => {
-    const response = await Network.get(Urls.addProduct)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.addProduct}/${shopId}`)
     if (!response.ok) return console.log(response.data.error)
     setProductList(response.data)
   }
@@ -544,6 +555,7 @@ const AddProduct = () => {
   }
 
   const handleAdd = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     e.preventDefault()
 
     // Create a new FormData instance
@@ -576,6 +588,7 @@ const AddProduct = () => {
     formDataPayload.append('category', selectedCategory)
     formDataPayload.append('sub_category', selectedsubCategory)
     formDataPayload.append('brand', selectedBrand)
+    formDataPayload.append('shop', shopId) // Add shop ID to payload
 
     // Append image if available
     if (formData.image) {
@@ -585,7 +598,7 @@ const AddProduct = () => {
 
     try {
       const response = await axios.post(
-        'http://195.26.253.123/pos/products/add_temp_product',
+        'http://195.26.253.123/pos/products/add_temp_product/${shopId}',
         formDataPayload, // Use formDataPayload here
       )
 
@@ -623,8 +636,9 @@ const AddProduct = () => {
   }
 
   const handleDelete = async (id) => {
+    const shopId = localStorage.getItem('shop_id')
     try {
-      const response = await Network.delete(`${Urls.actionTempProduct}/${id}/`) // Updated to use Network.delete
+      const response = await Network.delete(`${Urls.actionTempProduct}/${shopId}/${id}`) // Updated to use Network.delete
       if (response.ok) {
         // Check if the response is successful
         setProductList((prevList) => prevList.filter((product) => product.id !== id)) // Remove the deleted product from the list
@@ -659,10 +673,11 @@ const AddProduct = () => {
   }
 
   const handlePublish = async () => {
+    const shopId = localStorage.getItem('shop_id')
     console.log('Publishing with data:', formData)
 
     try {
-      const url = Urls.publishProduct
+      const url = `${Urls.publishProduct}/${shopId}`
       const response = await Network.post(url) // Assuming `formData` contains the product data
 
       if (response.status === 201 || response.status === 200) {

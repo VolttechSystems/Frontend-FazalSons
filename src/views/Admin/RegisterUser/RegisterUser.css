@@ -339,4 +339,20 @@ td button {
 .addUser-button1:hover {
   background-color: darkgreen; /* Darker green on hover */
 }
+.suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestions-list li {
+  margin: 5px 0;
+  cursor: pointer;
+  color: blue;
+}
+
+.suggestions-list li:hover {
+  text-decoration: underline;
+}
+
 

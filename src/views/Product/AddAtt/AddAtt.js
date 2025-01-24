@@ -350,7 +350,7 @@ class AddAtt extends Component {
             <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
           </Link>
         </div>
-        Attribute Groups
+
         {attributes.map((attribute, attrIndex) => (
           <div key={attrIndex} style={{ marginBottom: '20px' }}>
             {/* Attribute Group Label and Input */}
@@ -378,7 +378,7 @@ class AddAtt extends Component {
             <div style={{ display: 'inline-block', marginLeft: '10px' }}>
               {attrIndex === attributes.length - 1 && !this.state.editData && (
                 <button className="add-attribute-button" onClick={this.addAttribute}>
-                  + Add Attribute
+                  + Add Attribute Group
                 </button>
               )}
 
@@ -461,20 +461,27 @@ class AddAtt extends Component {
         ))}
         <div>
           {this.state.editData ? (
-            <button onClick={this.handleUpdate} style={{ marginTop: '20px' }}>
+            <button
+              className="Add-button-att"
+              onClick={this.handleUpdate}
+              style={{ marginTop: '20px' }}
+            >
               Update
             </button>
           ) : (
-            <button onClick={this.handleSubmit} style={{ marginTop: '20px' }}>
+            <button
+              className="Add-button-att"
+              onClick={this.handleSubmit}
+              style={{ marginTop: '20px' }}
+            >
               Submit
             </button>
           )}
         </div>
         <h2 style={{ marginTop: '40px' }}>Attribute Groups</h2>
         <table border="1" style={{ width: '100%', textAlign: 'left' }}>
-          <thead>
+          <thead style={{ backgroundColor: 'blue' }}>
             <tr>
-              <th>Attribute ID</th>
               <th>Attribute Type</th>
               <th>Attribute Group</th>
               <th>Attribute</th>
@@ -484,7 +491,6 @@ class AddAtt extends Component {
           <tbody>
             {apiData.map((item, index) => (
               <tr key={index}>
-                <td>{item.att_id}</td>
                 <td>{item.att_type}</td>
                 <td>{item.attribute_name}</td>
                 <td>
@@ -492,8 +498,12 @@ class AddAtt extends Component {
                 </td>
 
                 <td>
-                  <button onClick={() => this.handleEdit(item)}>Edit</button>
-                  <button onClick={() => this.handleDelete(item.att_id)}>Delete</button>
+                  <button className="E-button-att" onClick={() => this.handleEdit(item)}>
+                    Edit
+                  </button>
+                  <button className="D-button-att" onClick={() => this.handleDelete(item.att_id)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

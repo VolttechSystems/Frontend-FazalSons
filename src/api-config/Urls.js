@@ -2,6 +2,7 @@ export default {
   login: 'accounts/login',
 
   logout: 'accounts/logout',
+  checkUsernameAvalability: 'accounts/check-username',
 
   //Salesman
   addSalesman: 'transaction/add_salesman',

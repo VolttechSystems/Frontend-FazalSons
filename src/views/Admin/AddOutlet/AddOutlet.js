@@ -155,7 +155,7 @@ const AddOutlet = () => {
       <form className="outlet-form" onSubmit={handleSubmit}>
         <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
         <div>
-          <label>Code:</label>
+          <label>Code *:</label>
           <input
             className="outlet-form-input"
             type="text"
@@ -166,7 +166,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Name:</label>
+          <label>Name *:</label>
           <input
             className="outlet-form-input"
             type="text"
@@ -177,13 +177,14 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Address:</label>
+          <label>Address *:</label>
           <input
             className="outlet-form-input"
             type="text"
             name="address"
             value={formData.address}
             onChange={handleChange}
+            required
           />
         </div>
         <div>

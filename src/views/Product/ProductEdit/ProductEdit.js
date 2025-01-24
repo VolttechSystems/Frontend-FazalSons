@@ -16,18 +16,9 @@ const ProductEdit = () => {
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
-      // try {
-      //   const response = await axios.get(`http://195.26.253.123/pos/products/action_product/${id}/`)
-      //   setProduct(response.data)
-      //   setLoading(false)
-      // } catch (error) {
-      //   console.error('Error fetching product details:', error)
-      //   setError('Failed to fetch product details.')
-      //   setLoading(false)
-      // }
-
+      const shopId = localStorage.getItem('shop_id')
       try {
-        const response = await Network.get(`${Urls.actionProductsagain}/${id}/`)
+        const response = await Network.get(`${Urls.actionProductsagain}/${shopId}/${id}`)
         setProduct(response.data)
         setLoading(false)
       } catch (error) {
@@ -47,23 +38,19 @@ const ProductEdit = () => {
 
   // Handle form submission
   const handleSubmit = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     e.preventDefault()
-    try {
-      await axios.put(`http://195.26.253.123/pos/products/action_product/${id}/`, product)
-      alert('Product updated successfully!')
-      navigate(`/base/POSTable2`) // Redirect after saving
-    } catch (error) {
-      console.error('Error updating product:', error)
-      alert('Failed to update product.')
-    }
-
-    // const response = await Network.put(`${Urls.actionProductsagain}/${id}/`, product)
-    // if (response.ok) {
-    //   toast.success('Product updated successfully!')
+    // try {
+    //   await axios.put(`http://195.26.253.123/pos/products/action_product/${id}/`, product)
+    //   alert('Product updated successfully!')
     //   navigate(`/base/POSTable2`) // Redirect after saving
-    // } else {
-    //   toast.error('Failed to update product.')
+    // } catch (error) {
+    //   console.error('Error updating product:', error)
+    //   alert('Failed to update product.')
     // }
+    const response = Network.put(`${Urls.actionProductsagain}/${shopId}/${id}`, product)
+    toast.success('Product updated successfully!')
+    navigate(`/base/POSTable2`) // Redirect after saving
   }
 
   if (loading) return <p>Loading...</p>

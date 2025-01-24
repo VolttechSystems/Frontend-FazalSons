@@ -23,6 +23,10 @@ function ShopUser() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false) // Toggle password visibility
+  const [usernameStatus, setUsernameStatus] = useState({
+    isTaken: null,
+    suggestions: [],
+  })
 
   // Fetch shops from the API
   const fetchShops = async () => {
@@ -63,6 +67,37 @@ function ShopUser() {
       ...prevState,
       [name]: value, // Update form data dynamically based on input name
     }))
+  }
+
+  // Username availability check
+  const handleUsernameChange = async (e) => {
+    const { name, value } = e.target
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+
+    if (value.trim() === '') {
+      setUsernameStatus({ isTaken: null, suggestions: [] })
+      return
+    }
+
+    try {
+      const response = await Network.get(`${Urls.checkUsernameAvalability}/?username=${value}`)
+
+      if (response.ok) {
+        setUsernameStatus({
+          isTaken: response.data.is_taken,
+          suggestions: response.data.suggestions || [],
+        })
+      } else {
+        console.error('Error checking username:', response.data.error)
+        toast.error('Unable to check username availability. Please try again later.')
+      }
+    } catch (error) {
+      console.error('Error checking username:', error)
+      toast.error('Unable to check username availability. Please try again later.')
+    }
   }
 
   // Submit form data to the API
@@ -140,8 +175,48 @@ function ShopUser() {
           borderRadius: '5px',
         }}
       >
+        {/* Username Field with Suggestions */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleUsernameChange}
+            style={{
+              width: '100%',
+              padding: '8px',
+              marginBottom: '10px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+            }}
+          />
+          {usernameStatus.isTaken === true && (
+            <div style={{ color: 'red', marginTop: '10px' }}>
+              <p>Username is already taken. Suggestions:</p>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {usernameStatus.suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    style={{ cursor: 'pointer', color: 'blue', marginBottom: '5px' }}
+                    onClick={() =>
+                      setFormData((prevState) => ({
+                        ...prevState,
+                        username: suggestion,
+                      }))
+                    }
+                  >
+                    {suggestion}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {usernameStatus.isTaken === false && (
+            <div style={{ color: 'green', marginTop: '10px' }}>Username is available!</div>
+          )}
+        </div>
         {[
-          { label: 'Username', name: 'username', type: 'text' },
           { label: 'Phone Number', name: 'phone_number', type: 'text' },
           { label: 'First Name', name: 'first_name', type: 'text' },
           { label: 'Last Name', name: 'last_name', type: 'text' },

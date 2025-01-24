@@ -11,6 +11,7 @@ function RegisterUser() {
   const [systemRoles, setSystemRoles] = useState([])
   const [showPassword, setShowPassword] = useState(false)
   const [outlets, setOutlets] = useState([]) // Outlet data
+  const [usernameStatus, setUsernameStatus] = useState({ isTaken: null, suggestions: [] }) // For username availability
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -80,6 +81,34 @@ function RegisterUser() {
       setOutlets(outlets) // Store filtered outlets in the state
     } catch (error) {
       console.error('Error fetching outlets:', error)
+    }
+  }
+
+  // Username availability check
+  const handleUsernameChange = async (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+
+    if (value.trim() === '') {
+      setUsernameStatus({ isTaken: null, suggestions: [] })
+      return
+    }
+
+    try {
+      const response = await Network.get(`${Urls.checkUsernameAvalability}/?username=${value}`)
+
+      if (response.ok) {
+        setUsernameStatus({
+          isTaken: response.data.is_taken,
+          suggestions: response.data.suggestions || [],
+        })
+      } else {
+        console.error('Error checking username:', response.data.error)
+        toast.error('Unable to check username availability. Please try again later.')
+      }
+    } catch (error) {
+      console.error('Error checking username:', error)
+      toast.error('Unable to check username availability. Please try again later.')
     }
   }
 
@@ -277,7 +306,7 @@ function RegisterUser() {
             required
           />
         </div>
-        <div className="input-group">
+        {/* <div className="input-group">
           <label>Username</label>
           <input
             type="text"
@@ -286,6 +315,35 @@ function RegisterUser() {
             onChange={handleChange}
             required
           />
+        </div> */}
+        <div className="input-group">
+          <label>Username</label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleUsernameChange}
+            required
+          />
+          {usernameStatus.isTaken === true && (
+            <div style={{ color: 'red', marginTop: '10px' }}>
+              <p>Username is already taken. Suggestions:</p>
+              <ul className="suggestions-list">
+                {usernameStatus.suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() => setFormData({ ...formData, username: suggestion })}
+                  >
+                    {suggestion}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {usernameStatus.isTaken === false && (
+            <div style={{ color: 'green', marginTop: '10px' }}>Username is available!</div>
+          )}
         </div>
         <div className="input-group">
           <label>Password</label>

@@ -13,20 +13,8 @@ const NewBarcode = () => {
 
   useEffect(() => {
     const fetchProductDetails = async () => {
-      // try {
-      //   const response = await axios.get(
-      //     `http://195.26.253.123/pos/products/barcode_product_data/${sku}/`
-      //   );
-      //   if (response.data && Object.keys(response.data).length > 0) {
-      //     setProductDetails(response.data);
-      //   } else {
-      //     setError('No product details found.');
-      //   }
-      // } catch (err) {
-      //   setError('Failed to fetch product details.');
-      // }
-
-      const response = await Network.get(`${Urls.FetchBarcodesofproducts}${sku}/`)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.FetchBarcodesofproducts}${shopId}/${sku}`)
       if (!response.ok) return console.log(response.data.error)
       setProductDetails(response.data)
     }

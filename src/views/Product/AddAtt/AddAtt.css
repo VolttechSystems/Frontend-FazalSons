@@ -111,6 +111,11 @@ th, td {
   border: 1px solid #ddd;
 }
 
+thead th {
+  background-color: #007bff;
+  color: white;
+}
+
 th {
   background-color: #f4f4f4;
   font-weight: bold;
@@ -194,4 +199,15 @@ button + button {
 
 .add-variation-button:hover {
   background-color: #45a049;
+}
+.Add-button-att{
+  background-color: green;
+
+}
+.E-button-att{
+  background-color: green;
+}
+
+.D-button-att{
+  background-color: red;
 }

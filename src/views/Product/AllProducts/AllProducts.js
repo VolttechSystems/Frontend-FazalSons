@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import Barcode from 'react-barcode'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import './AllProducts.css'
@@ -42,24 +41,8 @@ const AllProducts = () => {
 
   // Fetch all products
   const fetchProducts = async () => {
-    // try {
-    //   const response = await axios.get(
-    //     `http://195.26.253.123/pos/products/show_product/${outletId}/`
-    //   );
-    //   setProducts(response.data);
-    //   setLoading(false);
-    // } catch (error) {
-    //   console.error("Error fetching products:", error);
-    //   setError("Failed to fetch products.");
-    //   setLoading(false);
-    // }
-    // (Urls.addBrand)
-
-    // const url = outletId
-    //       ? `${Urls.fetchAllProducts}/${outletId}/`
-    //       : Urls.addHeadCategory
-
-    const response = await Network.get(`${Urls.fetchAllProducts}${outletId}/`)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.fetchAllProducts}${shopId}/${outletId}`)
     if (!response.ok) return console.log(response.data.error)
     setProducts(response.data)
     setLoading(false)
@@ -67,18 +50,8 @@ const AllProducts = () => {
 
   // Fetch product details for modal
   const fetchProductDetails = async (productId) => {
-    // try {
-    //   const response = await axios.get(
-    //     `http://195.26.253.123/pos/products/shows_all_product_detail/${productId}/`,
-    //   )
-    //   setProductDetails(response.data)
-    //   setIsModalOpen(true) // Open modal after fetching details
-    // } catch (error) {
-    //   console.error('Error fetching product details:', error)
-    //   alert('Failed to fetch product details.')
-    // }
-
-    const response = await Network.get(`${Urls.ShowAllProductDetails}${productId}/`)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.ShowAllProductDetails}${shopId}/${productId}`)
     if (!response.ok) return console.log(response.data.error)
     setProductDetails(response.data)
     setIsModalOpen(true) // Open modal after fetching details
@@ -88,22 +61,15 @@ const AllProducts = () => {
     fetchProducts()
   }, [outletId])
 
-  const handleDelete = async (sku) => {
-    // if (window.confirm('Are you sure you want to delete this Product?')) {
-    //   try {
-    //     await axios.delete(`http://195.26.253.123/pos/products/action_product/${sku}/`)
-    //     alert('Product deleted successfully!')
-    //     fetchProducts() // Refresh products after deletion
-    //   } catch (error) {
-    //     console.error('Error deleting Product:', error)
-    //     alert('Failed to delete Product.')
-    //   }
-
-    const response = await Network.delete(`${Urls.actionProducts}/${sku}/`)
+  const handleDelete = async (id) => {
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.delete(`${Urls.actionProductsagain}/${shopId}/${id}`)
     if (!response.ok) return console.log(response.data.error)
     toast.success('Product deleted successfully!')
     fetchProducts() // Refresh products after deletion
     toast.error('Product deletion cancelled.')
+    setIsModalOpen(false) // Close the dialog after deletion
+    fetchProducts() // Refresh products after deletion
   }
 
   const handleEdit = (id) => {
@@ -239,7 +205,7 @@ const AllProducts = () => {
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
                         <Button
-                          onClick={() => handleDelete(detail.sku)}
+                          onClick={() => handleDelete(detail.id)}
                           variant="contained"
                           style={{ backgroundColor: '#ee4262' }}
                         >

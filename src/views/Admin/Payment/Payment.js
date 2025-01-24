@@ -140,7 +140,6 @@ const Payment = () => {
         <table className="payment-methods-table">
           <thead className="payment-methods-header">
             <tr>
-              <th>ID</th>
               <th>Payment Method Name</th>
               <th>Actions</th>
             </tr>
@@ -148,7 +147,6 @@ const Payment = () => {
           <tbody>
             {payments.map((payment) => (
               <tr key={payment.id}>
-                <td>{payment.id}</td>
                 <td>{payment.pm_name}</td>
                 <td>
                   <button
