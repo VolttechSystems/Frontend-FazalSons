@@ -66,6 +66,7 @@
   text-align: left;
   font-weight: bold;
   border: 1px solid #ddd;
+  font-family: 'Times New Roman', serif;
 }
 
 .outlet-table-body tr:nth-child(even) {
@@ -80,6 +81,7 @@
   padding: 10px;
   border: 1px solid #ddd;
   text-align: left;
+  font-family: Arial, sans-serif; 
 }
 
 .outlet-table-actions button {
@@ -113,3 +115,12 @@
 .outlet-table-actions .E-button:hover {
   background-color: darkgreen;
 }
+.outlet-table-body td {
+  font-family: 'Times New Roman', serif;
+}
+
+label, button {
+  font-family: 'Times New Roman', serif;
+}
+
+

@@ -153,9 +153,9 @@ const AddOutlet = () => {
       />
 
       <form className="outlet-form" onSubmit={handleSubmit}>
-        <h2>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
+        <h2 style={{ fontFamily: 'Times New Roman, serif' }}>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
         <div>
-          <label>Code *:</label>
+          <label>Code <span style={{color:'red'}}>*</span></label>
           <input
             className="outlet-form-input"
             type="text"
@@ -166,7 +166,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Name *:</label>
+          <label>Name <span style={{color:'red'}}>*</span></label>
           <input
             className="outlet-form-input"
             type="text"
@@ -177,7 +177,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Address *:</label>
+          <label>Address <span style={{color:'red'}}>*</span></label>
           <input
             className="outlet-form-input"
             type="text"
@@ -188,7 +188,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Mobile:</label>
+          <label>Mobile <span style={{color:'red', fontSize:'12px'}}>(Optional)</span></label>
           <input
             className="outlet-form-input"
             type="text"
@@ -198,7 +198,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Manager Name:</label>
+          <label>Manager Name <span style={{color:'red', fontSize:'12px'}}>(Optional)</span></label>
           <input
             className="outlet-form-input"
             type="text"
@@ -208,7 +208,7 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Phone No.:</label>
+          <label>Phone No. <span style={{color:'red', fontSize:'12px'}}>(Optional)</span></label>
           <input
             className="outlet-form-input"
             type="text"
@@ -226,12 +226,12 @@ const AddOutlet = () => {
         <table className="outlet-table">
           <thead className="outlet-table-header">
             <tr>
-              <th>Outlet Code</th>
-              <th>Outlet Name</th>
+              <th>Code</th>
+              <th>Name</th>
               <th>Address</th>
-              <th>Outlet Mobile</th>
+              <th>Mobile No.</th>
               <th>Manager Name</th>
-              <th>Contact Number</th>
+              <th>Manager Number</th>
               <th>Actions</th>
             </tr>
           </thead>
