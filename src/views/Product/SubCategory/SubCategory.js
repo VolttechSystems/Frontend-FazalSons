@@ -40,85 +40,9 @@ const AddSubCat = () => {
   const [selectedHeadCategory, setSelectedHeadCategory] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
 
-  const API_ADD_SUBCATEGORIES = 'http://195.26.253.123/pos/products/add_subcategories'
-  const API_HEAD_CATEGORIES = 'http://195.26.253.123/pos/products/add_head_category'
-  const API_PARENT_CATEGORIES = 'http://195.26.253.123/pos/products/add_parent_category'
-  const API_ATT_TYPES = 'http://195.26.253.123/pos/products/add_attribute_type'
-  const API_FETCH_VARIATIONS_GROUP = 'http://195.26.253.123/pos/products/fetch_variations_group'
-
-  const API_UPDATE_SUBCATEGORY = 'http://195.26.253.123/pos/products/action_subcategories'
-  const API_FETCH_CATEGORIES = 'http://195.26.253.123/pos/products/add_categories'
-  const API_FETCH_SUBCATEGORIES = 'http://195.26.253.123/pos/products/add_subcategories'
-
-  // Fetch initial data and categories list
-  // useEffect(() => {
-  //   const fetchInitialData = async () => {
-  //     try {
-  //       const [
-  //         headResponse,
-  //         parentResponse,
-  //         attTypesResponse,
-  //         categoriesResponse,
-  //         subcategoriesResponse,
-  //       ] = await Promise.all([
-  //         axios.get(API_HEAD_CATEGORIES),
-  //         axios.get(API_PARENT_CATEGORIES),
-  //         axios.get(API_ATT_TYPES),
-  //         axios.get(API_FETCH_CATEGORIES),
-  //         axios.get(API_FETCH_SUBCATEGORIES),
-  //       ])
-
-  //       setHeadCategories(headResponse.data)
-  //       setParentCategories(parentResponse.data)
-  //       setAttTypes(attTypesResponse.data)
-  //       setCategories(categoriesResponse.data)
-  //       setsubCategories(subcategoriesResponse.data)
-  //     } catch (error) {
-  //       console.error('Error in fetchInitialData:', error)
-
-  //       // Log each endpoint individually
-  //       try {
-  //         const headResponse = await axios.get(API_HEAD_CATEGORIES)
-  //         setHeadCategories(headResponse.data)
-  //       } catch (headError) {
-  //         console.error('Error fetching Head Categories:', headError)
-  //       }
-
-  //       try {
-  //         const parentResponse = await axios.get(API_PARENT_CATEGORIES)
-  //         setParentCategories(parentResponse.data)
-  //       } catch (parentError) {
-  //         console.error('Error fetching Parent Categories:', parentError)
-  //       }
-
-  //       try {
-  //         const attTypesResponse = await axios.get(API_ATT_TYPES)
-  //         setAttTypes(attTypesResponse.data)
-  //       } catch (attError) {
-  //         console.error('Error fetching Attribute Types:', attError)
-  //       }
-
-  //       try {
-  //         const categoriesResponse = await axios.get(API_FETCH_CATEGORIES)
-  //         setCategories(categoriesResponse.data)
-  //       } catch (categoriesError) {
-  //         console.error('Error fetching Categories:', categoriesError)
-  //       }
-
-  //       try {
-  //         const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
-  //         setsubCategories(subcategoriesResponse.data)
-  //       } catch (subcategoriesError) {
-  //         console.error('Error fetching Categories:', subcategoriesError)
-  //       }
-  //     }
-  //   }
-
-  //   fetchInitialData()
-  // }, [])
-
   useEffect(() => {
     const fetchInitialData = async () => {
+      const shopId = localStorage.getItem('shop_id')
       try {
         // Use Promise.all to fetch all endpoints simultaneously
         const [
@@ -128,53 +52,54 @@ const AddSubCat = () => {
           categoriesResponse,
           subcategoriesResponse,
         ] = await Promise.all([
-          Network.get(Urls.addHeadCategory),
-          Network.get(Urls.addParentCategory),
-          Network.get(Urls.addAttributeTypes),
-          Network.get(Urls.addCategory),
-          Network.get(Urls.addSubCategories),
+          Network.get(`${Urls.addHeadCategory}${shopId}`),
+          Network.get(`${Urls.addParentCategory}${shopId}`),
+          Network.get(`${Urls.addAttributeTypes}/${shopId}`),
+          Network.get(`${Urls.addCategory}/${shopId}`),
+          Network.get(`${Urls.addSubCategories}/${shopId}`),
         ])
 
         // Update state with fetched data
-        setHeadCategories(headResponse.data)
-        setParentCategories(parentResponse.data)
-        setAttTypes(attTypesResponse.data)
-        setCategories(categoriesResponse.data)
-        setsubCategories(subcategoriesResponse.data)
+        setHeadCategories(headResponse.data.results)
+        setParentCategories(parentResponse.data.results)
+        setAttTypes(attTypesResponse.data.results)
+        setCategories(categoriesResponse.data.results)
+        setsubCategories(subcategoriesResponse.data.results)
       } catch (error) {
         console.error('Error in fetchInitialData:', error)
 
         // Attempt to fetch each endpoint individually in case of failure
         try {
-          const headResponse = await Network.get(Urls.addHeadCategory)
-          setHeadCategories(headResponse.data)
+          const headResponse = await Network.get(`${Urls.addHeadCategory}${shopId}`)
+          setHeadCategories(headResponse.data.results)
         } catch (headError) {
           console.error('Error fetching Head Categories:', headError)
         }
 
         try {
-          const parentResponse = await Network.get(Urls.addParentCategory)
-          setParentCategories(parentResponse.data)
+          const parentResponse = await Network.get(`${Urls.addParentCategory}${shopId}`)
+          setParentCategories(parentResponse.data.results)
         } catch (parentError) {
           console.error('Error fetching Parent Categories:', parentError)
         }
 
         try {
-          const attTypesResponse = await Network.get(Urls.addAttributeTypes)
-          setAttTypes(attTypesResponse.data)
+          const attTypesResponse = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
+          setAttTypes(attTypesResponse.data.results)
         } catch (attError) {
           console.error('Error fetching Attribute Types:', attError)
         }
 
         try {
-          const categoriesResponse = await Network.get(Urls.addCategory)
-          setCategories(categoriesResponse.data)
+          const categoriesResponse = await Network.get(`${Urls.addCategory}/${shopId}`)
+          setCategories(categoriesResponse.data.results)
         } catch (categoriesError) {
           console.error('Error fetching Categories:', categoriesError)
         }
+
         try {
-          const subcategoriesResponse = await Network.get(Urls.addSubCategories)
-          setsubCategories(subcategoriesResponse.data)
+          const subcategoriesResponse = await Network.get(`${Urls.addSubCategories}/${shopId}`)
+          setsubCategories(subcategoriesResponse.data.results)
         } catch (subcategoriesError) {
           console.error('Error fetching Sub Categories:', subcategoriesError)
         }
@@ -185,16 +110,11 @@ const AddSubCat = () => {
   }, [])
 
   const fetchsubCategories = async () => {
-    // try {
-    //   const subcategoriesResponse = await axios.get(API_FETCH_SUBCATEGORIES)
-    //   setCategories(subcategoriesResponse.data)
-    // } catch (error) {
-    //   console.error('Error fetching Categories:', error)
-    // }
+    const shopId = localStorage.getItem('shop_id')
 
-    const response = await Network.get(Urls.addSubCategories)
+    const response = await Network.get(`${Urls.addSubCategories}/${shopId}`)
     if (!response.ok) return consoe.log(response.data.error)
-    setCategories(subcategoriesResponse.data)
+    setsubCategories(response.data.results)
   }
 
   useEffect(() => {
@@ -205,16 +125,10 @@ const AddSubCat = () => {
   // Fetch Attribute Types
   useEffect(() => {
     const fetchAttTypes = async () => {
-      // try {
-      //   const response = await axios.get(API_ATT_TYPES)
-      //   setAttTypes(response.data)
-      // } catch (error) {
-      //   console.error('Error fetching Attribute Types:', error)
-      // }
-
-      const response = await Network.get(Urls.addAttributeTypes)
-      if (!response.ok) return console.log(response.data.error)
-      setAttTypes(response.data)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
+      if (!response.ok) return consoe.log(response.data.error)
+      setAttTypes(response.data.results)
     }
     fetchAttTypes()
   }, [])
@@ -225,20 +139,15 @@ const AddSubCat = () => {
 
   // Fetch Head Categories
   const fetchHeadCategories = async () => {
-    // try {
-    //   const response = await axios.get('http://195.26.253.123/pos/products/add_head_category')
-    //   setHeadCategories(response.data)
-    // } catch (error) {
-    //   console.error('Error fetching head categories:', error)
-    //   //setError('Failed to load head categories. Please try again later.');
-    // }
+    const shopId = localStorage.getItem('shop_id')
 
-    const response = await Network.get(Urls.addHeadCategory)
+    const response = await Network.get(`${Urls.addHeadCategory}${shopId}`)
     if (!response.ok) return console.log(response.data.error)
-    setHeadCategories(response.data)
+    setHeadCategories(response.data.results)
   }
 
   const handleHeadCategoryChange = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     const headCategoryId = e.target.value // This will now hold the numeric ID
     console.log('Selected Head Category ID:', headCategoryId) // Logs the correct ID
 
@@ -256,29 +165,47 @@ const AddSubCat = () => {
     setSelectedParentCategory('')
 
     if (headCategoryId) {
-      // try {
-      //   const response = await axios.get(
-      //     `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
-      //   )
-      //   console.log('Parent Categories:', response.data)
-      //   setParentCategories(response.data) // Populate parent categories
-      // } catch (error) {
-      //   console.error(
-      //     `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
-      //     error,
-      //   )
-      //   // Optional: Display error message to user
-      // }
-
-      const response = await Network.get(`${Urls.fetchHeadtoParentCategory}${headCategoryId}/`)
+      const response = await Network.get(
+        `${Urls.fetchHeadtoParentCategory}${shopId}/${headCategoryId}`,
+      )
       if (!response.ok) return console.log(response.data.error)
       console.log('Parent Categories:', response.data)
       setParentCategories(response.data)
     }
   }
 
-  const handleParentCategoryChange = async (e) => {
-    const parentCategoryId = e.target.value // Get the selected parent category ID
+  // const handleParentCategoryChange = async (e) => {
+  //   const shopId = localStorage.getItem('shop_id')
+  //   const parentCategoryId = e.target.value // Get the selected parent category ID
+  //   console.log('Selected Parent Category ID:', parentCategoryId) // Log for debugging
+
+  //   setSelectedParentCategory(parentCategoryId) // Save the selected parent category in state
+
+  //   // Update formData with the selected parent category ID
+  //   setFormData({
+  //     ...formData,
+  //     parentCategory: parentCategoryId,
+  //   })
+
+  //   // Reset dependent dropdowns
+
+  //   setSelectedParentCategory('')
+  //   setCategories([])
+
+  //   setSelectedCategory('') // Reset any previously selected category
+
+  //   if (parentCategoryId) {
+  //     const response = await Network.get(
+  //       `${Urls.fetchParenttoCategory}${shopId}/${parentCategoryId}`,
+  //     )
+  //     if (!response.ok) return console.log(response.data.error)
+  //     console.log('Categories:', response.data) // Log fetched categories
+  //     setCategories(response.data)
+  //   }
+  // }
+  const handleParentCategoryChange = async (selectedOption) => {
+    const shopId = localStorage.getItem('shop_id')
+    const parentCategoryId = selectedOption?.value // Get the selected parent category ID
     console.log('Selected Parent Category ID:', parentCategoryId) // Log for debugging
 
     setSelectedParentCategory(parentCategoryId) // Save the selected parent category in state
@@ -286,52 +213,42 @@ const AddSubCat = () => {
     // Update formData with the selected parent category ID
     setFormData({
       ...formData,
-      parentCategory: parentCategoryId,
+      pc_name: parentCategoryId, // Ensure `pc_name` is updated correctly
     })
 
     // Reset dependent dropdowns
-
-    setSelectedParentCategory('')
-    setCategories([])
-
+    setCategories([]) // Clear categories if a new parent category is selected
     setSelectedCategory('') // Reset any previously selected category
 
     if (parentCategoryId) {
-      // try {
-      //   // Fetch categories based on parent category
-      //   const response = await axios.get(
-      //     `http://195.26.253.123/pos/products/fetch_parent_to_category/${parentCategoryId}/`,
-      //   )
-      //   console.log('Categories:', response.data) // Log fetched categories
-      //   setCategories(response.data) // Populate the categories dropdown
-      // } catch (error) {
-      //   console.error(
-      //     `Error fetching categories for Parent Category ID: ${parentCategoryId}`,
-      //     error,
-      //   )
-      //   // Optional: Display an error message to the user
-      // }
-
-      const response = await Network.get(`${Urls.fetchParenttoCategory}${parentCategoryId}/`)
-      if (!response.ok) return console.log(response.data.error)
-      console.log('Categories:', response.data) // Log fetched categories
-      setCategories(response.data)
+      try {
+        const response = await Network.get(
+          `${Urls.fetchParenttoCategory}${shopId}/${parentCategoryId}`,
+        )
+        if (!response.ok) {
+          console.log(response.data.error)
+          return
+        }
+        console.log('Categories:', response.data) // Log fetched categories
+        setCategories(response.data) // Update the categories dropdown
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
     }
   }
 
   //Fetch attributes and variations
   useEffect(() => {
+    const shopId = localStorage.getItem('shop_id')
     if (formData.attType.length > 0) {
       const fetchAttributes = async () => {
         try {
           console.log('Selected Attribute Types:', formData.attType)
 
-          // const responses = await Promise.all(
-          //   formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)),
-          // )
-
           const responses = await Promise.all(
-            formData.attType.map((typeId) => Network.get(`${Urls.fetchVariationGroup}/${typeId}`)),
+            formData.attType.map((typeId) =>
+              Network.get(`${Urls.fetchVariationGroup}/${shopId}/${typeId}`),
+            ),
           )
 
           const data = responses.flatMap((res) => res.data)
@@ -362,15 +279,14 @@ const AddSubCat = () => {
 
   // Fetch Groups Based on Selected Attribute Types
   useEffect(() => {
+    const shopId = localStorage.getItem('shop_id')
     if (formData.attType.length > 0) {
       const fetchGroups = async () => {
         try {
-          // const responses = await Promise.all(
-          //   formData.attType.map((typeId) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${typeId}`)),
-          // )
-
           const responses = await Promise.all(
-            formData.attType.map((typeId) => Network.get(`${Urls.fetchVariationGroup}/${typeId}`)),
+            formData.attType.map((typeId) =>
+              Network.get(`${Urls.fetchVariationGroup}/${shopId}/${typeId}`),
+            ),
           )
           const data = responses.flatMap((res) => res.data)
           setTableData(data)
@@ -448,13 +364,9 @@ const AddSubCat = () => {
   7
 
   const handleSubmit = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     e.preventDefault()
 
-    // const attributeGroup = Array.isArray(formData.attribute_name)
-    //   ? formData.attribute_name
-    //   : formData.attribute_name
-    //       .split(',')
-    //       .map((item) => item.trim());
     const payload = {
       //category_name: formData.category_name,
       sub_category_name: formData.sub_category_name,
@@ -464,18 +376,18 @@ const AddSubCat = () => {
       // pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
       category: formData.category_name ? parseInt(formData.category_name, 10) : null,
       attribute_group: selectedAttributes.map((attr) => attr.split(':')[1]), // Extract only the attribute_id
+      shop: shopId,
     }
     console.log(payload)
 
     try {
       if (editMode) {
         // PUT request to update category
-        // const response = await axios.put(`${API_UPDATE_SUBCATEGORY}/${editsubCategoryId}`, payload)
         const response = await Network.put(
-          `${Urls.updateSubCategory}/${editsubCategoryId}`,
+          `${Urls.updateSubCategory}/${shopId}/${editsubCategoryId}`,
           payload,
         )
-
+        // await Network.put(`${Urls.updateSubCategory}/${shopId}/${editsubCategoryId}`, payload)
         // Update the category list with the new data
         const updatedsubCategories = subcategories.map((cat) =>
           cat.id === editsubCategoryId ? response.data : cat,
@@ -489,8 +401,8 @@ const AddSubCat = () => {
         fetchsubCategories()
       } else {
         // POST request to add new subcategory
-        // const response = await axios.post(API_ADD_SUBCATEGORIES, payload)
-        const response = await Network.post(Urls.addSubCategories, payload)
+        const response = await Network.post(`${Urls.addSubCategories}/${shopId}`, payload)
+        // await Network.post(`${Urls.addSubCategories}/${shopId}`, payload)
         const newsubCategory = response.data
         // setsubCategories((prevsubCategories) => [...prevsubCategories, newsubCategory]);
         // setTableData((prevData) => [...prevData, newsubCategory]);
@@ -499,10 +411,9 @@ const AddSubCat = () => {
         if (newsubCategory) {
           setsubCategories((prev) => [...prev, ...response.data])
           setTableData((prev) => [...prev, ...response.data])
-          setMessage('Category added successfully.')
+          setMessage('Sub Category added successfully.')
         }
       }
-
       // Reset form and exit edit mode
       setFormData({
         headCategory: '',
@@ -528,9 +439,10 @@ const AddSubCat = () => {
 
   const handleEdit = async (subcategory) => {
     try {
+      const shopId = localStorage.getItem('shop_id')
       // Fetch category details from API
       // const response = await axios.get(`${API_UPDATE_SUBCATEGORY}/${subcategory.id}`)
-      const response = await Network.get(`${Urls.updateSubCategory}/${subcategory.id}`)
+      const response = await Network.get(`${Urls.updateSubCategory}/${shopId}/${subcategory.id}`)
       const subcategoryData = response.data
       console.log({ subcategoryData })
       console.log(subcategoryData.att_type, 'att_type data')
@@ -579,12 +491,13 @@ const AddSubCat = () => {
       // )
 
       const responses = await Promise.all(
-        subcategoryData.att_type.map((id) => Network.get(`${Urls.fetchVariationGroup}/${id.id}`)),
+        subcategoryData.att_type.map((id) =>
+          Network.get(`${Urls.fetchVariationGroup}/${shopId}/${id.id}`),
+        ),
       )
       const data = responses.flatMap((res) => res.data)
-      fetchsubCategories()
-      setTableData(data)
 
+      setTableData(data)
       setEditMode(true)
       setEditsubCategoryId(subcategoryData.id) // Store the ID for updating
       fetchsubCategories()
@@ -596,18 +509,10 @@ const AddSubCat = () => {
   }
 
   const handleDelete = async (subcategoryId) => {
-    // try {
-    //   await axios.delete(`${API_UPDATE_SUBCATEGORY}/${subcategoryId}`)
-    //   setsubCategories(subcategories.filter((subcategory) => subcategory.id !== subcategoryId))
-    //   setMessage('subcategory deleted successfully.')
-    //   fetchsubCategories()
-    // } catch (error) {
-    //   console.error('Error deleting subcategory:', error)
-    //   setMessage('Failed to delete subcategory.')
-    // }
+    const shopId = localStorage.getItem('shop_id')
 
     try {
-      await Network.delete(`${Urls.updateSubCategory}/${subcategoryId}`)
+      await Network.delete(`${Urls.updateSubCategory}/${shopId}/${subcategoryId}`)
       setsubCategories(subcategories.filter((subcategory) => subcategory.id !== subcategoryId))
       setMessage('subcategory deleted successfully.')
       fetchsubCategories()
@@ -626,25 +531,61 @@ const AddSubCat = () => {
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Head Category: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="headCategory"
-              value={formData.headCategory}
-              onChange={handleHeadCategoryChange}
-              style={{
-                flex: 1,
-                padding: '8px',
-                border: '1px solid #ced4da', // Matches input field border
-                borderRadius: '4px', // Adds consistent rounded corners
-                backgroundColor: '#fff', // Matches input field background
+              options={headCategories.map((category) => ({
+                value: category.id, // Use category ID as value
+                label: category.hc_name, // Display hc_name as label
+              }))} // Convert headCategories to value/label pairs
+              value={
+                formData.headCategory
+                  ? {
+                      value: formData.headCategory,
+                      label: headCategories.find(
+                        (category) => category.id === formData.headCategory,
+                      )?.hc_name,
+                    }
+                  : null
+              } // Match the selected value
+              onChange={(selectedOption) =>
+                handleHeadCategoryChange({
+                  target: { name: 'headCategory', value: selectedOption?.value },
+                })
+              } // Simulate native event for handleHeadCategoryChange
+              placeholder="Select Head Category"
+              isSearchable // Enable search functionality
+              isClearable // Allow clearing the selection
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  padding: '5px',
+                  border: '1px solid #ced4da', // Matches input field border
+                  borderRadius: '4px', // Adds consistent rounded corners
+                  backgroundColor: '#fff', // Matches input field background
+                  height: '42px', // Consistent height
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px', // Adjusts internal padding
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input placeholder font size
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input selected value font size
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
               }}
-            >
-              <option value="">Select</option>
-              {headCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.hc_name}
-                </option>
-              ))}
-            </select>
+            />
             <Link to="/Product/AddHeadCategory">
               <button
                 style={{
@@ -666,25 +607,57 @@ const AddSubCat = () => {
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Parent Category: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="pc_name"
-              value={formData.selectedParentCategory}
-              onChange={handleParentCategoryChange}
-              style={{
-                flex: 1,
-                padding: '8px',
-                border: '1px solid #ced4da', // Matches input field border
-                borderRadius: '4px', // Adds consistent rounded corners
-                backgroundColor: '#fff', // Matches input field background
+              options={parentCategories.map((category) => ({
+                value: category.id, // Use the category ID as value
+                label: category.pc_name, // Display pc_name as label
+              }))} // Convert parentCategories to value/label pairs
+              value={
+                formData.pc_name
+                  ? {
+                      value: formData.pc_name,
+                      label: parentCategories.find((category) => category.id === formData.pc_name)
+                        ?.pc_name,
+                    }
+                  : null
+              } // Match the selected value
+              onChange={handleParentCategoryChange} // Directly pass the selected option to the handler
+              placeholder="Select Parent Category"
+              isSearchable // Enable search functionality
+              isClearable // Allow clearing the selection
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  padding: '5px',
+                  border: '1px solid #ced4da', // Matches input field border
+                  borderRadius: '4px', // Adds consistent rounded corners
+                  backgroundColor: '#fff', // Matches input field background
+                  height: '42px', // Consistent height
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px', // Adjusts internal padding
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input placeholder font size
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input selected value font size
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
               }}
-            >
-              <option value="">Select Parent Category</option>
-              {parentCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.pc_name}
-                </option>
-              ))}
-            </select>
+            />
+
             <Link to="/Product/AddParentCategory">
               <button
                 style={{
@@ -706,31 +679,62 @@ const AddSubCat = () => {
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Category: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="category_name"
-              value={formData.selectedCategory}
-              onChange={(e) => {
-                const selectedOptionId = e.target.value
+              options={categories.map((category) => ({
+                value: category.id, // Use category ID as value
+                label: category.category_name, // Display category_name as label
+              }))} // Convert categories to value/label pairs
+              value={
+                formData.category_name
+                  ? {
+                      value: formData.category_name,
+                      label: categories.find((category) => category.id === formData.category_name)
+                        ?.category_name,
+                    }
+                  : null
+              } // Match the selected value
+              onChange={(selectedOption) => {
+                const selectedOptionId = selectedOption?.value // Get the selected option ID
                 setFormData({
                   ...formData,
-                  category_name: selectedOptionId,
+                  category_name: selectedOptionId, // Store the selected ID in formData
                 })
               }}
-              style={{
-                flex: 1,
-                padding: '8px',
-                border: '1px solid #ced4da', // Matches input field border
-                borderRadius: '4px', // Adds consistent rounded corners
-                backgroundColor: '#fff', // Matches input field background
+              placeholder="Select Category"
+              isSearchable // Enable search functionality
+              isClearable // Allow clearing the selection
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  padding: '5px',
+                  border: '1px solid #ced4da', // Matches input field border
+                  borderRadius: '4px', // Adds consistent rounded corners
+                  backgroundColor: '#fff', // Matches input field background
+                  height: '42px', // Consistent height
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px', // Adjusts internal padding
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input placeholder font size
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input selected value font size
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
               }}
-            >
-              <option value="">Select Category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.category_name}
-                </option>
-              ))}
-            </select>
+            />
             <Link to="/Category/AddCategories">
               <button
                 style={{

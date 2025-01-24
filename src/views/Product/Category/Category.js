@@ -129,6 +129,7 @@ const AddCategories = () => {
   }
 
   const handleHeadCategoryChange = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     const headCategoryId = e.target.value // This will now hold the numeric ID
 
     setSelectedHeadCategory(headCategoryId) // Save selected head category
@@ -145,20 +146,9 @@ const AddCategories = () => {
     setSelectedParentCategory('')
 
     if (headCategoryId) {
-      // try {
-      //   const response = await axios.get(
-      //     `http://195.26.253.123/pos/products/fetch_head_to_parent_category/${headCategoryId}/`,
-      //   )
-      //   setParentCategories(response.data) // Populate parent categories
-      // } catch (error) {
-      //   console.error(
-      //     `Error fetching parent categories for Head Category ID: ${headCategoryId}`,
-      //     error,
-      //   )
-      //   // Optional: Display error message to user
-      // }
-
-      const response = await Network.get(`${Urls.fetchHeadtoParentCategory}${headCategoryId}/`)
+      const response = await Network.get(
+        `${Urls.fetchHeadtoParentCategory}${shopId}/${headCategoryId}`,
+      )
       if (!response.ok) return console.log(response.data.error)
       setParentCategories(response.data)
     }
@@ -166,11 +156,14 @@ const AddCategories = () => {
 
   //Fetch attributes and variations
   useEffect(() => {
+    const shopId = localStorage.getItem('shop_id')
     if (formData.attType.length > 0) {
       const fetchAttributes = async () => {
         try {
           const responses = await Promise.all(
-            formData.attType.map((typeId) => Network.get(`${Urls.fetchVariationGroup}/${typeId}`)),
+            formData.attType.map((typeId) =>
+              Network.get(`${Urls.fetchVariationGroup}/${shopId}/${typeId}`),
+            ),
           )
 
           // Check if all responses are successful
@@ -199,11 +192,14 @@ const AddCategories = () => {
 
   // Fetch Groups Based on Selected Attribute Types
   useEffect(() => {
+    const shopId = localStorage.getItem('shop_id')
     if (formData.attType.length > 0) {
       const fetchGroups = async () => {
         try {
           const responses = await Promise.all(
-            formData.attType.map((typeId) => Network.get(`${Urls.fetchVariationGroup}/${typeId}`)),
+            formData.attType.map((typeId) =>
+              Network.get(`${Urls.fetchVariationGroup}/${shopId}/${typeId}`),
+            ),
           )
 
           // Check if all responses are successful
@@ -335,6 +331,7 @@ const AddCategories = () => {
   // }
 
   const handleSubmit = async (e) => {
+    const shopId = localStorage.getItem('shop_id')
     e.preventDefault()
 
     // Prepare the payload
@@ -346,16 +343,17 @@ const AddCategories = () => {
       status: formData.status,
       pc_name: formData.pc_name ? parseInt(formData.pc_name, 10) : null,
       attribute_group: selectedAttributes.map((attr) => attr.split(':')[1]), // Extract only the attribute_id
+      shop: shopId,
     }
 
     try {
       if (editMode) {
         // Update existing category
-        await Network.put(`${Urls.updateCategory}/${editCategoryId}`, payload)
+        await Network.put(`${Urls.updateCategory}/${shopId}/${editCategoryId}`, payload)
         setMessage('Category updated successfully.')
       } else {
         // Add new category
-        await Network.post(Urls.addCategory, payload)
+        await Network.post(`${Urls.addCategory}/${shopId}`, payload)
         setMessage('Category added successfully.')
       }
 
@@ -386,12 +384,9 @@ const AddCategories = () => {
 
   const handleEdit = async (category) => {
     try {
-      // Fetch category details from API
+      const shopId = localStorage.getItem('shop_id')
 
-      // const response = await axios.get(`${API_UPDATE_CATEGORY}/${category.id}`)
-      // const categoryData = response.data
-
-      const response = await Network.get(`${Urls.updateCategory}/${category.id}`)
+      const response = await Network.get(`${Urls.updateCategory}/${shopId}/${category.id}`)
       const categoryData = response.data
 
       //console.log(categoryData[0].category_name, 'bb');
@@ -440,7 +435,9 @@ const AddCategories = () => {
       //   categoryData.att_type.map((id) => axios.get(`${API_FETCH_VARIATIONS_GROUP}/${id.id}`)),
       // )
       const responses = await Promise.all(
-        categoryData.att_type.map((id) => Network.get(`${Urls.fetchVariationGroup}/${id.id}`)),
+        categoryData.att_type.map((id) =>
+          Network.get(`${Urls.fetchVariationGroup}/${shopId}/${id.id}`),
+        ),
       )
       const data = responses.flatMap((res) => res.data)
       setTableData(data)
@@ -454,17 +451,9 @@ const AddCategories = () => {
   }
 
   const handleDelete = async (categoryId) => {
-    // try {
-    //   await axios.delete(`${API_UPDATE_CATEGORY}/${categoryId}`)
-    //   setCategories(categories.filter((category) => category.id !== categoryId))
-    //   setMessage('Category deleted successfully.')
-    //   fetchCategories() // Refresh categories after editing
-    // } catch (error) {
-    //   console.error('Error deleting category:', error)
-    //   setMessage('Failed to delete category.')
-    // }
+    const shopId = localStorage.getItem('shop_id')
 
-    const response = await Network.delete(`${Urls.updateCategory}/${categoryId}`)
+    const response = await Network.delete(`${Urls.updateCategory}/${shopId}/${categoryId}`)
     if (!response.ok) return console.log(response.data.error)
     setCategories(categories.filter((category) => category.id !== categoryId))
     setMessage('Category deleted successfully.')
@@ -480,25 +469,61 @@ const AddCategories = () => {
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Head Category: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="headCategory"
-              value={formData.headCategory}
-              onChange={handleHeadCategoryChange}
-              style={{
-                flex: 1,
-                padding: '8px',
-                border: '1px solid #ced4da', // Matches input field border
-                borderRadius: '4px', // Adds consistent rounded corners
-                backgroundColor: '#fff', // Matches input field background
+              options={headCategories.map((category) => ({
+                value: category.id, // Use category ID as value
+                label: category.hc_name, // Display hc_name as label
+              }))} // Convert headCategories to value/label pairs
+              value={
+                formData.headCategory
+                  ? {
+                      value: formData.headCategory,
+                      label: headCategories.find(
+                        (category) => category.id === formData.headCategory,
+                      )?.hc_name,
+                    }
+                  : null
+              } // Match the selected value
+              onChange={(selectedOption) =>
+                handleHeadCategoryChange({
+                  target: { name: 'headCategory', value: selectedOption?.value },
+                })
+              } // Simulate native event for handleHeadCategoryChange
+              placeholder="Select Head Category"
+              isSearchable // Enable search functionality
+              isClearable // Allow clearing the selection
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  padding: '5px',
+                  border: '1px solid #ced4da', // Matches input field border
+                  borderRadius: '4px', // Adds consistent rounded corners
+                  backgroundColor: '#fff', // Matches input field background
+                  height: '42px', // Consistent height
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px', // Adjusts internal padding
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input placeholder font size
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input selected value font size
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
               }}
-            >
-              <option value="">Select</option>
-              {headCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.hc_name}
-                </option>
-              ))}
-            </select>
+            />
             <Link to="/Product/AddHeadCategory">
               <button
                 style={{
@@ -520,31 +545,62 @@ const AddCategories = () => {
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
           <label style={{ fontWeight: 'bold' }}>Parent Category: *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
-            <select
+            <Select
               name="pc_name"
-              value={formData.pc_name}
-              onChange={(e) => {
-                const selectedOptionId = e.target.value // Get the ID of the selected option
+              options={parentCategories.map((category) => ({
+                value: category.id, // Use the category ID as value
+                label: category.pc_name, // Display pc_name as label
+              }))} // Convert parentCategories to value/label pairs
+              value={
+                formData.pc_name
+                  ? {
+                      value: formData.pc_name,
+                      label: parentCategories.find((category) => category.id === formData.pc_name)
+                        ?.pc_name,
+                    }
+                  : null
+              } // Match the selected value
+              onChange={(selectedOption) => {
+                const selectedOptionId = selectedOption?.value // Get the selected option ID
                 setFormData({
                   ...formData,
-                  pc_name: selectedOptionId, // Store the selected ID instead of the name
+                  pc_name: selectedOptionId, // Store the selected ID in formData
                 })
               }}
-              style={{
-                flex: 1,
-                padding: '8px',
-                border: '1px solid #ced4da', // Matches input field border
-                borderRadius: '4px', // Adds consistent rounded corners
-                backgroundColor: '#fff', // Matches input field background
+              placeholder="Select Parent Category"
+              isSearchable // Enable search functionality
+              isClearable // Allow clearing the selection
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  flex: 1,
+                }),
+                control: (base) => ({
+                  ...base,
+                  padding: '5px',
+                  border: '1px solid #ced4da', // Matches input field border
+                  borderRadius: '4px', // Adds consistent rounded corners
+                  backgroundColor: '#fff', // Matches input field background
+                  height: '42px', // Consistent height
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px', // Adjusts internal padding
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input placeholder font size
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  fontSize: '16px', // Matches input selected value font size
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: '0',
+                }),
               }}
-            >
-              <option value="">Select Parent Category</option> {/* Default option */}
-              {parentCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.pc_name}
-                </option>
-              ))}
-            </select>
+            />
             <Link to="/Product/AddParentCategory">
               <button
                 style={{

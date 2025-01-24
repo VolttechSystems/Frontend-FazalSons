@@ -153,7 +153,7 @@ class AddAtt extends Component {
       att_type: attType,
       attribute_name: attribute.attributeName,
       variation: attribute.variations,
-      shop_id: shopId, // Include shop ID
+      shop: shopId, // Include shop ID
     }))
 
     console.log('Payload:', payload) // Debugging
@@ -243,12 +243,13 @@ class AddAtt extends Component {
       att_type: attType, // Attribute type (e.g., "Automobiles")
       attribute_name: attributes[0].attributeName, // Use `att_id` for the attribute name
       variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
+      shop: shopId, // Include shop ID
     }
     //console.log("Update Payload:", [attribute_name]);
     console.log('Update Payload:', JSON.stringify(payload))
 
     const response = await Network.put(
-      `${Urls.updateVariationGroup}/${shopId}/${editData.att_id}`,
+      `${Urls.updateVariationGroup}${shopId}/${editData.att_id}`,
       JSON.stringify(payload),
     )
     if (!response.ok) return consoe.log(response.data.error)
