@@ -2,12 +2,17 @@
 
 /* Container for the whole Add Attribute form */
 .add-att-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.container{
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 /* Main header styling */
@@ -200,14 +205,116 @@ button + button {
 .add-variation-button:hover {
   background-color: #45a049;
 }
-.Add-button-att{
-  background-color: green;
 
-}
 .E-button-att{
   background-color: green;
 }
 
 .D-button-att{
   background-color: red;
+}
+
+/* Container for the entire form */
+.add-att-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Attribute group container */
+.attribute-container {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Label styles */
+label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Input fields */
+input[type="text"] {
+  width: calc(100% - 40px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.add-variation-button {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.add-variation-button:hover {
+  background-color: #45a049;
+}
+
+.remove-variation-button {
+  background-color: red;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+/* Nested variation container */
+.variation-container {
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.input-button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* Submit button */
+.Add-button-att {
+  display: inline-block; /* Change to inline-block for better alignment */
+  margin: 20px 0; /* Remove auto centering */
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.Add-button-att:hover {
+  background-color: #45a049;
+}
+
+ button ,h1,h2,h3,h4,h5,h6{
+  font-family: 'Times New Roman', serif;
 }

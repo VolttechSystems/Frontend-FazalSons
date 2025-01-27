@@ -282,8 +282,10 @@ class AddAtt extends Component {
     const { apiData, attributes, attType, attributeTypes, currentPage, totalPages } = this.state
 
     return (
-      <div style={{ padding: '20px' }}>
-        <h1>{this.state.editData ? 'Edit Attribute' : 'Add Attributes'}</h1>
+      <div className="add-att-container">
+        <h2 style={{ textAlign: 'center' }}>
+          {this.state.editData ? 'Edit Attributes' : 'Add Attributes '}
+        </h2>
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -296,252 +298,159 @@ class AddAtt extends Component {
           pauseOnHover
           theme="colored"
         />
-        {/* Attribute Type Dropdown
-        <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="attType" style={{ marginRight: '10px' }}>
-            Attribute Type
-          </label>
-          <select
-            name="attType"
-            id="attType"
-            value={attType}
-            onChange={(e) => this.setState({ attType: e.target.value })}
-            style={{
-              marginRight: '10px',
-              width: '30%',
-              padding: '5px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          >
-            <option value="">Select Attribute Type</option>
-            {this.state.attributeTypes?.map((type) => (
-              <option key={type.id} value={type.id}>
-                {type.att_type}
-              </option>
-            ))}
-          </select>
 
-          <Link to="/Product/AddAttributeType">
-            <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
-          </Link>
-        </div> */}
-        {/* Attribute Type Dropdown */}
-        <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="attType" style={{ marginRight: '10px' }}>
-            Attribute Type
-          </label>
-          <Select
-            name="attType"
-            options={attributeTypes}
-            value={attributeTypes.find((type) => type.value === attType)}
-            onChange={(selectedOption) => this.setState({ attType: selectedOption?.value })}
-            placeholder="Select Attribute Type"
-            isSearchable
-            styles={{
-              container: (base) => ({
-                ...base,
-                width: '30%',
-                marginRight: '10px',
-              }),
-            }}
-          />
-          <Link to="/Product/AddAttributeType">
-            <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
-          </Link>
-        </div>
-
-        {attributes.map((attribute, attrIndex) => (
-          <div key={attrIndex} style={{ marginBottom: '20px' }}>
-            {/* Attribute Group Label and Input */}
-            <label htmlFor={`attributeName-${attrIndex}`} style={{ marginRight: '10px' }}>
-              Attribute Group {attrIndex + 1}
-            </label>
-            <input
-              type="text"
-              name="attributeName"
-              id={`attributeName-${attrIndex}`}
-              placeholder={`Attribute Group ${attrIndex + 1}`}
-              value={attribute.attributeName}
-              onChange={(e) => this.handleInputChange(e, attrIndex)}
-              onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
-              style={{
-                marginRight: '10px',
-                width: '30%',
-                padding: '5px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
+        {/* Attribute Type Section */}
+        <div className="attribute-container">
+          <label htmlFor="attType">Attribute Type</label>
+          <div className="input-button-container">
+            <Select
+              name="attType"
+              options={attributeTypes}
+              value={attributeTypes.find((type) => type.value === attType)}
+              onChange={(selectedOption) => this.setState({ attType: selectedOption?.value })}
+              placeholder="Select Attribute Type"
+              isSearchable
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  width: '100%',
+                }),
               }}
             />
+            <Link to="/Product/AddAttributeType">
+              <button className="add-variation-button">+</button>
+            </Link>
+          </div>
+        </div>
 
-            {/* Buttons for adding and removing attribute groups */}
-            <div style={{ display: 'inline-block', marginLeft: '10px' }}>
+        {/* Attribute Groups */}
+        {attributes.map((attribute, attrIndex) => (
+          <div key={attrIndex} className="attribute-container">
+            <label htmlFor={`attributeName-${attrIndex}`}>Attribute Group {attrIndex + 1}</label>
+            <div className="input-button-container">
+              <input
+                type="text"
+                name="attributeName"
+                id={`attributeName-${attrIndex}`}
+                placeholder={`Attribute Group ${attrIndex + 1}`}
+                value={attribute.attributeName}
+                onChange={(e) => this.handleInputChange(e, attrIndex)}
+                onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
+              />
+
               {attrIndex === attributes.length - 1 && !this.state.editData && (
-                <button className="add-attribute-button" onClick={this.addAttribute}>
+                <button className="add-variation-button" onClick={this.addAttribute}>
                   + Add Attribute Group
                 </button>
               )}
-
-              {/* Red Cross Button to Remove Attribute */}
               {attributes.length > 1 && (
                 <button
-                  className="remove-attribute-button"
+                  className="remove-variation-button"
                   onClick={() => this.removeAttribute(attrIndex)}
-                  style={{
-                    color: 'red',
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    fontSize: '18px',
-                  }}
                 >
                   &times;
                 </button>
               )}
             </div>
 
-            {/* Attribute Variations */}
-            <div style={{ marginLeft: '30px', marginTop: '10px' }}>
+            {/* Variations */}
+            <div className="variation-container">
               {attribute.variations.map((variation, varIndex) => (
-                <div
-                  key={varIndex}
-                  style={{
-                    marginBottom: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  {/* Variation Input */}
-                  <label
-                    htmlFor={`variation-${attrIndex}-${varIndex}`}
-                    style={{ marginRight: '10px' }}
-                  >
-                    Attribute {varIndex + 1}
-                  </label>
+                <div key={varIndex} className="input-button-container">
                   <input
                     type="text"
-                    id={`variation-${attrIndex}-${varIndex}`}
                     placeholder={`Attribute ${varIndex + 1}`}
                     value={variation}
                     onChange={(e) => this.handleVariationChange(e, attrIndex, varIndex)}
-                    style={{ marginRight: '10px', width: '25%' }}
                   />
 
-                  {/* Buttons to Add/Remove Variations */}
-                  <div
-                    className="variation-actions-container"
-                    style={{ display: 'flex', alignItems: 'center' }}
-                  >
-                    {/* Remove Variation Button */}
-                    {attribute.variations.length > 1 && (
-                      <button
-                        className="remove-variation-button"
-                        onClick={() => this.removeVariation(attrIndex, varIndex)}
-                        style={{ marginLeft: '10px' }}
-                      >
-                        &times;
-                      </button>
-                    )}
-
-                    {/* Add Variation Button */}
-                    {varIndex === attribute.variations.length - 1 && (
-                      <button
-                        className="add-variation-button"
-                        onClick={() => this.addVariation(attrIndex)}
-                        style={{ marginLeft: '10px' }}
-                      >
-                        + Add Attribute
-                      </button>
-                    )}
-                  </div>
+                  {attribute.variations.length > 1 && (
+                    <button
+                      className="remove-variation-button"
+                      onClick={() => this.removeVariation(attrIndex, varIndex)}
+                    >
+                      &times;
+                    </button>
+                  )}
+                  {varIndex === attribute.variations.length - 1 && (
+                    <button
+                      className="add-variation-button"
+                      onClick={() => this.addVariation(attrIndex)}
+                    >
+                      + Add Attribute
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         ))}
-        <div>
+
+        {/* Submit Button */}
+        <div style={{ textAlign: 'left', marginTop: '-20px', marginBottom: '-20px' }}>
           {this.state.editData ? (
-            <button
-              className="Add-button-att"
-              onClick={this.handleUpdate}
-              style={{ marginTop: '20px' }}
-            >
+            <button className="Add-button-att" onClick={this.handleUpdate}>
               Update
             </button>
           ) : (
-            <button
-              className="Add-button-att"
-              onClick={this.handleSubmit}
-              style={{ marginTop: '20px' }}
-            >
+            <button className="Add-button-att" onClick={this.handleSubmit}>
               Submit
             </button>
           )}
         </div>
-        <h2 style={{ marginTop: '40px' }}>Attribute Groups</h2>
-        <table border="1" style={{ width: '100%', textAlign: 'left' }}>
-          <thead style={{ backgroundColor: 'blue' }}>
-            <tr>
-              <th>Attribute Type</th>
-              <th>Attribute Group</th>
-              <th>Attribute</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {apiData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.att_type}</td>
-                <td>{item.attribute_name}</td>
-                <td>
-                  {Array.isArray(item.variation) ? item.variation.join(', ') : 'No Variations'}
-                </td>
 
-                <td>
-                  <button className="E-button-att" onClick={() => this.handleEdit(item)}>
-                    Edit
-                  </button>
-                  <button className="D-button-att" onClick={() => this.handleDelete(item.att_id)}>
-                    Delete
-                  </button>
-                </td>
+        {/* Attribute Groups Table */}
+        <h4 style={{ marginTop: '20px', marginBottom: '-5px' }}>Attribute Groups</h4>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Attribute Type</th>
+                <th>Attribute Group</th>
+                <th>Attribute</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <div
-          className="pagination"
-          style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
-        >
-          <button
-            style={{
-              padding: '5px 8px',
-              marginRight: '5px',
-              backgroundColor: '#007BFF',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
+            </thead>
+            <tbody>
+              {apiData.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.att_type}</td>
+                  <td>{item.attribute_name}</td>
+                  <td>
+                    {Array.isArray(item.variation) ? item.variation.join(', ') : 'No Variations'}
+                  </td>
+                  <td className="actions">
+                    <button className="E-button-att" onClick={() => this.handleEdit(item)}>
+                      Edit
+                    </button>
+                    <button className="D-button-att" onClick={() => this.handleDelete(item.att_id)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {/* Pagination */}
+          <div
+            className="pagination"
+            style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
           >
-            Previous
-          </button>
-          <button
-            style={{
-              padding: '5px 8px',
-              backgroundColor: '#007BFF',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
-          >
-            Next
-          </button>
+            <button
+              style={{ padding: '5px 10px', marginRight: '5px' }}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <button
+              style={{ padding: '5px 10px' }}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     )

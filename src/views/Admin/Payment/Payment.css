@@ -65,17 +65,20 @@
   border: 1px solid #ddd; /* Light gray border */
   padding: 10px; /* Spacing inside cells */
   text-align: left; /* Align text to the left */
+  font-family: 'Times New Roman', serif;
 }
 
 .payment-methods-header {
   background-color: #0056b3; /* Blue background */
   color: white; /* White font */
   border-bottom: 2px solid #0056b3; /* Slightly darker border under the header */
+  font-family: 'Times New Roman', serif;
 }
 
 /* Table Row Borders */
 .payment-methods-table tr:nth-child(even) {
   background-color: #f9f9f9; /* Light gray for alternate rows */
+  font-family: 'Times New Roman', serif;
 }
 
 
@@ -113,4 +116,7 @@
 .payment-delete-button:hover {
   background-color: darkred; /* Darker red on hover */
   border-color: darkred; /* Darker red border on hover */
+}
+label, button {
+  font-family: 'Times New Roman', serif;
 }

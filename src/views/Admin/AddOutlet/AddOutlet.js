@@ -153,9 +153,13 @@ const AddOutlet = () => {
       />
 
       <form className="outlet-form" onSubmit={handleSubmit}>
-        <h2 style={{ fontFamily: 'Times New Roman, serif' }}>{editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}</h2>
+        <h2 style={{ fontFamily: 'Times New Roman, serif', textAlign: 'center' }}>
+          {editingOutletId ? 'Edit Outlet' : 'Add New Outlet'}
+        </h2>
         <div>
-          <label>Code <span style={{color:'red'}}>*</span></label>
+          <label>
+            Code <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="outlet-form-input"
             type="text"
@@ -166,7 +170,9 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Name <span style={{color:'red'}}>*</span></label>
+          <label>
+            Name <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="outlet-form-input"
             type="text"
@@ -177,7 +183,9 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Address <span style={{color:'red'}}>*</span></label>
+          <label>
+            Address <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="outlet-form-input"
             type="text"
@@ -188,7 +196,9 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Mobile <span style={{color:'red', fontSize:'12px'}}>(Optional)</span></label>
+          <label>
+            Mobile <span style={{ color: 'red', fontSize: '12px' }}>(Optional)</span>
+          </label>
           <input
             className="outlet-form-input"
             type="text"
@@ -198,7 +208,9 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Manager Name <span style={{color:'red', fontSize:'12px'}}>(Optional)</span></label>
+          <label>
+            Manager Name <span style={{ color: 'red', fontSize: '12px' }}>(Optional)</span>
+          </label>
           <input
             className="outlet-form-input"
             type="text"
@@ -208,7 +220,9 @@ const AddOutlet = () => {
           />
         </div>
         <div>
-          <label>Phone No. <span style={{color:'red', fontSize:'12px'}}>(Optional)</span></label>
+          <label>
+            Phone No. <span style={{ color: 'red', fontSize: '12px' }}>(Optional)</span>
+          </label>
           <input
             className="outlet-form-input"
             type="text"

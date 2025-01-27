@@ -119,9 +119,13 @@ const Payment = () => {
       />
 
       <form onSubmit={handleSubmit}>
-        <h2>{editingPaymentId ? 'Edit Payment Method' : 'Add New Payment Method'}</h2>
+        <h2 style={{ fontFamily: 'Times New Roman, serif', textAlign: 'center' }}>
+          {editingPaymentId ? 'Edit Payment Method' : 'Add New Payment Method'}
+        </h2>
         <div>
-          <label>Payment Method Name:</label>
+          <label>
+            Payment Method Name: <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             type="text"
             name="pm_name"

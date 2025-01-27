@@ -25,6 +25,8 @@ import { faPrint, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons
 import AppSidebar from '/src/components/AppSidebar.js' // Your sidebar component
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { Network, Urls } from '../../../api-config'
+
 // import Transections from '/Transections.js';
 
 function Transections() {
@@ -285,23 +287,18 @@ function Transections() {
 
   const fetchInvoices = async () => {
     setLoading(true) // Set loading to true when starting to fetch data
-    try {
-      console.log(`Fetching invoices for Outlet ID: ${outletId}`) // Log to confirm outletId
-      const response = await fetch(
-        `http://195.26.253.123/pos/transaction/get_all_invoices/${outletId}`,
-      )
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`)
-      }
-      const data = await response.json()
-      console.log('Wasfa', data) // Log the response data for verification
-      setInvoices(data) // Update the invoices state with the fetched data
-    } catch (error) {
-      console.error('Error fetching invoices:', error)
-      setError('Error fetching invoices.') // Set the error state
-    } finally {
-      setLoading(false) // Set loading to false once the data is fetched or an error occurs
+
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.fetchInvoices}/${shopId}/${outletId}`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
     }
+
+    if (response.status === 200) {
+      setInvoices(response.data)
+    }
+
+    setLoading(false)
   }
 
   // Fetch invoices based on the dynamic outlet ID
@@ -313,21 +310,13 @@ function Transections() {
 
   useEffect(() => {
     const fetchdueInvoices = async () => {
-      try {
-        console.log(`Fetching due invoices for Outlet ID: ${outletId}`) // Log outletId for verification
-        const response = await fetch(
-          `http://195.26.253.123/pos/transaction/get_due_invoices/${outletId}`,
-        )
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
-        }
-
-        const data = await response.json()
-        console.log('Due Invoices:', data) // Log the response for debugging
-        setdueInvoices(data) // Update the due invoices state
-      } catch (error) {
-        console.error('Error fetching due invoices:', error)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.fetchDueInoices}/${shopId}/${outletId}`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+      if (response.status === 200) {
+        setdueInvoices(response.data)
       }
     }
 
@@ -340,17 +329,16 @@ function Transections() {
   //new
 
   const handleSalesButtonClick = async () => {
-    try {
-      console.log(`Fetching sales data for Outlet ID: ${outletId}`) // Log outletId for verification
-      const response = await axios.get(
-        `http://195.26.253.123/pos/transaction/today_sale_report/${outletId}`,
-      )
-      console.log('Sales Data:', response.data) // Check the structure of the response data
-      setSalesData(response.data) // Update the sales data state
-      setIsOpen(true) // Open the sales modal/dialog
-    } catch (error) {
-      console.error('Error fetching sales data:', error)
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.fetchTodaySales}/${shopId}/${outletId}`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
     }
+
+    if (response.status === 200) {
+      setSalesData(response.data)
+    }
+    setIsOpen(true)
   }
 
   const handleClose = () => {
@@ -455,27 +443,35 @@ function Transections() {
   const fetchNewProducts = async () => {
     if (!selectedInvoice) return // Do not fetch if no invoice is selected
 
-    try {
-      // Make the API request to get products for the selected invoice code
-      const response = await fetch(
-        `http://195.26.253.123/pos/transaction/get_invoice_products/${selectedInvoice}/`,
-      )
+    // try {
+    //   // Make the API request to get products for the selected invoice code
+    //   const response = await fetch(
+    //     `http://195.26.253.123/pos/transaction/get_invoice_products/${selectedInvoice}/`,
+    //   )
 
-      // Check if the response is successful
-      if (!response.ok) {
-        console.error('API Error:', response.status, response.statusText)
-        throw new Error(`Failed to fetch products: ${response.statusText}`)
-      }
+    //   // Check if the response is successful
+    //   if (!response.ok) {
+    //     console.error('API Error:', response.status, response.statusText)
+    //     throw new Error(`Failed to fetch products: ${response.statusText}`)
+    //   }
 
-      // Parse the JSON response
-      const data = await response.json()
-      console.log('Products fetched:', data) // Debug log
+    //   // Parse the JSON response
+    //   const data = await response.json()
+    //   console.log('Products fetched:', data) // Debug log
 
-      // Assuming data is an array of products
-      setnewProducts(data) // Update the state with the fetched products
-    } catch (error) {
-      console.error('Error fetching products:', error) // Error logging
+    //   // Assuming data is an array of products
+    //   setnewProducts(data) // Update the state with the fetched products
+    // } catch (error) {
+    //   console.error('Error fetching products:', error) // Error logging
+    // }
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.getInvoices}/${shopId}/${selectedInvoice}`)
+
+    if (response.status === 200) {
+      toast.success('Invoice Fetched')
     }
+    const data = response.data
+    setnewProducts(data)
   }
 
   useEffect(() => {
@@ -489,11 +485,17 @@ function Transections() {
       return // Exit if no product or invoice is selected
     }
 
+    const shopId = localStorage.getItem('shop_id')
+
     console.log('Fetching product details for:', selectedProduct, selectedInvoice)
 
     try {
-      const response = await fetch(
-        `http://195.26.253.123/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`,
+      // const response = await fetch(
+      //   `http://195.26.253.123/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`,
+      // )
+
+      const response = await Network.get(
+        `${Urls.getProductDetail}/${shopId}/${selectedInvoice}/${selectedProduct}`,
       )
 
       if (!response.ok) {
@@ -501,7 +503,7 @@ function Transections() {
         throw new Error('Failed to fetch product details')
       }
 
-      const data = await response.json()
+      const data = await response.data
       console.log('Fetched Product Details:', data)
 
       if (data.length > 0) {
@@ -523,6 +525,7 @@ function Transections() {
       console.error('Invalid return: Product not selected or invoice code is missing.')
       return
     }
+    const shopId = localStorage.getItem('shop_id')
 
     // Prepare the data as lists for the API
     const requestData = {
@@ -530,25 +533,26 @@ function Transections() {
       rate: [price], // Price (Rate) as a list
       quantity: [returnQty], // Quantity as a list
       invoice_code: selectedInvoice, // Add invoice code instead of quantity
+      shop: shopId,
     }
 
     console.log('Submitting return data:', requestData)
 
     try {
-      const response = await fetch('http://195.26.253.123/pos/transaction/transactions_return', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData), // Send the data as JSON
-      })
+      // const response = await fetch('http://195.26.253.123/pos/transaction/transactions_return', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(requestData), // Send the data as JSON
+      const response = await Network.post(`${Urls.salesReturn}/${shopId}/${outletId}`, requestData)
 
       if (!response.ok) {
         console.error('Error in return API:', response.status, response.statusText)
         throw new Error('Failed to process return')
       }
 
-      const responseData = await response.json()
+      const responseData = await response.data
       console.log('Return processed successfully:', responseData)
 
       // Optional: Show a success message or reset fields
@@ -616,30 +620,20 @@ function Transections() {
 
   useEffect(() => {
     const fetchSalesmen = async () => {
+      const shopId = localStorage.getItem('shop_id')
       if (!outletId) return // If no outletId, skip fetching
 
-      try {
-        const response = await fetch(
-          `http://195.26.253.123/pos/transaction/outlet-wise-salesman/${outletId}/`,
-        )
-        const data = await response.json()
-        if (data && Array.isArray(data)) {
-          setSalesmen(data)
-        }
-      } catch (error) {
-        console.error('Error fetching salesmen:', error)
+      const response = await Network.get(`${Urls.fetchSalesman}/${shopId}/${outletId}`)
+      if (response.status === 200) {
+        setSalesmen(response.data)
       }
     }
 
     const fetchAdditionalFees = async () => {
-      try {
-        const response = await fetch('http://195.26.253.123/pos/transaction/add_additional_fee')
-        const data = await response.json()
-        if (data && Array.isArray(data)) {
-          setAdditionalFees(data)
-        }
-      } catch (error) {
-        console.error('Error fetching additional fees:', error)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.fetchAdditionalFee}/${shopId}`)
+      if (response.status === 200) {
+        setAdditionalFees(response.data)
       }
     }
 
@@ -685,44 +679,40 @@ function Transections() {
       }
     }
 
-    const fetchDeliveryFees = async () => {
-      try {
-        const response = await fetch(
-          'http://195.26.253.123/pos/transaction/action_additional_fee/id/',
-        )
-        const data = await response.json()
-        if (data && Array.isArray(data)) {
-          setDeliveryFees(data)
-        }
-      } catch (error) {
-        console.error('Error fetching delivery fees:', error)
+    const fetchDeliveryFees = async (id) => {
+      // try {
+      //   const response = await fetch(
+      //     'http://195.26.253.123/pos/transaction/action_additional_fee/id/',
+      //   )
+      //   const data = await response.json()
+      //   if (data && Array.isArray(data)) {
+      //     setDeliveryFees(data)
+      //   }
+      // } catch (error) {
+      //   console.error('Error fetching delivery fees:', error)
+      // }
+
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.fetchDelieveryFee}/${shopId}/${id}`)
+      if (response.status === 200) {
+        setDeliveryFees(response.data)
       }
     }
 
     const fetchAllProducts = async (outletId) => {
-      try {
-        const response = await fetch(
-          `http://195.26.253.123/pos/transaction/all_product/${outletId}/`,
-        )
-        const data = await response.json()
-        if (Array.isArray(data)) {
-          const groupedData = groupByProductName(data)
-          setAllProducts(groupedData)
-        }
-      } catch (error) {
-        console.error('Error fetching all products:', error)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.fetchAllTransectionProduct}/${shopId}/${outletId}`)
+      if (response.status === 200) {
+        const groupedData = groupByProductName(response.data)
+        setAllProducts(groupedData)
       }
     }
 
     const fetchCustomer = async () => {
-      try {
-        const response = await fetch('http://195.26.253.123/pos/customer/add_customer')
-        const data = await response.json()
-        if (data && Array.isArray(data)) {
-          setCustomer(data)
-        }
-      } catch (error) {
-        console.error('Error fetching customer:', error)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await Network.get(`${Urls.fetchCustomer}/${shopId}`)
+      if (response.status === 200) {
+        setCustomer(response.data.results)
       }
     }
 
@@ -742,29 +732,23 @@ function Transections() {
 
   // Fetch product details by SKU and add to the table
   const fetchProductDetails = async (sku) => {
+    const shopId = localStorage.getItem('shop_id')
     console.log('Fetching product details for SKU:', sku) // Debug log
     try {
-      const response = await fetch(`http://195.26.253.123/pos/transaction/products_detail/${sku}/`)
+      // const response = await fetch(`http://195.26.253.123/pos/transaction/products_detail/${sku}/`)
+      const response = await Network.get(`${Urls.fetchAllProductDetail}/${shopId}/${sku}`)
       if (!response.ok) {
         console.error('API Error:', response.status, response.statusText)
         return
       }
 
-      const product = await response.json()
+      // const product = await response.json()
+      const product = response.data
       console.log('Product Details Fetched:', product) // Debug log
 
       setTableData((prevTableData) => [
         ...prevTableData,
         {
-          // sku: product.sku || 'N/A',
-          // product_name: product.product_name || 'Unknown Product',
-          // quantity: 1,
-          // discount: 0,
-          // selling_price: product.discount_price || product.selling_price || 0, // Use discount_price if available
-          // // discount_price: product.discount_price || null, // Ensure discount_price is included
-          // discount_value: 0,
-          // total_after_discount: product.discount_price || product.selling_price || 0, // Set initial total
-
           sku: product.sku || 'N/A',
           product_name: product.product_name || 'Unknown Product',
           quantity: 1,
@@ -858,6 +842,7 @@ function Transections() {
 
   const handlePayment = async () => {
     // Create arrays for fee codes and amounts
+    const shopId = localStorage.getItem('shop_id') // Get shop ID from local storage
     const feeCodes = selectedFees.map((fee) => fee.fee_code) // Create an array for fee codes
     const fees = selectedFees.map((fee) => fee.fee_amount) // Create an array for fee amounts
 
@@ -881,23 +866,23 @@ function Transections() {
       fee_amount: fees, // Fee amounts array (can be empty if no fees are selected)
       pm_method: paymentMethods, // Payment method IDs array
       pm_amount: paymentAmounts, // Payment amounts array
+      shop: shopId,
     }
 
     try {
       // Sending POST request with the payload
-      const response = await fetch('http://195.26.253.123/pos/transaction/add_transaction', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      // const response = await fetch('http://195.26.253.123/pos/transaction/add_transaction', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(payload),
+      // })
 
+      const response = await Network.post(`${Urls.addTransection}/${shopId}/${outletId}`, payload)
       if (response.ok) {
-        const result = await response.json()
         toast.success('Transaction added successfully!')
         resetForm() // Reset the form after successful transaction
       } else {
-        const errorData = await response.json()
-        console.error('API Error Response:', errorData)
+        console.error('API Error Response:', response.data)
 
         // Display backend errors
         if (errorData) {
@@ -1477,7 +1462,7 @@ function Transections() {
             <option>Select Customer</option>
             {customer.map((cust) => (
               <option key={cust.cust_code} value={cust.cust_code}>
-                {cust.first_name}
+                {cust.display_name}
               </option>
             ))}
           </select>

@@ -133,4 +133,20 @@ export default {
   addShops: 'admin/add_shop',
   addShopUser: 'admin/shop-admin-user',
   actionShops: 'admin/action_shop',
+
+  //transections
+  fetchSalesman: 'transaction/outlet-wise-salesman',
+  fetchCustomer: 'customer/add_customer',
+  fetchAllTransectionProduct: 'transaction/all_product',
+  fetchDelieveryFee: 'transaction/action_additional_fee',
+  fetchDueInoices: 'transaction/get_due_invoices',
+  fetchInvoices: 'transaction/get_all_invoices',
+  fetchTodaySales: 'transaction/today_sale_report',
+  fetchAllProductDetail: 'transaction/products_detail',
+  addTransection: 'transaction/add_transaction',
+  fetchNewProducts: 'transaction/get_invoice_products',
+  fetchAdditionalFee: 'transaction/add_additional_fee',
+  getInvoices: 'transaction/get_invoice_products',
+  getProductDetail: 'transaction/get_product_detail',
+  salesReturn: 'transaction/transactions_return',
 }
