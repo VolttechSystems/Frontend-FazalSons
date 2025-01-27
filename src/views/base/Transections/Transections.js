@@ -96,10 +96,13 @@ function Transections() {
   const [loading, setLoading] = useState([])
   const [sku, setSku] = useState('')
   const [showCustomerModal, setShowCustomerModal] = useState(false)
+  const shopId = localStorage.getItem('shop_id')
   const [customerForm, setCustomerForm] = useState({
     display_name: '',
     mobile_no: '',
     address: '',
+    shop: shopId, // Add shop_id
+    outlet: outletId, // Add outlet_id
   })
 
   const resetCustomerForm = () => {
@@ -115,23 +118,32 @@ function Transections() {
 
   // Handle form submission (add customer)
   const handleAddCustomer = async () => {
-    try {
-      const response = await axios.post(
-        'http://195.26.253.123/pos/transaction/add-customer-in-pos',
-        customerForm,
-      )
+    // try {
+    //   const response = await axios.post(
+    //     'http://195.26.253.123/pos/transaction/add-customer-in-pos',
+    //     customerForm,
+    //   )
 
-      if (response.data) {
-        toast.success('Customer Added Successfully!') // Success message
+    //   if (response.data) {
+    //     toast.success('Customer Added Successfully!') // Success message
 
-        // Reset the form and close the modal
-        resetCustomerForm()
-      } else {
-        toast.error('Failed to add customer')
-      }
-    } catch (error) {
-      console.error('Error adding customer:', error)
-      toast.error('Error adding customer')
+    //     // Reset the form and close the modal
+    //     resetCustomerForm()
+    //   } else {
+    //     toast.error('Failed to add customer')
+    //   }
+    // } catch (error) {
+    //   console.error('Error adding customer:', error)
+    //   toast.error('Error adding customer')
+    // }
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.post(
+      `${Urls.addCustomerinPOS}/${shopId}/${outletId}`,
+      customerForm,
+    )
+    if (response.ok) {
+      toast.success('Customer Added Successfully!') // Success message
+      resetCustomerForm()
     }
   }
 
@@ -534,6 +546,7 @@ function Transections() {
       quantity: [returnQty], // Quantity as a list
       invoice_code: selectedInvoice, // Add invoice code instead of quantity
       shop: shopId,
+      outlet: outletId, // Outlet code
     }
 
     console.log('Submitting return data:', requestData)
@@ -553,14 +566,16 @@ function Transections() {
       }
 
       const responseData = await response.data
-      console.log('Return processed successfully:', responseData)
+      // console.log('Return processed successfully:', responseData)
+      toast.success('Return processed successfully', responseData)
 
       // Optional: Show a success message or reset fields
-      alert('Return processed successfully!')
+      // alert('Return processed successfully!')
+      toast.success('Return processed successfully')
       setIsDialogOpen(false) // Close the dialog
     } catch (error) {
       console.error('Error processing return:', error)
-      alert('An error occurred while processing the return. Please try again.')
+      toast.error('Error processing return', error)
     }
   }
 

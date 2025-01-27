@@ -3,6 +3,7 @@ import { Network, Urls } from '../../../api-config'
 import { Autocomplete, TextField } from '@mui/material'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import './ShopUser.css'
 
 function ShopUser() {
   // State to manage form data
@@ -18,6 +19,9 @@ function ShopUser() {
   })
 
   // State to manage shop list, user list, loading state, and messages
+  const [editFormData, setEditFormData] = useState(null) // Separate state for editing
+  const [showEditModal, setShowEditModal] = useState(false) // Manage Edit Modal visibility
+  const [selectedUser, setSelectedUser] = useState({ username: '', user_id: null })
   const [shops, setShops] = useState([])
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -59,6 +63,90 @@ function ShopUser() {
     fetchShops()
     fetchUsers()
   }, [])
+
+  const handleEditClick = (user) => {
+    console.log('Edit button clicked for user:', user) // Debugging: Confirm user data
+
+    // Ensure the user object has all required fields
+    if (!user || !user.user_id) {
+      console.error('Invalid user data:', user)
+      toast.error('Failed to open edit modal. User data is invalid.')
+      return
+    }
+
+    // Save the selected user object for reference
+    setSelectedUser(user)
+
+    // Set the form data for editing
+    setEditFormData({
+      username: user.username,
+      password: '', // Always empty to allow new password input
+      phone_number: user.phone_number || '', // Default to empty string if missing
+      is_active: user.is_active,
+      shop: user.shop_id || [], // Use shop ID for the shop field
+    })
+
+    // Update modal visibility
+    setShowEditModal(true)
+
+    // Debug logs after state updates
+    console.log('Modal state should now be true.')
+    console.log('Edit form data set to:', {
+      username: user.username,
+      password: '',
+      phone_number: user.phone_number || '',
+      is_active: user.is_active,
+      shop: user.shop_id || '',
+    })
+  }
+
+  const handleUpdateUser = async () => {
+    const userId = selectedUser.user_id // Retrieve the selected user ID
+
+    if (!userId) {
+      toast.error('User ID is missing. Unable to update.')
+      return
+    }
+
+    const { username, password, phone_number, is_active, shop } = editFormData
+
+    // Construct payload
+    const payload = {
+      user_id: userId.toString(),
+      username,
+      phone_number: phone_number || '',
+      is_active,
+      shop, // Array of shop IDs
+    }
+
+    if (password.trim() !== '') {
+      payload.password = password // Include password if not empty
+    }
+
+    try {
+      const response = await Network.patch(`${Urls.updateShopUser}/${userId}`, payload)
+
+      if (response.ok) {
+        toast.success('User updated successfully!')
+        setShowEditModal(false) // Close modal
+        fetchUsers() // Refresh the user list
+      } else {
+        console.error('Failed to update user. Response:', response)
+        toast.error('Failed to update user.')
+      }
+    } catch (error) {
+      console.error('Error updating user:', error)
+      toast.error('An error occurred while updating the user.')
+    }
+  }
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target
+    setEditFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+  }
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -371,11 +459,24 @@ function ShopUser() {
                 </td>
 
                 <td style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-                  {/* Delete button */}
+                  <button
+                    onClick={() => handleEditClick(user)}
+                    style={{
+                      backgroundColor: 'green',
+                      color: 'white',
+                      padding: '5px 10px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      marginRight: '10px',
+                    }}
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={() => handleDelete(user.id)}
                     style={{
-                      backgroundColor: '#dc3545',
+                      backgroundColor: 'red',
                       color: 'white',
                       padding: '5px 10px',
                       border: 'none',
@@ -400,6 +501,110 @@ function ShopUser() {
           )}
         </tbody>
       </table>
+
+      {/* Edit Modal */}
+      {showEditModal && editFormData && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowEditModal(false)}></div>
+          <div className="modal show">
+            <div className="modal-content">
+              <h3 className="modal-title">Edit User</h3>
+
+              <div className="input-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  className="modal-input"
+                  value={editFormData.username}
+                  disabled
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  className="modal-input"
+                  value={editFormData.password || ''}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({ ...prev, password: e.target.value }))
+                  }
+                  placeholder="Enter new password if needed"
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Phone Number</label>
+                <input
+                  type="text"
+                  name="phone_number"
+                  className="modal-input"
+                  value={editFormData.phone_number || ''}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({ ...prev, phone_number: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Is Active</label>
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  checked={editFormData.is_active || false}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({ ...prev, is_active: e.target.checked }))
+                  }
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Shop</label>
+                <Autocomplete
+                  multiple
+                  options={shops}
+                  getOptionLabel={(option) => option.name}
+                  value={shops.filter((shop) => (editFormData.shop || []).includes(shop.id))} // Pre-fill selected shop names
+                  onChange={(event, newValue) => {
+                    const selectedShops = newValue.map((shop) => shop.id)
+                    setEditFormData((prev) => ({ ...prev, shop: selectedShops }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      style={{
+                        backgroundColor: 'white',
+                        width: '100%',
+                        padding: '8px',
+                        marginBottom: '20px',
+                      }}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                      }}
+                    />
+                  )}
+                  disableClearable
+                />
+              </div>
+
+              <div className="modal-buttons">
+                <button className="modal-btn modal-update-btn" onClick={handleUpdateUser}>
+                  Update
+                </button>
+                <button
+                  className="modal-btn modal-cancel-btn"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

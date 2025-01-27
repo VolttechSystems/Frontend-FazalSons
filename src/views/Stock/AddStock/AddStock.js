@@ -42,13 +42,14 @@ const AddStock = () => {
   }
 
   const fetchProductList = async (outletId) => {
+    const shopId = localStorage.getItem('shop_id') // Get shop_id from local storage
     if (!outletId) {
       setProductList([])
       return
     }
 
     try {
-      const response = await Network.get(`${Urls.getProduct}/${outletId}/`)
+      const response = await Network.get(`${Urls.getProduct}/${shopId}/${outletId}`)
 
       setProductList(response.data || [])
     } catch (error) {
@@ -57,6 +58,7 @@ const AddStock = () => {
   }
 
   const fetchStockData = async () => {
+    const shopId = localStorage.getItem('shop_id')
     if (!selectedProduct) {
       setStockData([])
       return
@@ -64,7 +66,7 @@ const AddStock = () => {
 
     try {
       const encodedProductName = encodeURIComponent(selectedProduct)
-      const url = `${Urls.addStock}/${encodedProductName}/`
+      const url = `${Urls.addStock}/${shopId}/${encodedProductName}`
       const response = await Network.get(url)
 
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -99,6 +101,7 @@ const AddStock = () => {
   }
 
   const handleSubmit = async () => {
+    const shopId = localStorage.getItem('shop_id')
     const updatedItems = stockData
       .filter((item) => updatedStock[item.sku] !== undefined)
       .map((item) => ({
@@ -112,10 +115,15 @@ const AddStock = () => {
     }
 
     try {
-      await axios.put(
-        `http://195.26.253.123/pos/stock/add_stock/${selectedProduct}/`,
+      // await axios.put(
+      //   `http://195.26.253.123/pos/stock/add_stock/${selectedProduct}/`,
+      //   updatedItems,
+      //   { headers: { 'Content-Type': 'application/json' } },
+      // )
+
+      const response = await Network.put(
+        `${Urls.addStock}/${shopId}/${selectedProduct}`,
         updatedItems,
-        { headers: { 'Content-Type': 'application/json' } },
       )
 
       toast.success('Stock updated successfully!')
@@ -158,16 +166,7 @@ const AddStock = () => {
         theme="colored"
       />
       {/* Outlet Dropdown */}
-      {/* <div className="select-container">
-        <select onChange={(e) => setSelectedOutlet(e.target.value)} value={selectedOutlet}>
-          <option value="">Select Outlet</option>
-          {outlets.map((outlet) => (
-            <option key={outlet.id} value={outlet.id}>
-              {outlet.outlet_name}
-            </option>
-          ))}
-        </select>
-      </div> */}
+
       <div className="select-container-wrapper">
         {/* Autocomplete for Outlet selection */}
         <div className="select-container">

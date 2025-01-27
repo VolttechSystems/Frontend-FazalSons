@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import Select from 'react-select'
-import axios from 'axios'
 import './RegisterUser.css'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -24,6 +23,7 @@ function RegisterUser() {
     outlet: [], // Updated to handle multiple outlets
     is_superuser: false,
   })
+  const [editFormData, setEditFormData] = useState(null) // New state for edit modal
   const [userList, setUserList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState({ username: '', user_id: null })
@@ -117,6 +117,10 @@ function RegisterUser() {
     const selectedOutlets = selectedOptions ? selectedOptions : []
     setFormData({ ...formData, outlet: selectedOutlets }) // Save full outlet objects in the state
   }
+  const handleEditOutletChange = (selectedOptions) => {
+    const selectedOutlets = selectedOptions ? selectedOptions : []
+    setEditFormData({ ...editFormData, outlet: selectedOutlets }) // Save full outlet objects in the state
+  }
 
   useEffect(() => {
     fetchOutlets() // Fetch outlets separately
@@ -139,50 +143,81 @@ function RegisterUser() {
     }
   }
 
+  // const handleEditClick = (user) => {
+  //   setSelectedUser(user) // The user object must have the `id` field
+  //   setFormData({
+  //     username: user.username,
+
+  //     password: '',
+  //     phone_number: user.phone_number || '',
+  //     is_active: user.is_active,
+  //     system_roles: user.system_roles.map((role) => role.id),
+  //     outlet: user.outlet.map((out) => ({
+  //       value: out.id,
+  //       label: out.outlet_name,
+  //     })),
+  //   })
+  //   setShowEditModal(true)
+  // }
   const handleEditClick = (user) => {
-    console.log('Edit user clicked:', user) // Debugging
-    setSelectedUser({ username: user.username, user_id: user.id, system_roles: user.system_roles })
+    setSelectedUser(user) // Set the selected user
+    setEditFormData({
+      username: user.username,
+      password: '',
+      phone_number: user.phone_number || '',
+      is_active: user.is_active,
+      system_roles: user.system_roles.map((role) => ({
+        id: role.id, // Map id
+        sys_role_name: role.sys_role_name, // Map sys_role_name
+      })), // Preserve the structure for system_roles
+      outlet: user.outlet.map((out) => ({
+        value: out.id,
+        label: out.outlet_name,
+      })), // Map outlet for Select component
+    })
     setShowEditModal(true)
   }
 
-  const handlePasswordChange = () => {
-    const payload = {
-      user_id: selectedUser.user_id,
-      new_password: newPassword,
+  const handleUpdateUser = async () => {
+    const shopId = localStorage.getItem('shop_id')
+    const userId = selectedUser.user_id
+
+    if (!userId) {
+      toast.error('User ID is missing. Unable to update.')
+      return
     }
 
-    // Clear previous errors before making the request
-    setNewPasswordErrors([])
+    const { username, phone_number, is_active, system_roles, outlet, password } = editFormData
 
-    // Make the API request
-    Network.post(Urls.passwordChange, payload)
-      .then((response) => {
-        console.log('Response from backend:', response) // Log the response
+    const payload = {
+      user_id: userId.toString(),
+      username,
+      phone_number: phone_number || '',
+      is_active,
+      system_roles: system_roles.map((role) => role.id),
+      outlet: outlet.map((out) => out.value),
+      shop: shopId.toString(),
+    }
 
-        // Check if there's a success message
-        if (response.data && response.data.message) {
-          setPasswordChangeMessage(response.data.message) // Set success message
-          setShowEditModal(false) // Close the modal after successful password change
-          setNewPassword('') // Reset the password field
-        }
-      })
-      .catch((error) => {
-        console.error('Error changing password:', error) // Log error
+    if (password.trim() !== '') {
+      payload.password = password
+    }
 
-        // Check if error response contains errors for the new_password field
-        if (error.response && error.response.data) {
-          const backendErrors = error.response.data
-          console.log('Backend Errors:', backendErrors) // Log backend errors
-
-          // If there are errors related to new_password, update the state
-          if (backendErrors.new_password) {
-            setNewPasswordErrors(backendErrors.new_password) // Set errors to display
-          }
-        } else {
-          // Handle unexpected errors here
-          toast.error('An unexpected error occurred while changing the password.')
-        }
-      })
+    try {
+      const response = await Network.patch(
+        `${Urls.registerUserUpdate}/${shopId}/${userId}`,
+        payload,
+      )
+      if (response.ok) {
+        toast.success('User updated successfully!')
+        setShowEditModal(false)
+        fetchUsers()
+      } else {
+        toast.error('Failed to update user.')
+      }
+    } catch (error) {
+      toast.error('An error occurred while updating the user.')
+    }
   }
 
   const togglePasswordVisibility = () => {
@@ -202,7 +237,7 @@ function RegisterUser() {
   const handleMultiSelectChange = (selectedOptions) => {
     const selectedRoles = selectedOptions ? selectedOptions.map((option) => option.value) : []
     setFormData({
-      ...formData,
+      ...editFormData,
       system_roles: selectedRoles,
     })
   }
@@ -306,16 +341,6 @@ function RegisterUser() {
             required
           />
         </div>
-        {/* <div className="input-group">
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div> */}
         <div className="input-group">
           <label>Username</label>
           <input
@@ -492,54 +517,105 @@ function RegisterUser() {
           Next
         </button>
       </div>
-      {showEditModal && selectedUser && (
+      {showEditModal && (
         <div className="modal show">
           <div className="modal-content">
-            <h3 className="modal-title">Change Password</h3>
-            <p className="modal-username">
-              Username: <strong>{selectedUser.username}</strong>
-            </p>
-            <p className="modal-roles">
-              System Roles:{' '}
-              <strong>
-                {selectedUser.system_roles && selectedUser.system_roles.length > 0
-                  ? selectedUser.system_roles.map((role, index) => (
-                      <span key={index}>
-                        {role.sys_role_name}
-                        {index < selectedUser.system_roles.length - 1 && ', '}
-                      </span>
-                    ))
-                  : 'No roles assigned'}
-              </strong>
-            </p>
+            <h3>Edit User</h3>
+            <div className="input-group">
+              <label>Username</label>
+              <input type="text" name="username" value={editFormData.username} disabled />
+            </div>
+            <div className="input-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                value={editFormData.password}
+                onChange={(e) => setEditFormData({ ...editFormData, password: e.target.value })}
+                placeholder="Enter new password if needed"
+              />
+            </div>
+            <div className="input-group">
+              <label>Phone Number</label>
+              <input
+                type="text"
+                name="phone_number"
+                value={editFormData.phone_number}
+                onChange={(e) => setEditFormData({ ...editFormData, phone_number: e.target.value })}
+              />
+            </div>
+            <div className="input-group">
+              <label>Is Active</label>
+              <input
+                type="checkbox"
+                name="is_active"
+                checked={editFormData.is_active}
+                onChange={(e) => setEditFormData({ ...editFormData, is_active: e.target.checked })}
+              />
+            </div>
+            <div className="input-group">
+              <label>System Roles</label>
+              <Select
+                isMulti
+                name="system_roles"
+                options={systemRoles} // Available roles to select
+                value={editFormData.system_roles.map((role) => ({
+                  value: role.id, // Map id to value
+                  label: role.sys_role_name, // Map sys_role_name to label
+                }))}
+                onChange={(selectedOptions) =>
+                  setEditFormData({
+                    ...editFormData,
+                    system_roles: selectedOptions.map((option) => ({
+                      id: option.value, // Map value back to id
+                      sys_role_name: option.label, // Map label back to sys_role_name
+                    })),
+                  })
+                }
+                placeholder="Select roles"
+              />
+            </div>
 
-            <input
-              type="password"
-              className="modal-input"
-              id="new-password"
-              placeholder="Enter new password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-
-            {/* Display password validation errors */}
-            {newPasswordErrors.length > 0 && (
-              <div className="password-errors">
-                {newPasswordErrors.map((error, index) => (
-                  <p key={index} className="error-message">
-                    {error}
-                  </p>
-                ))}
-              </div>
-            )}
-
-            <div className="modal-buttons">
-              <button className="modal-btn modal-update-btn" onClick={handlePasswordChange}>
-                Update Password
+            <div className="input-group">
+              <label>Outlets</label>
+              <Select
+                isMulti
+                name="outlet"
+                options={outlets.map((outlet) => ({
+                  value: outlet.id,
+                  label: outlet.outlet_name,
+                  outlet_code: outlet.outlet_code, // Include other outlet data if needed
+                }))}
+                onChange={handleEditOutletChange}
+                value={editFormData.outlet} // formData.outlet should be an array of full outlet objects
+                placeholder="Select outlets"
+              />
+            </div>
+            <div className="modal-buttons" style={{ marginTop: '10px', textAlign: 'center' }}>
+              <button
+                onClick={handleUpdateUser}
+                style={{
+                  backgroundColor: 'green', // Green background
+                  color: 'white', // White text
+                  border: 'none',
+                  padding: '10px 15px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  marginRight: '10px', // Add spacing between buttons
+                }}
+              >
+                Update
               </button>
               <button
-                className="modal-btn modal-cancel-btn"
                 onClick={() => setShowEditModal(false)}
+                style={{
+                  backgroundColor: 'red', // Red background
+                  color: 'white', // White text
+                  border: 'none',
+                  padding: '10px 15px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
               >
                 Cancel
               </button>

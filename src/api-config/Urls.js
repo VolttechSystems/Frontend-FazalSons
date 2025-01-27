@@ -101,6 +101,8 @@ export default {
   deleteUser: 'accounts/delete_user',
   //password Change user
   passwordChange: 'accounts/admin-change-password/',
+  registerUserUpdate: 'accounts/update_user',
+  updateShopUser: 'admin/update-shops-user',
 
   //addPayment
   addpayment: 'transaction/add_payment',
@@ -149,4 +151,5 @@ export default {
   getInvoices: 'transaction/get_invoice_products',
   getProductDetail: 'transaction/get_product_detail',
   salesReturn: 'transaction/transactions_return',
+  addCustomerinPOS: 'transaction/add-customer-in-pos',
 }
