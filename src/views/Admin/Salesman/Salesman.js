@@ -68,6 +68,11 @@ const Salesman = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const shopId = localStorage.getItem('shop_id')
+    if (!shopId) {
+      toast.error('Shop ID not found in local storage.')
+      return
+    }
+
     const selectedOutlets = formData.outlet.map((outlet) => outlet.value)
 
     const dataToSend = {
@@ -81,17 +86,37 @@ const Salesman = () => {
     }
 
     try {
-      const response = editingSalesmanId
-        ? await Network.put(`${Urls.updateSalesman}/${shopId}/${editingSalesmanId}`, dataToSend)
-        : await Network.post(`${Urls.addSalesman}/${shopId}`, dataToSend)
-      toast.success(
-        editingSalesmanId ? 'Salesman updated successfully!' : 'Salesman added successfully!',
-      )
-      fetchSalesmen(currentPage)
-      resetForm()
+      let response
+
+      if (editingSalesmanId) {
+        // Update existing salesman
+        response = await Network.put(
+          `${Urls.updateSalesman}/${shopId}/${editingSalesmanId}`,
+          dataToSend,
+        )
+      } else {
+        // Add new salesman
+        response = await Network.post(`${Urls.addSalesman}/${shopId}`, dataToSend)
+      }
+
+      if (response.status === 200 || response.status === 201) {
+        // Successful response
+        toast.success(
+          editingSalesmanId ? 'Salesman updated successfully!' : 'Salesman added successfully!',
+        )
+        fetchSalesmen(currentPage)
+        resetForm()
+      } else {
+        // Handle API failure
+        const errorMessage =
+          response.data?.error || 'The fields shop, salesman_name must make a unique set.'
+        toast.error(errorMessage)
+      }
     } catch (error) {
+      // Handle unexpected errors
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred.'
+      toast.error(errorMessage)
       console.error('Error submitting data:', error)
-      toast.error('Error submitting data!')
     }
   }
 

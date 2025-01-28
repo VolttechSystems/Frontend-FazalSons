@@ -10,6 +10,7 @@ const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 const POS = React.lazy(() => import('./views/base/POS/POS'))
 const POSTable2 = React.lazy(() => import('./views/base/POSTable2/POSTable2'))
+const POSTable1 = React.lazy(() => import('./views/base/POSTable1/POSTable1'))
 const Salesman = React.lazy(() => import('./views/Admin/Salesman/Salesman'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
 const Transections = React.lazy(() => import('./views/base/Transections/Transections'))
@@ -92,6 +93,12 @@ const routes = [
     element: 'POSTable2',
     element: (props) => <AuthGuard element={POSTable2} requiredPermission="product" {...props} />,
   }, // POSTable2
+  {
+    path: '/base/POSTable1',
+    name: 'POSTable1',
+    element: 'POSTable1',
+    element: (props) => <AuthGuard element={POSTable1} requiredPermission="Customer" {...props} />,
+  }, // POSTable1
   { path: '/base/RegisterSystem', name: 'RegisterSystem', element: RegisterSystem }, // Register
   {
     path: '/Admin/Salesman',
@@ -169,7 +176,7 @@ const routes = [
     element: (props) => <AuthGuard element={AddStock} requiredPermission="stock" {...props} />,
   }, //AddStock
   {
-    path: '/Customer/AddCustomer',
+    path: '/Customer/AddCustomer/:outletId',
     name: 'AddCustomer',
     element: 'AddCustomer',
     element: (props) => (

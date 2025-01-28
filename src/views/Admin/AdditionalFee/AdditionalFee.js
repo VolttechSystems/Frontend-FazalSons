@@ -64,26 +64,46 @@ const AdditionalFee = () => {
     }
 
     try {
+      let response
+
       if (editingFeeId) {
         // Update existing fee
-        await Network.put(`${Urls.updateAdditionalFee}/${shopId}/${editingFeeId}`, formData)
-        toast.success('Fee updated successfully.')
-        setEditingFeeId(null)
+        response = await Network.put(
+          `${Urls.updateAdditionalFee}/${shopId}/${editingFeeId}`,
+          formData,
+        )
+
+        if (response.status === 200) {
+          toast.success('Fee updated successfully.')
+          fetchFees(currentPage)
+          setEditingFeeId(null)
+        } else {
+          const errorMessage = response.data?.error || 'Error updating fee. Please try again.'
+          toast.error(errorMessage)
+        }
       } else {
         // Add new fee
-        const response = await Network.post(`${Urls.addAdditionalFee}/${shopId}`, formData)
-        if (response && response.data) {
+        response = await Network.post(`${Urls.addAdditionalFee}/${shopId}`, formData)
+
+        if (response.status === 201) {
+          // Success case for adding a fee
           toast.success('Fee added successfully.')
           setFees((prev) => [...prev, response.data]) // Append the new fee
         } else {
-          toast.error('Failed to add fee.')
+          // Handle validation error or API failure
+          const errorMessage =
+            response.data?.error || 'The fields shop, fee_name must make a unique set.'
+          toast.error(errorMessage)
         }
       }
+
+      // Reset form data
       setFormData({ fee_name: '', shop: shopId })
-      fetchFees(currentPage) // Refetch fees to include the new/updated data
     } catch (error) {
-      toast.error('An error occurred while adding/updating the fee.')
-      console.error('Error adding/updating fee:', error)
+      // Handle unexpected errors
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred.'
+      toast.error(errorMessage)
+      console.error('Error adding/updating additional fee:', error)
     }
   }
 

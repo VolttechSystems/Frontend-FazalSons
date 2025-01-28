@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import './AddCustomer.css'
 import { Network, Urls } from '../../../api-config'
 import { ToastContainer, toast } from 'react-toastify'
@@ -30,6 +30,7 @@ const AddCustomer = () => {
     online_access: 'no',
     status: 'active',
     shop: '', // Add shop to formData
+    outlet: '', // Add outlet to formData
   })
 
   const [customers, setCustomers] = useState([])
@@ -41,27 +42,41 @@ const AddCustomer = () => {
   const [pageSize] = useState(10) // Items per page
   const navigate = useNavigate()
   const apiUrl = 'http://195.26.253.123/pos/customer'
+  const { outletId } = useParams()
 
   useEffect(() => {
     const shopId = localStorage.getItem('shop_id')
     if (shopId) {
-      setFormData((prev) => ({ ...prev, shop: shopId })) // Set shop in formData
-    } else {
+      setFormData((prev) => ({ ...prev, shop: shopId, outlet: outletId })) // Set shop and outlet in formData
     }
-    fetchCustomers(currentPage)
+    fetchCustomers(currentPage, outletId) // Pass outletId to the fetchCustomers function
     fetchCustomerChannels()
     fetchCustomerTypes()
-  }, [currentPage])
+  }, [currentPage, outletId])
 
-  const fetchCustomers = async (page = 0) => {
+  const fetchCustomers = async (page = 0, outletId) => {
     const shopId = localStorage.getItem('shop_id')
+    if (!shopId || !outletId) {
+      console.error('Missing shopId or outletId')
+      return
+    }
+
     const response = await Network.get(
-      `${Urls.addCustomer}/${shopId}?Starting=${page}&limit=${pageSize}`,
+      `${Urls.addCustomer}/${shopId}/${outletId}?Starting=${page}&limit=${pageSize}`,
     )
-    if (!response.ok) return console.log(response.data.error)
+
+    if (!response.ok) {
+      console.error(response.data.error)
+      return
+    }
+
     setCustomers(response.data.results) // Set existing customers
     setTotalPages(Math.ceil(response.data.count / pageSize))
   }
+
+  useEffect(() => {
+    fetchCustomers(0, outletId) // Fetch customers when outletId changes
+  }, [outletId])
 
   const fetchCustomerChannels = async () => {
     const shopId = localStorage.getItem('shop_id')
@@ -114,8 +129,8 @@ const AddCustomer = () => {
       if (editingCustomerId) {
         // Update existing customer
         response = await Network.put(
-          `${Urls.actionCustomer}/${shopId}/${editingCustomerId}`,
-          formData,
+          `${Urls.actionCustomer}/${shopId}/${outletId}/${editingCustomerId}`,
+          { ...formData, shop: shopId, outlet: outletId }, // Include shop and outlet in the payload
         )
         if (response.ok && response.data) {
           setCustomers((prev) =>
@@ -129,7 +144,10 @@ const AddCustomer = () => {
         }
       } else {
         // Add new customer
-        response = await Network.post(`${Urls.addCustomer}/${shopId}`, formData)
+        response = await Network.post(
+          `${Urls.addCustomer}/${shopId}/${outletId}`,
+          { ...formData, shop: shopId, outlet: outletId }, // Include shop and outlet in the payload
+        )
         if (response.ok && response.data) {
           setCustomers((prev) => [response.data, ...prev]) // Add new customer to top
           toast.success('Customer added successfully!')
@@ -162,6 +180,7 @@ const AddCustomer = () => {
         online_access: 'no',
         status: 'active',
         shop: shopId,
+        outlet: outletId,
       })
       setEditingCustomerId(null)
     } catch (error) {

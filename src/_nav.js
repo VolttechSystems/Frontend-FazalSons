@@ -161,10 +161,16 @@ const _nav = [
     key: 'Customer',
     icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
     items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'Add Customer',
+      //   to: '/Customer/AddCustomer',
+      //   key: 'Customer',
+      // },
       {
         component: CNavItem,
         name: 'Add Customer',
-        to: '/Customer/AddCustomer',
+        to: 'base/POSTable1',
         key: 'Customer',
       },
     ],

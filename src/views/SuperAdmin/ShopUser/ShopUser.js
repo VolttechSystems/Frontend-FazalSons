@@ -83,7 +83,6 @@ function ShopUser() {
       password: '', // Always empty to allow new password input
       phone_number: user.phone_number || '', // Default to empty string if missing
       is_active: user.is_active,
-      shop: user.shop_id || [], // Use shop ID for the shop field
     })
 
     // Update modal visibility
@@ -96,7 +95,6 @@ function ShopUser() {
       password: '',
       phone_number: user.phone_number || '',
       is_active: user.is_active,
-      shop: user.shop_id || '',
     })
   }
 
@@ -108,7 +106,7 @@ function ShopUser() {
       return
     }
 
-    const { username, password, phone_number, is_active, shop } = editFormData
+    const { username, password, phone_number, is_active } = editFormData
 
     // Construct payload
     const payload = {
@@ -116,7 +114,6 @@ function ShopUser() {
       username,
       phone_number: phone_number || '',
       is_active,
-      shop, // Array of shop IDs
     }
 
     if (password.trim() !== '') {
@@ -138,14 +135,6 @@ function ShopUser() {
       console.error('Error updating user:', error)
       toast.error('An error occurred while updating the user.')
     }
-  }
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target
-    setEditFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }))
   }
 
   // Handle form field changes
@@ -548,7 +537,10 @@ function ShopUser() {
                 />
               </div>
 
-              <div className="input-group">
+              <div
+                className="input-group"
+                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
                 <label>Is Active</label>
                 <input
                   type="checkbox"
@@ -557,36 +549,6 @@ function ShopUser() {
                   onChange={(e) =>
                     setEditFormData((prev) => ({ ...prev, is_active: e.target.checked }))
                   }
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Shop</label>
-                <Autocomplete
-                  multiple
-                  options={shops}
-                  getOptionLabel={(option) => option.name}
-                  value={shops.filter((shop) => (editFormData.shop || []).includes(shop.id))} // Pre-fill selected shop names
-                  onChange={(event, newValue) => {
-                    const selectedShops = newValue.map((shop) => shop.id)
-                    setEditFormData((prev) => ({ ...prev, shop: selectedShops }))
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      style={{
-                        backgroundColor: 'white',
-                        width: '100%',
-                        padding: '8px',
-                        marginBottom: '20px',
-                      }}
-                      InputProps={{
-                        ...params.InputProps,
-                        disableUnderline: true,
-                      }}
-                    />
-                  )}
-                  disableClearable
                 />
               </div>
 

@@ -256,6 +256,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Network, Urls } from '../../../api-config'
 import { Link } from 'react-router-dom'
+
 import {
   Box,
   Button,
@@ -416,11 +417,11 @@ const CustomerChannel = () => {
         </Typography>
       </CardHeader>
       <CardContent>
-        <Link to="/Customer/AddCustomer">
+        {/* <Link to="/Customer/AddCustomer">
           <Button variant="outlined" color="primary" sx={{ mb: 2 }}>
             Back to Add Customer
           </Button>
-        </Link>
+        </Link> */}
 
         <ToastContainer
           position="top-right"
