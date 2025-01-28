@@ -20,10 +20,10 @@ function RegisterUser() {
     phone_number: '',
     is_active: true,
     system_roles: [],
-    outlet: [], // Updated to handle multiple outlets
+    outlet: [],
     is_superuser: false,
   })
-  const [editFormData, setEditFormData] = useState(null) // New state for edit modal
+  // const [editFormData, setEditFormData] = useState(null) // New state for edit modal
   const [userList, setUserList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState({ username: '', user_id: null })
@@ -159,66 +159,66 @@ function RegisterUser() {
   //   })
   //   setShowEditModal(true)
   // }
-  const handleEditClick = (user) => {
-    setSelectedUser(user) // Set the selected user
-    setEditFormData({
-      username: user.username,
-      password: '',
-      phone_number: user.phone_number || '',
-      is_active: user.is_active,
-      system_roles: user.system_roles.map((role) => ({
-        id: role.id, // Map id
-        sys_role_name: role.sys_role_name, // Map sys_role_name
-      })), // Preserve the structure for system_roles
-      outlet: user.outlet.map((out) => ({
-        value: out.id,
-        label: out.outlet_name,
-      })), // Map outlet for Select component
-    })
-    setShowEditModal(true)
-  }
+  // const handleEditClick = (user) => {
+  //   setSelectedUser(user) // Set the selected user
+  //   setEditFormData({
+  //     username: user.username,
+  //     password: '',
+  //     phone_number: user.phone_number || '',
+  //     is_active: user.is_active,
+  //     system_roles: user.system_roles.map((role) => ({
+  //       id: role.id, // Map id
+  //       sys_role_name: role.sys_role_name, // Map sys_role_name
+  //     })), // Preserve the structure for system_roles
+  //     outlet: user.outlet.map((out) => ({
+  //       value: out.id,
+  //       label: out.outlet_name,
+  //     })), // Map outlet for Select component
+  //   })
+  //   setShowEditModal(true)
+  // }
 
-  const handleUpdateUser = async () => {
-    const shopId = localStorage.getItem('shop_id')
-    const userId = selectedUser.user_id
+  // const handleUpdateUser = async () => {
+  //   const shopId = localStorage.getItem('shop_id')
+  //   const userId = selectedUser.user_id
 
-    if (!userId) {
-      toast.error('User ID is missing. Unable to update.')
-      return
-    }
+  //   if (!userId) {
+  //     toast.error('User ID is missing. Unable to update.')
+  //     return
+  //   }
 
-    const { username, phone_number, is_active, system_roles, outlet, password } = editFormData
+  //   const { username, phone_number, is_active, system_roles, outlet, password } = editFormData
 
-    const payload = {
-      user_id: userId.toString(),
-      username,
-      phone_number: phone_number || '',
-      is_active,
-      system_roles: system_roles.map((role) => role.id),
-      outlet: outlet.map((out) => out.value),
-      shop: shopId.toString(),
-    }
+  //   const payload = {
+  //     user_id: userId.toString(),
+  //     username,
+  //     phone_number: phone_number || '',
+  //     is_active,
+  //     system_roles: system_roles.map((role) => role.id),
+  //     outlet: outlet.map((out) => out.value),
+  //     shop: shopId.toString(),
+  //   }
 
-    if (password.trim() !== '') {
-      payload.password = password
-    }
+  //   if (password.trim() !== '') {
+  //     payload.password = password
+  //   }
 
-    try {
-      const response = await Network.patch(
-        `${Urls.registerUserUpdate}/${shopId}/${userId}`,
-        payload,
-      )
-      if (response.ok) {
-        toast.success('User updated successfully!')
-        setShowEditModal(false)
-        fetchUsers()
-      } else {
-        toast.error('Failed to update user.')
-      }
-    } catch (error) {
-      toast.error('An error occurred while updating the user.')
-    }
-  }
+  //   try {
+  //     const response = await Network.patch(
+  //       `${Urls.registerUserUpdate}/${shopId}/${userId}`,
+  //       payload,
+  //     )
+  //     if (response.ok) {
+  //       toast.success('User updated successfully!')
+  //       setShowEditModal(false)
+  //       fetchUsers()
+  //     } else {
+  //       toast.error('Failed to update user.')
+  //     }
+  //   } catch (error) {
+  //     toast.error('An error occurred while updating the user.')
+  //   }
+  // }
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev) // Toggle password visibility
@@ -237,7 +237,7 @@ function RegisterUser() {
   const handleMultiSelectChange = (selectedOptions) => {
     const selectedRoles = selectedOptions ? selectedOptions.map((option) => option.value) : []
     setFormData({
-      ...editFormData,
+      ...formData,
       system_roles: selectedRoles,
     })
   }
@@ -245,17 +245,20 @@ function RegisterUser() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const shopId = localStorage.getItem('shop_id')
-    const { outlet, ...restFormData } = formData
+    const { outlet, username, password, ...restFormData } = formData
     const selectedOutlets = outlet.map((outlet) => outlet.value)
 
     const payload = {
       ...restFormData,
+      username: formData.username,
+      password: formData.password,
       outlet: selectedOutlets,
       shop: shopId,
     }
+    console.log('payload-----------------', payload)
 
     try {
-      const response = await Network.post(`${Urls.registerUser}${shopId}/`, payload)
+      const response = await Network.post(`${Urls.registerUser}${shopId}`, payload)
       if (response.ok) {
         toast.success('User registered successfully!')
         fetchUsers(currentPage)
@@ -377,8 +380,11 @@ function RegisterUser() {
               type={showPassword ? 'text' : 'password'} // Toggle between "text" and "password"
               name="password"
               value={formData.password}
-              onChange={handleChange}
-              required
+              onChange={(e) => {
+                console.log(`${e.target.name}:`, e.target.value)
+                setFormData({ ...formData, [e.target.name]: e.target.value })
+              }}
+              // required
               placeholder="Enter your password"
             />
             <span
