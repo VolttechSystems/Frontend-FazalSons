@@ -725,7 +725,7 @@ function Transections() {
 
     const fetchCustomer = async () => {
       const shopId = localStorage.getItem('shop_id')
-      const response = await Network.get(`${Urls.fetchCustomer}/${shopId}`)
+      const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
       if (response.status === 200) {
         setCustomer(response.data.results)
       }
