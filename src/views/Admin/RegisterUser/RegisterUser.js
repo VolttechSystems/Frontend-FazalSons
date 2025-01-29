@@ -23,7 +23,7 @@ function RegisterUser() {
     outlet: [],
     is_superuser: false,
   })
-  // const [editFormData, setEditFormData] = useState(null) // New state for edit modal
+  const [editFormData, setEditFormData] = useState(null) // New state for edit modal
   const [userList, setUserList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState({ username: '', user_id: null })
@@ -159,66 +159,67 @@ function RegisterUser() {
   //   })
   //   setShowEditModal(true)
   // }
-  // const handleEditClick = (user) => {
-  //   setSelectedUser(user) // Set the selected user
-  //   setEditFormData({
-  //     username: user.username,
-  //     password: '',
-  //     phone_number: user.phone_number || '',
-  //     is_active: user.is_active,
-  //     system_roles: user.system_roles.map((role) => ({
-  //       id: role.id, // Map id
-  //       sys_role_name: role.sys_role_name, // Map sys_role_name
-  //     })), // Preserve the structure for system_roles
-  //     outlet: user.outlet.map((out) => ({
-  //       value: out.id,
-  //       label: out.outlet_name,
-  //     })), // Map outlet for Select component
-  //   })
-  //   setShowEditModal(true)
-  // }
+  const handleEditClick = (user) => {
+    setSelectedUser(user) // Set the selected user
+    setEditFormData({
+      username: user.username,
+      password: '',
+      phone_number: user.phone_number || '',
+      is_active: user.is_active,
+      system_roles: user.system_roles.map((role) => ({
+        id: role.id, // Map id
+        sys_role_name: role.sys_role_name, // Map sys_role_name
+      })), // Preserve the structure for system_roles
+      outlet: user.outlet.map((out) => ({
+        value: out.id,
+        label: out.outlet_name,
+      })), // Map outlet for Select component
+    })
+    setShowEditModal(true)
+  }
 
-  // const handleUpdateUser = async () => {
-  //   const shopId = localStorage.getItem('shop_id')
-  //   const userId = selectedUser.user_id
+  const handleUpdateUser = async () => {
+    const shopId = localStorage.getItem('shop_id')
+    const userId = selectedUser.user_id
 
-  //   if (!userId) {
-  //     toast.error('User ID is missing. Unable to update.')
-  //     return
-  //   }
+    if (!userId) {
+      toast.error('User ID is missing. Unable to update.')
+      return
+    }
 
-  //   const { username, phone_number, is_active, system_roles, outlet, password } = editFormData
+    const { username, phone_number, is_active, system_roles, outlet, password } = editFormData
 
-  //   const payload = {
-  //     user_id: userId.toString(),
-  //     username,
-  //     phone_number: phone_number || '',
-  //     is_active,
-  //     system_roles: system_roles.map((role) => role.id),
-  //     outlet: outlet.map((out) => out.value),
-  //     shop: shopId.toString(),
-  //   }
+    const payload = {
+      user_id: userId.toString(),
+      username,
+      phone_number: phone_number || '',
+      is_active,
+      system_roles: system_roles.map((role) => role.id),
+      outlet: outlet.map((out) => out.value),
+      shop: shopId.toString(),
+    }
+    console.log('payload-----------------', payload)
 
-  //   if (password.trim() !== '') {
-  //     payload.password = password
-  //   }
+    if (password.trim() !== '') {
+      payload.password = password
+    }
 
-  //   try {
-  //     const response = await Network.patch(
-  //       `${Urls.registerUserUpdate}/${shopId}/${userId}`,
-  //       payload,
-  //     )
-  //     if (response.ok) {
-  //       toast.success('User updated successfully!')
-  //       setShowEditModal(false)
-  //       fetchUsers()
-  //     } else {
-  //       toast.error('Failed to update user.')
-  //     }
-  //   } catch (error) {
-  //     toast.error('An error occurred while updating the user.')
-  //   }
-  // }
+    try {
+      const response = await Network.patch(
+        `${Urls.registerUserUpdate}/${shopId}/${userId}`,
+        payload,
+      )
+      if (response.ok) {
+        toast.success('User updated successfully!')
+        setShowEditModal(false)
+        fetchUsers()
+      } else {
+        toast.error('Failed to update user.')
+      }
+    } catch (error) {
+      toast.error('An error occurred while updating the user.')
+    }
+  }
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev) // Toggle password visibility
@@ -296,6 +297,7 @@ function RegisterUser() {
   const handleDelete = (userId) => {
     Network.delete(`${Urls.deleteUser}/${userId}`)
       .then((response) => {
+        toast.success('User deleted successfully:')
         console.log('User deleted successfully:', response)
         fetchUsers() // Refresh the user list
       })
@@ -494,7 +496,7 @@ function RegisterUser() {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(user.id)} // Pass user ID dynamically
+                  onClick={() => handleDelete(user.user_id)} // Pass user ID dynamically
                   className="del-button1"
                 >
                   Delete

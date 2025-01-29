@@ -208,112 +208,164 @@ const DaySale = () => {
             </TableBody>
           </Table>
         )}
-        <Dialog open={showModal} onClose={closeModal} maxWidth="md" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold' }}>Report Details</DialogTitle>
-          <DialogContent>
+        <Dialog open={showModal} onClose={closeModal} maxWidth="xs" fullWidth>
+          <DialogContent
+            sx={{
+              fontFamily: 'monospace',
+              textAlign: 'center',
+              padding: '15px 15px',
+              background: '#fff',
+              border: 'none',
+              overflow: 'hidden',
+              minHeight: 'auto',
+              width: '300px',
+              margin: 'auto',
+              boxShadow: 'none',
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 'bold',
+                marginBottom: 1,
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+              }}
+            >
+              POINT OF SALE
+            </Typography>
+            <Typography sx={{ fontSize: '12px' }}>Sample Address</Typography>
+            <Typography sx={{ fontSize: '12px' }}>Tel: 010101010</Typography>
+            <Typography sx={{ fontSize: '12px', marginBottom: 2 }}>Email: abc@pos.com</Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 'bold', textDecoration: 'none', marginBottom: 2 }}
+            >
+              SALES INVOICE
+            </Typography>
+
             {detailData && (
-              <Box>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Customer Type:</strong> {detailData.customer_type}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Date:</strong> {detailData.date}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Gross Total:</strong> {detailData.gross_total}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Discount:</strong> {detailData.discount}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Grand Total:</strong> {detailData.grand_total}
-                </Typography>
-                <Typography sx={{ marginBottom: 1 }}>
-                  <strong>Status:</strong> {detailData.status}
-                </Typography>
-                <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-                  Items
-                </Typography>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>SKU</TableCell>
-                      <TableCell>Product</TableCell>
-                      <TableCell>Variation</TableCell>
-                      <TableCell>Quantity</TableCell>
-                      <TableCell>Per Rate</TableCell>
-                      <TableCell>Gross Total</TableCell>
-                      <TableCell>Discounted Value</TableCell>
-                      <TableCell>Item Total</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {detailData.items.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{item.sku}</TableCell>
-                        <TableCell>{item.product || 'N/A'}</TableCell>
-                        <TableCell>{item.variation || 'N/A'}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>{item.per_rate}</TableCell>
-                        <TableCell>{item.gross_total}</TableCell>
-                        <TableCell>{item.discounted_value}</TableCell>
-                        <TableCell>{item.item_total}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-                  Payments
-                </Typography>
-                {detailData.Payment.map((payment, index) => (
-                  <Typography key={index} sx={{ marginBottom: 1 }}>
-                    <strong>Method:</strong> {payment.payment_method}, <strong>Amount:</strong>{' '}
-                    {payment.amount}
+              <Box sx={{ textAlign: 'left', fontSize: '12px', marginBottom: 2, lineHeight: '1.5' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography>
+                    <strong>Customer Type:</strong>
                   </Typography>
-                ))}
-                <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-                  Additional Fees
-                </Typography>
-                {detailData.additional_fee.map((additionalfee, index) => (
-                  <Typography key={index} sx={{ marginBottom: 1 }}>
-                    <strong>Method:</strong> {additionalfee.fee_method}, <strong>Fee:</strong>{' '}
-                    {additionalfee.fee}
+                  <Typography>{detailData.customer_type}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography>
+                    <strong>Date:</strong>
                   </Typography>
-                ))}
-                <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-                  Returns
-                </Typography>
-                {detailData.returns.length > 0 ? (
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Product</TableCell>
-                        <TableCell>Variation</TableCell>
-                        <TableCell>Quantity</TableCell>
-                        <TableCell>Per Rate</TableCell>
-                        <TableCell>Item Total</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {detailData.returns.map((returnItem, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{returnItem.product}</TableCell>
-                          <TableCell>{returnItem.variation}</TableCell>
-                          <TableCell>{returnItem.quantity}</TableCell>
-                          <TableCell>{returnItem.per_rate}</TableCell>
-                          <TableCell>{returnItem.item_total}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Typography>No Returns</Typography>
-                )}
+                  <Typography>{detailData.date}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography>
+                    <strong>Gross Total:</strong>
+                  </Typography>
+                  <Typography>₨ {detailData.gross_total}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography>
+                    <strong>Discount:</strong>
+                  </Typography>
+                  <Typography>₨ {detailData.discount}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography>
+                    <strong>Grand Total:</strong>
+                  </Typography>
+                  <Typography>₨ {detailData.grand_total}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography>
+                    <strong>Status:</strong>
+                  </Typography>
+                  <Typography>{detailData.status}</Typography>
+                </Box>
               </Box>
             )}
+
+            <Table
+              size="small"
+              sx={{
+                borderTop: '2px solid black',
+                borderBottom: '2px solid black',
+                marginBottom: '10px',
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '12px', textAlign: 'left' }}>
+                    Item
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '12px', textAlign: 'center' }}>
+                    Qty
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '12px', textAlign: 'right' }}>
+                    Amount
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {detailData?.items?.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell sx={{ fontSize: '12px', textAlign: 'left' }}>
+                      {item.product || 'N/A'}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: '12px', textAlign: 'center' }}>
+                      {item.quantity}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: '12px', textAlign: 'right' }}>
+                      ₨ {item.item_total}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <Box sx={{ textAlign: 'left', fontSize: '12px', lineHeight: '1.5', marginBottom: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography>
+                  <strong>Additional Fee:</strong>
+                </Typography>
+                <Typography>
+                  {detailData?.additional_fee?.length
+                    ? `${detailData.additional_fee[0].fee_method} - ₨ ${detailData.additional_fee[0].fee}`
+                    : 'None'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography>
+                  <strong>Returns:</strong>
+                </Typography>
+                <Typography>
+                  {detailData?.returns?.length ? `${detailData.returns.length} items` : 'None'}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography>
+                  <strong>Paid:</strong>
+                </Typography>
+                <Typography>₨ {detailData?.Payment[0]?.amount}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography>
+                  <strong>Paid Via:</strong>
+                </Typography>
+                <Typography>{detailData?.Payment[0]?.payment_method}</Typography>
+              </Box>
+            </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeModal} variant="contained" color="secondary">
+            <Button
+              onClick={closeModal}
+              variant="contained"
+              color="secondary"
+              sx={{ fontSize: '12px' }}
+            >
               Close
             </Button>
           </DialogActions>

@@ -211,12 +211,13 @@ function ShopUser() {
 
   // Handle delete user
   const handleDelete = async (userId) => {
+    console.log('Deleting user with ID:', userId)
     try {
       const response = await Network.delete(
         `http://195.26.253.123/pos/accounts/delete_user/${userId}`,
       )
       if (response.status === 204) {
-        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)) // Remove user from list
+        setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== userId)) // Remove user from list
         toast.success('User deleted successfully!') // Show success notification
       } else {
         toast.error('Failed to delete user.') // Show error notification
@@ -438,7 +439,7 @@ function ShopUser() {
         <tbody>
           {users.length > 0 ? (
             users.map((user) => (
-              <tr key={user.id}>
+              <tr key={user.user_id}>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.username}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.email}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.phone_number}</td>
@@ -463,7 +464,7 @@ function ShopUser() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => handleDelete(user.user_id)}
                     style={{
                       backgroundColor: 'red',
                       color: 'white',
