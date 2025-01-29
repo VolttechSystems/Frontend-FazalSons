@@ -153,4 +153,6 @@ export default {
   salesReturn: 'transaction/transactions_return',
   addCustomerinPOS: 'transaction/add-customer-in-pos',
   addPaymentMethod: ' transaction/add_payment',
+  recieveDueInvoice: 'transaction/receive_due_invoice',
+  getDueInvoice: 'transaction/get_amount_of_due_invoices',
 }

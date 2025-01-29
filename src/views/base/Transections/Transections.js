@@ -39,6 +39,8 @@ function Transections() {
   //fullscreen
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isSidebarVisible, setIsSidebarVisible] = useState(true)
+  const [receivingTypeOptions, setReceivingTypeOptions] = useState([])
+  const [receivingType, setReceivingType] = useState(null)
 
   const [products, setProducts] = useState([]) // List of products in the table
   const [salesmen, setSalesmen] = useState([])
@@ -69,7 +71,7 @@ function Transections() {
   //NEW
   const [isDialogOpenTwo, setIsDialogOpenTwo] = useState(false)
   const [dueinvoice, duesetInvoice] = useState('')
-  const [receivingType, setReceivingType] = useState('')
+
   const [dueAmounts, setDueAmounts] = useState('')
 
   const [invoices, setInvoices] = useState([])
@@ -105,6 +107,27 @@ function Transections() {
     shop: shopId, // Add shop_id
     outlet: outletId, // Add outlet_id
   })
+  //new code
+  useEffect(() => {
+    // Fetch Receiving Types from API
+    const shopId = localStorage.getItem('shop_id')
+    const fetchReceivingTypes = async () => {
+      try {
+        const response = await Network.get(`${Urls.addpayment}/${shopId}/`)
+
+        if (response.status === 200) {
+          // Use response.status instead of response.ok (which is for fetch)
+          setReceivingTypeOptions(response.data) // Axios directly returns parsed JSON in response.data
+        } else {
+          console.error('Failed to fetch receiving types')
+        }
+      } catch (error) {
+        console.error('Error fetching receiving types:', error)
+      }
+    }
+
+    fetchReceivingTypes()
+  }, []) // Remove `shopId` from dependency array since it's retrieved from localStorage
 
   const resetCustomerForm = () => {
     setCustomerForm({
@@ -1212,13 +1235,14 @@ function Transections() {
 
                         if (invoiceCode) {
                           try {
-                            // Fetch the due amount for the selected invoice
-                            const response = await fetch(
-                              `http://195.26.253.123/pos/transaction/get_amount_of_due_invoices/${invoiceCode}`,
+                            // Fetch the due amount for the selected invoice using Axios
+                            const response = await Network.get(
+                              `${Urls.getDueInvoice}/${invoiceCode}`,
                             )
-                            if (response.ok) {
-                              const data = await response.json()
-                              setDueAmounts(data.due_amount) // Update dueAmounts state
+
+                            if (response.status === 200) {
+                              // Axios uses `response.status`, not `response.ok`
+                              setDueAmounts(response.data.due_amount) // Update dueAmounts state
                             } else {
                               console.error('Failed to fetch due amount.')
                             }
@@ -1254,15 +1278,26 @@ function Transections() {
                     <Typography variant="body2" sx={{ marginBottom: 1 }}>
                       Receiving Type *
                     </Typography>
-                    <Select
-                      fullWidth
+                    <select
                       value={receivingType}
                       onChange={(e) => setReceivingType(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        backgroundColor: '#f9f9f9',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                      }}
                     >
-                      <MenuItem value="Debit Card">Debit Card</MenuItem>
-                      <MenuItem value="Credit Card">Credit Card</MenuItem>
-                      <MenuItem value="Cash">Cash</MenuItem>
-                    </Select>
+                      <option value="">Select Receiving Type</option>
+                      {receivingTypeOptions.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.pm_name}
+                        </option>
+                      ))}
+                    </select>
                   </Box>
 
                   {/* Due Amount Input */}
@@ -1300,40 +1335,36 @@ function Transections() {
                   onClick={async () => {
                     if (selectedDueInvoice && dueAmounts && receivingType) {
                       try {
-                        // Convert dueAmounts to a number
                         const dueAmountNumeric = parseFloat(dueAmounts)
-
-                        // Send PUT request to the API
-                        const response = await fetch(
-                          `http://195.26.253.123/pos/transaction/receive_due_invoice/${selectedDueInvoice}`,
+                        const response = await Network.put(
+                          `${Urls.recieveDueInvoice}/${selectedDueInvoice}`,
                           {
-                            method: 'PUT',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              due_amount: dueAmountNumeric, // Ensure numeric type
-                              receiving_type: receivingType,
-                            }),
+                            due_amount: dueAmountNumeric,
+                            receiving_type: receivingType, // Send the selected ID
                           },
                         )
 
-                        if (response.ok) {
-                          const result = await response.json()
-                          alert('Due amount received successfully!')
-                          handleCloseDialog()
+                        if (response.status === 200) {
+                          toast.success('Due amount received successfully.')
+
+                          //  Reset Fields After Successful Submission
+                          setSelectedDueInvoice('')
+                          setDueAmounts('')
+                          setReceivingType('')
+                          fetchdueInvoices()
+
+                          handleCloseDialog() // Close the dialog
                         } else {
-                          const error = await response.json()
                           alert(
-                            `Failed to receive the due amount: ${error.detail || 'Please try again.'}`,
+                            `Failed to receive the due amount: ${response.data.detail || 'Please try again.'}`,
                           )
                         }
                       } catch (error) {
                         console.error('Error while receiving due amount:', error)
-                        alert('An error occurred. Please try again later.')
+                        toast.error('Failed to receive the due amount. Please try again.')
                       }
                     } else {
-                      alert('Please select an invoice and complete all required fields.')
+                      toast.error('Failed to receive the due amount. Please try again.')
                     }
                   }}
                   color="secondary"
