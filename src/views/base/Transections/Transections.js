@@ -25,7 +25,9 @@ import { faPrint, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons
 import AppSidebar from '/src/components/AppSidebar.js' // Your sidebar component
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Network, Urls } from '../../../api-config'
+import { Network, Urls } from '../../../api-config';
+import initSqlJs from 'sql.js'
+// import { openDB } from "idb";
 
 // import Transections from '/Transections.js';
 
@@ -41,18 +43,25 @@ function Transections() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true)
   const [receivingTypeOptions, setReceivingTypeOptions] = useState([])
   const [receivingType, setReceivingType] = useState(null)
+
   const [products, setProducts] = useState([]) // List of products in the table
   const [salesmen, setSalesmen] = useState([])
   const [customer, setCustomer] = useState([])
   const [additionalFees, setAdditionalFees] = useState([])
+  const [transactions, setTransactions] = useState([]) // State to store transactions
+
   const [selectedFees, setSelectedFees] = useState([])
+
   const [paymentMethods, setPaymentMethods] = useState([])
   const [selectedPayments, setSelectedPayments] = useState([])
+
+  const [deliveryFees, setDeliveryFees] = useState([])
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
   const [allProducts, setAllProducts] = useState({})
   const [alertMessage, setAlertMessage] = useState('')
   const [visible, setVisible] = useState(false)
   const [productDetails, setProductDetails] = useState({})
+  const [selectedSKU, setSelectedSKU] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedSalesman, setSelectedSalesman] = useState('')
   const [tableData, setTableData] = useState([])
@@ -63,7 +72,10 @@ function Transections() {
 
   //NEW
   const [isDialogOpenTwo, setIsDialogOpenTwo] = useState(false)
+  const [dueinvoice, duesetInvoice] = useState('')
+
   const [dueAmounts, setDueAmounts] = useState('')
+
   const [invoices, setInvoices] = useState([])
   const [dueinvoices, setdueInvoices] = useState([])
   //const [products, setProducts] = useState([]);
@@ -74,10 +86,7 @@ function Transections() {
 
   //NEW
   const [price, setPrice] = useState(0) // Price of the product
-  const [totalQuantity, setTotalQuantity] = useState(0) // Price of the product
-  const [remainingQuantity, setRemainingQuantity] = useState(0) // Price of the product
   const [returnQty, setReturnQty] = useState(0) // Quantity of product being returned
-  const [remainingQuantityInput, setRemainingQuantityInput] = useState(remainingQuantity)
   const [returnAmount, setReturnAmount] = useState(0) // Total amount for the return
   const [isDialogOpenthree, setIsDialogOpenthree] = useState(false)
   const [closingDate, setClosingDate] = useState('')
@@ -100,6 +109,490 @@ function Transections() {
     shop: shopId, // Add shop_id
     outlet: outletId, // Add outlet_id
   })
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // const [db, setDb] = useState(null);
+  // const [SQL, setSQL] = useState(null);
+
+  // // Initialize SQL.js
+  // useEffect(() => {
+  //   initSqlJs().then((SQLInstance) => {
+  //     setSQL(SQLInstance);  // Store the initialized SQL.js instance
+  //     const db = new SQLInstance.Database();
+  //     setDb(db); // Set the SQLite database
+  //     createTables(db);
+  //     loadDatabaseFromIndexedDB(SQLInstance);
+  //   }).catch((error) => {
+  //     console.error('Error initializing SQL.js:', error);
+  //   });
+  // }, []);
+
+  // const createTables = (db) => {
+  //   // Create tables if they don't exist
+  //   const createTableQuery = `
+  //   CREATE TABLE IF NOT EXISTS products (
+  //   id INTEGER PRIMARY KEY,
+  //   shop INTEGER,
+  //   product_name TEXT,
+  //   sku TEXT UNIQUE,
+  //   outlet INTEGER,
+  //   sub_category INTEGER,
+  //   category INTEGER,
+  //   brand INTEGER,
+  //   season TEXT,
+  //   description TEXT,
+  //   notes TEXT,
+  //   color TEXT,
+  //   image TEXT,
+  //   cost_price TEXT,
+  //   selling_price TEXT,
+  //   discount_price TEXT,
+  //   wholesale_price TEXT,
+  //   retail_price TEXT,
+  //   token_price TEXT,
+  //   created_at TEXT,
+  //   created_by TEXT,
+  //   updated_at TEXT,
+  //   updated_by TEXT
+  // );
+  //   `
+  //   db.run(createTableQuery)
+  // }
+
+  // // Fetch products from the online API
+  // const fetchProductsFromAPI = async () => {
+  //   try {
+  //     const response = await fetch('http://195.26.253.123/pos/products/add_product/17');
+  //     const products = await response.json();
+  //     const productList = products.results || []; 
+      
+  //     console.log('Fetched products from API:', products); // Log the fetched products
+      
+  //     if (productList && productList.length > 0) {
+  //       console.log('Passing products to storeProductsInDb');
+  //       storeProductsInDb(productList);
+  //     } else {
+  //       console.log('No products to store or invalid data');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
+  
+
+  // // Store fetched products in SQLite DB
+  // const storeProductsInDb = (products) => {
+  //   if (!SQL) {
+  //     console.error('SQL is not initialized, unable to store products in DB');
+  //     return;
+  //   }
+
+  //   // Create a new database instance only if necessary
+  //   const dbInstance = db || new SQL.Database(); // Use existing DB if available, else create a new one
+
+  //   const insertProductQuery = `
+  //     INSERT OR REPLACE INTO products (
+  //       id, shop, product_name, sku, outlet, sub_category, category, brand, season, description, 
+  //       notes, color, image, cost_price, selling_price, discount_price, wholesale_price, 
+  //       retail_price, token_price, created_at, created_by, updated_at, updated_by
+  //     ) VALUES (
+  //       :id, :shop, :product_name, :sku, :outlet, :sub_category, :category, :brand, 
+  //       :season, :description, :notes, :color, :image, :cost_price, :selling_price, 
+  //       :discount_price, :wholesale_price, :retail_price, :token_price, :created_at, 
+  //       :created_by, :updated_at, :updated_by
+  //     );
+  //   `;
+    
+  //   const stmt = dbInstance.prepare(insertProductQuery);
+
+  //   products.forEach((product) => {
+  //     stmt.run({
+  //       ':id': product.id,
+  //       ':shop': product.shop,
+  //       ':product_name': product.product_name,
+  //       ':sku': product.sku,
+  //       ':outlet': product.outlet,
+  //       ':sub_category': product.sub_category,
+  //       ':category': product.category,
+  //       ':brand': product.brand,
+  //       ':season': product.season,
+  //       ':description': product.description,
+  //       ':notes': product.notes,
+  //       ':color': product.color,
+  //       ':image': product.image,
+  //       ':cost_price': product.cost_price,
+  //       ':selling_price': product.selling_price,
+  //       ':discount_price': product.discount_price,
+  //       ':wholesale_price': product.wholesale_price,
+  //       ':retail_price': product.retail_price,
+  //       ':token_price': product.token_price,
+  //       ':created_at': product.created_at,
+  //       ':created_by': product.created_by,
+  //       ':updated_at': product.updated_at,
+  //       ':updated_by': product.updated_by,
+  //     });
+  //   });
+
+  //   console.log('Stored products in SQLite DB:', products);
+  //   // Save the updated database to IndexedDB
+  //   saveDatabaseToIndexedDB(dbInstance);
+  // };
+  // // Save the SQLite database to IndexedDB
+  // const saveDatabaseToIndexedDB = (db) => {
+  //   const binaryData = db.export();
+  //   const request = indexedDB.open('SQLiteDatabase', 1);
+
+  //   request.onupgradeneeded = (event) => {
+  //     const db = event.target.result;
+  //     if (!db.objectStoreNames.contains('databases')) {
+  //       db.createObjectStore('databases');
+  //     }
+  //   };
+
+  //   request.onsuccess = (event) => {
+  //     const db = event.target.result;
+  //     const transaction = db.transaction('databases', 'readwrite');
+  //     const store = transaction.objectStore('databases');
+  //     store.put(binaryData, 'productsDatabase');
+  //   };
+
+  //   request.onerror = (error) => {
+  //     console.error('Error saving database to IndexedDB:', error);
+  //   };
+  // };
+
+  // // Load the SQLite database from IndexedDB if it exists
+  // const loadDatabaseFromIndexedDB = (SQL) => {
+  //   const request = indexedDB.open('SQLiteDatabase', 1);
+
+  //   request.onupgradeneeded = (event) => {
+  //     const db = event.target.result;
+  //     if (!db.objectStoreNames.contains('databases')) {
+  //       db.createObjectStore('databases');
+  //     }
+  //   };
+
+  //   request.onsuccess = (event) => {
+  //     const db = event.target.result;
+  //     const transaction = db.transaction('databases', 'readonly');
+  //     const store = transaction.objectStore('databases');
+  //     const getRequest = store.get('productsDatabase');
+
+  //     getRequest.onsuccess = (e) => {
+  //       const binaryData = e.target.result;
+  //       if (binaryData) {
+  //         const newDb = new SQL.Database(binaryData);
+  //         setDb(newDb);
+  //         // Optionally, you can fetch products from the loaded database
+  //       }
+  //     };
+  //   };
+
+  //   request.onerror = (error) => {
+  //     console.error('Error loading database from IndexedDB:', error);
+  //   };
+  // };
+
+  // useEffect(() => {
+  //   // Fetch products and store in SQLite DB when the page reloads
+  //   fetchProductsFromAPI();
+  // }, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const [db, setDb] = useState(null); // State to hold the SQLite DB instance
+    const [SQL, setSQL] = useState(null); // State to hold the SQL.js library
+  
+    // Initialize SQL.js library
+    useEffect(() => {
+      initSqlJs().then((SQLInstance) => {
+        setSQL(SQLInstance);  // Save the SQL.js instance
+        
+      }).catch((error) => {
+        console.error('Error initializing SQL.js:', error);
+      });
+    }, []);
+  
+    // Fetch products from API and store in IndexedDB/SQLite DB
+    const fetchProductsFromAPI = async () => {
+      try {
+        const response = await fetch('http://195.26.253.123/pos/products/add_product/17');
+        const products = await response.json();
+        console.log('Fetched products from API:', products);
+        
+        if (products.results && products.results.length > 0) {
+          storeProductsInDb(products.results); // Only call when products are available
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+  
+    // Store the fetched products in SQLite DB
+    const storeProductsInDb = (products) => {
+      if (!SQL || !db) {
+        console.error('SQL or DB is not initialized.');
+        return; // Early return if SQL or DB is not ready
+      }
+  
+      const insertProductQuery = `
+        INSERT OR REPLACE INTO products (
+          id, shop, product_name, sku, outlet, sub_category, category, brand, season, description, 
+          notes, color, image, cost_price, selling_price, discount_price, wholesale_price, 
+          retail_price, token_price, created_at, created_by, updated_at, updated_by
+        ) VALUES (
+          :id, :shop, :product_name, :sku, :outlet, :sub_category, :category, :brand, 
+          :season, :description, :notes, :color, :image, :cost_price, :selling_price, 
+          :discount_price, :wholesale_price, :retail_price, :token_price, :created_at, 
+          :created_by, :updated_at, :updated_by
+        );
+      `;
+      
+      const stmt = db.prepare(insertProductQuery); // Prepare the insert query
+      
+      // Run the insert query for each product
+      products.forEach((product) => {
+        stmt.run({
+          ':id': product.id,
+          ':shop': product.shop,
+          ':product_name': product.product_name,
+          ':sku': product.sku,
+          ':outlet': product.outlet,
+          ':sub_category': product.sub_category,
+          ':category': product.category,
+          ':brand': product.brand,
+          ':season': product.season,
+          ':description': product.description,
+          ':notes': product.notes,
+          ':color': product.color,
+          ':image': product.image,
+          ':cost_price': product.cost_price,
+          ':selling_price': product.selling_price,
+          ':discount_price': product.discount_price,
+          ':wholesale_price': product.wholesale_price,
+          ':retail_price': product.retail_price,
+          ':token_price': product.token_price,
+          ':created_at': product.created_at,
+          ':created_by': product.created_by,
+          ':updated_at': product.updated_at,
+          ':updated_by': product.updated_by,
+        });
+      });
+  
+      console.log('Stored products in SQLite DB:', products);
+  
+      // Optionally, save the updated DB to IndexedDB
+      saveDatabaseToIndexedDB(db);
+    };
+  
+    const saveDatabaseToIndexedDB = (db) => {
+      const binaryData = db.export(); // Export SQLite DB as binary data
+    
+      // Open IndexedDB and specify a version (increase if needed)
+      const request = indexedDB.open('SQLiteDatabase', 2); // Change version if needed
+    
+      request.onupgradeneeded = (event) => {
+        const idb = event.target.result;
+    
+        // Ensure the 'databases' object store is created
+        if (!idb.objectStoreNames.contains('databases')) {
+          idb.createObjectStore('databases'); // No keyPath needed for key-value storage
+          console.log('Created "databases" object store');
+        }
+      };
+    
+      request.onsuccess = (event) => {
+        const idb = event.target.result;
+    
+        // Ensure the object store exists before proceeding
+        if (!idb.objectStoreNames.contains('databases')) {
+          console.error('Object store "databases" not found!');
+          return;
+        }
+    
+        const transaction = idb.transaction('databases', 'readwrite');
+        const store = transaction.objectStore('databases');
+    
+        const putRequest = store.put(binaryData, 'productsDatabase');
+    
+        putRequest.onsuccess = () => {
+          console.log('SQLite database saved to IndexedDB successfully!');
+        };
+    
+        putRequest.onerror = (error) => {
+          console.error('Error saving SQLite database to IndexedDB:', error);
+        };
+      };
+    
+      request.onerror = (event) => {
+        console.error('Error opening IndexedDB:', event.target.error);
+      };
+    };
+    
+  
+    // Initialize the SQLite DB and Create tables
+    useEffect(() => {
+      if (SQL) {
+        const dbInstance = new SQL.Database(); // Initialize the SQLite DB
+        setDb(dbInstance); // Save the DB instance in state
+        createTables(dbInstance); // Create necessary tables
+      }
+    }, [SQL]); // Run once SQL is loaded
+  
+    // Create the products table if it does not exist
+    const createTables = (db) => {
+      const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS products (
+          id INTEGER PRIMARY KEY,
+          shop INTEGER,
+          product_name TEXT,
+          sku TEXT UNIQUE,
+          outlet INTEGER,
+          sub_category INTEGER,
+          category INTEGER,
+          brand INTEGER,
+          season TEXT,
+          description TEXT,
+          notes TEXT,
+          color TEXT,
+          image TEXT,
+          cost_price TEXT,
+          selling_price TEXT,
+          discount_price TEXT,
+          wholesale_price TEXT,
+          retail_price TEXT,
+          token_price TEXT,
+          created_at TEXT,
+          created_by TEXT,
+          updated_at TEXT,
+          updated_by TEXT
+        );
+      `;
+      db.run(createTableQuery);
+    };
+  
+    // Fetch products from IndexedDB (if needed)
+    const loadDatabaseFromIndexedDB = () => {
+      const request = indexedDB.open('SQLiteDatabase', 1); // Open IndexedDB
+    
+      request.onsuccess = (event) => {
+        const idb = event.target.result;
+    
+        // Ensure the object store exists
+        if (!idb.objectStoreNames.contains('databases')) {
+          console.error('Object store "databases" not found! Cannot load data.');
+          return;
+        }
+    
+        const transaction = idb.transaction('databases', 'readonly');
+        const store = transaction.objectStore('databases');
+        const getRequest = store.get('productsDatabase');
+    
+        getRequest.onsuccess = (e) => {
+          const binaryData = e.target.result;
+          if (binaryData) {
+            const loadedDb = new SQL.Database(binaryData); // Load SQLite DB
+            setDb(loadedDb); // Store the database in React state
+            console.log('Loaded database from IndexedDB successfully');
+          } else {
+            console.warn('No database found in IndexedDB.');
+          }
+        };
+    
+        getRequest.onerror = (error) => {
+          console.error('Error retrieving database from IndexedDB:', error);
+        };
+      };
+    
+      request.onerror = (event) => {
+        console.error('Error opening IndexedDB:', event.target.error);
+      };
+    };
+
+
+
+    
+    
+  
+    useEffect(() => {
+      loadDatabaseFromIndexedDB(); // Optionally load DB from IndexedDB
+    }, []);
+  
+    // Call this to start the product fetch process
+    useEffect(() => {
+      if (db) {
+        fetchProductsFromAPI(); // Call API after DB is initialized
+      }
+    }, [db]); // Run once the DB is set
+  
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //new code
   useEffect(() => {
     // Fetch Receiving Types from API
@@ -121,13 +614,6 @@ function Transections() {
 
     fetchReceivingTypes()
   }, []) // Remove `shopId` from dependency array since it's retrieved from localStorage
-
-  // Ensure state updates when `remainingQuantity` changes
-  useEffect(() => {
-    if (remainingQuantity !== undefined) {
-      setRemainingQuantityInput(remainingQuantity)
-    }
-  }, [remainingQuantity])
 
   const resetCustomerForm = () => {
     setCustomerForm({
@@ -202,6 +688,37 @@ function Transections() {
       setIsSidebarVisible(true) // Show sidebar on other pages
     }
   }, [window.location.pathname])
+
+  const toggleFullScreen = () => {
+    if (!isFullscreen) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen()
+      } else if (document.documentElement.mozRequestFullScreen) {
+        // Firefox
+        document.documentElement.mozRequestFullScreen()
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        // Chrome, Safari, Opera
+        document.documentElement.webkitRequestFullscreen()
+      } else if (document.documentElement.msRequestFullscreen) {
+        // IE/Edge
+        document.documentElement.msRequestFullscreen()
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+      } else if (document.mozCancelFullScreen) {
+        // Firefox
+        document.mozCancelFullScreen()
+      } else if (document.webkitExitFullscreen) {
+        // Chrome, Safari, Opera
+        document.webkitExitFullscreen()
+      } else if (document.msExitFullscreen) {
+        // IE/Edge
+        document.msExitFullscreen()
+      }
+    }
+    setIsFullscreen(!isFullscreen)
+  }
 
   // Handle Fullscreen Toggle
   const handleFullscreenToggle = () => {
@@ -350,6 +867,12 @@ function Transections() {
     setSelectedInvoice(invoiceCode) // Set the selected invoice code to state
   }
 
+  // Handle invoice selection
+  const handledueInvoiceChange = (event) => {
+    const DueinvoiceCode = event.target.value // Get the selected invoice code (e.g., INV-1)
+    setSelectedDueInvoice(DueinvoiceCode) // Set the selected invoice code to state
+  }
+
   // Handle Dropdown Selection
   const handleFeeSelection = (event) => {
     const selectedFeeId = event.target.value
@@ -462,6 +985,10 @@ function Transections() {
     console.log('Fetching product details for:', selectedProduct, selectedInvoice)
 
     try {
+      // const response = await fetch(
+      //   `http://195.26.253.123/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`,
+      // )
+
       const response = await Network.get(
         `${Urls.getProductDetail}/${shopId}/${selectedInvoice}/${selectedProduct}`,
       )
@@ -479,9 +1006,7 @@ function Transections() {
 
         // Map API fields to your state variables
         setPrice(product.rate || 0) // Backend field 'rate' sets Price
-        setTotalQuantity(product.total_quantity || 0) // Backend field 'rate' sets Price
-        setRemainingQuantity(product.remaining_quantity || 0) // Backend field 'rate' sets Price
-        setReturnQty(product.return_quantity || 0) // Backend field 'quantity' sets Return Qty
+        setReturnQty(product.quantity || 0) // Backend field 'quantity' sets Return Qty
         setReturnAmount(product.rate || 0) // Backend field 'rate' sets Return Amount
       }
     } catch (error) {
@@ -502,7 +1027,6 @@ function Transections() {
       sku: [selectedProduct], // SKU as a list
       rate: [price], // Price (Rate) as a list
       quantity: [returnQty], // Quantity as a list
-      remaining_quantity: [remainingQuantity], // Remaining Quantity as a list
       invoice_code: selectedInvoice, // Add invoice code instead of quantity
       shop: shopId,
       outlet: outletId, // Outlet code
@@ -511,6 +1035,12 @@ function Transections() {
     console.log('Submitting return data:', requestData)
 
     try {
+      // const response = await fetch('http://195.26.253.123/pos/transaction/transactions_return', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(requestData), // Send the data as JSON
       const response = await Network.post(`${Urls.salesReturn}/${shopId}/${outletId}`, requestData)
 
       if (!response.ok) {
@@ -522,11 +1052,10 @@ function Transections() {
       // console.log('Return processed successfully:', responseData)
       toast.success('Return processed successfully', responseData)
 
+      // Optional: Show a success message or reset fields
+      // alert('Return processed successfully!')
+      toast.success('Return processed successfully')
       setIsDialogOpen(false) // Close the dialog
-
-      // Optionally, you can reset the form or perform other actions
-
-      fetchInvoices()
     } catch (error) {
       console.error('Error processing return:', error)
       toast.error('Error processing return', error)
@@ -564,7 +1093,19 @@ function Transections() {
         })
       }
 
+      //    else {
+      //     alert("Product not found.");
+      // }
       setSku('') // Reset input field
+
+      // console.log("Product:", product);
+      //     if (product) {
+      //         setProducts((prev) => [...prev, product]);
+      //     }
+      //     // else {
+      //     //     alert("Product not found.");
+      //     // }
+      //     setSku(""); // Reset input field
     }
   }
 
@@ -626,6 +1167,14 @@ function Transections() {
         console.error('Error fetching payment methods:', error)
       }
     }
+
+    // const fetchDeliveryFees = async (id) => {
+    //   const shopId = localStorage.getItem('shop_id')
+    //   const response = await Network.get(`${Urls.fetchDelieveryFee}/${shopId}/${id}`)
+    //   if (response.status === 200) {
+    //     setDeliveryFees(response.data)
+    //   }
+    // }
 
     const fetchAllProducts = async (outletId) => {
       const shopId = localStorage.getItem('shop_id')
@@ -862,6 +1411,12 @@ function Transections() {
     )
   }
 
+  // Function to handle button click and show alert
+  const handleButtonClick = (message) => {
+    setAlertMessage(message)
+    setVisible(true)
+  }
+
   const handleCustomerChange = (e) => {
     const value = e.target.value
     setSelectedCustomer(value)
@@ -1085,25 +1640,6 @@ function Transections() {
                     />
                   </div>
 
-                  {/* Total Quantity Field */}
-                  <div style={{ marginBottom: '10px' }}>
-                    <label htmlFor="price" style={{ display: 'block', marginBottom: '5px' }}>
-                      Total Quantity
-                    </label>
-                    <input
-                      type="number"
-                      id="total_quantity"
-                      value={totalQuantity} // Auto-updated by API
-                      readOnly
-                      style={{
-                        width: '100%',
-                        padding: '8px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                      }}
-                    />
-                  </div>
-
                   {/* Return Quantity Field */}
                   <div style={{ marginBottom: '10px' }}>
                     <label htmlFor="returnQty" style={{ display: 'block', marginBottom: '5px' }}>
@@ -1119,58 +1655,6 @@ function Transections() {
                         padding: '8px',
                         borderRadius: '4px',
                         border: '1px solid #ccc',
-                      }}
-                    />
-                  </div>
-
-                  {/* Remaining Quantity Field */}
-                  <div style={{ marginBottom: '10px' }}>
-                    <label
-                      htmlFor="remaining_quantity"
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginBottom: '5px',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      <span>Remaining Quantity</span>
-                      <span style={{ color: '#007bff', fontSize: '14px' }}>(Editable)</span>
-                    </label>
-
-                    <input
-                      type="number"
-                      id="remaining_quantity"
-                      value={remainingQuantityInput}
-                      onChange={(e) => {
-                        let value = parseInt(e.target.value, 10)
-
-                        // Ensure value is within allowed range
-                        if (!isNaN(value) && value >= 0 && value <= remainingQuantity) {
-                          setRemainingQuantityInput(value)
-                        } else if (value > remainingQuantity) {
-                          toast.error(
-                            `You can only enter a value between 0 and ${remainingQuantity}`,
-                            {
-                              position: 'top-right',
-                              autoClose: 3000,
-                              hideProgressBar: false,
-                              closeOnClick: true,
-                              pauseOnHover: true,
-                              draggable: true,
-                              progress: undefined,
-                            },
-                          )
-                        }
-                      }}
-                      min="0"
-                      max={remainingQuantity}
-                      style={{
-                        width: '100%',
-                        padding: '8px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                        backgroundColor: '#f9f9f9', // Slightly different background to indicate editability
                       }}
                     />
                   </div>
@@ -1204,7 +1688,7 @@ function Transections() {
                   onClick={handleSalesReturn} // Trigger the API call
                   color="primary"
                   variant="contained"
-                  // disabled={!selectedProduct || returnQty <= 0} // Disable if invalid
+                  disabled={!selectedProduct || returnQty <= 0} // Disable if invalid
                 >
                   Return
                 </Button>
@@ -1437,6 +1921,8 @@ function Transections() {
             {/* Fullscreen Toggle Button */}
 
             {isSidebarVisible && <AppSidebar />}
+            {/* <button onClick={toggleSidebar}>Toggle Sidebar</button>
+      <button onClick={toggleFullScreen}>Toggle Full-Screen</button> */}
             <Button
               variant="contained"
               onClick={handleFullscreenToggle}
