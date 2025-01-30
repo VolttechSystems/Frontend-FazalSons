@@ -41,25 +41,18 @@ function Transections() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true)
   const [receivingTypeOptions, setReceivingTypeOptions] = useState([])
   const [receivingType, setReceivingType] = useState(null)
-
   const [products, setProducts] = useState([]) // List of products in the table
   const [salesmen, setSalesmen] = useState([])
   const [customer, setCustomer] = useState([])
   const [additionalFees, setAdditionalFees] = useState([])
-  const [transactions, setTransactions] = useState([]) // State to store transactions
-
   const [selectedFees, setSelectedFees] = useState([])
-
   const [paymentMethods, setPaymentMethods] = useState([])
   const [selectedPayments, setSelectedPayments] = useState([])
-
-  const [deliveryFees, setDeliveryFees] = useState([])
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
   const [allProducts, setAllProducts] = useState({})
   const [alertMessage, setAlertMessage] = useState('')
   const [visible, setVisible] = useState(false)
   const [productDetails, setProductDetails] = useState({})
-  const [selectedSKU, setSelectedSKU] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedSalesman, setSelectedSalesman] = useState('')
   const [tableData, setTableData] = useState([])
@@ -70,10 +63,7 @@ function Transections() {
 
   //NEW
   const [isDialogOpenTwo, setIsDialogOpenTwo] = useState(false)
-  const [dueinvoice, duesetInvoice] = useState('')
-
   const [dueAmounts, setDueAmounts] = useState('')
-
   const [invoices, setInvoices] = useState([])
   const [dueinvoices, setdueInvoices] = useState([])
   //const [products, setProducts] = useState([]);
@@ -212,37 +202,6 @@ function Transections() {
       setIsSidebarVisible(true) // Show sidebar on other pages
     }
   }, [window.location.pathname])
-
-  const toggleFullScreen = () => {
-    if (!isFullscreen) {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen()
-      } else if (document.documentElement.mozRequestFullScreen) {
-        // Firefox
-        document.documentElement.mozRequestFullScreen()
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        // Chrome, Safari, Opera
-        document.documentElement.webkitRequestFullscreen()
-      } else if (document.documentElement.msRequestFullscreen) {
-        // IE/Edge
-        document.documentElement.msRequestFullscreen()
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen()
-      } else if (document.mozCancelFullScreen) {
-        // Firefox
-        document.mozCancelFullScreen()
-      } else if (document.webkitExitFullscreen) {
-        // Chrome, Safari, Opera
-        document.webkitExitFullscreen()
-      } else if (document.msExitFullscreen) {
-        // IE/Edge
-        document.msExitFullscreen()
-      }
-    }
-    setIsFullscreen(!isFullscreen)
-  }
 
   // Handle Fullscreen Toggle
   const handleFullscreenToggle = () => {
@@ -391,12 +350,6 @@ function Transections() {
     setSelectedInvoice(invoiceCode) // Set the selected invoice code to state
   }
 
-  // Handle invoice selection
-  const handledueInvoiceChange = (event) => {
-    const DueinvoiceCode = event.target.value // Get the selected invoice code (e.g., INV-1)
-    setSelectedDueInvoice(DueinvoiceCode) // Set the selected invoice code to state
-  }
-
   // Handle Dropdown Selection
   const handleFeeSelection = (event) => {
     const selectedFeeId = event.target.value
@@ -509,10 +462,6 @@ function Transections() {
     console.log('Fetching product details for:', selectedProduct, selectedInvoice)
 
     try {
-      // const response = await fetch(
-      //   `http://195.26.253.123/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`,
-      // )
-
       const response = await Network.get(
         `${Urls.getProductDetail}/${shopId}/${selectedInvoice}/${selectedProduct}`,
       )
@@ -615,19 +564,7 @@ function Transections() {
         })
       }
 
-      //    else {
-      //     alert("Product not found.");
-      // }
       setSku('') // Reset input field
-
-      // console.log("Product:", product);
-      //     if (product) {
-      //         setProducts((prev) => [...prev, product]);
-      //     }
-      //     // else {
-      //     //     alert("Product not found.");
-      //     // }
-      //     setSku(""); // Reset input field
     }
   }
 
@@ -689,14 +626,6 @@ function Transections() {
         console.error('Error fetching payment methods:', error)
       }
     }
-
-    // const fetchDeliveryFees = async (id) => {
-    //   const shopId = localStorage.getItem('shop_id')
-    //   const response = await Network.get(`${Urls.fetchDelieveryFee}/${shopId}/${id}`)
-    //   if (response.status === 200) {
-    //     setDeliveryFees(response.data)
-    //   }
-    // }
 
     const fetchAllProducts = async (outletId) => {
       const shopId = localStorage.getItem('shop_id')
@@ -931,12 +860,6 @@ function Transections() {
         day: 'numeric',
       })
     )
-  }
-
-  // Function to handle button click and show alert
-  const handleButtonClick = (message) => {
-    setAlertMessage(message)
-    setVisible(true)
   }
 
   const handleCustomerChange = (e) => {
@@ -1514,8 +1437,6 @@ function Transections() {
             {/* Fullscreen Toggle Button */}
 
             {isSidebarVisible && <AppSidebar />}
-            {/* <button onClick={toggleSidebar}>Toggle Sidebar</button>
-      <button onClick={toggleFullScreen}>Toggle Full-Screen</button> */}
             <Button
               variant="contained"
               onClick={handleFullscreenToggle}
