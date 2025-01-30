@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import Barcode from 'react-barcode'
-import axios from 'axios'
+
 import { Network, Urls } from '../../../api-config'
 
 const NewBarcode = () => {

@@ -84,7 +84,10 @@ function Transections() {
 
   //NEW
   const [price, setPrice] = useState(0) // Price of the product
+  const [totalQuantity, setTotalQuantity] = useState(0) // Price of the product
+  const [remainingQuantity, setRemainingQuantity] = useState(0) // Price of the product
   const [returnQty, setReturnQty] = useState(0) // Quantity of product being returned
+  const [remainingQuantityInput, setRemainingQuantityInput] = useState(remainingQuantity)
   const [returnAmount, setReturnAmount] = useState(0) // Total amount for the return
   const [isDialogOpenthree, setIsDialogOpenthree] = useState(false)
   const [closingDate, setClosingDate] = useState('')
@@ -128,6 +131,13 @@ function Transections() {
 
     fetchReceivingTypes()
   }, []) // Remove `shopId` from dependency array since it's retrieved from localStorage
+
+  // Ensure state updates when `remainingQuantity` changes
+  useEffect(() => {
+    if (remainingQuantity !== undefined) {
+      setRemainingQuantityInput(remainingQuantity)
+    }
+  }, [remainingQuantity])
 
   const resetCustomerForm = () => {
     setCustomerForm({
@@ -520,7 +530,9 @@ function Transections() {
 
         // Map API fields to your state variables
         setPrice(product.rate || 0) // Backend field 'rate' sets Price
-        setReturnQty(product.quantity || 0) // Backend field 'quantity' sets Return Qty
+        setTotalQuantity(product.total_quantity || 0) // Backend field 'rate' sets Price
+        setRemainingQuantity(product.remaining_quantity || 0) // Backend field 'rate' sets Price
+        setReturnQty(product.return_quantity || 0) // Backend field 'quantity' sets Return Qty
         setReturnAmount(product.rate || 0) // Backend field 'rate' sets Return Amount
       }
     } catch (error) {
@@ -541,6 +553,7 @@ function Transections() {
       sku: [selectedProduct], // SKU as a list
       rate: [price], // Price (Rate) as a list
       quantity: [returnQty], // Quantity as a list
+      remaining_quantity: [remainingQuantity], // Remaining Quantity as a list
       invoice_code: selectedInvoice, // Add invoice code instead of quantity
       shop: shopId,
       outlet: outletId, // Outlet code
@@ -549,12 +562,6 @@ function Transections() {
     console.log('Submitting return data:', requestData)
 
     try {
-      // const response = await fetch('http://195.26.253.123/pos/transaction/transactions_return', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(requestData), // Send the data as JSON
       const response = await Network.post(`${Urls.salesReturn}/${shopId}/${outletId}`, requestData)
 
       if (!response.ok) {
@@ -566,10 +573,11 @@ function Transections() {
       // console.log('Return processed successfully:', responseData)
       toast.success('Return processed successfully', responseData)
 
-      // Optional: Show a success message or reset fields
-      // alert('Return processed successfully!')
-      toast.success('Return processed successfully')
       setIsDialogOpen(false) // Close the dialog
+
+      // Optionally, you can reset the form or perform other actions
+
+      fetchInvoices()
     } catch (error) {
       console.error('Error processing return:', error)
       toast.error('Error processing return', error)
@@ -1154,6 +1162,25 @@ function Transections() {
                     />
                   </div>
 
+                  {/* Total Quantity Field */}
+                  <div style={{ marginBottom: '10px' }}>
+                    <label htmlFor="price" style={{ display: 'block', marginBottom: '5px' }}>
+                      Total Quantity
+                    </label>
+                    <input
+                      type="number"
+                      id="total_quantity"
+                      value={totalQuantity} // Auto-updated by API
+                      readOnly
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                      }}
+                    />
+                  </div>
+
                   {/* Return Quantity Field */}
                   <div style={{ marginBottom: '10px' }}>
                     <label htmlFor="returnQty" style={{ display: 'block', marginBottom: '5px' }}>
@@ -1169,6 +1196,58 @@ function Transections() {
                         padding: '8px',
                         borderRadius: '4px',
                         border: '1px solid #ccc',
+                      }}
+                    />
+                  </div>
+
+                  {/* Remaining Quantity Field */}
+                  <div style={{ marginBottom: '10px' }}>
+                    <label
+                      htmlFor="remaining_quantity"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: '5px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      <span>Remaining Quantity</span>
+                      <span style={{ color: '#007bff', fontSize: '14px' }}>(Editable)</span>
+                    </label>
+
+                    <input
+                      type="number"
+                      id="remaining_quantity"
+                      value={remainingQuantityInput}
+                      onChange={(e) => {
+                        let value = parseInt(e.target.value, 10)
+
+                        // Ensure value is within allowed range
+                        if (!isNaN(value) && value >= 0 && value <= remainingQuantity) {
+                          setRemainingQuantityInput(value)
+                        } else if (value > remainingQuantity) {
+                          toast.error(
+                            `You can only enter a value between 0 and ${remainingQuantity}`,
+                            {
+                              position: 'top-right',
+                              autoClose: 3000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                            },
+                          )
+                        }
+                      }}
+                      min="0"
+                      max={remainingQuantity}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                        backgroundColor: '#f9f9f9', // Slightly different background to indicate editability
                       }}
                     />
                   </div>
@@ -1202,7 +1281,7 @@ function Transections() {
                   onClick={handleSalesReturn} // Trigger the API call
                   color="primary"
                   variant="contained"
-                  disabled={!selectedProduct || returnQty <= 0} // Disable if invalid
+                  // disabled={!selectedProduct || returnQty <= 0} // Disable if invalid
                 >
                   Return
                 </Button>

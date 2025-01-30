@@ -1,7 +1,17 @@
 import React, { Component } from 'react'
 import './AddAtt.css'
-import Select from 'react-select'
+
+import axios from 'axios'
+import { CButton } from '@coreui/react'
 import { Link } from 'react-router-dom'
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from '@mui/material'
 import { Network, Urls } from '../../../api-config'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -18,12 +28,8 @@ class AddAtt extends Component {
         },
       ],
       apiData: [],
-      attributeTypes: [],
-      currentPage: 0, // Pagination starts from 0
-      totalPages: 1,
-      pageSize: 10, // Number of items per page
-      shopId: localStorage.getItem('shop_id') || '', // Shop ID from local storage
       editData: null, // Holds data for editing
+      attribute: [], // This is where the attributes are stored
     }
   }
 
@@ -42,51 +48,22 @@ class AddAtt extends Component {
   }
 
   fetchAttributeTypes = async () => {
-    const { shopId } = this.state
-    try {
-      const response = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch attribute types')
-      }
-      const data = response.data.results || []
-      this.setState({
-        attributeTypes: data.map((type) => ({
-          value: type.id,
-          label: type.att_type,
-        })),
-      })
-    } catch (error) {
-      console.error('Error fetching attribute types:', error)
-      toast.error('Error fetching attribute types.')
-    }
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.addAttributeTypes}/${shopId}`)
+    if (!response.ok) return console.log(response.data.error)
+    this.setState({ attributeTypes: response.data.results })
   }
 
-  fetchData = async (page = 0) => {
-    const { shopId, pageSize } = this.state
-    try {
-      const response = await Network.get(
-        `${Urls.variationGroup}${shopId}?Starting=${page}&limit=${pageSize}`,
-      )
-
-      console.log('Fetched Data:', response.data) // Debugging
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch data')
-      }
-
-      this.setState({
-        apiData: response.data.results || [], // Populate the table with results
-        totalPages: Math.ceil(response.data.count / pageSize), // Calculate total pages for pagination
-      })
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error('Error fetching data.')
-    }
+  fetchData = async () => {
+    const shopId = localStorage.getItem('shop_id')
+    const response = await Network.get(`${Urls.variationGroup}${shopId}`)
+    if (!response.ok) return console.log(response.data.error)
+    this.setState({ apiData: response.data.results })
   }
 
   // Function to fetch attribute types from the API
   variationGroups = async () => {
-    const { shopId } = this.state
+    const shopId = localStorage.getItem('shop_id')
     const response = await Network.get(`${Urls.variationGroup}${shopId}`)
     if (!response.ok) return consoe.log(response.data.error)
     setTypes(response.data)
@@ -146,9 +123,9 @@ class AddAtt extends Component {
   }
 
   handleSubmit = async () => {
-    const { attType, attributes, shopId } = this.state
+    const { attType, attributes } = this.state
+    const shopId = localStorage.getItem('shop_id')
 
-    // Construct the payload
     const payload = attributes.map((attribute) => ({
       att_type: attType,
       attribute_name: attribute.attributeName,
@@ -156,15 +133,11 @@ class AddAtt extends Component {
       shop: shopId, // Include shop ID
     }))
 
-    console.log('Payload:', payload) // Debugging
-
     try {
-      // API call
       const response = await Network.post(`${Urls.addAttributes}${shopId}`, payload)
 
-      console.log('API Response:', response.data) // Debugging
-
       if (!response.ok) {
+        // Handle and display backend errors
         const errorData = response.data
         if (errorData && errorData.error) {
           Object.keys(errorData.error).forEach((key) => {
@@ -185,21 +158,18 @@ class AddAtt extends Component {
 
       // Success case
       toast.success('Data successfully submitted!')
-      this.setState({
-        attType: '',
-        attributes: [{ attributeName: '', variations: [] }],
-      })
-      this.fetchData(this.state.currentPage)
+      this.fetchData()
     } catch (error) {
       console.error('Error submitting data:', error)
       toast.error('An error occurred while submitting data.')
     }
-  }
-
-  handlePageChange = (newPage) => {
-    if (newPage >= 0 && newPage < this.state.totalPages) {
-      this.setState({ currentPage: newPage }, () => this.fetchData(newPage))
-    }
+    this.setState({
+      editData: null,
+      attType: '',
+      attributes: [{ attributeName: '', variations: [] }],
+    })
+    this.fetchData()
+    this.variationGroups()
   }
 
   handleEdit = (item) => {
@@ -216,13 +186,17 @@ class AddAtt extends Component {
 
     const attTypeId = selectedAttributeType ? selectedAttributeType.id : ''
 
+    console.log('Editing Item Data:', item) // ✅ Debugging log
+
     this.setState({
-      attType: item.att_type || '',
       attType: attTypeId,
       attributes: [
         {
           attributeName: item.attribute_name || '',
-          variations: item.variation || [],
+          variations:
+            Array.isArray(item.variation) && item.variation.length > 0
+              ? item.variation //  Now correctly using `variation`
+              : [], // Default empty if missing
         },
       ],
       editData: { ...item, att_id: attId },
@@ -230,7 +204,8 @@ class AddAtt extends Component {
   }
 
   handleUpdate = async () => {
-    const { editData, attType, attributes, shopId } = this.state
+    const { editData, attType, attributes } = this.state
+    const shopId = localStorage.getItem('shop_id')
 
     if (!editData || !editData.att_id) {
       alert('No valid item selected for update.')
@@ -242,7 +217,11 @@ class AddAtt extends Component {
       att_id: editData.att_id, // The ID of the attribute group to update
       att_type: attType, // Attribute type (e.g., "Automobiles")
       attribute_name: attributes[0].attributeName, // Use `att_id` for the attribute name
-      variation_name: attributes[0].variations, // List of variations (e.g., ["ABC", "DEF"])
+      variation:
+        Array.isArray(attributes[0].variations) && attributes[0].variations.length > 0
+          ? attributes[0].variations // ✅ Ensure variations are included
+          : editData.variation || [], // ✅ Preserve existing variations if they exist
+
       shop: shopId, // Include shop ID
     }
     //console.log("Update Payload:", [attribute_name]);
@@ -260,13 +239,13 @@ class AddAtt extends Component {
       attType: '',
       attributes: [{ attributeName: '', variations: [] }],
     })
-    this.fetchData(this.state.currentPage)
+    this.fetchData()
     this.variationGroups()
   }
 
   handleDelete = async (attId) => {
     const shopId = localStorage.getItem('shop_id')
-    const response = await Network.delete(`${Urls.updateVariationGroup}/${shopId}/${attId}`)
+    const response = await Network.delete(`${Urls.updateVariationGroup}${shopId}/${attId}`)
     if (!response.ok) return console.log(response.data.error)
     toast.success('Attribute deleted successfully!')
     this.setState({
@@ -274,12 +253,12 @@ class AddAtt extends Component {
       attType: '',
       attributes: [{ attributeName: '', variations: [] }],
     })
-    this.fetchData(this.state.currentPage)
+    this.fetchData()
     this.variationGroups()
   }
 
   render() {
-    const { apiData, attributes, attType, attributeTypes, currentPage, totalPages } = this.state
+    const { apiData, attributes, attType, editData } = this.state
 
     return (
       <div className="add-att-container">
@@ -299,26 +278,33 @@ class AddAtt extends Component {
           theme="colored"
         />
 
-        {/* Attribute Type Section */}
+        {/* Attribute Type Dropdown */}
         <div className="attribute-container">
           <label htmlFor="attType">Attribute Type</label>
           <div className="input-button-container">
-            <Select
+            <select
               name="attType"
-              options={attributeTypes}
-              value={attributeTypes.find((type) => type.value === attType)}
-              onChange={(selectedOption) => this.setState({ attType: selectedOption?.value })}
-              placeholder="Select Attribute Type"
-              isSearchable
-              styles={{
-                container: (base) => ({
-                  ...base,
-                  width: '100%',
-                }),
+              id="attType"
+              value={attType}
+              onChange={(e) => this.setState({ attType: e.target.value })}
+              style={{
+                marginRight: '10px',
+                width: '100%',
+                padding: '5px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
               }}
-            />
+            >
+              <option value="">Select Attribute Type</option>
+              {this.state.attributeTypes?.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.att_type}
+                </option>
+              ))}
+            </select>
+
             <Link to="/Product/AddAttributeType">
-              <button className="add-variation-button">+</button>
+              <button style={{ padding: '5px 10px', cursor: 'pointer' }}>+</button>
             </Link>
           </div>
         </div>
@@ -326,6 +312,7 @@ class AddAtt extends Component {
         {/* Attribute Groups */}
         {attributes.map((attribute, attrIndex) => (
           <div key={attrIndex} className="attribute-container">
+            {/* Attribute Group Label and Input */}
             <label htmlFor={`attributeName-${attrIndex}`}>Attribute Group {attrIndex + 1}</label>
             <div className="input-button-container">
               <input
@@ -338,14 +325,18 @@ class AddAtt extends Component {
                 onKeyPress={(e) => this.handleKeyPress(e, attrIndex)}
               />
 
-              {attrIndex === attributes.length - 1 && !this.state.editData && (
-                <button className="add-variation-button" onClick={this.addAttribute}>
-                  + Add Attribute Group
+              {/* Buttons for adding and removing attribute groups */}
+
+              {attrIndex === attributes.length - 1 && !editData && (
+                <button className="add-attribute-button" onClick={this.addAttribute}>
+                  + Add Attribute
                 </button>
               )}
+
+              {/* Red Cross Button to Remove Attribute */}
               {attributes.length > 1 && (
                 <button
-                  className="remove-variation-button"
+                  className="remove-attribute-button"
                   onClick={() => this.removeAttribute(attrIndex)}
                 >
                   &times;
@@ -353,17 +344,21 @@ class AddAtt extends Component {
               )}
             </div>
 
-            {/* Variations */}
+            {/* Attribute Variations */}
             <div className="variation-container">
               {attribute.variations.map((variation, varIndex) => (
                 <div key={varIndex} className="input-button-container">
+                  {/* Variation Input */}
+
                   <input
                     type="text"
+                    id={`variation-${attrIndex}-${varIndex}`}
                     placeholder={`Attribute ${varIndex + 1}`}
                     value={variation}
                     onChange={(e) => this.handleVariationChange(e, attrIndex, varIndex)}
                   />
 
+                  {/* Buttons to Add/Remove Variations */}
                   {attribute.variations.length > 1 && (
                     <button
                       className="remove-variation-button"
@@ -372,6 +367,8 @@ class AddAtt extends Component {
                       &times;
                     </button>
                   )}
+
+                  {/* Add Variation Button */}
                   {varIndex === attribute.variations.length - 1 && (
                     <button
                       className="add-variation-button"
@@ -386,25 +383,32 @@ class AddAtt extends Component {
           </div>
         ))}
 
-        {/* Submit Button */}
         <div style={{ textAlign: 'left', marginTop: '-20px', marginBottom: '-20px' }}>
-          {this.state.editData ? (
-            <button className="Add-button-att" onClick={this.handleUpdate}>
+          {editData ? (
+            <button
+              className="Add-button-att"
+              onClick={this.handleUpdate}
+              style={{ marginTop: '20px' }}
+            >
               Update
             </button>
           ) : (
-            <button className="Add-button-att" onClick={this.handleSubmit}>
+            <button
+              className="Add-button-att"
+              onClick={this.handleSubmit}
+              style={{ marginTop: '20px' }}
+            >
               Submit
             </button>
           )}
         </div>
 
-        {/* Attribute Groups Table */}
         <h4 style={{ marginTop: '20px', marginBottom: '-5px' }}>Attribute Groups</h4>
         <div className="table-container">
-          <table>
+          <table border="1" style={{ width: '100%', textAlign: 'left' }}>
             <thead>
               <tr>
+                <th>Attribute ID</th>
                 <th>Attribute Type</th>
                 <th>Attribute Group</th>
                 <th>Attribute</th>
@@ -414,12 +418,17 @@ class AddAtt extends Component {
             <tbody>
               {apiData.map((item, index) => (
                 <tr key={index}>
+                  <td>{item.att_id}</td>
                   <td>{item.att_type}</td>
                   <td>{item.attribute_name}</td>
                   <td>
-                    {Array.isArray(item.variation) ? item.variation.join(', ') : 'No Variations'}
+                    {console.log('📊 Table Row Data:', item)}
+                    {Array.isArray(item.variation) && item.variation.length > 0
+                      ? item.variation.join(', ') // Updated to use `variation`
+                      : 'No Variations'}
                   </td>
-                  <td className="actions">
+
+                  <td>
                     <button className="E-button-att" onClick={() => this.handleEdit(item)}>
                       Edit
                     </button>
@@ -431,26 +440,6 @@ class AddAtt extends Component {
               ))}
             </tbody>
           </table>
-          {/* Pagination */}
-          <div
-            className="pagination"
-            style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
-          >
-            <button
-              style={{ padding: '5px 10px', marginRight: '5px' }}
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button
-              style={{ padding: '5px 10px' }}
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-          </div>
         </div>
       </div>
     )

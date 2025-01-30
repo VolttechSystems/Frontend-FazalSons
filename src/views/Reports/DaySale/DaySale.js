@@ -92,6 +92,86 @@ const DaySale = () => {
     setDetailData(null)
   }
 
+  const printInvoice = () => {
+    if (!detailData) return
+
+    const printWindow = window.open('', '_blank')
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; }
+            .container { padding: 20px; border: 2px solid black; width: 300px; margin: auto; }
+            .header { font-weight: bold; text-transform: uppercase; font-size: 14px; margin-bottom: 10px; }
+            .info, .table { font-size: 12px; width: 100%; text-align: left; margin-top: 10px; }
+            .table th, .table td { border-bottom: 1px solid black; padding: 5px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">POINT OF SALE</div>
+            <div class="info">Sample Address</div>
+            <div class="info">Tel: 010101010</div>
+            <div class="info">Email: abc@pos.com</div>
+
+            <div class="header">SALES INVOICE</div>
+
+            <div class="info"><strong>Customer Type:</strong> ${detailData.customer_type}</div>
+            <div class="info"><strong>Date:</strong> ${detailData.date}</div>
+            <div class="info"><strong>Gross Total:</strong> ₨ ${detailData.gross_total}</div>
+            <div class="info"><strong>Discount:</strong> ₨ ${detailData.discount}</div>
+            <div class="info"><strong>Grand Total:</strong> ₨ ${detailData.grand_total}</div>
+            <div class="info"><strong>Status:</strong> ${detailData.status}</div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${detailData.items
+                  .map(
+                    (item) =>
+                      `<tr>
+                        <td>${item.product || 'N/A'}</td>
+                        <td>${item.quantity}</td>
+                        <td>₨ ${item.item_total}</td>
+                      </tr>`,
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+
+            <div class="info"><strong>Additional Fee:</strong> ${
+              detailData?.additional_fee?.length
+                ? `${detailData.additional_fee[0].fee_method} - ₨ ${detailData.additional_fee[0].fee}`
+                : 'None'
+            }</div>
+
+            <div class="info"><strong>Returns:</strong> ${
+              detailData?.returns?.length ? `${detailData.returns.length} items` : 'None'
+            }</div>
+
+            <div class="info"><strong>Paid:</strong> ₨ ${detailData?.Payment[0]?.amount}</div>
+            <div class="info"><strong>Paid Via:</strong> ${detailData?.Payment[0]?.payment_method}</div>
+          </div>
+
+          <script>
+            setTimeout(() => { window.print(); window.close(); }, 500);
+          </script>
+        </body>
+      </html>
+    `)
+
+    printWindow.document.close()
+  }
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', padding: 4 }}>
       <Box
@@ -113,24 +193,6 @@ const DaySale = () => {
         </Typography>
         {error && <Typography sx={{ color: 'red', marginBottom: 2 }}>{error}</Typography>}
         <Box sx={{ display: 'flex', gap: 3, marginBottom: 3 }}>
-          {/* <Select
-            value={selectedOutlet}
-            onChange={(e) => setSelectedOutlet(e.target.value)}
-            displayEmpty
-            fullWidth
-            sx={{
-              backgroundColor: '#fff',
-              borderRadius: 1,
-              padding: 1,
-            }}
-          >
-            <MenuItem value="">Select Outlet</MenuItem>
-            {outlets.map((outlet) => (
-              <MenuItem key={outlet.id} value={outlet.id}>
-                {outlet.outlet_name}
-              </MenuItem>
-            ))}
-          </Select> */}
           {/* Autocomplete for Outlet with search feature */}
           <Autocomplete
             value={outlets.find((outlet) => outlet.id === selectedOutlet) || null} // Find the outlet object based on selected id
@@ -145,24 +207,6 @@ const DaySale = () => {
             disableClearable
           />
 
-          {/* <Select
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            displayEmpty
-            fullWidth
-            sx={{
-              backgroundColor: '#fff',
-              borderRadius: 1,
-              padding: 1,
-            }}
-          >
-            <MenuItem value="">Select Date</MenuItem>
-            {dates.map((date) => (
-              <MenuItem key={date} value={date}>
-                {date}
-              </MenuItem>
-            ))}
-          </Select> */}
           {/* Autocomplete for Date with search feature */}
           <Autocomplete
             value={selectedDate}
@@ -367,6 +411,9 @@ const DaySale = () => {
               sx={{ fontSize: '12px' }}
             >
               Close
+            </Button>
+            <Button onClick={printInvoice} variant="contained" color="primary">
+              Print Report
             </Button>
           </DialogActions>
         </Dialog>
