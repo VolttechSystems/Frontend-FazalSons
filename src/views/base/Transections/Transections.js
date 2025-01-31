@@ -152,6 +152,53 @@ function Transections() {
     }
   }
 
+  //additional fee, payment method online fetch
+  const saveDropdownDataToIndexedDB = (key, data) => {
+    const request = indexedDB.open('SQLiteDatabase', 3)
+
+    request.onsuccess = (event) => {
+      const db = event.target.result
+      const transaction = db.transaction('databases', 'readwrite')
+      const store = transaction.objectStore('databases')
+
+      store.put(data, key)
+      console.log(`✅ Saved ${key} to IndexedDB`)
+    }
+
+    request.onerror = (event) => {
+      console.error('❌ IndexedDB Error:', event.target.error)
+    }
+  }
+
+  const loadDropdownDataFromIndexedDB = (key, setState) => {
+    const request = indexedDB.open('SQLiteDatabase', 3)
+
+    request.onsuccess = (event) => {
+      const db = event.target.result
+      const transaction = db.transaction('databases', 'readonly')
+      const store = transaction.objectStore('databases')
+
+      const getRequest = store.get(key)
+      getRequest.onsuccess = (e) => {
+        const data = e.target.result
+        if (data) {
+          console.log(`✅ Loaded ${key} from IndexedDB:`, data)
+          setState(data)
+        } else {
+          console.warn(`⚠️ No ${key} data found in IndexedDB.`)
+        }
+      }
+
+      getRequest.onerror = (error) => {
+        console.error(`❌ Error retrieving ${key} from IndexedDB:`, error)
+      }
+    }
+
+    request.onerror = (event) => {
+      console.error('❌ IndexedDB Error:', event.target.error)
+    }
+  }
+
   // Store the fetched products in SQLite DB
   const storeProductsInDb = (products) => {
     if (!SQL || !db) {
@@ -944,64 +991,91 @@ function Transections() {
   }
 
   useEffect(() => {
+    // const fetchSalesmen = async () => {
+    //   const shopId = localStorage.getItem('shop_id')
+    //   if (!outletId) return // If no outletId, skip fetching
+
+    //   const response = await Network.get(`${Urls.fetchSalesman}/${shopId}/${outletId}`)
+    //   if (response.status === 200) {
+    //     setSalesmen(response.data)
+    //   }
+    // }
+
     const fetchSalesmen = async () => {
       const shopId = localStorage.getItem('shop_id')
       if (!outletId) return // If no outletId, skip fetching
 
-      const response = await Network.get(`${Urls.fetchSalesman}/${shopId}/${outletId}`)
-      if (response.status === 200) {
-        setSalesmen(response.data)
+      if (!navigator.onLine) {
+        console.log('⚠️ Offline: Loading salesmen from IndexedDB...')
+        loadDropdownDataFromIndexedDB('salesmen', setSalesmen)
+        return
+      }
+
+      try {
+        const response = await Network.get(`${Urls.fetchSalesman}/${shopId}/${outletId}`)
+        if (response.status === 200) {
+          setSalesmen(response.data)
+          saveDropdownDataToIndexedDB('salesmen', response.data) // Store in IndexedDB
+        }
+      } catch (error) {
+        console.error('❌ Error fetching salesmen:', error)
       }
     }
 
     const fetchAdditionalFees = async () => {
+      if (!navigator.onLine) {
+        console.log('⚠️ Offline: Fetching Additional Fees from IndexedDB...')
+        loadDropdownDataFromIndexedDB('additionalFees', setAdditionalFees)
+        return
+      }
       const shopId = localStorage.getItem('shop_id')
       const response = await Network.get(`${Urls.fetchAdditionalFee}/${shopId}`)
       if (response.status === 200) {
         setAdditionalFees(response.data)
+        saveDropdownDataToIndexedDB('additionalFees', response.data)
       }
     }
 
     const fetchPayment = async () => {
+      if (!navigator.onLine) {
+        console.log('⚠️ Offline: Fetching Payment Methods from IndexedDB...')
+        loadDropdownDataFromIndexedDB('paymentMethods', setPaymentMethods)
+        return
+      }
+
       try {
         // Retrieve shopId from localStorage
         const shopId = localStorage.getItem('shop_id')
-
         if (!shopId) {
-          console.error('Shop ID is missing in localStorage')
-          alert('Shop ID not found. Please log in again.')
-          return // Exit the function
-        }
-
-        // Include shopId in the API URL as a path parameter
-        const response = await fetch(`http://195.26.253.123/pos/transaction/add_payment/${shopId}/`)
-
-        // const response = await Network.get(`${Urls.addpayment}/${shopId}/`)
-
-        if (!response.ok) {
-          console.error('Failed to fetch payment methods:', response.statusText)
+          console.error('🚨 Shop ID is missing in localStorage')
+          toast.error('Shop ID not found. Please log in again.')
           return
         }
 
-        const data = await response.json()
+        // Fetch payment methods from API
+        const response = await fetch(`http://195.26.253.123/pos/transaction/add_payment/${shopId}/`)
+        if (!response.ok) {
+          console.error('❌ Failed to fetch payment methods:', response.statusText)
+          return
+        }
 
-        if (data && Array.isArray(data)) {
-          setPaymentMethods(data) // Update the state with payment methods
+        const data = await response.json() // Parse JSON response
+        if (Array.isArray(data)) {
+          setPaymentMethods(data) // Update state
+          saveDropdownDataToIndexedDB('paymentMethods', data) // Store data in IndexedDB
+          console.log('✅ Payment Methods fetched and stored:', data)
         } else {
-          console.error('Unexpected response format:', data)
+          console.error('⚠️ Unexpected response format:', data)
         }
       } catch (error) {
-        console.error('Error fetching payment methods:', error)
+        console.error('🚨 Error fetching payment methods:', error)
       }
     }
 
-    // const fetchDeliveryFees = async (id) => {
-    //   const shopId = localStorage.getItem('shop_id')
-    //   const response = await Network.get(`${Urls.fetchDelieveryFee}/${shopId}/${id}`)
-    //   if (response.status === 200) {
-    //     setDeliveryFees(response.data)
-    //   }
-    // }
+    // useEffect(() => {
+    //   fetchAdditionalFees()
+    //   fetchPayment()
+    // }, [])
 
     const fetchAllProducts = async (outletId) => {
       const shopId = localStorage.getItem('shop_id')
@@ -1012,11 +1086,31 @@ function Transections() {
       }
     }
 
+    // const fetchCustomer = async () => {
+    //   const shopId = localStorage.getItem('shop_id')
+    //   const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
+    //   if (response.status === 200) {
+    //     setCustomer(response.data.results)
+    //   }
+    // }
+
     const fetchCustomer = async () => {
       const shopId = localStorage.getItem('shop_id')
-      const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
-      if (response.status === 200) {
-        setCustomer(response.data.results)
+
+      if (!navigator.onLine) {
+        console.log('⚠️ Offline: Loading customers from IndexedDB...')
+        loadDropdownDataFromIndexedDB('customers', setCustomer)
+        return
+      }
+
+      try {
+        const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
+        if (response.status === 200) {
+          setCustomer(response.data.results)
+          saveDropdownDataToIndexedDB('customers', response.data.results) // Store in IndexedDB
+        }
+      } catch (error) {
+        console.error('❌ Error fetching customers:', error)
       }
     }
 
@@ -1912,9 +2006,22 @@ function Transections() {
               </option>
             ))}
           </select>
-          <Link to="/Admin/Salesman">
+          {/* <Link to="/Admin/Salesman">
+            <button className="add-customer">+</button>
+          </Link> */}
+
+          <Link
+            to={navigator.onLine ? '/Admin/Salesman' : '#'}
+            onClick={(e) => {
+              if (!navigator.onLine) {
+                e.preventDefault() // Prevents navigation when offline
+                toast.error('⚠️ You are offline! Salesman cannot be added.')
+              }
+            }}
+          >
             <button className="add-customer">+</button>
           </Link>
+
           <input
             ref={inputRef}
             type="text"
@@ -2051,13 +2158,33 @@ function Transections() {
                       value={(product.selling_price * product.quantity * product.discount) / 100} // Result will be an integer now
                       onChange={(e) => {
                         const discountValue = parseInt(e.target.value) || 0
-                        setTableData((prevData) => {
-                          const updatedData = [...prevData]
-                          updatedData[index].discount =
-                            (discountValue / (product.selling_price * product.quantity)) * 100 || 0
-                          updatedData[index].discountValue = discountValue
-                          return updatedData
-                        })
+                        // setTableData((prevData) => {
+                        //   const updatedData = [...prevData]
+                        //   updatedData[index].discount =
+                        //     (discountValue / (product.selling_price * product.quantity)) * 100 || 0
+                        //   updatedData[index].discountValue = discountValue
+                        //   return updatedData
+                        // })
+
+                        if (navigator.onLine) {
+                          setTableData((prevData) => {
+                            const updatedData = [...prevData]
+                            updatedData[index].discount =
+                              (discountValue / (product.selling_price * product.quantity)) * 100 ||
+                              0
+                            updatedData[index].discountValue = discountValue
+                            return updatedData
+                          })
+                        } else {
+                          setCartItems((prevData) => {
+                            const updatedData = [...prevData]
+                            updatedData[index].discount =
+                              (discountValue / (product.selling_price * product.quantity)) * 100 ||
+                              0
+                            updatedData[index].discountValue = discountValue
+                            return updatedData
+                          })
+                        }
                       }}
                       className="no-spinner"
                     />
@@ -2074,11 +2201,25 @@ function Transections() {
                       } // Calculate based on discount_price or selling_price
                       onChange={(e) => {
                         const netAmount = parseInt(e.target.value) || 0 // Ensure netAmount is an integer
-                        setTableData((prevData) => {
-                          const updatedData = [...prevData]
-                          updatedData[index].netAmount = netAmount
-                          return updatedData
-                        })
+                        // setTableData((prevData) => {
+                        //   const updatedData = [...prevData]
+                        //   updatedData[index].netAmount = netAmount
+                        //   return updatedData
+                        // })
+
+                        if (navigator.onLine) {
+                          setTableData((prevData) => {
+                            const updatedData = [...prevData]
+                            updatedData[index].netAmount = netAmount
+                            return updatedData
+                          })
+                        } else {
+                          setCartItems((prevData) => {
+                            const updatedData = [...prevData]
+                            updatedData[index].netAmount = netAmount
+                            return updatedData
+                          })
+                        }
                       }}
                       className="no-spinner"
                     />
@@ -2110,10 +2251,12 @@ function Transections() {
             <tbody>
               <tr>
                 <td className="summary-label">PRODUCTS</td>
-                <td className="summary-value">{tableData.length}</td>
+                <td className="summary-value">
+                  {navigator.onLine ? tableData.length : cartItems.length}
+                </td>
                 <td className="summary-label">INVOICE</td>
                 <td className="summary-value">
-                  {tableData
+                  {(navigator.onLine ? tableData : cartItems)
                     .reduce(
                       (acc, item) =>
                         acc +
@@ -2126,7 +2269,7 @@ function Transections() {
                 </td>
                 <td className="summary-label">GROSS</td>
                 <td className="summary-value">
-                  {tableData
+                  {(navigator.onLine ? tableData : cartItems)
                     .reduce(
                       (acc, item) =>
                         acc +
@@ -2137,7 +2280,6 @@ function Transections() {
                     )
                     .toFixed(2)}
                 </td>
-
                 <td className="summary-label">ADVANCE</td>
                 <td>
                   <input
@@ -2154,7 +2296,7 @@ function Transections() {
                 <td className="summary-value">{totalPaymentAfterDiscount.toFixed(2)}</td>
                 <td className="summary-label">PURCHASE</td>
                 <td className="summary-value">
-                  {tableData
+                  {(navigator.onLine ? tableData : cartItems)
                     .reduce(
                       (acc, item) =>
                         acc +
@@ -2165,7 +2307,6 @@ function Transections() {
                     )
                     .toFixed(2)}
                 </td>
-
                 <td className="summary-label">DISCOUNT</td>
                 <td className="summary-value">{totalDiscount.toFixed(2)}</td>
                 <td className="summary-label">DUE</td>
@@ -2186,7 +2327,20 @@ function Transections() {
                   </option>
                 ))}
               </select>
-              <Link to="/Admin/AdditionalFee">
+              {/* <Link to="/Admin/AdditionalFee">
+                <button disabled={!navigator.onLine} className="add-fee-btn">
+                  +
+                </button>
+              </Link> */}
+              <Link
+                to={navigator.onLine ? '/Admin/AdditionalFee' : '#'}
+                onClick={(e) => {
+                  if (!navigator.onLine) {
+                    e.preventDefault() // Prevents navigation when offline
+                    toast.error('⚠️ You are offline! Additional Fee cannot be added.')
+                  }
+                }}
+              >
                 <button className="add-fee-btn">+</button>
               </Link>
             </div>
@@ -2222,7 +2376,15 @@ function Transections() {
                   </option>
                 ))}
               </select>
-              <Link to="/Admin/Payment">
+              <Link
+                to={navigator.onLine ? '/Admin/Payment' : '#'}
+                onClick={(e) => {
+                  if (!navigator.onLine) {
+                    e.preventDefault() // Prevents navigation when offline
+                    toast.error('⚠️ You are offline! Payment method cannot be added.')
+                  }
+                }}
+              >
                 <button className="add-payment-method-btn">+</button>
               </Link>
             </div>
