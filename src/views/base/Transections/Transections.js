@@ -25,7 +25,7 @@ import { faPrint, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons
 import AppSidebar from '/src/components/AppSidebar.js' // Your sidebar component
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Network, Urls } from '../../../api-config';
+import { Network, Urls } from '../../../api-config'
 import initSqlJs from 'sql.js'
 // import { openDB } from "idb";
 
@@ -110,368 +110,202 @@ function Transections() {
     outlet: outletId, // Add outlet_id
   })
 
+  const [db, setDb] = useState(null) // State to hold the SQLite DB instance
+  const [SQL, setSQL] = useState(null) // State to hold the SQL.js library
 
+  useEffect(() => {
+    if (Object.keys(allProducts).length > 0) {
+      console.log('📌 Updated All Products:', allProducts)
+    }
+  }, [allProducts]) // ✅ Only logs when allProducts updates
 
+  useEffect(() => {
+    initSqlJs().then((SQLInstance) => {
+      console.log('✅ SQL.js Loaded')
+      setSQL(SQLInstance)
+    })
+  }, [])
 
+  useEffect(() => {
+    if (SQL) {
+      console.log('🔄 SQL.js is ready, now loading IndexedDB...')
+      loadDatabaseFromIndexedDB() // ✅ Now runs only after SQL.js is set
+    }
+  }, [SQL])
 
-
-
-
-
-
-
-
-
-  // const [db, setDb] = useState(null);
-  // const [SQL, setSQL] = useState(null);
-
-  // // Initialize SQL.js
-  // useEffect(() => {
-  //   initSqlJs().then((SQLInstance) => {
-  //     setSQL(SQLInstance);  // Store the initialized SQL.js instance
-  //     const db = new SQLInstance.Database();
-  //     setDb(db); // Set the SQLite database
-  //     createTables(db);
-  //     loadDatabaseFromIndexedDB(SQLInstance);
-  //   }).catch((error) => {
-  //     console.error('Error initializing SQL.js:', error);
-  //   });
-  // }, []);
-
-  // const createTables = (db) => {
-  //   // Create tables if they don't exist
-  //   const createTableQuery = `
-  //   CREATE TABLE IF NOT EXISTS products (
-  //   id INTEGER PRIMARY KEY,
-  //   shop INTEGER,
-  //   product_name TEXT,
-  //   sku TEXT UNIQUE,
-  //   outlet INTEGER,
-  //   sub_category INTEGER,
-  //   category INTEGER,
-  //   brand INTEGER,
-  //   season TEXT,
-  //   description TEXT,
-  //   notes TEXT,
-  //   color TEXT,
-  //   image TEXT,
-  //   cost_price TEXT,
-  //   selling_price TEXT,
-  //   discount_price TEXT,
-  //   wholesale_price TEXT,
-  //   retail_price TEXT,
-  //   token_price TEXT,
-  //   created_at TEXT,
-  //   created_by TEXT,
-  //   updated_at TEXT,
-  //   updated_by TEXT
-  // );
-  //   `
-  //   db.run(createTableQuery)
-  // }
-
-  // // Fetch products from the online API
+  // Fetch products from API and store in IndexedDB/SQLite DB
   // const fetchProductsFromAPI = async () => {
+  //   const shopId = localStorage.getItem('shop_id')
   //   try {
-  //     const response = await fetch('http://195.26.253.123/pos/products/add_product/17');
-  //     const products = await response.json();
-  //     const productList = products.results || []; 
-      
-  //     console.log('Fetched products from API:', products); // Log the fetched products
-      
-  //     if (productList && productList.length > 0) {
-  //       console.log('Passing products to storeProductsInDb');
-  //       storeProductsInDb(productList);
-  //     } else {
-  //       console.log('No products to store or invalid data');
+  //     const response = await fetch('http://195.26.253.123/pos/products/add_product/' + shopId)
+  //     const products = await response.json()
+  //     console.log('Fetched products from API:', products)
+
+  //     if (products.results && products.results.length > 0) {
+  //       storeProductsInDb(products.results) // Only call when products are available
   //     }
   //   } catch (error) {
-  //     console.error('Error fetching products:', error);
+  //     console.error('Error fetching products:', error)
   //   }
-  // };
-  
+  // }
 
-  // // Store fetched products in SQLite DB
-  // const storeProductsInDb = (products) => {
-  //   if (!SQL) {
-  //     console.error('SQL is not initialized, unable to store products in DB');
-  //     return;
-  //   }
-
-  //   // Create a new database instance only if necessary
-  //   const dbInstance = db || new SQL.Database(); // Use existing DB if available, else create a new one
-
-  //   const insertProductQuery = `
-  //     INSERT OR REPLACE INTO products (
-  //       id, shop, product_name, sku, outlet, sub_category, category, brand, season, description, 
-  //       notes, color, image, cost_price, selling_price, discount_price, wholesale_price, 
-  //       retail_price, token_price, created_at, created_by, updated_at, updated_by
-  //     ) VALUES (
-  //       :id, :shop, :product_name, :sku, :outlet, :sub_category, :category, :brand, 
-  //       :season, :description, :notes, :color, :image, :cost_price, :selling_price, 
-  //       :discount_price, :wholesale_price, :retail_price, :token_price, :created_at, 
-  //       :created_by, :updated_at, :updated_by
-  //     );
-  //   `;
-    
-  //   const stmt = dbInstance.prepare(insertProductQuery);
-
-  //   products.forEach((product) => {
-  //     stmt.run({
-  //       ':id': product.id,
-  //       ':shop': product.shop,
-  //       ':product_name': product.product_name,
-  //       ':sku': product.sku,
-  //       ':outlet': product.outlet,
-  //       ':sub_category': product.sub_category,
-  //       ':category': product.category,
-  //       ':brand': product.brand,
-  //       ':season': product.season,
-  //       ':description': product.description,
-  //       ':notes': product.notes,
-  //       ':color': product.color,
-  //       ':image': product.image,
-  //       ':cost_price': product.cost_price,
-  //       ':selling_price': product.selling_price,
-  //       ':discount_price': product.discount_price,
-  //       ':wholesale_price': product.wholesale_price,
-  //       ':retail_price': product.retail_price,
-  //       ':token_price': product.token_price,
-  //       ':created_at': product.created_at,
-  //       ':created_by': product.created_by,
-  //       ':updated_at': product.updated_at,
-  //       ':updated_by': product.updated_by,
-  //     });
-  //   });
-
-  //   console.log('Stored products in SQLite DB:', products);
-  //   // Save the updated database to IndexedDB
-  //   saveDatabaseToIndexedDB(dbInstance);
-  // };
-  // // Save the SQLite database to IndexedDB
-  // const saveDatabaseToIndexedDB = (db) => {
-  //   const binaryData = db.export();
-  //   const request = indexedDB.open('SQLiteDatabase', 1);
-
-  //   request.onupgradeneeded = (event) => {
-  //     const db = event.target.result;
-  //     if (!db.objectStoreNames.contains('databases')) {
-  //       db.createObjectStore('databases');
-  //     }
-  //   };
-
-  //   request.onsuccess = (event) => {
-  //     const db = event.target.result;
-  //     const transaction = db.transaction('databases', 'readwrite');
-  //     const store = transaction.objectStore('databases');
-  //     store.put(binaryData, 'productsDatabase');
-  //   };
-
-  //   request.onerror = (error) => {
-  //     console.error('Error saving database to IndexedDB:', error);
-  //   };
-  // };
-
-  // // Load the SQLite database from IndexedDB if it exists
-  // const loadDatabaseFromIndexedDB = (SQL) => {
-  //   const request = indexedDB.open('SQLiteDatabase', 1);
-
-  //   request.onupgradeneeded = (event) => {
-  //     const db = event.target.result;
-  //     if (!db.objectStoreNames.contains('databases')) {
-  //       db.createObjectStore('databases');
-  //     }
-  //   };
-
-  //   request.onsuccess = (event) => {
-  //     const db = event.target.result;
-  //     const transaction = db.transaction('databases', 'readonly');
-  //     const store = transaction.objectStore('databases');
-  //     const getRequest = store.get('productsDatabase');
-
-  //     getRequest.onsuccess = (e) => {
-  //       const binaryData = e.target.result;
-  //       if (binaryData) {
-  //         const newDb = new SQL.Database(binaryData);
-  //         setDb(newDb);
-  //         // Optionally, you can fetch products from the loaded database
-  //       }
-  //     };
-  //   };
-
-  //   request.onerror = (error) => {
-  //     console.error('Error loading database from IndexedDB:', error);
-  //   };
-  // };
-
-  // useEffect(() => {
-  //   // Fetch products and store in SQLite DB when the page reloads
-  //   fetchProductsFromAPI();
-  // }, []);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    const [db, setDb] = useState(null); // State to hold the SQLite DB instance
-    const [SQL, setSQL] = useState(null); // State to hold the SQL.js library
-  
-    // Initialize SQL.js library
-    useEffect(() => {
-      initSqlJs().then((SQLInstance) => {
-        setSQL(SQLInstance);  // Save the SQL.js instance
-        
-      }).catch((error) => {
-        console.error('Error initializing SQL.js:', error);
-      });
-    }, []);
-  
-    // Fetch products from API and store in IndexedDB/SQLite DB
-    const fetchProductsFromAPI = async () => {
-      try {
-        const response = await fetch('http://195.26.253.123/pos/products/add_product/17');
-        const products = await response.json();
-        console.log('Fetched products from API:', products);
-        
-        if (products.results && products.results.length > 0) {
-          storeProductsInDb(products.results); // Only call when products are available
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
+  const fetchProductsFromAPI = async () => {
+    if (!navigator.onLine) {
+      console.log('Offline mode: Loading products from IndexedDB')
+      fetchProductsFromDB()
+      return
+    }
+    try {
+      const shopId = localStorage.getItem('shop_id')
+      const response = await axios.get(`http://195.26.253.123/pos/products/add_product/${shopId}`)
+      if (response.data.results.length > 0) {
+        setProducts(response.data.results)
+        storeProductsInDb(response.data.results)
       }
-    };
-  
-    // Store the fetched products in SQLite DB
-    const storeProductsInDb = (products) => {
-      if (!SQL || !db) {
-        console.error('SQL or DB is not initialized.');
-        return; // Early return if SQL or DB is not ready
-      }
-  
-      const insertProductQuery = `
-        INSERT OR REPLACE INTO products (
-          id, shop, product_name, sku, outlet, sub_category, category, brand, season, description, 
-          notes, color, image, cost_price, selling_price, discount_price, wholesale_price, 
-          retail_price, token_price, created_at, created_by, updated_at, updated_by
-        ) VALUES (
-          :id, :shop, :product_name, :sku, :outlet, :sub_category, :category, :brand, 
-          :season, :description, :notes, :color, :image, :cost_price, :selling_price, 
-          :discount_price, :wholesale_price, :retail_price, :token_price, :created_at, 
-          :created_by, :updated_at, :updated_by
-        );
-      `;
-      
-      const stmt = db.prepare(insertProductQuery); // Prepare the insert query
-      
-      // Run the insert query for each product
-      products.forEach((product) => {
-        stmt.run({
-          ':id': product.id,
-          ':shop': product.shop,
-          ':product_name': product.product_name,
-          ':sku': product.sku,
-          ':outlet': product.outlet,
-          ':sub_category': product.sub_category,
-          ':category': product.category,
-          ':brand': product.brand,
-          ':season': product.season,
-          ':description': product.description,
-          ':notes': product.notes,
-          ':color': product.color,
-          ':image': product.image,
-          ':cost_price': product.cost_price,
-          ':selling_price': product.selling_price,
-          ':discount_price': product.discount_price,
-          ':wholesale_price': product.wholesale_price,
-          ':retail_price': product.retail_price,
-          ':token_price': product.token_price,
-          ':created_at': product.created_at,
-          ':created_by': product.created_by,
-          ':updated_at': product.updated_at,
-          ':updated_by': product.updated_by,
-        });
-      });
-  
-      console.log('Stored products in SQLite DB:', products);
-  
-      // Optionally, save the updated DB to IndexedDB
-      saveDatabaseToIndexedDB(db);
-    };
-  
-    const saveDatabaseToIndexedDB = (db) => {
-      const binaryData = db.export(); // Export SQLite DB as binary data
-    
-      // Open IndexedDB and specify a version (increase if needed)
-      const request = indexedDB.open('SQLiteDatabase', 2); // Change version if needed
-    
-      request.onupgradeneeded = (event) => {
-        const idb = event.target.result;
-    
-        // Ensure the 'databases' object store is created
-        if (!idb.objectStoreNames.contains('databases')) {
-          idb.createObjectStore('databases'); // No keyPath needed for key-value storage
-          console.log('Created "databases" object store');
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    }
+  }
+
+  // Store the fetched products in SQLite DB
+  const storeProductsInDb = (products) => {
+    if (!SQL || !db) {
+      console.error('❌ SQL.js or DB is not initialized yet.')
+      return
+    }
+
+    console.log('🔄 Storing products in SQLite DB...')
+    const insertProductQuery = `
+      INSERT OR REPLACE INTO products (
+        id, product_name, sku, season, description
+      ) VALUES (
+        :id, :product_name, :sku, :season, :description
+      );
+    `
+
+    const stmt = db.prepare(insertProductQuery)
+    let storedCount = 0
+
+    products.forEach((product) => {
+      stmt.run({
+        ':id': product.id,
+        ':product_name': product.product_name,
+        ':sku': product.sku,
+        ':season': product.season,
+        ':description': product.description,
+      })
+      storedCount++
+    })
+
+    stmt.free() // ✅ Free memory
+    console.log(`✅ Stored ${storedCount} products in SQLite DB.`)
+
+    saveDatabaseToIndexedDB(db)
+    fetchProductsFromDB() // ✅ Immediately verify data is saved
+  }
+
+  //NEW
+  const fetchProductsFromDB = () => {
+    if (!db) {
+      console.error('🛑 Database not initialized yet!')
+      return
+    }
+
+    console.log('🔄 Fetching products from SQLite DB...')
+    const stmt = db.prepare('SELECT * FROM products')
+    const productsData = []
+
+    while (stmt.step()) {
+      const product = stmt.getAsObject()
+      console.log('🔍 Found product:', product)
+      productsData.push(product)
+    }
+    stmt.free()
+
+    if (productsData.length > 0) {
+      console.log('✅ Products successfully retrieved from DB:', productsData)
+
+      // 🔥 Group Products by Name for the Dropdown (Like API Response)
+      const groupedProducts = productsData.reduce((acc, product) => {
+        const productName = product.product_name || 'Unknown' // Ensure a label
+        if (!acc[productName]) {
+          acc[productName] = []
         }
-      };
-    
-      request.onsuccess = (event) => {
-        const idb = event.target.result;
-    
-        // Ensure the object store exists before proceeding
-        if (!idb.objectStoreNames.contains('databases')) {
-          console.error('Object store "databases" not found!');
-          return;
-        }
-    
-        const transaction = idb.transaction('databases', 'readwrite');
-        const store = transaction.objectStore('databases');
-    
-        const putRequest = store.put(binaryData, 'productsDatabase');
-    
-        putRequest.onsuccess = () => {
-          console.log('SQLite database saved to IndexedDB successfully!');
-        };
-    
-        putRequest.onerror = (error) => {
-          console.error('Error saving SQLite database to IndexedDB:', error);
-        };
-      };
-    
-      request.onerror = (event) => {
-        console.error('Error opening IndexedDB:', event.target.error);
-      };
-    };
-    
-  
-    // Initialize the SQLite DB and Create tables
-    useEffect(() => {
-      if (SQL) {
-        const dbInstance = new SQL.Database(); // Initialize the SQLite DB
-        setDb(dbInstance); // Save the DB instance in state
-        createTables(dbInstance); // Create necessary tables
+        acc[productName].push({
+          sku: product.sku,
+          item_name: product.product_name,
+          color: product.color,
+        })
+        return acc
+      }, {})
+
+      console.log('📌 Grouped Products:', groupedProducts)
+
+      setProducts([...productsData]) // ✅ Update Normal Products
+      setAllProducts(groupedProducts) // ✅ Update Grouped Products for Dropdown
+    } else {
+      console.warn('⚠️ No products found in DB. Possible storage issue.')
+    }
+  }
+
+  const saveDatabaseToIndexedDB = (db) => {
+    const binaryData = db.export() // Export SQLite DB as binary data
+
+    // Open IndexedDB and specify a version (increment if needed)
+    const request = indexedDB.open('SQLiteDatabase', 3) // ⬆️ INCREASED VERSION TO FORCE UPGRADE
+
+    request.onupgradeneeded = (event) => {
+      console.log('⚠️ Upgrading IndexedDB - Creating object store if missing...')
+      const idb = event.target.result
+
+      // ✅ Ensure the "databases" object store is created
+      if (!idb.objectStoreNames.contains('databases')) {
+        idb.createObjectStore('databases') // No keyPath needed
+        console.log('✅ Created "databases" object store')
       }
-    }, [SQL]); // Run once SQL is loaded
-  
-    // Create the products table if it does not exist
-    const createTables = (db) => {
-      const createTableQuery = `
+    }
+
+    request.onsuccess = (event) => {
+      console.log('✅ IndexedDB opened successfully')
+      const idb = event.target.result
+
+      if (!idb.objectStoreNames.contains('databases')) {
+        console.error('❌ Object store "databases" is STILL missing!')
+        return
+      }
+
+      const transaction = idb.transaction('databases', 'readwrite')
+      const store = transaction.objectStore('databases')
+      const putRequest = store.put(binaryData, 'productsDatabase')
+
+      putRequest.onsuccess = () => {
+        console.log('✅ SQLite database saved to IndexedDB successfully!')
+      }
+
+      putRequest.onerror = (error) => {
+        console.error('⚠️ Error saving SQLite database to IndexedDB:', error)
+      }
+    }
+
+    request.onerror = (event) => {
+      console.error('❌ Error opening IndexedDB:', event.target.error)
+    }
+  }
+
+  // Initialize the SQLite DB and Create tables
+  useEffect(() => {
+    if (SQL) {
+      console.log('🔄 Reinitializing SQLite Database...')
+      const dbInstance = new SQL.Database() // ✅ Create a fresh database
+      setDb(dbInstance)
+      createTables(dbInstance) // ✅ Ensure tables are created again
+      saveDatabaseToIndexedDB(dbInstance) // ✅ Save the fresh database to IndexedDB
+    }
+  }, [SQL])
+
+  // Create the products table if it does not exist
+  const createTables = (db) => {
+    const createTableQuery = `
         CREATE TABLE IF NOT EXISTS products (
           id INTEGER PRIMARY KEY,
           shop INTEGER,
@@ -497,101 +331,83 @@ function Transections() {
           updated_at TEXT,
           updated_by TEXT
         );
-      `;
-      db.run(createTableQuery);
-    };
-  
-    // Fetch products from IndexedDB (if needed)
-    const loadDatabaseFromIndexedDB = () => {
-      const request = indexedDB.open('SQLiteDatabase', 1); // Open IndexedDB
-    
-      request.onsuccess = (event) => {
-        const idb = event.target.result;
-    
-        // Ensure the object store exists
-        if (!idb.objectStoreNames.contains('databases')) {
-          console.error('Object store "databases" not found! Cannot load data.');
-          return;
-        }
-    
-        const transaction = idb.transaction('databases', 'readonly');
-        const store = transaction.objectStore('databases');
-        const getRequest = store.get('productsDatabase');
-    
-        getRequest.onsuccess = (e) => {
-          const binaryData = e.target.result;
-          if (binaryData) {
-            const loadedDb = new SQL.Database(binaryData); // Load SQLite DB
-            setDb(loadedDb); // Store the database in React state
-            console.log('Loaded database from IndexedDB successfully');
-          } else {
-            console.warn('No database found in IndexedDB.');
-          }
-        };
-    
-        getRequest.onerror = (error) => {
-          console.error('Error retrieving database from IndexedDB:', error);
-        };
-      };
-    
-      request.onerror = (event) => {
-        console.error('Error opening IndexedDB:', event.target.error);
-      };
-    };
+      `
+    db.run(createTableQuery)
+  }
 
+  // Fetch products from IndexedDB (if needed)
+  const loadDatabaseFromIndexedDB = () => {
+    console.log('🔄 Loading database from IndexedDB...')
+    const request = indexedDB.open('SQLiteDatabase', 3)
 
+    request.onsuccess = (event) => {
+      const idb = event.target.result
 
-    
-    
-  
-    useEffect(() => {
-      loadDatabaseFromIndexedDB(); // Optionally load DB from IndexedDB
-    }, []);
-  
-    // Call this to start the product fetch process
-    useEffect(() => {
-      if (db) {
-        fetchProductsFromAPI(); // Call API after DB is initialized
+      if (!idb.objectStoreNames.contains('databases')) {
+        console.error('❌ Object store "databases" not found!')
+        return
       }
-    }, [db]); // Run once the DB is set
-  
- 
-  
 
+      const transaction = idb.transaction('databases', 'readonly')
+      const store = transaction.objectStore('databases')
+      const getRequest = store.get('productsDatabase')
 
+      getRequest.onsuccess = async (e) => {
+        const binaryData = e.target.result
+        if (!binaryData) {
+          console.warn('⚠️ No database found in IndexedDB.')
+          return
+        }
 
+        if (!SQL) {
+          console.warn('⚠️ SQL.js is not ready yet. Waiting...')
+          await new Promise((resolve) => {
+            const interval = setInterval(() => {
+              if (SQL) {
+                clearInterval(interval)
+                resolve()
+              }
+            }, 100)
+          })
+        }
 
+        try {
+          const loadedDb = new SQL.Database(binaryData)
+          setDb(loadedDb)
+          console.log('✅ Loaded database from IndexedDB successfully')
+          fetchProductsFromDB() // ✅ Load products after setting DB
+        } catch (error) {
+          console.error('❌ Error loading SQLite database:', error)
+        }
+      }
+    }
+  }
 
+  useEffect(() => {
+    loadDatabaseFromIndexedDB() // Optionally load DB from IndexedDB
+  }, [])
 
+  // Call this to start the product fetch process
+  useEffect(() => {
+    if (db) {
+      if (navigator.onLine) {
+        console.log('🌐 Online: Fetching products from API...')
+        fetchProductsFromAPI()
+      } else {
+        console.log('⚠️ Offline mode: Fetching products from IndexedDB...')
+        fetchProductsFromDB()
+      }
+    }
 
+    // Listen for online event to sync
+    const handleOnline = () => {
+      console.log('🔄 Back online! Syncing products...')
+      fetchProductsFromAPI()
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [db])
 
   //new code
   useEffect(() => {
@@ -2025,17 +1841,21 @@ function Transections() {
             autoFocus // Keep input in focus
           />
           <select className="product-dropdown" onChange={handleProductSelect}>
-            console.log("All Products:", allProducts);
+            {/* {console.log('All Products:', allProducts)} */}
             <option>Select Product</option>
-            {Object.entries(allProducts).map(([productName, productDetails]) => (
-              <optgroup key={productName} label={productName}>
-                {productDetails.map((product) => (
-                  <option key={product.sku} value={product.sku}>
-                    {product.sku} - {product.item_name} {product.color && `- ${product.color}`}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
+            {Object.keys(allProducts).length > 0 ? (
+              Object.entries(allProducts).map(([productName, productDetails]) => (
+                <optgroup key={productName} label={productName}>
+                  {productDetails.map((product) => (
+                    <option key={product.sku} value={product.sku}>
+                      {product.sku} - {product.item_name} {product.color && `- ${product.color}`}
+                    </option>
+                  ))}
+                </optgroup>
+              ))
+            ) : (
+              <option disabled>No products available</option>
+            )}
           </select>
         </section>
 
