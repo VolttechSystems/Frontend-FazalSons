@@ -112,27 +112,28 @@ function Transections() {
 
 
 
-
-
-
     const [db, setDb] = useState(null); // State to hold the SQLite DB instance
     const [SQL, setSQL] = useState(null); // State to hold the SQL.js library
 
   
     // Initialize SQL.js library
     useEffect(() => {
-      initSqlJs().then((SQLInstance) => {
-        setSQL(SQLInstance);  // Save the SQL.js instance
-        
-      }).catch((error) => {
-        console.error('Error initializing SQL.js:', error);
-      });
+      initSqlJs({
+        // Required to load the WASM file correctly
+        locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/${file}`,
+      })
+        .then((SQLInstance) => {
+          setSql(SQLInstance); // Save the initialized SQL.js instance to state
+        })
+        .catch((error) => {
+          console.error('Error initializing SQL.js:', error);
+        });
     }, []);
 
 
-    const fetchDataFromAPI = async () => {
+  const fetchDataFromAPI = async () => {
       try {
-        // Run both API requests in parallel
+        // Run API requests in parallel
         const [products_response, customer_response] = await Promise.all([
           fetch("http://195.26.253.123/pos/products/add_product/17"),
           fetch("http://195.26.253.123/pos/customer/add_customer/17/18"),
@@ -159,39 +160,6 @@ function Transections() {
       }
     };
     
-  
-    // // Fetch products from API and store in IndexedDB/SQLite DB
-    // const fetchProductsFromAPI = async () => {
-    //   try {
-    //     // PRODUCTS API
-    //     const products_response = await fetch('http://195.26.253.123/pos/products/add_product/17');
-    //     const products = await products_response.json();
-    //     console.log('Fetched products from API:', products);
-    
-    //     if (products.results && products.results.length > 0) {
-    //       storeProductsInDb(products.results); // Only call when products are available
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching products:', error);
-    //   }
-
-
-    //   try {
-    //     // CUSTOMER API
-    //     const customer_response = await fetch('http://195.26.253.123/pos/customer/add_customer/17/18');
-    //     const customer = await customer_response.json();
-    //     console.log('Fetched customers from API:', customer);
-        
-    
-    //     if (customer.results && customer.results.length > 0) {
-    //       storeProductsInDb(customer.results); // Only call when products are available
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching products:', error);
-    //   }
-        
-    // };
-  
 // Store the fetched customers in SQLite DB
     const storeCustomersInDb = (customers) => {
       if (!SQL || !db) {
@@ -287,63 +255,69 @@ function Transections() {
       // Optionally, save the updated DB to IndexedDB
       saveDatabaseToIndexedDB(db);
     };
-  
+
+    
     // const saveDatabaseToIndexedDB = (db) => {
     //   const binaryData = db.export(); // Export SQLite DB as binary data
+    //   console.log("Saving binary data to IndexedDB:", binaryData); // Log the binary data
     
-    //   // Open IndexedDB and specify a version (increase if needed)
-    //   const request = indexedDB.open('SQLiteDatabase', 2); // Change version if needed
+    //   // Open IndexedDB with an incremented version (ensure the version is updated)
+    //   const request = indexedDB.open("SQLiteDatabase", 8); // Increment version to 6 (or higher than the current version)
     
     //   request.onupgradeneeded = (event) => {
     //     const idb = event.target.result;
     
-    //     // Ensure the 'databases' object store is created
-    //     if (!idb.objectStoreNames.contains('databases')) {
-    //       idb.createObjectStore('databases'); // No keyPath needed for key-value storage
+    //     // Always create the 'databases' object store during upgrade
+    //     if (!idb.objectStoreNames.contains("databases")) {
+    //       idb.createObjectStore("databases"); // Create object store for storing databases
     //       console.log('Created "databases" object store');
+    //     } else {
+    //       console.log('"databases" object store already exists');
     //     }
     //   };
     
     //   request.onsuccess = (event) => {
     //     const idb = event.target.result;
     
-    //     // Ensure the object store exists before proceeding
-    //     if (!idb.objectStoreNames.contains('databases')) {
-    //       console.error('Object store "databases" not found!');
-    //       return;
-    //     }
+    //     // Check if the object store "databases" exists before proceeding
+    //     const transaction = idb.transaction("databases", "readwrite");
+    //     const store = transaction.objectStore("databases");
     
-    //     const transaction = idb.transaction('databases', 'readwrite');
-    //     const store = transaction.objectStore('databases');
-    
-    //     const putRequest = store.put(binaryData, 'productsDatabase');
-    
-    //     putRequest.onsuccess = () => {
-    //       console.log('SQLite database saved to IndexedDB successfully!');
+    //     // Save the binary data of the products database
+    //     const putProductsRequest = store.put(binaryData, "productsDatabase");
+    //     putProductsRequest.onsuccess = () => {
+    //       console.log("Products SQLite database saved to IndexedDB successfully!");
+    //     };
+    //     putProductsRequest.onerror = (error) => {
+    //       console.error("Error saving products database to IndexedDB:", error);
     //     };
     
-    //     putRequest.onerror = (error) => {
-    //       console.error('Error saving SQLite database to IndexedDB:', error);
+    //     // Save the binary data of the customers database
+    //     const putCustomersRequest = store.put(binaryData, "customersDatabase");
+    //     putCustomersRequest.onsuccess = () => {
+    //       console.log("Customers SQLite database saved to IndexedDB successfully!");
+    //     };
+    //     putCustomersRequest.onerror = (error) => {
+    //       console.error("Error saving customers database to IndexedDB:", error);
     //     };
     //   };
     
     //   request.onerror = (event) => {
-    //     console.error('Error opening IndexedDB:', event.target.error);
+    //     console.error("Error opening IndexedDB:", event.target.error);
     //   };
     // };
     
     const saveDatabaseToIndexedDB = (db) => {
-      const binaryData = db.export(); // Export SQLite DB as binary data
+      const binaryData = db.export();
+      console.log("Saving binary data to IndexedDB:", binaryData);
     
-      // Open IndexedDB and specify a version (increase if needed)
-      const request = indexedDB.open("SQLiteDatabase", 3); // Increment version if needed
+      // Increment the version number to ensure onupgradeneeded is triggered
+      const request = indexedDB.open("SQLiteDatabase", 9); // Version increased to 9
     
       request.onupgradeneeded = (event) => {
         const idb = event.target.result;
-    
-        // Ensure the 'databases' object store is created
         if (!idb.objectStoreNames.contains("databases")) {
-          idb.createObjectStore("databases"); // No keyPath needed for key-value storage
+          idb.createObjectStore("databases");
           console.log('Created "databases" object store');
         }
       };
@@ -351,31 +325,31 @@ function Transections() {
       request.onsuccess = (event) => {
         const idb = event.target.result;
     
-        // Ensure the object store exists before proceeding
+        // Verify the object store exists before creating a transaction
         if (!idb.objectStoreNames.contains("databases")) {
-          console.error('Object store "databases" not found!');
+          console.error('"databases" object store does not exist');
           return;
         }
     
         const transaction = idb.transaction("databases", "readwrite");
         const store = transaction.objectStore("databases");
     
-        // Store products database
+        // Save products database
         const putProductsRequest = store.put(binaryData, "productsDatabase");
         putProductsRequest.onsuccess = () => {
-          console.log("Products SQLite database saved to IndexedDB successfully!");
+          console.log("Products database saved successfully!");
         };
         putProductsRequest.onerror = (error) => {
-          console.error("Error saving products database to IndexedDB:", error);
+          console.error("Error saving products database:", error);
         };
     
-        // Store customers database separately
+        // Save customers database
         const putCustomersRequest = store.put(binaryData, "customersDatabase");
         putCustomersRequest.onsuccess = () => {
-          console.log("Customers SQLite database saved to IndexedDB successfully!");
+          console.log("Customers database saved successfully!");
         };
         putCustomersRequest.onerror = (error) => {
-          console.error("Error saving customers database to IndexedDB:", error);
+          console.error("Error saving customers database:", error);
         };
       };
     
@@ -383,7 +357,7 @@ function Transections() {
         console.error("Error opening IndexedDB:", event.target.error);
       };
     };
-    
+
   
     // Initialize the SQLite DB and Create tables
     useEffect(() => {
@@ -439,79 +413,10 @@ function Transections() {
         db.run(createCustomersTableQuery);
     };
 
-
-    const loadDatabaseFromIndexedDB = () => {
-      const request = indexedDB.open('SQLiteDatabase', 3); // Open IndexedDB (ensure version is correct)
-    
-      request.onsuccess = (event) => {
-        const idb = event.target.result;
-    
-        // Ensure the object store exists
-        if (!idb.objectStoreNames.contains('databases')) {
-          console.error('Object store "databases" not found! Cannot load data.');
-          return;
-        }
-    
-        const transaction = idb.transaction('databases', 'readonly');
-        const store = transaction.objectStore('databases');
-        
-        // Load products database
-        const getProductsRequest = store.get('productsDatabase');
-        getProductsRequest.onsuccess = (e) => {
-          const binaryData = e.target.result;
-          if (binaryData) {
-            const loadedDb = new SQL.Database(binaryData); // Load SQLite DB for products
-            const selectProductQuery = 'SELECT * FROM products'; // Retrieve products data
-            const stmt = loadedDb.prepare(selectProductQuery);
-            const products = [];
-            
-            while (stmt.step()) {
-              const row = stmt.getAsObject();
-              products.push(row);
-            }
-            setProducts(products); // Store products data in React state
-            console.log('Loaded products database from IndexedDB successfully');
-          } else {
-            console.warn('No products database found in IndexedDB.');
-          }
-        };
-        getProductsRequest.onerror = (error) => {
-          console.error('Error retrieving products database from IndexedDB:', error);
-        };
-    
-        // Load customers database
-        const getCustomersRequest = store.get('customersDatabase');
-        getCustomersRequest.onsuccess = (e) => {
-          const binaryData = e.target.result;
-          if (binaryData) {
-            const loadedDb = new SQL.Database(binaryData); // Load SQLite DB for customers
-            const selectCustomerQuery = 'SELECT * FROM customers'; // Retrieve customers data
-            const stmt = loadedDb.prepare(selectCustomerQuery);
-            const customers = [];
-            
-            while (stmt.step()) {
-              const row = stmt.getAsObject();
-              customers.push(row);
-            }
-            setCustomer(customers); // Store customers data in React state
-            console.log('Loaded customers database from IndexedDB successfully');
-          } else {
-            console.warn('No customers database found in IndexedDB.');
-          }
-        };
-        getCustomersRequest.onerror = (error) => {
-          console.error('Error retrieving customers database from IndexedDB:', error);
-        };
-      };
-    
-      request.onerror = (event) => {
-        console.error('Error opening IndexedDB:', event.target.error);
-      };
-    };
-    
   
+
     // const loadDatabaseFromIndexedDB = () => {
-    //   const request = indexedDB.open('SQLiteDatabase', 3); // Open IndexedDB (ensure version is correct)
+    //   const request = indexedDB.open('SQLiteDatabase',9); // Open IndexedDB with correct version
     
     //   request.onsuccess = (event) => {
     //     const idb = event.target.result;
@@ -524,37 +429,67 @@ function Transections() {
     
     //     const transaction = idb.transaction('databases', 'readonly');
     //     const store = transaction.objectStore('databases');
-        
+    
     //     // Load products database
     //     const getProductsRequest = store.get('productsDatabase');
     //     getProductsRequest.onsuccess = (e) => {
     //       const binaryData = e.target.result;
+    //       console.log('Retrieved products database binaryData:', binaryData); // Log the binary data
+           
     //       if (binaryData) {
-    //         const loadedDb = new SQL.Database(binaryData); // Load SQLite DB for products
-    //         setDb(loadedDb); // Store the database in React state
-    //         console.log('Loaded products database from IndexedDB successfully');
+    //         try {
+    //           const loadedDb = new SQL.Database(binaryData); // Load SQLite DB for products
+    //           const selectProductQuery = 'SELECT * FROM products'; // Retrieve products data
+    //           const stmt = loadedDb.prepare(selectProductQuery);
+    //           const products = [];
+    
+    //           while (stmt.step()) {
+    //             const row = stmt.getAsObject();
+    //             products.push(row);
+    //           }
+    //           setProducts(products); // Store products data in React state
+    //           console.log('Loaded products database from IndexedDB successfully');
+    //         } catch (err) {
+    //           console.error('Error loading SQLite DB from binary data:', err);
+    //         }
     //       } else {
     //         console.warn('No products database found in IndexedDB.');
     //       }
     //     };
+    
     //     getProductsRequest.onerror = (error) => {
-    //       console.error('Error retrieving products database from IndexedDB:', error);
+    //       console.error('Error retrieving products database from IndexedDB:', error.target.error);
     //     };
     
     //     // Load customers database
     //     const getCustomersRequest = store.get('customersDatabase');
     //     getCustomersRequest.onsuccess = (e) => {
     //       const binaryData = e.target.result;
+    //       console.log('Retrieved customers database binaryData:', binaryData); // Log the binary data
+    
     //       if (binaryData) {
-    //         const loadedDb = new SQL.Database(binaryData); // Load SQLite DB for customers
-    //         setDb(loadedDb); // Store the customers database in React state
-    //         console.log('Loaded customers database from IndexedDB successfully');
+    //         try {
+    //           const loadedDb = new SQL.Database(binaryData); // Load SQLite DB for customers
+    //           const selectCustomerQuery = 'SELECT * FROM customers'; // Retrieve customers data
+    //           const stmt = loadedDb.prepare(selectCustomerQuery);
+    //           const customers = [];
+    
+    //           while (stmt.step()) {
+    //             const row = stmt.getAsObject();
+    //             customers.push(row);
+    //           }
+    //           setCustomer(customers); // Store customers data in React state
+    //           console.log('Loaded customers database from IndexedDB successfully');
+    //         } catch (err) {
+    //           console.error('Error loading SQLite DB from binary data:', err);
+    //         }
     //       } else {
     //         console.warn('No customers database found in IndexedDB.');
     //       }
     //     };
+    
     //     getCustomersRequest.onerror = (error) => {
-    //       console.error('Error retrieving customers database from IndexedDB:', error);
+    //       console.error('Error retrieving customers database from IndexedDB:', error.target.error);
     //     };
     //   };
     
@@ -562,6 +497,78 @@ function Transections() {
     //     console.error('Error opening IndexedDB:', event.target.error);
     //   };
     // };
+    
+
+    const loadDatabaseFromIndexedDB = () => {
+  const request = indexedDB.open('SQLiteDatabase', 9);
+
+  request.onsuccess = (event) => {
+    const idb = event.target.result;
+
+    if (!idb.objectStoreNames.contains('databases')) {
+      console.error('Object store "databases" not found!');
+      return;
+    }
+
+    const transaction = idb.transaction('databases', 'readonly');
+    const store = transaction.objectStore('databases');
+
+    // Load products database
+    const getProductsRequest = store.get('productsDatabase');
+    getProductsRequest.onsuccess = (e) => {
+      const binaryData = e.target.result;
+      if (!binaryData) {
+        console.warn('No products database found.');
+        return;
+      }
+      
+      // Ensure SQL is available
+      if (!window.SQL) { // Check global availability
+        console.error('SQL.js library not loaded!');
+        return;
+      }
+
+      try {
+        const loadedDb = new window.SQL.Database(binaryData);
+        // ... rest of products loading code ...
+      } catch (err) {
+        console.error('Products DB Error:', err);
+      }
+    };
+
+    // Load customers database
+    const getCustomersRequest = store.get('customersDatabase');
+    getCustomersRequest.onsuccess = (e) => {
+      const binaryData = e.target.result;
+      if (!binaryData) {
+        console.warn('No customers database found.');
+        return;
+      }
+
+      // Check if SQL.js is available
+      if (!window.SQL) { // Explicit check
+        console.error('SQL.js not available for customers DB!');
+        return;
+      }
+
+      try {
+        // Use window.SQL to ensure global scope
+        const loadedDb = new window.SQL.Database(binaryData);
+        // ... rest of customers loading code ...
+      } catch (err) {
+        console.error('Customers DB Error:', err);
+      }
+    };
+
+    getCustomersRequest.onerror = (error) => {
+      console.error('Customers retrieval error:', error.target.error);
+    };
+  };
+
+  request.onerror = (event) => {
+    console.error('IndexedDB open error:', event.target.error);
+  };
+};
     
     useEffect(() => {
       loadDatabaseFromIndexedDB(); // Optionally load DB from IndexedDB
