@@ -112,6 +112,7 @@ function Transections() {
 
   const [db, setDb] = useState(null) // State to hold the SQLite DB instance
   const [SQL, setSQL] = useState(null) // State to hold the SQL.js library
+  const [cartItems, setCartItems] = useState([]) // ✅ Store added products for table
 
   useEffect(() => {
     if (Object.keys(allProducts).length > 0) {
@@ -132,22 +133,6 @@ function Transections() {
       loadDatabaseFromIndexedDB() // ✅ Now runs only after SQL.js is set
     }
   }, [SQL])
-
-  // Fetch products from API and store in IndexedDB/SQLite DB
-  // const fetchProductsFromAPI = async () => {
-  //   const shopId = localStorage.getItem('shop_id')
-  //   try {
-  //     const response = await fetch('http://195.26.253.123/pos/products/add_product/' + shopId)
-  //     const products = await response.json()
-  //     console.log('Fetched products from API:', products)
-
-  //     if (products.results && products.results.length > 0) {
-  //       storeProductsInDb(products.results) // Only call when products are available
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching products:', error)
-  //   }
-  // }
 
   const fetchProductsFromAPI = async () => {
     if (!navigator.onLine) {
@@ -170,22 +155,26 @@ function Transections() {
   // Store the fetched products in SQLite DB
   const storeProductsInDb = (products) => {
     if (!SQL || !db) {
-      console.error('❌ SQL.js or DB is not initialized yet.')
+      console.error('🛑 SQL or DB is not initialized.')
       return
     }
 
     console.log('🔄 Storing products in SQLite DB...')
     const insertProductQuery = `
       INSERT OR REPLACE INTO products (
-        id, product_name, sku, season, description
+        id, product_name, sku, season, description, notes, color, image, cost_price, 
+        selling_price, discount_price, wholesale_price, retail_price, token_price, 
+        created_at, created_by, updated_at, updated_by, shop, outlet, sub_category, 
+        category, brand
       ) VALUES (
-        :id, :product_name, :sku, :season, :description
+        :id, :product_name, :sku, :season, :description, :notes, :color, :image, 
+        :cost_price, :selling_price, :discount_price, :wholesale_price, :retail_price, 
+        :token_price, :created_at, :created_by, :updated_at, :updated_by, :shop, 
+        :outlet, :sub_category, :category, :brand
       );
     `
 
     const stmt = db.prepare(insertProductQuery)
-    let storedCount = 0
-
     products.forEach((product) => {
       stmt.run({
         ':id': product.id,
@@ -193,15 +182,29 @@ function Transections() {
         ':sku': product.sku,
         ':season': product.season,
         ':description': product.description,
+        ':notes': product.notes,
+        ':color': product.color,
+        ':image': product.image,
+        ':cost_price': product.cost_price,
+        ':selling_price': product.selling_price,
+        ':discount_price': product.discount_price,
+        ':wholesale_price': product.wholesale_price,
+        ':retail_price': product.retail_price,
+        ':token_price': product.token_price,
+        ':created_at': product.created_at,
+        ':created_by': product.created_by,
+        ':updated_at': product.updated_at,
+        ':updated_by': product.updated_by,
+        ':shop': product.shop,
+        ':outlet': product.outlet,
+        ':sub_category': product.sub_category,
+        ':category': product.category,
+        ':brand': product.brand,
       })
-      storedCount++
     })
 
-    stmt.free() // ✅ Free memory
-    console.log(`✅ Stored ${storedCount} products in SQLite DB.`)
-
+    console.log(`✅ Stored ${products.length} products in SQLite DB.`)
     saveDatabaseToIndexedDB(db)
-    fetchProductsFromDB() // ✅ Immediately verify data is saved
   }
 
   //NEW
@@ -333,6 +336,14 @@ function Transections() {
         );
       `
     db.run(createTableQuery)
+  }
+
+  // ✅ Add product to cart (table)
+  const addProductToCart = (sku) => {
+    const product = products.find((p) => p.sku === sku)
+    if (product) {
+      setCartItems([...cartItems, { ...product, quantity: 1, discount: 0 }])
+    }
   }
 
   // Fetch products from IndexedDB (if needed)
@@ -1197,11 +1208,85 @@ function Transections() {
   }
 
   // Handle SKU selection
-  const handleProductSelect = (e) => {
+  // const handleProductSelect = (e) => {
+  //   const sku = e.target.value
+  //   console.log('Selected SKU:', sku) // Debug log
+  //   if (sku && sku !== 'Select Product') {
+  //     fetchProductDetails(sku)
+  //   }
+  // }
+
+  const fetchProductDetailsFromDB = (sku) => {
+    if (!db) {
+      console.error('🛑 Database is not initialized!')
+      return null
+    }
+
+    try {
+      console.log('🔄 Searching for SKU in SQLite DB:', sku)
+      const stmt = db.prepare('SELECT * FROM products WHERE sku = ?')
+      stmt.bind([sku])
+
+      if (stmt.step()) {
+        const product = stmt.getAsObject()
+        console.log('✅ Found Product in DB:', product)
+        return product
+      } else {
+        console.warn('⚠️ Product not found in IndexedDB.')
+        return null
+      }
+    } catch (error) {
+      console.error('❌ Error fetching product from IndexedDB:', error)
+      return null
+    }
+  }
+
+  const fetchProductDetailsFromAPI = async (sku) => {
+    try {
+      console.log('🌍 Fetching Product from API:', sku)
+      const shopId = localStorage.getItem('shop_id')
+      const response = await axios.get(
+        `http://195.26.253.123/pos/products/add_product/${shopId}?sku=${sku}`,
+      )
+
+      if (response.data && response.data.results.length > 0) {
+        console.log('✅ Product retrieved from API:', response.data.results[0])
+        return response.data.results[0]
+      } else {
+        console.warn('⚠️ Product not found in API.')
+        return null
+      }
+    } catch (error) {
+      console.error('❌ Error fetching product from API:', error)
+      return null
+    }
+  }
+
+  const handleProductSelect = async (e) => {
     const sku = e.target.value
-    console.log('Selected SKU:', sku) // Debug log
-    if (sku && sku !== 'Select Product') {
-      fetchProductDetails(sku)
+    console.log('📌 Selected SKU:', sku)
+
+    if (!sku || sku === 'Select Product') return // Prevent invalid selections
+
+    let productDetails
+
+    if (navigator.onLine) {
+      productDetails = await fetchProductDetailsFromAPI(sku) // ✅ Fetch from API when online
+    } else {
+      productDetails = fetchProductDetailsFromDB(sku) // ✅ Fetch from IndexedDB when offline
+    }
+
+    if (!productDetails) {
+      console.error('❌ Product not found for SKU:', sku)
+      return
+    }
+
+    console.log('✅ Product Details:', productDetails)
+
+    if (navigator.onLine) {
+      setTableData((prev) => [...prev, { ...productDetails, quantity: 1, discount: 0 }])
+    } else {
+      setCartItems((prev) => [...prev, { ...productDetails, quantity: 1, discount: 0 }])
     }
   }
 
@@ -1860,7 +1945,7 @@ function Transections() {
         </section>
 
         {/* Display Table if a product is selected */}
-        {tableData.length > 0 ? (
+        {(navigator.onLine ? tableData.length > 0 : cartItems.length > 0) ? (
           <table border="1" width="100%" cellPadding="10" style={{ marginTop: '20px' }}>
             <thead>
               <tr>
@@ -1876,7 +1961,7 @@ function Transections() {
               </tr>
             </thead>
             <tbody>
-              {tableData.map((product, index) => (
+              {(navigator.onLine ? tableData : cartItems).map((product, index) => (
                 <tr key={index}>
                   <td>{product.sku}</td>
                   <td>{product.product_name}</td>
@@ -1886,11 +1971,24 @@ function Transections() {
                       value={product.quantity}
                       onChange={(e) => {
                         const qty = e.target.value
-                        setTableData((prevData) => {
-                          const updatedData = [...prevData]
-                          updatedData[index].quantity = parseInt(qty) || 1
-                          return updatedData
-                        })
+                        // setTableData((prevData) => {
+                        //   const updatedData = [...prevData]
+                        //   updatedData[index].quantity = parseInt(qty) || 1
+                        //   return updatedData, navigator.onLine
+                        // })
+                        if (navigator.onLine) {
+                          setTableData((prev) => {
+                            const updatedData = [...prev]
+                            updatedData[index].quantity = parseInt(qty) || 1
+                            return updatedData
+                          })
+                        } else {
+                          setCartItems((prev) => {
+                            const updatedData = [...prev]
+                            updatedData[index].quantity = parseInt(qty) || 1
+                            return updatedData
+                          })
+                        }
                       }}
                       className="no-spinner"
                     />
@@ -1925,11 +2023,24 @@ function Transections() {
                       value={product.discount}
                       onChange={(e) => {
                         const discount = parseInt(e.target.value) || 0 // Ensure discount is an integer
-                        setTableData((prevData) => {
-                          const updatedData = [...prevData]
-                          updatedData[index].discount = discount
-                          return updatedData
-                        })
+                        // setTableData((prevData) => {
+                        //   const updatedData = [...prevData]
+                        //   updatedData[index].discount = discount
+                        //   return updatedData
+                        // })
+                        if (navigator.onLine) {
+                          setTableData((prev) => {
+                            const updatedData = [...prev]
+                            updatedData[index].discount = parseFloat(discount) || 0
+                            return updatedData
+                          })
+                        } else {
+                          setCartItems((prev) => {
+                            const updatedData = [...prev]
+                            updatedData[index].discount = parseFloat(discount) || 0
+                            return updatedData
+                          })
+                        }
                       }}
                       className="no-spinner"
                     />
@@ -1975,9 +2086,13 @@ function Transections() {
 
                   <td>
                     <button
-                      onClick={() =>
-                        setTableData((prevData) => prevData.filter((_, i) => i !== index))
-                      }
+                      onClick={() => {
+                        if (navigator.onLine) {
+                          setTableData((prevData) => prevData.filter((_, i) => i !== index))
+                        } else {
+                          setCartItems((prevData) => prevData.filter((_, i) => i !== index))
+                        }
+                      }}
                     >
                       ❌
                     </button>
