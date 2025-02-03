@@ -349,6 +349,7 @@ function Transections() {
     if (SQL) {
       console.log('🔄 Reinitializing SQLite Database...')
       const dbInstance = new SQL.Database() // ✅ Create a fresh database
+
       setDb(dbInstance)
       createTables(dbInstance) // ✅ Ensure tables are created again
       saveDatabaseToIndexedDB(dbInstance) // ✅ Save the fresh database to IndexedDB
@@ -359,108 +360,164 @@ function Transections() {
   const createTables = (db) => {
     console.log('🔄 Ensuring all necessary tables exist...')
 
-    // Products Table
-    const createProductsTable = `
-        CREATE TABLE IF NOT EXISTS products (
-          id INTEGER PRIMARY KEY,
-          shop INTEGER,
-          product_name TEXT,
-          sku TEXT UNIQUE,
-          outlet INTEGER,
-          sub_category INTEGER,
-          category INTEGER,
-          brand INTEGER,
-          season TEXT,
-          description TEXT,
-          notes TEXT,
-          color TEXT,
-          image TEXT,
-          cost_price TEXT,
-          selling_price TEXT,
-          discount_price TEXT,
-          wholesale_price TEXT,
-          retail_price TEXT,
-          token_price TEXT,
-          created_at TEXT,
-          created_by TEXT,
-          updated_at TEXT,
-          updated_by TEXT
-        );
-    `
-    db.run(createProductsTable)
-    console.log('✅ Products table ensured.')
+    try {
+      // Products Table
+      db.run(`
+            CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY,
+                shop INTEGER,
+                product_name TEXT,
+                sku TEXT UNIQUE,
+                outlet INTEGER,
+                sub_category INTEGER,
+                category INTEGER,
+                brand INTEGER,
+                season TEXT,
+                description TEXT,
+                notes TEXT,
+                color TEXT,
+                image TEXT,
+                cost_price TEXT,
+                selling_price TEXT,
+                discount_price TEXT,
+                wholesale_price TEXT,
+                retail_price TEXT,
+                token_price TEXT,
+                created_at TEXT,
+                created_by TEXT,
+                updated_at TEXT,
+                updated_by TEXT
+            );
+        `)
+      console.log('✅ Products table ensured.')
 
-    // Transactions Table
-    const createTransactionsTable = `
-        CREATE TABLE IF NOT EXISTS transactions (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          invoice_code TEXT UNIQUE,
-          outlet_code INTEGER,
-          shop INTEGER,
-          cust_code TEXT,
-          salesman_code TEXT,
-          quantity TEXT,
-          gross_total TEXT,
-          per_discount TEXT,
-          discounted_value TEXT,
-          items_discount TEXT,
-          grand_total TEXT,
-          advanced_payment TEXT,
-          due_amount TEXT,
-          additional_fees TEXT,
-          total_pay TEXT,
-          status TEXT,
-          created_at TEXT,
-          created_by TEXT,
-          updated_at TEXT,
-          updated_by TEXT
-        );
-    `
-    db.run(createTransactionsTable)
-    console.log('✅ Transactions table ensured.')
+      // Transactions Table
+      db.run(`
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                invoice_code TEXT UNIQUE,
+                outlet_code INTEGER,
+                shop INTEGER,
+                cust_code TEXT,
+                salesman_code TEXT,
+                quantity TEXT,
+                gross_total TEXT,
+                per_discount TEXT,
+                discounted_value TEXT,
+                items_discount TEXT,
+                grand_total TEXT,
+                advanced_payment TEXT,
+                due_amount TEXT,
+                additional_fees TEXT,
+                total_pay TEXT,
+                status TEXT,
+                created_at TEXT,
+                created_by TEXT,
+                updated_at TEXT,
+                updated_by TEXT
+            );
+        `)
+      console.log('✅ Transactions table ensured.')
 
-    // Transaction Items Table
-    const createTransactionItemsTable = `
-        CREATE TABLE IF NOT EXISTS tbl_transaction_item (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          invoice_code TEXT,
-          sku TEXT,
-          quantity TEXT,
-          rate TEXT,
-          gross_total TEXT,
-          per_discount TEXT,
-          discounted_value TEXT,
-          item_total TEXT,
-          status TEXT, -- Sold, return
-          created_at TEXT,
-          created_by TEXT,
-          updated_at TEXT,
-          updated_by TEXT,
-          FOREIGN KEY (invoice_code) REFERENCES transactions(invoice_code) ON DELETE CASCADE
-        );
-    `
-    db.run(createTransactionItemsTable)
-    console.log('✅ Transaction Items table ensured.')
-  }
-
-  // ✅ Add product to cart (table)
-  const addProductToCart = (sku) => {
-    const product = products.find((p) => p.sku === sku)
-    if (product) {
-      setCartItems([...cartItems, { ...product, quantity: 1, discount: 0 }])
+      // Transaction Items Table
+      db.run(`
+            CREATE TABLE IF NOT EXISTS tbl_transaction_item (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                invoice_code TEXT,
+                sku TEXT,
+                quantity TEXT,
+                rate TEXT,
+                gross_total TEXT,
+                per_discount TEXT,
+                discounted_value TEXT,
+                item_total TEXT,
+                status TEXT, -- Sold, return
+                created_at TEXT,
+                created_by TEXT,
+                updated_at TEXT,
+                updated_by TEXT,
+                FOREIGN KEY (invoice_code) REFERENCES transactions(invoice_code) ON DELETE CASCADE
+            );
+        `)
+      console.log('✅ Transaction Items table ensured.')
+    } catch (error) {
+      console.error('❌ Error creating tables:', error)
     }
   }
 
   // Fetch products from IndexedDB (if needed)
+  // const loadDatabaseFromIndexedDB = () => {
+  //   console.log('🔄 Loading database from IndexedDB...')
+  //   const request = indexedDB.open('SQLiteDatabase', 12)
+
+  //   request.onsuccess = (event) => {
+  //     const idb = event.target.result
+
+  //     if (!idb.objectStoreNames.contains('databases')) {
+  //       console.error('❌ Object store "databases" not found!')
+  //       return
+  //     }
+
+  //     const transaction = idb.transaction('databases', 'readonly')
+  //     const store = transaction.objectStore('databases')
+  //     const getRequest = store.get('productsDatabase')
+
+  //     getRequest.onsuccess = async (e) => {
+  //       const binaryData = e.target.result
+  //       if (!binaryData) {
+  //         console.warn('⚠️ No database found in IndexedDB.')
+  //         return
+  //       }
+
+  //       if (!SQL) {
+  //         console.warn('⚠️ SQL.js is not ready yet. Waiting...')
+  //         await new Promise((resolve) => {
+  //           const interval = setInterval(() => {
+  //             if (SQL) {
+  //               clearInterval(interval)
+  //               resolve()
+  //             }
+  //           }, 100)
+  //         })
+  //       }
+
+  //       try {
+  //         const loadedDb = new SQL.Database(binaryData)
+  //         setDb(loadedDb)
+  //         console.log('✅ Loaded database from IndexedDB successfully')
+  //         fetchProductsFromDB() // ✅ Load products after setting DB
+  //       } catch (error) {
+  //         console.error('❌ Error loading SQLite database:', error)
+  //       }
+  //     }
+  //   }
+  // }
+
   const loadDatabaseFromIndexedDB = () => {
     console.log('🔄 Loading database from IndexedDB...')
-    const request = indexedDB.open('SQLiteDatabase', 12)
 
-    request.onsuccess = (event) => {
+    const request = indexedDB.open('SQLiteDatabase', 12) // Increment version to trigger upgrade
+
+    request.onupgradeneeded = (event) => {
+      console.log('⚠️ IndexedDB upgrade needed, creating object store...')
       const idb = event.target.result
 
       if (!idb.objectStoreNames.contains('databases')) {
-        console.error('❌ Object store "databases" not found!')
+        idb.createObjectStore('databases')
+        console.log("✅ Created 'databases' object store")
+      }
+    }
+
+    request.onsuccess = async (event) => {
+      const idb = event.target.result
+      console.log('✅ IndexedDB opened successfully')
+
+      if (!idb.objectStoreNames.contains('databases')) {
+        console.warn("❌ Object store 'databases' is STILL missing! Forcing recreation...")
+        indexedDB.deleteDatabase('SQLiteDatabase') // Force delete
+        setTimeout(() => {
+          window.location.reload() // Reload page to trigger database recreation
+        }, 1000)
         return
       }
 
@@ -470,8 +527,12 @@ function Transections() {
 
       getRequest.onsuccess = async (e) => {
         const binaryData = e.target.result
+
         if (!binaryData) {
-          console.warn('⚠️ No database found in IndexedDB.')
+          console.warn('⚠️ No database found in IndexedDB. Creating new one...')
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
           return
         }
 
@@ -491,11 +552,15 @@ function Transections() {
           const loadedDb = new SQL.Database(binaryData)
           setDb(loadedDb)
           console.log('✅ Loaded database from IndexedDB successfully')
-          fetchProductsFromDB() // ✅ Load products after setting DB
+          createTables(loadedDb) // Ensure tables exist
         } catch (error) {
           console.error('❌ Error loading SQLite database:', error)
         }
       }
+    }
+
+    request.onerror = (event) => {
+      console.error('❌ Error opening IndexedDB:', event.target.error)
     }
   }
 
