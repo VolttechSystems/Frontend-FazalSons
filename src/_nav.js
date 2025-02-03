@@ -20,7 +20,7 @@ const _nav = [
     component: CNavItem,
     name: 'Dashboard',
     to: '/dashboard',
-    // key:"doashboard",
+    key: 'Admin',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
   },
 

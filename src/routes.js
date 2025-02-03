@@ -72,9 +72,37 @@ const Shops = React.lazy(() => import('./views/SuperAdmin/Shops/Shops'))
 const ShopUser = React.lazy(() => import('./views/SuperAdmin/ShopUser/ShopUser'))
 
 const routes = [
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/pages/unauthorized', name: 'unauthorized', element: unauthorized },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  // {
+  //   path: '/',
+  //   // exact: true,
+  //   name: 'Home',
+  //   element: 'Home',
+  //   element: (props) => <AuthGuard element={Home} requiredPermission="Admin" {...props} />,
+  // },
+
+  // { path: '/pages/unauthorized', name: 'unauthorized', element: unauthorized },
+  // {
+  //   path: '/dashboard',
+  //   name: 'Dashboard',
+  //   element: 'Dashboard',
+  //   element: (props) => <AuthGuard element={Dashboard} requiredPermission="Admin" {...props} />,
+  // },
+  {
+    path: '/',
+    name: 'Home',
+    element: (props) => <AuthGuard element={Home} requiredPermission="Admin" {...props} />,
+  },
+  {
+    path: '/pages/unauthorized',
+    name: 'unauthorized',
+    element: unauthorized,
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    element: (props) => <AuthGuard element={Dashboard} requiredPermission="Admin" {...props} />,
+  },
+
   { path: '/pages/Login', name: 'Login', element: Login },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
