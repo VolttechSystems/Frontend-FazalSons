@@ -12,13 +12,16 @@ const ProductEdit = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const { outletId } = useParams() // Get the outletId from the URL parameter
 
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       const shopId = localStorage.getItem('shop_id')
       try {
-        const response = await Network.get(`${Urls.actionProductsagain}/${shopId}/${id}`)
+        const response = await Network.get(
+          `${Urls.actionProductsagain}/${shopId}/${outletId}/${id}`,
+        )
         setProduct(response.data)
         setLoading(false)
       } catch (error) {
@@ -28,7 +31,7 @@ const ProductEdit = () => {
       }
     }
     fetchProduct()
-  }, [id])
+  }, [outletId, id])
 
   // Handle input changes
   const handleChange = (e) => {
@@ -48,7 +51,7 @@ const ProductEdit = () => {
     //   console.error('Error updating product:', error)
     //   alert('Failed to update product.')
     // }
-    const response = Network.put(`${Urls.actionProductsagain}/${shopId}/${id}`, product)
+    const response = Network.put(`${Urls.actionProductsagain}/${shopId}/${outletId}/${id}`, product)
     toast.success('Product updated successfully!')
     navigate(`/base/POSTable2`) // Redirect after saving
   }

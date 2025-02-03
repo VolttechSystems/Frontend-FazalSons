@@ -75,6 +75,7 @@ const AddProduct = () => {
   const [error, setError] = useState('')
   const [showSubCategoryDropdown, setShowSubCategoryDropdown] = useState(false)
   const { userOutlets } = useAuth()
+  const { outletId } = useParams() // Get the outletId from the URL parameter
 
   // Function to handle button click and open the dialog
 
@@ -82,7 +83,7 @@ const AddProduct = () => {
     const shopId = localStorage.getItem('shop_id')
     if (confirmDelete) {
       try {
-        const response = await Network.delete(`${Urls.deleteTempProduct}/${shopId}`) // Updated to use Network.delete
+        const response = await Network.delete(`${Urls.deleteTempProduct}/${shopId}/${outletId}`) // Updated to use Network.delete
         if (!response.ok) {
           console.log(response.data.error)
           return
@@ -466,7 +467,7 @@ const AddProduct = () => {
 
   const fetchProductList = async () => {
     const shopId = localStorage.getItem('shop_id')
-    const response = await Network.get(`${Urls.addProduct}/${shopId}`)
+    const response = await Network.get(`${Urls.addProduct}/${shopId}/${outletId}`)
     if (!response.ok) return console.log(response.data.error)
     setProductList(response.data)
   }
@@ -584,7 +585,7 @@ const AddProduct = () => {
     formDataPayload.append('wholesale_price', formData.wholesale_price)
     formDataPayload.append('retail_price', formData.retail_price)
     formDataPayload.append('token_price', formData.token_price)
-    formDataPayload.append('outlet', formData.outlet) // Use outlet ID
+    formDataPayload.append('outlet', outletId) // Use outlet ID
     formDataPayload.append('category', selectedCategory)
     formDataPayload.append('sub_category', selectedsubCategory)
     formDataPayload.append('brand', selectedBrand)
@@ -598,7 +599,7 @@ const AddProduct = () => {
 
     try {
       const response = await axios.post(
-        'http://195.26.253.123/pos/products/add_temp_product/${shopId}',
+        `http://195.26.253.123/pos/products/add_temp_product/${shopId}/${outletId}`,
         formDataPayload, // Use formDataPayload here
       )
 
@@ -638,7 +639,7 @@ const AddProduct = () => {
   const handleDelete = async (id) => {
     const shopId = localStorage.getItem('shop_id')
     try {
-      const response = await Network.delete(`${Urls.actionTempProduct}/${shopId}/${id}`) // Updated to use Network.delete
+      const response = await Network.delete(`${Urls.actionTempProduct}/${shopId}/${outletId}/${id}`) // Updated to use Network.delete
       if (response.ok) {
         // Check if the response is successful
         setProductList((prevList) => prevList.filter((product) => product.id !== id)) // Remove the deleted product from the list
@@ -677,7 +678,7 @@ const AddProduct = () => {
     console.log('Publishing with data:', formData)
 
     try {
-      const url = `${Urls.publishProduct}/${shopId}`
+      const url = `${Urls.publishProduct}/${shopId}/${outletId}`
       const response = await Network.post(url) // Assuming `formData` contains the product data
 
       if (response.status === 201 || response.status === 200) {
@@ -791,28 +792,9 @@ const AddProduct = () => {
           {activeTab === 0 && (
             <div className="form-column">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-                <label style={{ flex: 1, fontWeight: 'bold' }}>
+                {/* <label style={{ flex: 1, fontWeight: 'bold' }}>
                   Outlet Name:
-                  {/* <select
-                    name="outlet"
-                    value={formData.outlet}
-                    onChange={handleChange}
-                    required
-                    style={{ width: '100%', padding: '8px' }} // Full width and some padding
-                  >
-                    <option value="" disabled>
-                      Select Outlet
-                    </option>
-                    {Array.isArray(outlets) && outlets.length > 0 ? (
-                      outlets.map((outlet) => (
-                        <option key={outlet.id} value={outlet.id}>
-                          {outlet.outlet_name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>Loading outlets...</option>
-                    )}
-                  </select> */}
+                 
                   <Select
                     options={
                       Array.isArray(outlets) && outlets.length > 0
@@ -843,12 +825,12 @@ const AddProduct = () => {
                       container: (base) => ({ ...base, width: '100%' }), // Full width
                     }}
                   />
-                </label>
+                </label> */}
 
-                <Link to="/Admin/AddOutlet">
+                {/* <Link to="/Admin/AddOutlet">
                   <button style={{ height: '100%', padding: '8px' }}>+</button>{' '}
-                  {/* Matches dropdown height */}
-                </Link>
+               
+                </Link> */}
               </div>
 
               <label>

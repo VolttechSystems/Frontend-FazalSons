@@ -10,6 +10,7 @@ const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 const POS = React.lazy(() => import('./views/base/POS/POS'))
 const POSTable2 = React.lazy(() => import('./views/base/POSTable2/POSTable2'))
+const POSTable3 = React.lazy(() => import('./views/base/POSTable3/POSTable3'))
 const POSTable1 = React.lazy(() => import('./views/base/POSTable1/POSTable1'))
 const Salesman = React.lazy(() => import('./views/Admin/Salesman/Salesman'))
 const RegisterSystem = React.lazy(() => import('./views/base/RegisterSystem/Register'))
@@ -94,6 +95,12 @@ const routes = [
     element: (props) => <AuthGuard element={POSTable2} requiredPermission="product" {...props} />,
   }, // POSTable2
   {
+    path: '/base/POSTable3',
+    name: 'POSTable3',
+    element: 'POSTable3',
+    element: (props) => <AuthGuard element={POSTable3} requiredPermission="product" {...props} />,
+  }, // POSTable3
+  {
     path: '/base/POSTable1',
     name: 'POSTable1',
     element: 'POSTable1',
@@ -111,7 +118,7 @@ const routes = [
     name: 'AllProducts',
     element: (props) => <AuthGuard element={AllProducts} requiredPermission="product" {...props} />,
   }, //AllProducts
-  { path: '/Product/ProductEdit/:id', name: 'ProductEdit', element: ProductEdit }, //ProductEdit
+  { path: '/Product/ProductEdit/:outletId/:id', name: 'ProductEdit', element: ProductEdit }, //ProductEdit
   {
     path: '/Product/Brands',
     name: 'Brands',
@@ -120,7 +127,7 @@ const routes = [
   }, //Brands
   { path: '/Product/AddBrands', name: 'AddBrands', element: AddBrands }, //AddBrands
   {
-    path: '/Product/AddProduct',
+    path: '/Product/AddProduct/:outletId',
     name: 'AddProduct',
     element: 'AddProduct',
     element: (props) => <AuthGuard element={AddProduct} requiredPermission="product" {...props} />,

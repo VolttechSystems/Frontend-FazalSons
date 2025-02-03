@@ -626,7 +626,9 @@ function Transections() {
 
   // Calculate due amount
   useEffect(() => {
-    const totalPayment = tableData.reduce(
+    const sourceData = navigator.onLine ? tableData : cartItems // Switch based on online status
+
+    const totalPayment = sourceData.reduce(
       (acc, item) =>
         acc +
         (item.discount_price
@@ -634,9 +636,10 @@ function Transections() {
           : item.selling_price * item.quantity),
       0,
     )
+
     const calculatedDue = totalPayment - advancePayment
     setDueAmount(calculatedDue > 0 ? calculatedDue : 0) // Prevent negative values
-  }, [tableData, advancePayment])
+  }, [tableData, cartItems, advancePayment]) // Added cartItems as dependency
 
   // Calculate total discount
   const totalDiscount = tableData.reduce(

@@ -203,10 +203,16 @@ const _nav = [
         to: 'base/POSTable2',
         key: 'product',
       },
+      // {
+      //   component: CNavItem,
+      //   name: 'Add Product',
+      //   to: '/Product/AddProduct',
+      //   key: 'product',
+      // },
       {
         component: CNavItem,
         name: 'Add Product',
-        to: '/Product/AddProduct',
+        to: 'base/POSTable3',
         key: 'product',
       },
       {
