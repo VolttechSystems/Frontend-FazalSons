@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import AuthGuard from './guards/AuthGuard'
 
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
@@ -68,6 +69,11 @@ const App = () => {
             <Route exact path="/404" name="Page 404" element={<Page404 />} />
             <Route exact path="/500" name="Page 500" element={<Page500 />} />
             <Route path="*" name="Home" element={<DefaultLayout />} />
+            {/* <Route
+              path="*"
+              name="Home"
+              element={<AuthGuard element={<DefaultLayout />} requiredPermission="Admin" />}
+            /> */}
           </Routes>
         </Suspense>
       </HashRouter>

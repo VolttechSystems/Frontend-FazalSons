@@ -51,7 +51,9 @@ const AllProducts = () => {
   // Fetch product details for modal
   const fetchProductDetails = async (productId) => {
     const shopId = localStorage.getItem('shop_id')
-    const response = await Network.get(`${Urls.ShowAllProductDetails}${shopId}/${productId}`)
+    const response = await Network.get(
+      `${Urls.ShowAllProductDetails}${shopId}/${outletId}/${productId}`,
+    )
     if (!response.ok) return console.log(response.data.error)
     setProductDetails(response.data)
     setIsModalOpen(true) // Open modal after fetching details
@@ -63,17 +65,17 @@ const AllProducts = () => {
 
   const handleDelete = async (id) => {
     const shopId = localStorage.getItem('shop_id')
-    const response = await Network.delete(`${Urls.actionProductsagain}/${shopId}/${id}`)
+    const response = await Network.delete(`${Urls.actionProductsagain}/${shopId}/${outletId}/${id}`)
     if (!response.ok) return console.log(response.data.error)
     toast.success('Product deleted successfully!')
     fetchProducts() // Refresh products after deletion
-    toast.error('Product deletion cancelled.')
+
     setIsModalOpen(false) // Close the dialog after deletion
     fetchProducts() // Refresh products after deletion
   }
 
   const handleEdit = (id) => {
-    navigate(`/Product/ProductEdit/${id}`) // Navigate to AddProduct with product ID
+    navigate(`/Product/ProductEdit/${outletId}/${id}`) // Navigate to AddProduct with product ID
   }
 
   const handleCloseModal = () => {

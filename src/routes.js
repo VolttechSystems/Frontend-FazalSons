@@ -146,7 +146,11 @@ const routes = [
     name: 'AllProducts',
     element: (props) => <AuthGuard element={AllProducts} requiredPermission="product" {...props} />,
   }, //AllProducts
-  { path: '/Product/ProductEdit/:outletId/:id', name: 'ProductEdit', element: ProductEdit }, //ProductEdit
+  {
+    path: '/Product/ProductEdit/:outletId/:id',
+    name: 'ProductEdit',
+    element: (props) => <AuthGuard element={ProductEdit} requiredPermission="product" {...props} />,
+  }, //ProductEdit
   {
     path: '/Product/Brands',
     name: 'Brands',
