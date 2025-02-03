@@ -142,7 +142,9 @@ function Transections() {
     }
     try {
       const shopId = localStorage.getItem('shop_id')
-      const response = await axios.get(`http://195.26.253.123/pos/products/add_product/${shopId}`)
+      const response = await axios.get(
+        `http://195.26.253.123/pos/products/add_product/${shopId}/${outletId}`,
+      )
       if (response.data.results.length > 0) {
         setProducts(response.data.results)
         storeProductsInDb(response.data.results)
