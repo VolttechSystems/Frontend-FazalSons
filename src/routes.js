@@ -89,8 +89,9 @@ const routes = [
   // },
   {
     path: '/',
+    exact: true,
     name: 'Home',
-    element: (props) => <AuthGuard element={Home} requiredPermission="Admin" {...props} />,
+    element: 'Home',
   },
   {
     path: '/pages/unauthorized',
