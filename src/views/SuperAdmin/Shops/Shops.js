@@ -182,7 +182,7 @@ const Shops = () => {
         />
 
         <label style={{ display: 'block', marginBottom: '5px' }}>
-          Number of Registered Outlets Allowed:
+          Number of Registered Per Outlets Allowed:
         </label>
         <input
           type="number"

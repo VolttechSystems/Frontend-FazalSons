@@ -158,7 +158,7 @@ const AddOutlet = () => {
         </h2>
         <div>
           <label>
-            Code <span style={{ color: 'red' }}>*</span>
+            Code <span style={{ color: '#0056B3' }}>*</span>
           </label>
           <input
             className="outlet-form-input"
@@ -171,7 +171,7 @@ const AddOutlet = () => {
         </div>
         <div>
           <label>
-            Name <span style={{ color: 'red' }}>*</span>
+            Name <span style={{ color: '#0056B3' }}>*</span>
           </label>
           <input
             className="outlet-form-input"
@@ -184,7 +184,7 @@ const AddOutlet = () => {
         </div>
         <div>
           <label>
-            Address <span style={{ color: 'red' }}>*</span>
+            Address <span style={{ color: '#0056B3' }}>*</span>
           </label>
           <input
             className="outlet-form-input"
@@ -197,7 +197,7 @@ const AddOutlet = () => {
         </div>
         <div>
           <label>
-            Mobile <span style={{ color: 'red', fontSize: '12px' }}>(Optional)</span>
+            Mobile <span style={{ color: '#0056B3', fontSize: '12px' }}>(Optional)</span>
           </label>
           <input
             className="outlet-form-input"
@@ -209,7 +209,7 @@ const AddOutlet = () => {
         </div>
         <div>
           <label>
-            Manager Name <span style={{ color: 'red', fontSize: '12px' }}>(Optional)</span>
+            Manager Name <span style={{ color: '#0056B3', fontSize: '12px' }}>(Optional)</span>
           </label>
           <input
             className="outlet-form-input"
@@ -221,7 +221,7 @@ const AddOutlet = () => {
         </div>
         <div>
           <label>
-            Phone No. <span style={{ color: 'red', fontSize: '12px' }}>(Optional)</span>
+            Phone No. <span style={{ color: '#0056B3', fontSize: '12px' }}>(Optional)</span>
           </label>
           <input
             className="outlet-form-input"
@@ -244,7 +244,7 @@ const AddOutlet = () => {
               <th>Name</th>
               <th>Address</th>
               <th>Mobile No.</th>
-              <th>Manager Name</th>
+              <th>Manager</th>
               <th>Manager Number</th>
               <th>Actions</th>
             </tr>

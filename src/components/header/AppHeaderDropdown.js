@@ -29,35 +29,70 @@ import { Network, Urls } from '../../api-config'
 const AppHeaderDropdown = () => {
   const navigate = useNavigate()
 
+  // const handleLogout = async () => {
+  //   try {
+  //     const token = localStorage.getItem('authToken') // Get the token from localStorage
+  //     console.log(token)
+
+  //     if (token) {
+  //       // Call the API for logout
+  //       await Network.post(
+  //         Urls.logout,
+  //         {},
+  //         {
+  //           headers: {
+  //             Authorization: `token ${token}`,
+  //           },
+  //         },
+  //       )
+
+  //       // Clear localStorage
+  //       localStorage.removeItem('authToken')
+  //       localStorage.removeItem('SysRoles') // Clear roles or any other stored items
+  //       localStorage.removeItem('outlets') // Clear outlets or any other stored items
+  //     }
+
+
+  //     // Redirect to the login page
+  //     navigate('/login')
+      
+  //   } catch (error) {
+  //     console.error('Logout failed:', error)
+  //   }
+  //     // Reload the page
+  //     window.location.reload();
+
+  // }
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('authToken') // Get the token from localStorage
-
+      const token = localStorage.getItem('authToken');
+  
       if (token) {
-        // Call the API for logout
-        await Network.post(
-          Urls.logout,
-          {},
-          {
-            headers: {
-              Authorization: `token ${token}`,
-            },
+        await fetch("http://195.26.253.123/pos/accounts/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,  // Capital "Token" is required
+            "Content-Type": "application/json",
           },
-        )
-
+          credentials: "include", // Ensures cookies are sent if needed
+        });
+  
         // Clear localStorage
-        localStorage.removeItem('authToken')
-        localStorage.removeItem('SysRoles') // Clear roles or any other stored items
-        localStorage.removeItem('outlets') // Clear outlets or any other stored items
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("SysRoles");
+        localStorage.removeItem("outlets");
+
+         // Replace history state to prevent going back
+      window.history.replaceState(null, "", window.location.href);
+  
+        // Redirect to login
+        navigate("/login");
       }
-
-      // Redirect to the login page
-      navigate('/login')
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error("Logout failed:", error);
     }
-  }
-
+  };
+  
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
