@@ -156,7 +156,7 @@ function Transections() {
 
   //additional fee, payment method online fetch
   const saveDropdownDataToIndexedDB = (key, data) => {
-    const request = indexedDB.open('SQLiteDatabase', 12)
+    const request = indexedDB.open('SQLiteDatabase', 14)
 
     request.onsuccess = (event) => {
       const db = event.target.result
@@ -173,7 +173,7 @@ function Transections() {
   }
 
   const loadDropdownDataFromIndexedDB = (key, setState) => {
-    const request = indexedDB.open('SQLiteDatabase', 12)
+    const request = indexedDB.open('SQLiteDatabase', 14)
 
     request.onsuccess = (event) => {
       const db = event.target.result
@@ -256,6 +256,50 @@ function Transections() {
     saveDatabaseToIndexedDB(db)
   }
 
+  const storeTransactionsInDB = (transactions) => {
+    if (!SQL || !db) {
+      console.error('🛑 SQL or DB is not initialized.')
+      return
+    }
+
+    console.log('🔄 Storing transactions in SQLite DB...')
+
+    const insertTransactionQuery = `
+        INSERT INTO transactions (
+            sku, quantity, rate, item_discount, cust_code, overall_discount, 
+            outlet_code, salesman_code, advanced_payment, fee_code, fee_amount, 
+            pm_method, pm_amount, shop
+        ) VALUES (
+            :sku, :quantity, :rate, :item_discount, :cust_code, :overall_discount, 
+            :outlet_code, :salesman_code, :advanced_payment, :fee_code, :fee_amount, 
+            :pm_method, :pm_amount, :shop
+        );
+    `
+
+    const stmt = db.prepare(insertTransactionQuery)
+    transactions.forEach((transaction) => {
+      stmt.run({
+        ':sku': JSON.stringify(transaction.sku), // Store SKU array as JSON string
+        ':quantity': JSON.stringify(transaction.quantity),
+        ':rate': JSON.stringify(transaction.rate),
+        ':item_discount': JSON.stringify(transaction.item_discount),
+        ':cust_code': transaction.cust_code,
+        ':overall_discount': transaction.overall_discount,
+        ':outlet_code': transaction.outlet_code,
+        ':salesman_code': transaction.salesman_code,
+        ':advanced_payment': transaction.advanced_payment,
+        ':fee_code': JSON.stringify(transaction.fee_code), // Store Fee Codes as JSON
+        ':fee_amount': JSON.stringify(transaction.fee_amount),
+        ':pm_method': JSON.stringify(transaction.pm_method),
+        ':pm_amount': JSON.stringify(transaction.pm_amount),
+        ':shop': transaction.shop,
+      })
+    })
+
+    console.log(`✅ Stored ${transactions.length} transactions in SQLite DB.`)
+    saveDatabaseToIndexedDB(db)
+  }
+
   //NEW
   const fetchProductsFromDB = () => {
     if (!db) {
@@ -300,19 +344,51 @@ function Transections() {
     }
   }
 
-  const saveDatabaseToIndexedDB = (db) => {
-    const binaryData = db.export() // Export SQLite DB as binary data
+  const fetchTransactionsFromDB = () => {
+    if (!db) {
+      console.error('🛑 Database not initialized yet!')
+      return
+    }
 
-    // Open IndexedDB and specify a version (increment if needed)
-    const request = indexedDB.open('SQLiteDatabase', 12) // ⬆️ INCREASED VERSION TO FORCE UPGRADE
+    console.log('🔄 Fetching transactions from SQLite DB...')
+    const stmt = db.prepare('SELECT * FROM transactions')
+    const transactionsData = []
+
+    while (stmt.step()) {
+      let transaction = stmt.getAsObject()
+
+      // Convert JSON fields back into arrays before using
+      transaction.sku = JSON.parse(transaction.sku || '[]')
+      transaction.quantity = JSON.parse(transaction.quantity || '[]')
+      transaction.rate = JSON.parse(transaction.rate || '[]')
+      transaction.item_discount = JSON.parse(transaction.item_discount || '[]')
+      transaction.fee_code = JSON.parse(transaction.fee_code || '[]')
+      transaction.fee_amount = JSON.parse(transaction.fee_amount || '[]')
+      transaction.pm_method = JSON.parse(transaction.pm_method || '[]')
+      transaction.pm_amount = JSON.parse(transaction.pm_amount || '[]')
+
+      transactionsData.push(transaction)
+    }
+    stmt.free()
+
+    if (transactionsData.length > 0) {
+      console.log('✅ Transactions successfully retrieved from DB:', transactionsData)
+    } else {
+      console.warn('⚠️ No transactions found in DB.')
+    }
+  }
+
+  const saveDatabaseToIndexedDB = (db) => {
+    const binaryData = db.export() // Export SQLite DB
+
+    const request = indexedDB.open('SQLiteDatabase', 14) // ⬆️ Increased Version
 
     request.onupgradeneeded = (event) => {
-      console.log('⚠️ Upgrading IndexedDB - Creating object store if missing...')
+      console.log('⚠️ Upgrading IndexedDB...')
       const idb = event.target.result
 
-      // ✅ Ensure the "databases" object store is created
       if (!idb.objectStoreNames.contains('databases')) {
-        idb.createObjectStore('databases') // No keyPath needed
+        idb.createObjectStore('databases')
         console.log('✅ Created "databases" object store')
       }
     }
@@ -328,15 +404,18 @@ function Transections() {
 
       const transaction = idb.transaction('databases', 'readwrite')
       const store = transaction.objectStore('databases')
-      const putRequest = store.put(binaryData, 'productsDatabase')
 
-      putRequest.onsuccess = () => {
-        console.log('✅ SQLite database saved to IndexedDB successfully!')
-      }
+      // 🔹 Store Products Database
+      const putProducts = store.put(binaryData, 'productsDatabase')
+      putProducts.onsuccess = () => console.log('✅ Products saved to IndexedDB!')
 
-      putRequest.onerror = (error) => {
-        console.error('⚠️ Error saving SQLite database to IndexedDB:', error)
-      }
+      putProducts.onerror = (error) => console.error('⚠️ Error saving Products:', error)
+
+      // 🔹 Store Transactions Database
+      const putTransactions = store.put(binaryData, 'transactionsDatabase')
+      putTransactions.onsuccess = () => console.log('✅ Transactions saved to IndexedDB!')
+
+      putTransactions.onerror = (error) => console.error('⚠️ Error saving Transactions:', error)
     }
 
     request.onerror = (event) => {
@@ -361,7 +440,7 @@ function Transections() {
     console.log('🔄 Ensuring all necessary tables exist...')
 
     try {
-      // Products Table
+      // ✅ Products Table
       db.run(`
             CREATE TABLE IF NOT EXISTS products (
                 id INTEGER PRIMARY KEY,
@@ -391,55 +470,30 @@ function Transections() {
         `)
       console.log('✅ Products table ensured.')
 
-      // Transactions Table
-      db.run(`
-            CREATE TABLE IF NOT EXISTS transactions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                invoice_code TEXT UNIQUE,
-                outlet_code INTEGER,
-                shop INTEGER,
-                cust_code TEXT,
-                salesman_code TEXT,
-                quantity TEXT,
-                gross_total TEXT,
-                per_discount TEXT,
-                discounted_value TEXT,
-                items_discount TEXT,
-                grand_total TEXT,
-                advanced_payment TEXT,
-                due_amount TEXT,
-                additional_fees TEXT,
-                total_pay TEXT,
-                status TEXT,
-                created_at TEXT,
-                created_by TEXT,
-                updated_at TEXT,
-                updated_by TEXT
-            );
-        `)
-      console.log('✅ Transactions table ensured.')
+      // 🚨 Drop old transactions table (for schema update)
+      db.run(`DROP TABLE IF EXISTS transactions`)
 
-      // Transaction Items Table
+      // ✅ Transactions Table - Same Logic as Products
       db.run(`
-            CREATE TABLE IF NOT EXISTS tbl_transaction_item (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                invoice_code TEXT,
-                sku TEXT,
-                quantity TEXT,
-                rate TEXT,
-                gross_total TEXT,
-                per_discount TEXT,
-                discounted_value TEXT,
-                item_total TEXT,
-                status TEXT, -- Sold, return
-                created_at TEXT,
-                created_by TEXT,
-                updated_at TEXT,
-                updated_by TEXT,
-                FOREIGN KEY (invoice_code) REFERENCES transactions(invoice_code) ON DELETE CASCADE
-            );
-        `)
-      console.log('✅ Transaction Items table ensured.')
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sku TEXT,
+            quantity TEXT,
+            rate TEXT,
+            item_discount TEXT,
+            cust_code TEXT,
+            overall_discount TEXT,
+            outlet_code TEXT,
+            saleman_code TEXT, -- 🔥 FIXED: Added missing column
+            advanced_payment INTEGER,
+            fee_code TEXT,
+            fee_amount TEXT,
+            pm_method TEXT,
+            pm_amount TEXT,
+            shop TEXT
+        );
+    `)
+      console.log('✅ Transactions table ensured.')
     } catch (error) {
       console.error('❌ Error creating tables:', error)
     }
@@ -496,7 +550,7 @@ function Transections() {
   const loadDatabaseFromIndexedDB = () => {
     console.log('🔄 Loading database from IndexedDB...')
 
-    const request = indexedDB.open('SQLiteDatabase', 12) // Increment version to trigger upgrade
+    const request = indexedDB.open('SQLiteDatabase', 14) // Increment version to trigger upgrade
 
     request.onupgradeneeded = (event) => {
       console.log('⚠️ IndexedDB upgrade needed, creating object store...')
@@ -515,9 +569,7 @@ function Transections() {
       if (!idb.objectStoreNames.contains('databases')) {
         console.warn("❌ Object store 'databases' is STILL missing! Forcing recreation...")
         indexedDB.deleteDatabase('SQLiteDatabase') // Force delete
-        setTimeout(() => {
-          window.location.reload() // Reload page to trigger database recreation
-        }, 1000)
+
         return
       }
 
@@ -530,9 +582,7 @@ function Transections() {
 
         if (!binaryData) {
           console.warn('⚠️ No database found in IndexedDB. Creating new one...')
-          setTimeout(() => {
-            window.location.reload()
-          }, 1000)
+
           return
         }
 
@@ -588,6 +638,30 @@ function Transections() {
 
     window.addEventListener('online', handleOnline)
     return () => window.removeEventListener('online', handleOnline)
+  }, [db])
+
+  useEffect(() => {
+    if (db) {
+      if (navigator.onLine) {
+        console.log('🌐 Online: Fetching transactions from API...')
+        // fetchTransactionsFromAPI(); // Implement this if needed
+      } else {
+        console.log('⚠️ Offline mode: Fetching transactions from IndexedDB...')
+        fetchTransactionsFromDB() // 🔥 Load offline transactions
+      }
+    }
+
+    // Listen for network changes (Online/Offline)
+    const handleOffline = () => {
+      console.log('⚠️ Went Offline: Fetching offline transactions...')
+      fetchTransactionsFromDB()
+    }
+
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('offline', handleOffline)
+    }
   }, [db])
 
   //new code
@@ -1429,30 +1503,30 @@ function Transections() {
 
   const handlePayment = async () => {
     const shopId = localStorage.getItem('shop_id')
-    const invoiceCode = `INV-${Date.now()}` // Unique invoice code
-    const feeCodes = selectedFees.map((fee) => fee.fee_code)
-    const fees = selectedFees.map((fee) => fee.fee_amount)
-    const paymentMethods = selectedPayments.map((payment) => payment.id)
-    const paymentAmounts = selectedPayments.map((payment) => payment.payment_method_amount)
 
     const transactionPayload = {
-      sku: tableData.map((item) => item.sku), // SKU of the items
-      quantity: tableData.map((item) => item.quantity), // Quantity of each item
-      rate: tableData.map((item) =>
-        item.discount_price ? item.discount_price : item.selling_price,
-      ), // Use discount price if available, else selling price
-      item_discount: tableData.map((item) => item.discount), // Item discount
-      cust_code: selectedCustomer, // Customer code
-      overall_discount: '0', // Overall discount
-      outlet_code: outletId, // Outlet code
-      saleman_code: selectedSalesman, // Salesman code
-      advanced_payment: advancePayment, // Advanced payment amount
-      fee_code: feeCodes, // Fee codes array
-      fee_amount: fees, // Fee amounts array
-      pm_method: paymentMethods, // Payment method IDs array
-      pm_amount: paymentAmounts, // Payment amounts array
+      outlet_code: outletId,
       shop: shopId,
+      cust_code: selectedCustomer,
+      saleman_code: selectedSalesman, // ✅ FIXED: Now included
+
+      // ✅ Store as actual arrays (Not stringified JSON)
+      sku: tableData.map((item) => item.sku),
+      quantity: tableData.map((item) => Number(item.quantity)), // Convert to integer
+      rate: tableData.map((item) => Number(item.discount_price || item.selling_price)), // Convert to integer
+      item_discount: tableData.map((item) => Number(item.discount)), // Convert to integer
+
+      overall_discount: '0',
+      advanced_payment: Number(advancePayment), // Ensure number type
+
+      fee_code: selectedFees.map((fee) => fee.fee_code), // Keep as an array
+      fee_amount: selectedFees.map((fee) => Number(fee.fee_amount)), // Convert to integer
+
+      pm_method: selectedPayments.map((payment) => payment.id), // Keep as an array
+      pm_amount: selectedPayments.map((payment) => Number(payment.payment_method_amount)), // Convert to integer
     }
+
+    console.log('📌 Final Transaction Payload:', transactionPayload)
 
     if (!navigator.onLine) {
       console.log('📌 Offline: Saving transaction to SQLite...')
@@ -1463,41 +1537,34 @@ function Transections() {
       }
 
       try {
-        // Insert into transactions table
         const insertTransactionQuery = `
-          INSERT INTO transactions (
-            invoice_code, outlet_code, shop, cust_code, salesman_code, quantity, 
-            gross_total, items_discount, grand_total, advanced_payment, due_amount, 
-            additional_fees, total_pay, status, created_at, created_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        `
-        db.run(insertTransactionQuery, Object.values(transactionPayload))
+                INSERT INTO transactions (
+                    outlet_code, shop, cust_code, saleman_code, sku, quantity, 
+                    rate, item_discount, overall_discount, advanced_payment, 
+                    fee_code, fee_amount, pm_method, pm_amount
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            `
 
-        // Insert each product into tbl_transaction_item
-        tableData.forEach((item) => {
-          const insertItemQuery = `
-            INSERT INTO tbl_transaction_item (
-              invoice_code, sku, quantity, rate, gross_total, per_discount, 
-              discounted_value, item_total, status, created_at, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-          `
-          db.run(insertItemQuery, [
-            invoiceCode,
-            item.sku,
-            item.quantity,
-            item.selling_price,
-            item.selling_price * item.quantity,
-            item.discount || 0,
-            0,
-            item.selling_price * item.quantity,
-            'Sold',
-            new Date().toISOString(),
-            'offline-user',
-          ])
-        })
+        // ✅ Store JSON string in SQLite but as proper arrays before sending to API
+        db.run(insertTransactionQuery, [
+          outletId,
+          shopId,
+          selectedCustomer,
+          selectedSalesman,
+          JSON.stringify(tableData.map((item) => item.sku)), // 🔥 FIXED
+          JSON.stringify(tableData.map((item) => item.quantity)), // 🔥 FIXED
+          JSON.stringify(tableData.map((item) => item.discount_price || item.selling_price)), // 🔥 FIXED
+          JSON.stringify(tableData.map((item) => item.discount)), // 🔥 FIXED
+          '0',
+          advancePayment,
+          JSON.stringify(selectedFees.map((fee) => fee.fee_code)), // 🔥 FIXED
+          JSON.stringify(selectedFees.map((fee) => fee.fee_amount)), // 🔥 FIXED
+          JSON.stringify(selectedPayments.map((payment) => payment.id)), // 🔥 FIXED
+          JSON.stringify(selectedPayments.map((payment) => payment.payment_method_amount)), // 🔥 FIXED
+        ])
 
         console.log('✅ Transaction saved offline:', transactionPayload)
-        saveDatabaseToIndexedDB(db) // Save to IndexedDB
+        saveDatabaseToIndexedDB(db)
         toast.success('Transaction saved offline!')
         resetForm()
       } catch (error) {
@@ -1507,11 +1574,15 @@ function Transections() {
       return
     }
 
-    // If Online: Send to Server
+    // ✅ Send Proper Data Types to API
     try {
-      const response = await Network.post(
-        `${Urls.addTransection}/${shopId}/${outletId}`,
-        transactionPayload,
+      const response = await fetch(
+        `http://195.26.253.123/pos/transaction/add_transaction/${shopId}/${outletId}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(transactionPayload), // ✅ Send as proper JSON
+        },
       )
 
       if (response.ok) {
@@ -1530,49 +1601,82 @@ function Transections() {
 
   const syncTransactionsWithServer = async () => {
     console.log('🔄 Checking for offline transactions...')
-    if (!db) return console.error('🛑 SQLite DB is not initialized.')
+    if (!db) {
+      console.error('❌ SQLite database not initialized.')
+      return
+    }
 
-    try {
-      const stmt = db.prepare("SELECT * FROM transactions WHERE status = 'pending'")
-      const transactions = []
+    const stmt = db.prepare('SELECT * FROM transactions')
+    const transactionsData = []
 
-      while (stmt.step()) {
-        transactions.push(stmt.getAsObject())
-      }
-      stmt.free()
+    while (stmt.step()) {
+      let transaction = stmt.getAsObject()
 
-      console.log('🔄 Found offline transactions:', transactions)
+      // Convert stored JSON strings back to arrays
+      transaction.sku = JSON.parse(transaction.sku || '[]')
+      transaction.quantity = JSON.parse(transaction.quantity || '[]')
+      transaction.rate = JSON.parse(transaction.rate || '[]')
+      transaction.item_discount = JSON.parse(transaction.item_discount || '[]')
+      transaction.fee_code = JSON.parse(transaction.fee_code || '[]')
+      transaction.fee_amount = JSON.parse(transaction.fee_amount || '[]')
+      transaction.pm_method = JSON.parse(transaction.pm_method || '[]')
+      transaction.pm_amount = JSON.parse(transaction.pm_amount || '[]')
 
-      for (const transaction of transactions) {
-        try {
-          const response = await fetch(
-            `${Urls.addTransection}/${transaction.shop}/${transaction.outlet_code}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(transaction),
-            },
-          )
+      transactionsData.push(transaction)
+    }
+    stmt.free()
 
-          if (response.ok) {
-            console.log('✅ Transaction synced successfully:', transaction)
+    if (transactionsData.length === 0) {
+      console.log('✅ No offline transactions to sync.')
+      return
+    }
 
-            db.run(`DELETE FROM transactions WHERE invoice_code = ?`, [transaction.invoice_code])
-            saveDatabaseToIndexedDB(db)
-          } else {
-            console.error('❌ Error syncing transaction:', await response.json())
-          }
-        } catch (error) {
-          console.error('❌ Network error syncing transaction:', error)
+    for (const transaction of transactionsData) {
+      try {
+        console.log('🚀 Syncing transaction:', transaction)
+
+        const response = await fetch(
+          `http://195.26.253.123/pos/transaction/add_transaction/${transaction.shop}/${transaction.outlet_code}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(transaction),
+          },
+        )
+
+        if (response.ok) {
+          console.log('✅ Transaction synced successfully:', transaction)
+
+          // Remove synced transaction from SQLite
+          db.run(`DELETE FROM transactions WHERE id = ?`, [transaction.id])
+          console.log('🗑️ Transaction removed from SQLite DB.')
+        } else {
+          console.error('❌ Error syncing transaction:', await response.json())
         }
+      } catch (error) {
+        console.error('❌ Network error syncing transaction:', error)
       }
-    } catch (error) {
-      console.error('❌ Error fetching transactions:', error)
     }
   }
+  useEffect(() => {
+    if (db) {
+      if (navigator.onLine) {
+        console.log('🌐 Online: Syncing transactions to API...')
+        syncTransactionsWithServer()
+      } else {
+        console.log('⚠️ Offline: Fetching transactions from IndexedDB...')
+        fetchTransactionsFromDB()
+      }
+    }
 
-  // Listen for online event to sync transactions
-  window.addEventListener('online', syncTransactionsWithServer)
+    const handleOnline = () => {
+      console.log('🔄 Back online! Syncing transactions...')
+      syncTransactionsWithServer()
+    }
+
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [db])
 
   // Handle SKU selection
   // const handleProductSelect = (e) => {
