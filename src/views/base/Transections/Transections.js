@@ -1436,22 +1436,22 @@ function Transections() {
     const paymentAmounts = selectedPayments.map((payment) => payment.payment_method_amount)
 
     const transactionPayload = {
-      invoice_code: invoiceCode,
-      outlet_code: outletId,
+      sku: tableData.map((item) => item.sku), // SKU of the items
+      quantity: tableData.map((item) => item.quantity), // Quantity of each item
+      rate: tableData.map((item) =>
+        item.discount_price ? item.discount_price : item.selling_price,
+      ), // Use discount price if available, else selling price
+      item_discount: tableData.map((item) => item.discount), // Item discount
+      cust_code: selectedCustomer, // Customer code
+      overall_discount: '0', // Overall discount
+      outlet_code: outletId, // Outlet code
+      saleman_code: selectedSalesman, // Salesman code
+      advanced_payment: advancePayment, // Advanced payment amount
+      fee_code: feeCodes, // Fee codes array
+      fee_amount: fees, // Fee amounts array
+      pm_method: paymentMethods, // Payment method IDs array
+      pm_amount: paymentAmounts, // Payment amounts array
       shop: shopId,
-      cust_code: selectedCustomer,
-      salesman_code: selectedSalesman,
-      quantity: tableData.length,
-      gross_total: tableData.reduce((sum, item) => sum + item.selling_price * item.quantity, 0),
-      items_discount: tableData.reduce((sum, item) => sum + item.discount, 0),
-      grand_total: tableData.reduce((sum, item) => sum + item.selling_price * item.quantity, 0),
-      advanced_payment: advancePayment,
-      due_amount: dueAmount,
-      additional_fees: fees.length > 0 ? fees.join(',') : null,
-      total_pay: advancePayment,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      created_by: 'offline-user',
     }
 
     if (!navigator.onLine) {
