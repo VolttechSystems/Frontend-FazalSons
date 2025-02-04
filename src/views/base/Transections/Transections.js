@@ -2404,7 +2404,20 @@ function Transections() {
 
         {/* CUSTOMER SECTION */}
         <section className="customer-section">
-          <select className="customer-select" onChange={handleCustomerChange}>
+          <select className="customer-select" onChange={handleCustomerChange}
+            style={{
+              width: "100%",
+              padding: "12px",
+              border: "2px solid #007bff",
+              borderRadius: "8px",
+              fontSize: "16px",
+              backgroundColor: "#fff",
+              color: "#333",
+              outline: "none",
+              cursor: "pointer",
+              transition: "0.3s",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}>
             <option>Select Customer</option>
             {customer.map((cust) => (
               <option key={cust.cust_code} value={cust.cust_code}>
@@ -2467,7 +2480,20 @@ function Transections() {
             </div>
           )}
 
-          <select className="salesman-select" onChange={handleSalesmanChange}>
+          <select className="salesman-select" onChange={handleSalesmanChange}
+            style={{
+              width: "100%",
+              padding: "12px",
+              border: "2px solid #007bff",
+              borderRadius: "8px",
+              fontSize: "16px",
+              backgroundColor: "#fff",
+              color: "#333",
+              outline: "none",
+              cursor: "pointer",
+              transition: "0.3s",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}>
             <option>Select Salesman</option>
             {salesmen.map((salesman) => (
               <option key={salesman.id} value={salesman.salesman_code}>
@@ -2500,8 +2526,31 @@ function Transections() {
             placeholder="Scan Here..."
             tabIndex={tabIndex} // Dynamically set tabIndex
             autoFocus // Keep input in focus
+            style={{
+              width: "100%", 
+              padding: "12px",
+              border: "2px solid #007bff",
+              borderRadius: "8px",
+              fontSize: "16px",
+              outline: "none",
+              transition: "0.3s",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}
           />
-          <select className="product-dropdown" onChange={handleProductSelect}>
+          <select className="product-dropdown" onChange={handleProductSelect}
+            style={{
+              width: "100%",
+              padding: "12px",
+              border: "2px solid #007bff",
+              borderRadius: "8px",
+              fontSize: "16px",
+              backgroundColor: "#fff",
+              color: "#333",
+              outline: "none",
+              cursor: "pointer",
+              transition: "0.3s",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}>
             {/* {console.log('All Products:', allProducts)} */}
             <option>Select Product</option>
             {Object.keys(allProducts).length > 0 ? (
@@ -2714,7 +2763,26 @@ function Transections() {
             </table>
           </div>
         ) : (
-          <p>No products selected yet.</p>
+<div
+  style={{
+    width: "100%",
+    border: "2px dotted #007bff",
+    padding: "15px",
+    borderRadius: "8px",
+    backgroundColor: "#f8f9fa",
+    textAlign: "center",
+    fontSize: "16px",
+    fontWeight: "bold",
+    color: "#333",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "80px", // Adjust height as needed
+  }}
+>
+  <p style={{ margin: 0 }}>No products selected yet.</p>
+</div>
         )}
 
         <section className="sales-summary">
@@ -2790,7 +2858,19 @@ function Transections() {
             {/* Fee Select Dropdown */}
             <div className="fee-dropdown">
               <label htmlFor="additional-fee">Additional Fee:</label>
-              <select id="additional-fee" onChange={handleFeeSelection}>
+              <select id="additional-fee" onChange={handleFeeSelection}  style={{
+                width: "100%",
+                padding: "6px",
+                border: "2px solid #007bff",
+                borderRadius: "8px",
+                fontSize: "16px",
+                backgroundColor: "#fff",
+                color: "#333",
+                outline: "none",
+                cursor: "pointer",
+                transition: "0.3s",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              }}>
                 <option value="">Select Additional Fee</option>
                 {additionalFees.map((fee) => (
                   <option key={fee.id} value={fee.id}>
@@ -2839,7 +2919,20 @@ function Transections() {
             {/* Payment Method Dropdown */}
             <div className="payment-method-dropdown">
               <label htmlFor="payment-method">Payment Method:</label>
-              <select id="payment-method" onChange={handlePaymentSelection}>
+              <select id="payment-method" onChange={handlePaymentSelection}
+                style={{
+                  width: "100%",
+                  padding: "6px",
+                  border: "2px solid #007bff",
+                  borderRadius: "8px",
+                  fontSize: "16px",
+                  backgroundColor: "#fff",
+                  color: "#333",
+                  outline: "none",
+                  cursor: "pointer",
+                  transition: "0.3s",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                }}>
                 <option value="">Select Payment Method</option>
                 {paymentMethods.map((method) => (
                   <option key={method.id} value={method.id}>
