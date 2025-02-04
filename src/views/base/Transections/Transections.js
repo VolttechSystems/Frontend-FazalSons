@@ -1421,7 +1421,6 @@ function Transections() {
 
   useEffect(() => {
     console.log('Updated Table Data:', tableData)
-    console.log('Updated Table Data:', cartItems)
   }, [tableData])
 
   //fetch product by scanner
@@ -1844,6 +1843,15 @@ function Transections() {
     return () => window.removeEventListener('online', handleOnline)
   }, [db])
 
+  // Handle SKU selection
+  // const handleProductSelect = (e) => {
+  //   const sku = e.target.value
+  //   console.log('Selected SKU:', sku) // Debug log
+  //   if (sku && sku !== 'Select Product') {
+  //     fetchProductDetails(sku)
+  //   }
+  // }
+
   const fetchProductDetailsFromDB = (sku) => {
     if (!db) {
       console.error('🛑 Database is not initialized!')
@@ -1860,11 +1868,11 @@ function Transections() {
         console.log('✅ Found Product in DB:', product)
         return product
       } else {
-        console.warn('⚠️ Product not found in IndexedDB.')
+        console.warn('⚠️ Product not found in SQLite DB for SKU:', sku)
         return null
       }
     } catch (error) {
-      console.error('❌ Error fetching product from IndexedDB:', error)
+      console.error('❌ Error fetching product from SQLite:', error)
       return null
     }
   }
@@ -1878,8 +1886,16 @@ function Transections() {
       )
 
       if (response.data && response.data.results.length > 0) {
-        console.log('✅ Product retrieved from API:', response.data.results[0])
-        return response.data.results[0]
+        // 🔍 Ensure we get the correct product based on SKU
+        const product = response.data.results.find((p) => p.sku === sku)
+
+        if (!product) {
+          console.warn(`⚠️ Product with SKU ${sku} not found in API response.`)
+          return null
+        }
+
+        console.log('✅ Correct Product Retrieved:', product)
+        return product
       } else {
         console.warn('⚠️ Product not found in API.')
         return null
@@ -1889,6 +1905,34 @@ function Transections() {
       return null
     }
   }
+
+  // const handleProductSelect = async (e) => {
+  //   const sku = e.target.value
+  //   console.log('📌 Selected SKU:', sku)
+
+  //   if (!sku || sku === 'Select Product') return // Prevent invalid selections
+
+  //   let productDetails
+
+  //   if (navigator.onLine) {
+  //     productDetails = await fetchProductDetailsFromAPI(sku) // ✅ Fetch from API when online
+  //   } else {
+  //     productDetails = fetchProductDetailsFromDB(sku) // ✅ Fetch from IndexedDB when offline
+  //   }
+
+  //   if (!productDetails) {
+  //     console.error('❌ Product not found for SKU:', sku)
+  //     return
+  //   }
+
+  //   console.log('✅ Product Details:', productDetails)
+
+  //   if (navigator.onLine) {
+  //     setTableData((prev) => [...prev, { ...productDetails, quantity: 1, discount: 0 }])
+  //   } else {
+  //     setCartItems((prev) => [...prev, { ...productDetails, quantity: 1, discount: 0 }])
+  //   }
+  // }
 
   const handleProductSelect = async (e) => {
     const sku = e.target.value
@@ -1909,12 +1953,17 @@ function Transections() {
       return
     }
 
-    console.log('✅ Product Details:', productDetails)
+    console.log('✅ Product Details Fetched:', productDetails)
+
+    // 🔥 Ensure we are not modifying the same object reference
+    const newProduct = { ...productDetails, quantity: 1, discount: 0 }
 
     if (navigator.onLine) {
-      setTableData((prev) => [...prev, { ...productDetails, quantity: 1, discount: 0 }])
+      setTableData((prev) => [...prev, newProduct])
+      console.log('📌 Updated Table Data (Online):', [...tableData, newProduct])
     } else {
-      setCartItems((prev) => [...prev, { ...productDetails, quantity: 1, discount: 0 }])
+      setCartItems((prev) => [...prev, newProduct])
+      console.log('📌 Updated Cart Items (Offline):', [...cartItems])
     }
   }
 
