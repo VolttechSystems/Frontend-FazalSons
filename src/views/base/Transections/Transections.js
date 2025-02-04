@@ -588,38 +588,28 @@ function Transections() {
   const loadDatabaseFromIndexedDB = () => {
     console.log('🔄 Loading database from IndexedDB...')
 
-    const request = indexedDB.open('SQLiteDatabase', 14) // Increment version to trigger upgrade
-
-    request.onupgradeneeded = (event) => {
-      console.log('⚠️ IndexedDB upgrade needed, creating object store...')
-      const idb = event.target.result
-
-      if (!idb.objectStoreNames.contains('databases')) {
-        idb.createObjectStore('databases')
-        console.log("✅ Created 'databases' object store")
-      }
-    }
+    const request = indexedDB.open('SQLiteDatabase', 14) // Keep version consistent
 
     request.onsuccess = async (event) => {
       const idb = event.target.result
       console.log('✅ IndexedDB opened successfully')
 
       if (!idb.objectStoreNames.contains('databases')) {
-        console.warn("❌ Object store 'databases' is STILL missing! Forcing recreation...")
-        indexedDB.deleteDatabase('SQLiteDatabase') // Force delete
+        console.warn("❌ Object store 'databases' is STILL missing! Recreating...")
+        indexedDB.deleteDatabase('SQLiteDatabase') // Force delete and recreate
         return
       }
 
       const transaction = idb.transaction('databases', 'readonly')
       const store = transaction.objectStore('databases')
 
-      // ✅ Load Products Database
-      const getProducts = store.get('productsDatabase')
-      getProducts.onsuccess = async (e) => {
+      const getRequest = store.get('transactionsDatabase')
+
+      getRequest.onsuccess = async (e) => {
         const binaryData = e.target.result
 
         if (!binaryData) {
-          console.warn('⚠️ No product database found in IndexedDB. Creating new one...')
+          console.warn('⚠️ No database found in IndexedDB. Creating new one...')
           return
         }
 
@@ -638,28 +628,9 @@ function Transections() {
         try {
           const loadedDb = new SQL.Database(binaryData)
           setDb(loadedDb)
-          console.log('✅ Loaded product database from IndexedDB successfully')
+          console.log('✅ Loaded transactions database from IndexedDB successfully')
+
           createTables(loadedDb) // Ensure tables exist
-        } catch (error) {
-          console.error('❌ Error loading SQLite product database:', error)
-        }
-      }
-
-      // ✅ Load Transactions Database
-      const getTransactions = store.get('transactionsDatabase')
-      getTransactions.onsuccess = async (e) => {
-        const binaryData = e.target.result
-
-        if (!binaryData) {
-          console.warn('⚠️ No transaction database found in IndexedDB. Creating new one...')
-          return
-        }
-
-        try {
-          const loadedDb = new SQL.Database(binaryData)
-          setDb(loadedDb)
-          console.log('✅ Loaded transaction database from IndexedDB successfully')
-          fetchTransactionsFromDB() // Ensure transactions are fetched after setting DB
         } catch (error) {
           console.error('❌ Error loading SQLite transaction database:', error)
         }
@@ -771,13 +742,13 @@ function Transections() {
     }
   }
 
-  const fetchCustomer = async () => {
-    const shopId = localStorage.getItem('shop_id')
-    const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
-    if (response.status === 200) {
-      setCustomer(response.data.results)
-    }
-  }
+  // const fetchCustomer = async () => {
+  //   const shopId = localStorage.getItem('shop_id')
+  //   const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
+  //   if (response.status === 200) {
+  //     setCustomer(response.data.results)
+  //   }
+  // }
 
   useEffect(() => {
     console.log('customerForm changed:', customerForm) // Logs when customerForm state changes
@@ -1258,27 +1229,6 @@ function Transections() {
     //   }
     // }
 
-    const fetchSalesmen = async () => {
-      const shopId = localStorage.getItem('shop_id')
-      if (!outletId) return // If no outletId, skip fetching
-
-      if (!navigator.onLine) {
-        console.log('⚠️ Offline: Loading salesmen from IndexedDB...')
-        loadDropdownDataFromIndexedDB('salesmen', setSalesmen)
-        return
-      }
-
-      try {
-        const response = await Network.get(`${Urls.fetchSalesman}/${shopId}/${outletId}`)
-        if (response.status === 200) {
-          setSalesmen(response.data)
-          saveDropdownDataToIndexedDB('salesmen', response.data) // Store in IndexedDB
-        }
-      } catch (error) {
-        console.error('❌ Error fetching salesmen:', error)
-      }
-    }
-
     const fetchAdditionalFees = async () => {
       if (!navigator.onLine) {
         console.log('⚠️ Offline: Fetching Additional Fees from IndexedDB...')
@@ -1329,45 +1279,12 @@ function Transections() {
       }
     }
 
-    // useEffect(() => {
-    //   fetchAdditionalFees()
-    //   fetchPayment()
-    // }, [])
-
     const fetchAllProducts = async (outletId) => {
       const shopId = localStorage.getItem('shop_id')
       const response = await Network.get(`${Urls.fetchAllTransectionProduct}/${shopId}/${outletId}`)
       if (response.status === 200) {
         const groupedData = groupByProductName(response.data)
         setAllProducts(groupedData)
-      }
-    }
-
-    // const fetchCustomer = async () => {
-    //   const shopId = localStorage.getItem('shop_id')
-    //   const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
-    //   if (response.status === 200) {
-    //     setCustomer(response.data.results)
-    //   }
-    // }
-
-    const fetchCustomer = async () => {
-      const shopId = localStorage.getItem('shop_id')
-
-      if (!navigator.onLine) {
-        console.log('⚠️ Offline: Loading customers from IndexedDB...')
-        loadDropdownDataFromIndexedDB('customers', setCustomer)
-        return
-      }
-
-      try {
-        const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
-        if (response.status === 200) {
-          setCustomer(response.data.results)
-          saveDropdownDataToIndexedDB('customers', response.data.results) // Store in IndexedDB
-        }
-      } catch (error) {
-        console.error('❌ Error fetching customers:', error)
       }
     }
 
@@ -1384,6 +1301,47 @@ function Transections() {
 
     return () => clearInterval(interval)
   }, [outletId])
+
+  const fetchSalesmen = async () => {
+    const shopId = localStorage.getItem('shop_id')
+    if (!outletId) return // If no outletId, skip fetching
+
+    if (!navigator.onLine) {
+      console.log('⚠️ Offline: Loading salesmen from IndexedDB...')
+      loadDropdownDataFromIndexedDB('salesmen', setSalesmen)
+      return
+    }
+
+    try {
+      const response = await Network.get(`${Urls.fetchSalesman}/${shopId}/${outletId}`)
+      if (response.status === 200) {
+        setSalesmen(response.data)
+        saveDropdownDataToIndexedDB('salesmen', response.data) // Store in IndexedDB
+      }
+    } catch (error) {
+      console.error('❌ Error fetching salesmen:', error)
+    }
+  }
+
+  const fetchCustomer = async () => {
+    const shopId = localStorage.getItem('shop_id')
+
+    if (!navigator.onLine) {
+      console.log('⚠️ Offline: Loading customers from IndexedDB...')
+      loadDropdownDataFromIndexedDB('customers', setCustomer)
+      return
+    }
+
+    try {
+      const response = await Network.get(`${Urls.fetchCustomer}/${shopId}/${outletId}`)
+      if (response.status === 200) {
+        setCustomer(response.data.results)
+        saveDropdownDataToIndexedDB('customers', response.data.results) // Store in IndexedDB
+      }
+    } catch (error) {
+      console.error('❌ Error fetching customers:', error)
+    }
+  }
 
   // Fetch product details by SKU and add to the table
   const fetchProductDetails = async (sku) => {
@@ -1558,104 +1516,6 @@ function Transections() {
   //   }
   // }
 
-  // const handlePayment = async () => {
-  //   const shopId = localStorage.getItem('shop_id')
-
-  //   const transactionPayload = {
-  //     outlet_code: outletId,
-  //     shop: shopId,
-  //     cust_code: selectedCustomer,
-  //     saleman_code: selectedSalesman, // ✅ FIXED: Now included
-
-  //     // ✅ Store as actual arrays (Not stringified JSON)
-  //     sku: tableData.map((item) => item.sku),
-  //     quantity: tableData.map((item) => Number(item.quantity)), // Convert to integer
-  //     rate: tableData.map((item) => Number(item.discount_price || item.selling_price)), // Convert to integer
-  //     item_discount: tableData.map((item) => Number(item.discount)), // Convert to integer
-
-  //     overall_discount: '0',
-  //     advanced_payment: Number(advancePayment), // Ensure number type
-
-  //     fee_code: selectedFees.map((fee) => fee.fee_code), // Keep as an array
-  //     fee_amount: selectedFees.map((fee) => Number(fee.fee_amount)), // Convert to integer
-
-  //     pm_method: selectedPayments.map((payment) => payment.id), // Keep as an array
-  //     pm_amount: selectedPayments.map((payment) => Number(payment.payment_method_amount)), // Convert to integer
-  //   }
-
-  //   console.log('📌 Final Transaction Payload:', transactionPayload)
-
-  //   if (!navigator.onLine) {
-  //     console.log('📌 Offline: Saving transaction to SQLite...')
-
-  //     if (!db) {
-  //       console.error('❌ Database is not initialized.')
-  //       return
-  //     }
-
-  //     try {
-  //       const insertTransactionQuery = `
-  //               INSERT INTO transactions (
-  //                   outlet_code, shop, cust_code, saleman_code, sku, quantity,
-  //                   rate, item_discount, overall_discount, advanced_payment,
-  //                   fee_code, fee_amount, pm_method, pm_amount
-  //               ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-  //           `
-
-  //       // ✅ Store JSON string in SQLite but as proper arrays before sending to API
-  //       db.run(insertTransactionQuery, [
-  //         outletId,
-  //         shopId,
-  //         selectedCustomer,
-  //         selectedSalesman,
-  //         JSON.stringify(tableData.map((item) => item.sku)), // 🔥 FIXED
-  //         JSON.stringify(tableData.map((item) => item.quantity)), // 🔥 FIXED
-  //         JSON.stringify(tableData.map((item) => item.discount_price || item.selling_price)), // 🔥 FIXED
-  //         JSON.stringify(tableData.map((item) => item.discount)), // 🔥 FIXED
-  //         '0',
-  //         advancePayment,
-  //         JSON.stringify(selectedFees.map((fee) => fee.fee_code)), // 🔥 FIXED
-  //         JSON.stringify(selectedFees.map((fee) => fee.fee_amount)), // 🔥 FIXED
-  //         JSON.stringify(selectedPayments.map((payment) => payment.id)), // 🔥 FIXED
-  //         JSON.stringify(selectedPayments.map((payment) => payment.payment_method_amount)), // 🔥 FIXED
-  //       ])
-
-  //       console.log('✅ Transaction saved offline:', transactionPayload)
-  //       saveDatabaseToIndexedDB(db)
-  //       toast.success('Transaction saved offline!')
-  //       resetForm()
-  //     } catch (error) {
-  //       console.error('❌ Error saving offline transaction:', error)
-  //       toast.error('Failed to save transaction offline.')
-  //     }
-  //     return
-  //   }
-
-  //   // ✅ Send Proper Data Types to API
-  //   try {
-  //     const response = await fetch(
-  //       `http://195.26.253.123/pos/transaction/add_transaction/${shopId}/${outletId}`,
-  //       {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify(transactionPayload), // ✅ Send as proper JSON
-  //       },
-  //     )
-
-  //     if (response.ok) {
-  //       toast.success('Transaction added successfully!')
-  //       fetchInvoices()
-  //       fetchdueInvoices()
-  //       resetForm()
-  //     } else {
-  //       toast.error('Failed to add transaction!')
-  //     }
-  //   } catch (error) {
-  //     console.error('❌ Error adding transaction:', error)
-  //     toast.error('An error occurred while processing the payment.')
-  //   }
-  // }
-
   const handlePayment = async () => {
     const shopId = localStorage.getItem('shop_id')
 
@@ -1691,6 +1551,12 @@ function Transections() {
     }
 
     console.log('📌 Final Transaction Payload:', transactionPayload)
+
+    if (!navigator.onLine) {
+      console.log('📌 Offline: Reloading salesmen and customers after transaction...')
+      fetchSalesmen()
+      fetchCustomer()
+    }
 
     // ✅ Handle Offline Payment (Save to SQLite)
     if (!navigator.onLine) {
@@ -1730,6 +1596,9 @@ function Transections() {
 
         console.log('✅ Transaction saved offline:', transactionPayload)
         saveDatabaseToIndexedDB(db) // ✅ Ensure DB is saved
+        // 🔥 Reload customers and salesmen from IndexedDB after each transaction
+        loadDropdownDataFromIndexedDB('customers', setCustomer)
+        loadDropdownDataFromIndexedDB('salesmen', setSalesmen)
         toast.success('Transaction saved offline!')
         resetForm()
       } catch (error) {
@@ -1764,20 +1633,22 @@ function Transections() {
     }
   }
 
-  const syncTransactionsWithServer = async () => {
-    console.log('🔄 Checking for offline transactions...')
+  const syncOfflineTransactions = async () => {
     if (!db) {
-      console.error('❌ SQLite database not initialized.')
+      console.error('🛑 SQLite database is not initialized!')
       return
     }
+    const shopId = localStorage.getItem('shop_id')
+
+    console.log('🔄 Checking for offline transactions to sync...')
 
     const stmt = db.prepare('SELECT * FROM transactions')
     const transactionsData = []
 
     while (stmt.step()) {
-      let transaction = stmt.getAsObject()
+      const transaction = stmt.getAsObject()
 
-      // Convert stored JSON strings back to arrays
+      // ✅ Ensure JSON fields are parsed back into arrays before syncing
       transaction.sku = JSON.parse(transaction.sku || '[]')
       transaction.quantity = JSON.parse(transaction.quantity || '[]')
       transaction.rate = JSON.parse(transaction.rate || '[]')
@@ -1792,16 +1663,19 @@ function Transections() {
     stmt.free()
 
     if (transactionsData.length === 0) {
-      console.log('✅ No offline transactions to sync.')
+      console.log('✅ No offline transactions found.')
       return
     }
 
+    console.log(`📌 Found ${transactionsData.length} offline transactions to sync.`)
+
+    // 🚀 Loop through each transaction and sync one by one
     for (const transaction of transactionsData) {
       try {
-        console.log('🚀 Syncing transaction:', transaction)
+        const { shop, outlet_code } = transaction
 
         const response = await fetch(
-          `http://195.26.253.123/pos/transaction/add_transaction/${transaction.shop}/${transaction.outlet_code}`,
+          `http://195.26.253.123/pos/transaction/sync-transaction/${shopId}/${outletId}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1811,23 +1685,31 @@ function Transections() {
 
         if (response.ok) {
           console.log('✅ Transaction synced successfully:', transaction)
-
-          // Remove synced transaction from SQLite
-          db.run(`DELETE FROM transactions WHERE id = ?`, [transaction.id])
-          console.log('🗑️ Transaction removed from SQLite DB.')
+          deleteTransactionFromDB(transaction.id) // 🔥 Delete after successful sync
         } else {
-          console.error('❌ Error syncing transaction:', await response.json())
+          console.error('❌ Failed to sync transaction:', await response.text())
         }
       } catch (error) {
-        console.error('❌ Network error syncing transaction:', error)
+        console.error('🚨 Error syncing transaction:', error)
       }
     }
   }
+
+  const deleteTransactionFromDB = (transactionId) => {
+    try {
+      db.run('DELETE FROM transactions WHERE id = ?', [transactionId])
+      console.log(`🗑️ Transaction ${transactionId} removed from SQLite DB.`)
+      saveDatabaseToIndexedDB(db) // ✅ Save updated DB to IndexedDB
+    } catch (error) {
+      console.error('❌ Error deleting transaction from SQLite:', error)
+    }
+  }
+
   useEffect(() => {
     if (db) {
       if (navigator.onLine) {
         console.log('🌐 Online: Syncing transactions to API...')
-        syncTransactionsWithServer()
+        syncOfflineTransactions()
       } else {
         console.log('⚠️ Offline: Fetching transactions from IndexedDB...')
         fetchTransactionsFromDB()
@@ -1836,21 +1718,12 @@ function Transections() {
 
     const handleOnline = () => {
       console.log('🔄 Back online! Syncing transactions...')
-      syncTransactionsWithServer()
+      syncOfflineTransactions()
     }
 
     window.addEventListener('online', handleOnline)
     return () => window.removeEventListener('online', handleOnline)
   }, [db])
-
-  // Handle SKU selection
-  // const handleProductSelect = (e) => {
-  //   const sku = e.target.value
-  //   console.log('Selected SKU:', sku) // Debug log
-  //   if (sku && sku !== 'Select Product') {
-  //     fetchProductDetails(sku)
-  //   }
-  // }
 
   const fetchProductDetailsFromDB = (sku) => {
     if (!db) {
@@ -2038,9 +1911,7 @@ function Transections() {
   }
 
   return (
-    <div
-      className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}
-    >
+    <div className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
       <div className={`transactions-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
         <ToastContainer
           position="top-right"
@@ -2060,7 +1931,11 @@ function Transections() {
           <div className="t-header-info">
             <Box>
               {/* Button to Fetch Sales Data */}
-              <Button variant="contained" onClick={handleSalesButtonClick} style={{backgroundColor: '#0056B3'}}>
+              <Button
+                variant="contained"
+                onClick={handleSalesButtonClick}
+                style={{ backgroundColor: '#0056B3' }}
+              >
                 Today Sales
               </Button>
 
@@ -2133,7 +2008,11 @@ function Transections() {
               </Dialog>
             </Box>
 
-            <Button variant="contained" onClick={handleButton} style={{backgroundColor: '#0056B3'}}>
+            <Button
+              variant="contained"
+              onClick={handleButton}
+              style={{ backgroundColor: '#0056B3' }}
+            >
               Sales Return
             </Button>
             {/* Styled Sales Return Dialog */}
@@ -2272,7 +2151,11 @@ function Transections() {
               </DialogActions>
             </Dialog>
             {/* <button className="t-header-button" onClick={() => handleButtonClick("Due Receivable clicked!")}>Due Receivable</button> */}
-            <Button variant="contained" onClick={handleOpenDialog} style={{backgroundColor: '#0056B3'}}>
+            <Button
+              variant="contained"
+              onClick={handleOpenDialog}
+              style={{ backgroundColor: '#0056B3' }}
+            >
               Due Receivable
             </Button>
 
@@ -2440,7 +2323,11 @@ function Transections() {
 
             <div>
               {/* Trigger Button */}
-              <Button variant="contained" onClick={handleOpenDialogthree} style={{backgroundColor: '#0056B3'}}>
+              <Button
+                variant="contained"
+                onClick={handleOpenDialogthree}
+                style={{ backgroundColor: '#0056B3' }}
+              >
                 Close Till
               </Button>
 
@@ -2636,195 +2523,195 @@ function Transections() {
         {/* Display Table if a product is selected */}
         {(navigator.onLine ? tableData.length > 0 : cartItems.length > 0) ? (
           <div className="table-container">
-          <table border="1" width="100%" cellPadding="10">
-            <thead>
-              <tr>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>SKU</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Product</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Quantity</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Selling Price</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Total</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Discount %</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Discount</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Total Discount</th>
-                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(navigator.onLine ? tableData : cartItems).map((product, index) => (
-                <tr key={index}>
-                  <td>{product.sku}</td>
-                  <td>{product.product_name}</td>
-                  <td>
-                    <input
-                      type="number"
-                      value={product.quantity}
-                      onChange={(e) => {
-                        const qty = e.target.value
-                        // setTableData((prevData) => {
-                        //   const updatedData = [...prevData]
-                        //   updatedData[index].quantity = parseInt(qty) || 1
-                        //   return updatedData, navigator.onLine
-                        // })
-                        if (navigator.onLine) {
-                          setTableData((prev) => {
-                            const updatedData = [...prev]
-                            updatedData[index].quantity = parseInt(qty) || 1
-                            return updatedData
-                          })
-                        } else {
-                          setCartItems((prev) => {
-                            const updatedData = [...prev]
-                            updatedData[index].quantity = parseInt(qty) || 1
-                            return updatedData
-                          })
-                        }
-                      }}
-                      className="no-spinner"
-                    />
-                  </td>
-                  <td>
-                    {product.discount_price ? (
-                      <>
-                        <span
-                          style={{
-                            textDecoration: 'line-through',
-                            color: 'red',
-                            marginRight: '10px',
-                          }}
-                        >
-                          {product.selling_price}
-                        </span>
-                        <span>{product.discount_price}</span>
-                      </>
-                    ) : (
-                      <span>{product.selling_price}</span>
-                    )}
-                  </td>
-                  <td>
-                    {(product.discount_price ? product.discount_price : product.selling_price) *
-                      product.quantity}
-                  </td>
-
-                  {/* Multiply and return as integer */}
-                  <td>
-                    <input
-                      type="number"
-                      value={product.discount}
-                      onChange={(e) => {
-                        const discount = parseInt(e.target.value) || 0 // Ensure discount is an integer
-                        // setTableData((prevData) => {
-                        //   const updatedData = [...prevData]
-                        //   updatedData[index].discount = discount
-                        //   return updatedData
-                        // })
-                        if (navigator.onLine) {
-                          setTableData((prev) => {
-                            const updatedData = [...prev]
-                            updatedData[index].discount = parseFloat(discount) || 0
-                            return updatedData
-                          })
-                        } else {
-                          setCartItems((prev) => {
-                            const updatedData = [...prev]
-                            updatedData[index].discount = parseFloat(discount) || 0
-                            return updatedData
-                          })
-                        }
-                      }}
-                      className="no-spinner"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={(product.selling_price * product.quantity * product.discount) / 100} // Result will be an integer now
-                      onChange={(e) => {
-                        const discountValue = parseInt(e.target.value) || 0
-                        // setTableData((prevData) => {
-                        //   const updatedData = [...prevData]
-                        //   updatedData[index].discount =
-                        //     (discountValue / (product.selling_price * product.quantity)) * 100 || 0
-                        //   updatedData[index].discountValue = discountValue
-                        //   return updatedData
-                        // })
-
-                        if (navigator.onLine) {
-                          setTableData((prevData) => {
-                            const updatedData = [...prevData]
-                            updatedData[index].discount =
-                              (discountValue / (product.selling_price * product.quantity)) * 100 ||
-                              0
-                            updatedData[index].discountValue = discountValue
-                            return updatedData
-                          })
-                        } else {
-                          setCartItems((prevData) => {
-                            const updatedData = [...prevData]
-                            updatedData[index].discount =
-                              (discountValue / (product.selling_price * product.quantity)) * 100 ||
-                              0
-                            updatedData[index].discountValue = discountValue
-                            return updatedData
-                          })
-                        }
-                      }}
-                      className="no-spinner"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={
-                        product.discount_price
-                          ? product.discount_price * product.quantity -
-                            (product.discount_price * product.quantity * product.discount) / 100
-                          : product.selling_price * product.quantity -
-                            (product.selling_price * product.quantity * product.discount) / 100
-                      } // Calculate based on discount_price or selling_price
-                      onChange={(e) => {
-                        const netAmount = parseInt(e.target.value) || 0 // Ensure netAmount is an integer
-                        // setTableData((prevData) => {
-                        //   const updatedData = [...prevData]
-                        //   updatedData[index].netAmount = netAmount
-                        //   return updatedData
-                        // })
-
-                        if (navigator.onLine) {
-                          setTableData((prevData) => {
-                            const updatedData = [...prevData]
-                            updatedData[index].netAmount = netAmount
-                            return updatedData
-                          })
-                        } else {
-                          setCartItems((prevData) => {
-                            const updatedData = [...prevData]
-                            updatedData[index].netAmount = netAmount
-                            return updatedData
-                          })
-                        }
-                      }}
-                      className="no-spinner"
-                    />
-                  </td>
-
-                  <td>
-                    <button
-                      onClick={() => {
-                        if (navigator.onLine) {
-                          setTableData((prevData) => prevData.filter((_, i) => i !== index))
-                        } else {
-                          setCartItems((prevData) => prevData.filter((_, i) => i !== index))
-                        }
-                      }}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </td>
+            <table border="1" width="100%" cellPadding="10">
+              <thead>
+                <tr>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>SKU</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Product</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Quantity</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Selling Price</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Total</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Discount %</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Discount</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Total Discount</th>
+                  <th style={{ backgroundColor: '#0056B3', color: 'white' }}>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(navigator.onLine ? tableData : cartItems).map((product, index) => (
+                  <tr key={index}>
+                    <td>{product.sku}</td>
+                    <td>{product.product_name}</td>
+                    <td>
+                      <input
+                        type="number"
+                        value={product.quantity}
+                        onChange={(e) => {
+                          const qty = e.target.value
+                          // setTableData((prevData) => {
+                          //   const updatedData = [...prevData]
+                          //   updatedData[index].quantity = parseInt(qty) || 1
+                          //   return updatedData, navigator.onLine
+                          // })
+                          if (navigator.onLine) {
+                            setTableData((prev) => {
+                              const updatedData = [...prev]
+                              updatedData[index].quantity = parseInt(qty) || 1
+                              return updatedData
+                            })
+                          } else {
+                            setCartItems((prev) => {
+                              const updatedData = [...prev]
+                              updatedData[index].quantity = parseInt(qty) || 1
+                              return updatedData
+                            })
+                          }
+                        }}
+                        className="no-spinner"
+                      />
+                    </td>
+                    <td>
+                      {product.discount_price ? (
+                        <>
+                          <span
+                            style={{
+                              textDecoration: 'line-through',
+                              color: 'red',
+                              marginRight: '10px',
+                            }}
+                          >
+                            {product.selling_price}
+                          </span>
+                          <span>{product.discount_price}</span>
+                        </>
+                      ) : (
+                        <span>{product.selling_price}</span>
+                      )}
+                    </td>
+                    <td>
+                      {(product.discount_price ? product.discount_price : product.selling_price) *
+                        product.quantity}
+                    </td>
+
+                    {/* Multiply and return as integer */}
+                    <td>
+                      <input
+                        type="number"
+                        value={product.discount}
+                        onChange={(e) => {
+                          const discount = parseInt(e.target.value) || 0 // Ensure discount is an integer
+                          // setTableData((prevData) => {
+                          //   const updatedData = [...prevData]
+                          //   updatedData[index].discount = discount
+                          //   return updatedData
+                          // })
+                          if (navigator.onLine) {
+                            setTableData((prev) => {
+                              const updatedData = [...prev]
+                              updatedData[index].discount = parseFloat(discount) || 0
+                              return updatedData
+                            })
+                          } else {
+                            setCartItems((prev) => {
+                              const updatedData = [...prev]
+                              updatedData[index].discount = parseFloat(discount) || 0
+                              return updatedData
+                            })
+                          }
+                        }}
+                        className="no-spinner"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={(product.selling_price * product.quantity * product.discount) / 100} // Result will be an integer now
+                        onChange={(e) => {
+                          const discountValue = parseInt(e.target.value) || 0
+                          // setTableData((prevData) => {
+                          //   const updatedData = [...prevData]
+                          //   updatedData[index].discount =
+                          //     (discountValue / (product.selling_price * product.quantity)) * 100 || 0
+                          //   updatedData[index].discountValue = discountValue
+                          //   return updatedData
+                          // })
+
+                          if (navigator.onLine) {
+                            setTableData((prevData) => {
+                              const updatedData = [...prevData]
+                              updatedData[index].discount =
+                                (discountValue / (product.selling_price * product.quantity)) *
+                                  100 || 0
+                              updatedData[index].discountValue = discountValue
+                              return updatedData
+                            })
+                          } else {
+                            setCartItems((prevData) => {
+                              const updatedData = [...prevData]
+                              updatedData[index].discount =
+                                (discountValue / (product.selling_price * product.quantity)) *
+                                  100 || 0
+                              updatedData[index].discountValue = discountValue
+                              return updatedData
+                            })
+                          }
+                        }}
+                        className="no-spinner"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={
+                          product.discount_price
+                            ? product.discount_price * product.quantity -
+                              (product.discount_price * product.quantity * product.discount) / 100
+                            : product.selling_price * product.quantity -
+                              (product.selling_price * product.quantity * product.discount) / 100
+                        } // Calculate based on discount_price or selling_price
+                        onChange={(e) => {
+                          const netAmount = parseInt(e.target.value) || 0 // Ensure netAmount is an integer
+                          // setTableData((prevData) => {
+                          //   const updatedData = [...prevData]
+                          //   updatedData[index].netAmount = netAmount
+                          //   return updatedData
+                          // })
+
+                          if (navigator.onLine) {
+                            setTableData((prevData) => {
+                              const updatedData = [...prevData]
+                              updatedData[index].netAmount = netAmount
+                              return updatedData
+                            })
+                          } else {
+                            setCartItems((prevData) => {
+                              const updatedData = [...prevData]
+                              updatedData[index].netAmount = netAmount
+                              return updatedData
+                            })
+                          }
+                        }}
+                        className="no-spinner"
+                      />
+                    </td>
+
+                    <td>
+                      <button
+                        onClick={() => {
+                          if (navigator.onLine) {
+                            setTableData((prevData) => prevData.filter((_, i) => i !== index))
+                          } else {
+                            setCartItems((prevData) => prevData.filter((_, i) => i !== index))
+                          }
+                        }}
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <p>No products selected yet.</p>
