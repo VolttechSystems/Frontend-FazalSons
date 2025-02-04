@@ -2039,7 +2039,6 @@ function Transections() {
 
   return (
     <div
-      id="transaction-container"
       className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}
     >
       <div className={`transactions-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
@@ -2061,7 +2060,7 @@ function Transections() {
           <div className="t-header-info">
             <Box>
               {/* Button to Fetch Sales Data */}
-              <Button variant="contained" onClick={handleSalesButtonClick}>
+              <Button variant="contained" onClick={handleSalesButtonClick} style={{backgroundColor: '#0056B3'}}>
                 Today Sales
               </Button>
 
@@ -2134,7 +2133,7 @@ function Transections() {
               </Dialog>
             </Box>
 
-            <Button variant="contained" onClick={handleButton}>
+            <Button variant="contained" onClick={handleButton} style={{backgroundColor: '#0056B3'}}>
               Sales Return
             </Button>
             {/* Styled Sales Return Dialog */}
@@ -2273,7 +2272,7 @@ function Transections() {
               </DialogActions>
             </Dialog>
             {/* <button className="t-header-button" onClick={() => handleButtonClick("Due Receivable clicked!")}>Due Receivable</button> */}
-            <Button variant="contained" onClick={handleOpenDialog}>
+            <Button variant="contained" onClick={handleOpenDialog} style={{backgroundColor: '#0056B3'}}>
               Due Receivable
             </Button>
 
@@ -2441,7 +2440,7 @@ function Transections() {
 
             <div>
               {/* Trigger Button */}
-              <Button variant="contained" onClick={handleOpenDialogthree}>
+              <Button variant="contained" onClick={handleOpenDialogthree} style={{backgroundColor: '#0056B3'}}>
                 Close Till
               </Button>
 
@@ -2636,18 +2635,19 @@ function Transections() {
 
         {/* Display Table if a product is selected */}
         {(navigator.onLine ? tableData.length > 0 : cartItems.length > 0) ? (
-          <table border="1" width="100%" cellPadding="10" style={{ marginTop: '20px' }}>
+          <div className="table-container">
+          <table border="1" width="100%" cellPadding="10">
             <thead>
               <tr>
-                <th>SKU</th>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Selling Price</th>
-                <th>Total</th>
-                <th>Discount %</th>
-                <th>Discount Value</th>
-                <th>Total After Discount</th>
-                <th>Actions</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>SKU</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Product</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Quantity</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Selling Price</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Total</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Discount %</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Discount</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Total Discount</th>
+                      <th style={{backgroundColor : '#0056B3', color: 'white'}}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -2818,13 +2818,14 @@ function Transections() {
                         }
                       }}
                     >
-                      ❌
+                      <i className="fas fa-trash"></i>
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <p>No products selected yet.</p>
         )}

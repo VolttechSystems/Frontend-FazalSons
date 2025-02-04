@@ -9,13 +9,7 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Main container styling */
-#transaction-container {
-  font-family: Arial, sans-serif;
-  overflow-y: auto;  /* Ensure scrolling for excess content */
-  padding-right: 2px;  /* Optional: Space for scrollbar */
-  width: 100%; /* Prevent content shrinkage */
-}
+
 
 /* Simple Mode */
 .simple-mode {
@@ -350,17 +344,64 @@ body {
   background-color: #e0e0e0;
 }
 
+
 /* Table Style */
+
+.table-container {
+  width: 100%;
+  max-height: 300px; /* Set the height for scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  border: 1px solid #ddd9d9; /* Optional: Add a border */
+  padding: 10px;
+  border-radius: 10px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 1px solid #f3f3f3;
 }
 
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #259FD7; /* Ensure header has background */
+  z-index: 10;
+}
+
+
 th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  white-space: nowrap; 
+  /* border-bottom: 1px solid #ddd; */
+}
+/* Prevent misalignment */
+thead tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  background-color:  #259FD7;
+}
+
+
+/* Allow tbody to scroll */
+/* tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+} */
+
+/* Ensure tbody rows remain properly aligned */
+tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 th {
