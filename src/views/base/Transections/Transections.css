@@ -26,10 +26,10 @@ body {
 
 /* Transactions Page Styling */
 .transactions-page {
-  padding: 20px;
+   padding: 20px;
   color: #333;
   background-color: #f4f4f9;
-  overflow-y: auto; /* Ensure scrolling for long content */
+  /* overflow-y: auto; //Ensure scrolling for long content  */
 }
 
 
@@ -114,7 +114,7 @@ body {
 /* Customer Section */
 .customer-section {
   display: flex;
-  gap: 10px;
+  gap: 5px;
   margin: 20px 0;
 }
 
@@ -125,20 +125,20 @@ body {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  width: 300px;
+  /* width: 300px; */
 }
 
 .add-customer {
-  background-color:rgb(75, 126, 88); 
+  background-color: #0056B3; 
   color: #fff;
-  padding: 8px 12px;
+  padding: 14px 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 7px;
   cursor: pointer;
 }
 
 .add-customer:hover {
-  background-color: rgb(75, 126, 88); 
+  background-color: #0056B3; 
 }
 
 /* Product Table */
@@ -508,10 +508,11 @@ button:focus {
 }
 
 .payment-summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
+display: flex;
+  /* justify-content: space-between; */
+  /* align-items: flex-start; */
+  /* margin-top: 15px; */
+  gap: 10px;
 }
 
 .payment-row {
@@ -522,6 +523,7 @@ button:focus {
 
 .payment-total {
   display: flex;
+  justify-content: end;
   align-items: center;
   gap: 15px;
 }
@@ -557,13 +559,14 @@ button:focus {
 .summary-table td {
   font-size: 14px;
   color: #555;
-  text-align: left;
+  text-align: center;
   padding: 5px 10px;
 }
 
 .summary-label {
   font-weight: bold;
   color: #666;
+ 
 }
 
 .summary-value {
@@ -616,8 +619,7 @@ background-color: #e9f7fe;
   }
   
   .payment-method-dropdown {
-  width: 28.5%;  /* Adjust dropdown widths */
-  margin-left: 11px;
+  width: 30%;  /* Adjust dropdown widths */
   height: 2%;
   margin-top: 0px;
   margin-bottom: 5px;
@@ -652,9 +654,8 @@ background-color: #e9f7fe;
   
 .selected-payment-methods {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
-  margin-left: -120px;
  
 }
 
@@ -662,20 +663,17 @@ background-color: #e9f7fe;
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-left: 2px;
 }
 
-.payment-item input {
-  width: 80px;
-}
+
 
 /* Payment Summary Section */
-.payment-summary {
+/* .payment-summary {
 margin-top: 5px;
-padding: 15px;
+padding: 0px;
 background-color: #f8f9fa;
 border-radius: 10px;
-}
+} */
 
 .payment-row {
 display: flex;
@@ -692,12 +690,7 @@ border: 1px solid #ccc;
 border-radius: 5px;
 }
 
-.payment-total {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-top: 20px;
-}
+
 
 .total-amount {
 font-size: 24px;
@@ -765,13 +758,12 @@ color: #000; /* Makes text bold when hovering */
 
 .fee-section {
   display: flex;
-  align-items: flex-start;
-  gap: 20px;
+  gap: 10px;
 }
 
 .selected-fees {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
 }
 
@@ -781,9 +773,6 @@ color: #000; /* Makes text bold when hovering */
   gap: 5px;
 }
 
-.fee-item input {
-  width: 80px;
-}
 
 .remove-btn {
   background-color: red;
@@ -811,29 +800,29 @@ color: #000; /* Makes text bold when hovering */
 }
 
 .add-fee-btn {
-  background-color: rgb(75, 126, 88); /* Sets the button background to blue */
+  background-color: #0056B3; /* Sets the button background to blue */
   color: white; /* Ensures text is visible */
   border: none;
-  border-radius: 4px; /* Adds rounded corners */
+  border-radius: 6px; /* Adds rounded corners */
   padding: 5px 10px; /* Adds spacing inside the button */
   cursor: pointer; /* Changes cursor to pointer on hover */
  
 }
 
 .add-fee-btn:hover {
-  background-color: rgb(75, 126, 88);  /* Adds a hover effect with a darker blue */
+  background-color:#0056B3;  /* Adds a hover effect with a darker blue */
 }
 .add-payment-method-btn{
-  background-color: rgb(75, 126, 88); /* Sets the button background to blue */
+  background-color:#0056B3; /* Sets the button background to blue */
   color: white; /* Ensures text is visible */
   border: none;
-  border-radius: 4px; /* Adds rounded corners */
+  border-radius: 6px; /* Adds rounded corners */
   padding: 5px 10px; /* Adds spacing inside the button */
   cursor: pointer; /* Changes cursor to pointer on hover */
   margin-left: 6px;
 }
 .add-payment-method-btn:hover {
-  background-color: rgb(75, 126, 88);  /* Adds a hover effect with a darker blue */
+  background-color: #0056B3;  /* Adds a hover effect with a darker blue */
 }
 
 

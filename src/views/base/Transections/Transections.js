@@ -2407,7 +2407,6 @@ function Transections() {
           <select className="customer-select" onChange={handleCustomerChange}
             style={{
               width: "100%",
-              padding: "12px",
               border: "2px solid #007bff",
               borderRadius: "8px",
               fontSize: "16px",
@@ -2430,7 +2429,7 @@ function Transections() {
             className="add-customer"
             onClick={() => setShowCustomerModal(true)} // Open modal
           >
-            +
+            <i className="fas fa-plus"></i>
           </button>
 
           {/* Modal */}
@@ -2514,7 +2513,7 @@ function Transections() {
               }
             }}
           >
-            <button className="add-customer">+</button>
+            <button className="add-customer"> <i className="fas fa-plus"></i></button>
           </Link>
 
           <input
@@ -2827,6 +2826,16 @@ function Transections() {
                     placeholder="0"
                     value={advancePayment}
                     onChange={(e) => setAdvancePayment(parseFloat(e.target.value) || 0)}
+                    style={{
+                      width: "90%", 
+                      padding: "3px",
+                      border: "2px solid #007bff",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                      outline: "none",
+                      transition: "0.3s",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    }}
                   />
                 </td>
               </tr>
@@ -2834,7 +2843,7 @@ function Transections() {
                 <td className="summary-label">SALE</td>
                 <td className="summary-value">{totalPaymentAfterDiscount.toFixed(2)}</td>
                 <td className="summary-label">PURCHASE</td>
-                <td className="summary-value">
+                <td className="summary-value" style={{color: '#0056B3'}}>
                   {(navigator.onLine ? tableData : cartItems)
                     .reduce(
                       (acc, item) =>
@@ -2847,9 +2856,9 @@ function Transections() {
                     .toFixed(2)}
                 </td>
                 <td className="summary-label">DISCOUNT</td>
-                <td className="summary-value">{totalDiscount.toFixed(2)}</td>
+                <td className="summary-value" style={{color : '#34b946'}}>{totalDiscount.toFixed(2)}</td>
                 <td className="summary-label">DUE</td>
-                <td className="summary-value">{dueAmount.toFixed(2)}</td>
+                <td className="summary-value" style={{color : 'red'}}>{dueAmount.toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
@@ -2857,12 +2866,12 @@ function Transections() {
           <div className="fee-section">
             {/* Fee Select Dropdown */}
             <div className="fee-dropdown">
-              <label htmlFor="additional-fee">Additional Fee:</label>
+            
               <select id="additional-fee" onChange={handleFeeSelection}  style={{
                 width: "100%",
                 padding: "6px",
                 border: "2px solid #007bff",
-                borderRadius: "8px",
+                // borderRadius: "8px",
                 fontSize: "16px",
                 backgroundColor: "#fff",
                 color: "#333",
@@ -2892,7 +2901,9 @@ function Transections() {
                   }
                 }}
               >
-                <button className="add-fee-btn">+</button>
+                <button className="add-fee-btn">
+                +
+                </button>
               </Link>
             </div>
 
@@ -2905,9 +2916,19 @@ function Transections() {
                     type="number"
                     value={fee.fee_amount}
                     onChange={(e) => handleInputChange(fee.id, e.target.value)}
+                    style={{
+                      width: "30%", 
+                      padding: "3px",
+                      border: "2px solid #007bff",
+                      // borderRadius: "8px",
+                      fontSize: "12px",
+                      outline: "none",
+                      transition: "0.3s",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    }}
                   />
                   <button className="remove-btn" onClick={() => handleRemoveFee(fee.id)}>
-                    X
+                  <i className="fas fa-trash"></i>
                   </button>
                 </div>
               ))}
@@ -2918,14 +2939,13 @@ function Transections() {
           <div className="payment-summary">
             {/* Payment Method Dropdown */}
             <div className="payment-method-dropdown">
-              <label htmlFor="payment-method">Payment Method:</label>
+            
               <select id="payment-method" onChange={handlePaymentSelection}
                 style={{
                   width: "100%",
                   padding: "6px",
                   border: "2px solid #007bff",
-                  borderRadius: "8px",
-                  fontSize: "16px",
+                  fontSize: "14px",
                   backgroundColor: "#fff",
                   color: "#333",
                   outline: "none",
@@ -2949,7 +2969,7 @@ function Transections() {
                   }
                 }}
               >
-                <button className="add-payment-method-btn">+</button>
+                <button className="add-payment-method-btn"> <b></b>+ </button>
               </Link>
             </div>
 
@@ -2962,15 +2982,26 @@ function Transections() {
                     type="number"
                     value={payment.payment_method_amount}
                     onChange={(e) => handlePaymentInputChange(payment.id, e.target.value)}
+                    style={{
+                      width: "30%", 
+                      padding: "3px",
+                      border: "2px solid #007bff",
+                      fontSize: "12px",
+                      outline: "none",
+                      transition: "0.3s",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    }}
                   />
                   <button className="remove-btn" onClick={() => handleRemovePayment(payment.id)}>
-                    X
+                  <i className="fas fa-trash"></i>
                   </button>
                 </div>
               ))}
             </div>
 
-            <div className="payment-total">
+          
+          </div>
+          <div className="payment-total">
               <span className="total-amount">
                 {(
                   tableData.reduce(
@@ -2994,7 +3025,6 @@ function Transections() {
                 Payment
               </CButton>
             </div>
-          </div>
         </section>
       </div>
     </div>
