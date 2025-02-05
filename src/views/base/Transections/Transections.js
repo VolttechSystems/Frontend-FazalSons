@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
+import { useMemo } from 'react'
 import './Transections.css'
 import { CAlert, CButton } from '@coreui/react'
+import Select from 'react-select'
 import {
   Button,
   Dialog,
@@ -9,7 +11,6 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Select,
   MenuItem,
   Box,
   Typography,
@@ -843,9 +844,12 @@ function Transections() {
   // Calculate total payment after discount
   useEffect(() => {
     const calculatedTotal = tableData.reduce((sum, item) => {
-      const discountedPrice = item.selling_price - (item.selling_price * item.discount) / 100
-      return sum + item.quantity * discountedPrice
+      // Check if discount_price exists; otherwise, use selling_price
+      const priceToUse = item.discount_price > 0 ? item.discount_price : item.selling_price
+
+      return sum + item.quantity * priceToUse
     }, 0)
+
     setTotalPaymentAfterDiscount(calculatedTotal)
   }, [tableData])
 
@@ -964,9 +968,8 @@ function Transections() {
   }
 
   // Handle invoice selection
-  const handleInvoiceChange = (event) => {
-    const invoiceCode = event.target.value // Get the selected invoice code (e.g., INV-1)
-    setSelectedInvoice(invoiceCode) // Set the selected invoice code to state
+  const handleInvoiceChange = (selectedOption) => {
+    setSelectedInvoice(selectedOption) // Store the full object
   }
 
   // Handle invoice selection
@@ -1062,18 +1065,25 @@ function Transections() {
     if (!selectedInvoice) return // Do not fetch if no invoice is selected
 
     const shopId = localStorage.getItem('shop_id')
-    const response = await Network.get(`${Urls.getInvoices}/${shopId}/${selectedInvoice}`)
+    const invoiceCode = selectedInvoice?.value // Extract the invoice code
 
-    if (response.status === 200) {
-      toast.success('Invoice Fetched')
+    try {
+      const response = await Network.get(`${Urls.getInvoices}/${shopId}/${invoiceCode}`)
+
+      if (response.status === 200) {
+        toast.success('Invoice Fetched')
+        setnewProducts(response.data) // Update state with fetched products
+      }
+    } catch (error) {
+      console.error('Error fetching invoice products:', error)
+      toast.error('Failed to fetch invoice products')
     }
-    const data = response.data
-    setnewProducts(data)
   }
 
+  // Fetch products when an invoice is selected
   useEffect(() => {
-    fetchNewProducts() // Fetch products when an invoice is selected
-  }, [selectedInvoice]) // Dependency on selectedInvoice
+    fetchNewProducts()
+  }, [selectedInvoice]) // Re-run when selectedInvoice changes
 
   //new
   const fetchNewProductDetails = async () => {
@@ -1083,30 +1093,28 @@ function Transections() {
     }
 
     const shopId = localStorage.getItem('shop_id')
+    const productSKU = selectedProduct?.value // Extract SKU from selectedProduct
+    const invoiceCode = selectedInvoice?.value // Extract invoice_code from selectedInvoice
 
-    console.log('Fetching product details for:', selectedProduct, selectedInvoice)
+    console.log('Fetching product details for:', productSKU, invoiceCode)
 
     try {
-      // const response = await fetch(
-      //   `http://195.26.253.123/pos/transaction/get_product_detail/${selectedInvoice}/${selectedProduct}/`,
-      // )
-
       const response = await Network.get(
-        `${Urls.getProductDetail}/${shopId}/${selectedInvoice}/${selectedProduct}`,
+        `${Urls.getProductDetail}/${shopId}/${invoiceCode}/${productSKU}`,
       )
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         console.error('API Error:', response.status, response.statusText)
         throw new Error('Failed to fetch product details')
       }
 
-      const data = await response.data
+      const data = response.data
       console.log('Fetched Product Details:', data)
 
       if (data.length > 0) {
-        const product = data[0] // Assuming the API returns an array with one object
+        const product = data[0] // Assuming API returns an array with one object
 
-        // Map API fields to your state variables
+        // Map API fields to state variables
         setPrice(product.rate || 0) // Backend field 'rate' sets Price
         setReturnQty(product.quantity || 0) // Backend field 'quantity' sets Return Qty
         setReturnAmount(product.rate || 0) // Backend field 'rate' sets Return Amount
@@ -1118,18 +1126,21 @@ function Transections() {
 
   const handleSalesReturn = async () => {
     if (!selectedProduct || !selectedInvoice) {
-      // Check for selected product and invoice code
       console.error('Invalid return: Product not selected or invoice code is missing.')
+      toast.error('Please select a product and invoice.')
       return
     }
-    const shopId = localStorage.getItem('shop_id')
 
-    // Prepare the data as lists for the API
+    const shopId = localStorage.getItem('shop_id')
+    const productSKU = selectedProduct?.value // Extract SKU from selected object
+    const invoiceCode = selectedInvoice?.value // Extract invoice_code from selected object
+
+    // Prepare the data correctly for the API
     const requestData = {
-      sku: [selectedProduct], // SKU as a list
-      rate: [price], // Price (Rate) as a list
-      quantity: [returnQty], // Quantity as a list
-      invoice_code: selectedInvoice, // Add invoice code instead of quantity
+      sku: [productSKU], // Convert SKU to a list of strings
+      rate: [price], // Convert rate to a list
+      quantity: [returnQty], // Convert quantity to a list
+      invoice_code: invoiceCode, // Send invoice_code as a string
       shop: shopId,
       outlet: outletId, // Outlet code
     }
@@ -1137,30 +1148,23 @@ function Transections() {
     console.log('Submitting return data:', requestData)
 
     try {
-      // const response = await fetch('http://195.26.253.123/pos/transaction/transactions_return', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(requestData), // Send the data as JSON
       const response = await Network.post(`${Urls.salesReturn}/${shopId}/${outletId}`, requestData)
 
-      if (!response.ok) {
-        console.error('Error in return API:', response.status, response.statusText)
-        throw new Error('Failed to process return')
+      if (response.status === 200 || response.status === 201) {
+        console.log('Return processed successfully:', response.data)
+        toast.success('Return processed successfully')
+        setIsDialogOpen(false) // Close the dialog
+      } else {
+        console.error(
+          'Error in return API:',
+          response.status,
+          response.statusText || 'No status text',
+        )
+        throw new Error(`Failed to process return: ${response.statusText || 'Unknown error'}`)
       }
-
-      const responseData = await response.data
-      // console.log('Return processed successfully:', responseData)
-      toast.success('Return processed successfully', responseData)
-
-      // Optional: Show a success message or reset fields
-      // alert('Return processed successfully!')
-      toast.success('Return processed successfully')
-      setIsDialogOpen(false) // Close the dialog
     } catch (error) {
       console.error('Error processing return:', error)
-      toast.error('Error processing return', error)
+      toast.error(`Error processing return: ${error.message}`)
     }
   }
 
@@ -1212,10 +1216,14 @@ function Transections() {
   }
 
   // For the Product Dropdown
-  const handleProductChange = (event) => {
-    const selectedValue = event.target.value
-    console.log('Selected Product:', selectedValue) // Log selected value
-    setSelectedProduct(selectedValue) // Update the selected product
+  // const handleProductChange = (event) => {
+  //   const selectedValue = event.target.value
+  //   console.log('Selected Product:', selectedValue) // Log selected value
+  //   setSelectedProduct(selectedValue) // Update the selected product
+  // }
+
+  const handleProductChange = (selectedOption) => {
+    setSelectedProduct(selectedOption) // Store full product object
   }
 
   useEffect(() => {
@@ -1840,6 +1848,18 @@ function Transections() {
     }
   }
 
+  const groupedOptions = useMemo(() => {
+    return Object.keys(allProducts).length > 0
+      ? Object.entries(allProducts).map(([productName, productDetails]) => ({
+          label: productName, // Group title
+          options: productDetails.map((product) => ({
+            value: product.sku,
+            label: `${product.sku} - ${product.item_name} ${product.color ? `- ${product.color}` : ''}`,
+          })),
+        }))
+      : []
+  }, [allProducts]) // Only re-run when allProducts changes
+
   const calculateTotal = () => {
     let totalAmount = products.reduce((sum, p) => sum + p.qty * p.price, 0)
     let totalDiscount = products.reduce((sum, p) => sum + p.qty * p.price * (p.discount / 100), 0)
@@ -2024,56 +2044,110 @@ function Transections() {
                   Select Invoice:
                 </Typography>
 
-                <select
-                  value={selectedInvoice} // Bind the selected invoice code
-                  onChange={handleInvoiceChange} // Update selected invoice
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    marginBottom: '20px',
+                <Select
+                  value={selectedInvoice} // Store the full object, not just the invoice code
+                  onChange={handleInvoiceChange} // Pass the selected object directly
+                  options={invoices.map((invoice) => ({
+                    value: invoice.invoice_code, // The actual invoice code (e.g., INV-1)
+                    label: invoice.invoice, // Display invoice name (e.g., Invoice #: 1)
+                  }))}
+                  placeholder="Select Invoice"
+                  isSearchable
+                  isClearable
+                  noOptionsMessage={() => 'No invoices available'}
+                  styles={{
+                    container: (base) => ({
+                      ...base,
+                      width: '100%',
+                    }),
+                    control: (base, { isFocused }) => ({
+                      ...base,
+                      minHeight: '40px',
+                      height: '40px',
+                      backgroundColor: '#f9f9f9',
+                      borderRadius: '5px',
+                      border: '1px solid #6290c1',
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                      transition: '0.3s',
+                      boxShadow: isFocused ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      marginBottom: '20px',
+                    }),
+                    valueContainer: (base) => ({
+                      ...base,
+                      padding: '0 8px',
+                      height: '40px',
+                    }),
+                    placeholder: (base) => ({
+                      ...base,
+                      fontSize: '16px',
+                    }),
+                    singleValue: (base) => ({
+                      ...base,
+                      fontSize: '16px',
+                    }),
+                    indicatorsContainer: (base) => ({
+                      ...base,
+                      height: '40px',
+                    }),
                   }}
-                >
-                  <option value="">Select Invoice</option>
-                  {invoices.map((invoice) => (
-                    <option key={invoice.invoice_code} value={invoice.invoice_code}>
-                      {invoice.invoice} {/* Display invoice name (e.g., Invoice #: 1) */}
-                    </option>
-                  ))}
-                </select>
+                />
 
                 {/* Product Dropdown */}
                 <div>
                   <label htmlFor="product">Select Product:</label>
-                  <select
-                    onChange={handleProductChange}
-                    value={selectedProduct}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: '5px',
-                      border: '1px solid #ccc',
-                      fontSize: '16px',
-                      cursor: 'pointer',
-                      marginBottom: '20px',
+                  <Select
+                    value={selectedProduct} // Store the full object instead of just SKU
+                    onChange={(selectedOption) => handleProductChange(selectedOption)} // Store the selected object
+                    options={
+                      newproducts.length > 0
+                        ? newproducts.map((product) => ({
+                            value: product.sku, // Store SKU as value
+                            label: `${product.sku} - ${product.product_name} - ${product.items}`, // Display full product info
+                          }))
+                        : []
+                    }
+                    placeholder="Select Product"
+                    isSearchable
+                    isClearable
+                    noOptionsMessage={() => 'No Products Available'}
+                    styles={{
+                      container: (base) => ({
+                        ...base,
+                        width: '100%',
+                      }),
+                      control: (base, { isFocused }) => ({
+                        ...base,
+                        minHeight: '40px',
+                        height: '40px',
+                        backgroundColor: '#f9f9f9',
+                        borderRadius: '5px',
+                        border: '1px solid #6290c1',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                        transition: '0.3s',
+                        boxShadow: isFocused ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        marginBottom: '20px',
+                      }),
+                      valueContainer: (base) => ({
+                        ...base,
+                        padding: '0 8px',
+                        height: '40px',
+                      }),
+                      placeholder: (base) => ({
+                        ...base,
+                        fontSize: '16px',
+                      }),
+                      singleValue: (base) => ({
+                        ...base,
+                        fontSize: '16px',
+                      }),
+                      indicatorsContainer: (base) => ({
+                        ...base,
+                        height: '40px',
+                      }),
                     }}
-                  >
-                    <option value="">Select Product</option>
-                    {newproducts.length > 0 ? (
-                      newproducts.map((product) => (
-                        <option key={product.id} value={product.sku}>
-                          {product.sku} - {product.product_name} - {product.items}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="">No Products Available</option>
-                    )}
-                  </select>
+                  />
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
@@ -2091,7 +2165,7 @@ function Transections() {
                         width: '100%',
                         padding: '8px',
                         borderRadius: '4px',
-                        border: '1px solid #ccc',
+                        border: '1px solid #6290c1',
                       }}
                     />
                   </div>
@@ -2110,7 +2184,7 @@ function Transections() {
                         width: '100%',
                         padding: '8px',
                         borderRadius: '4px',
-                        border: '1px solid #ccc',
+                        border: '1px solid #6290c1',
                       }}
                     />
                   </div>
@@ -2129,7 +2203,7 @@ function Transections() {
                         width: '100%',
                         padding: '8px',
                         borderRadius: '4px',
-                        border: '1px solid #ccc',
+                        border: '1px solid #6290c1',
                       }}
                     />
                   </div>
@@ -2144,7 +2218,6 @@ function Transections() {
                   onClick={handleSalesReturn} // Trigger the API call
                   color="primary"
                   variant="contained"
-                  disabled={!selectedProduct || returnQty <= 0} // Disable if invalid
                 >
                   Return
                 </Button>
@@ -2173,50 +2246,81 @@ function Transections() {
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ marginBottom: '10px' }}>
                       Select Invoice:
                     </Typography>
-                    <select
-                      value={selectedDueInvoice} // Bind the selected invoice code
-                      onChange={async (e) => {
-                        const invoiceCode = e.target.value
-                        setSelectedDueInvoice(invoiceCode) // Update selected invoice state
 
-                        if (invoiceCode) {
+                    <Select
+                      value={selectedDueInvoice} // Store the full object instead of just invoice_code
+                      onChange={async (selectedOption) => {
+                        setSelectedDueInvoice(selectedOption) // Store selected object
+
+                        if (selectedOption) {
                           try {
-                            // Fetch the due amount for the selected invoice using Axios
+                            // Extract the invoice code
+                            const invoiceCode = selectedOption.value
+
+                            // Fetch the due amount for the selected invoice
                             const response = await Network.get(
                               `${Urls.getDueInvoice}/${invoiceCode}`,
                             )
 
                             if (response.status === 200) {
-                              // Axios uses `response.status`, not `response.ok`
                               setDueAmounts(response.data.due_amount) // Update dueAmounts state
                             } else {
                               console.error('Failed to fetch due amount.')
+                              setDueAmounts('') // Reset if API call fails
                             }
                           } catch (error) {
                             console.error('Error fetching due amount:', error)
+                            setDueAmounts('') // Reset in case of error
                           }
                         } else {
-                          setDueAmounts('') // Reset the due amount field if no invoice is selected
+                          setDueAmounts('') // Reset due amount field if no invoice is selected
                         }
                       }}
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        backgroundColor: '#f9f9f9',
-                        borderRadius: '5px',
-                        border: '1px solid #ccc',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        marginBottom: '20px',
+                      options={dueinvoices.map((invoice) => ({
+                        value: invoice.invoice_code, // Ensure value matches invoice_code
+                        label: invoice.invoice, // Display invoice name (e.g., "Invoice #: 1")
+                      }))}
+                      placeholder="Select Invoice"
+                      isSearchable
+                      isClearable
+                      noOptionsMessage={() => 'No invoices available'}
+                      styles={{
+                        container: (base) => ({
+                          ...base,
+                          width: '100%',
+                        }),
+                        control: (base, { isFocused }) => ({
+                          ...base,
+                          minHeight: '40px',
+                          height: '40px',
+                          backgroundColor: '#f9f9f9',
+                          borderRadius: '5px',
+                          border: '1px solid #ccc',
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          transition: '0.3s',
+                          boxShadow: isFocused ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                          marginBottom: '20px',
+                        }),
+                        valueContainer: (base) => ({
+                          ...base,
+                          padding: '0 8px',
+                          height: '40px',
+                        }),
+                        placeholder: (base) => ({
+                          ...base,
+                          fontSize: '16px',
+                        }),
+                        singleValue: (base) => ({
+                          ...base,
+                          fontSize: '16px',
+                        }),
+                        indicatorsContainer: (base) => ({
+                          ...base,
+                          height: '40px',
+                        }),
                       }}
-                    >
-                      <option value="">Select Invoice</option>
-                      {dueinvoices.map((invoice) => (
-                        <option key={invoice.invoice_code} value={invoice.invoice_code}>
-                          {invoice.invoice} {/* Display invoice name (e.g., Invoice #: 1) */}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </Box>
 
                   {/* Receiving Type Dropdown */}
@@ -2282,21 +2386,23 @@ function Transections() {
                     if (selectedDueInvoice && dueAmounts && receivingType) {
                       try {
                         const dueAmountNumeric = parseFloat(dueAmounts)
+                        const invoiceCode = selectedDueInvoice?.value // Extract invoice_code
+
                         const response = await Network.put(
-                          `${Urls.recieveDueInvoice}/${selectedDueInvoice}`,
+                          `${Urls.recieveDueInvoice}/${invoiceCode}`, // Use extracted value here
                           {
                             due_amount: dueAmountNumeric,
-                            receiving_type: receivingType, // Send the selected ID
+                            receiving_type: receivingType, // Send the selected
                           },
                         )
 
                         if (response.status === 200) {
                           toast.success('Due amount received successfully.')
 
-                          //  Reset Fields After Successful Submission
-                          setSelectedDueInvoice('')
+                          // Reset Fields After Successful Submission
+                          setSelectedDueInvoice(null)
                           setDueAmounts('')
-                          setReceivingType('')
+                          setReceivingType(null)
                           fetchdueInvoices()
 
                           handleCloseDialog() // Close the dialog
@@ -2310,7 +2416,7 @@ function Transections() {
                         toast.error('Failed to receive the due amount. Please try again.')
                       }
                     } else {
-                      toast.error('Failed to receive the due amount. Please try again.')
+                      toast.error('Please select an invoice, due amount, and receiving type.')
                     }
                   }}
                   color="secondary"
@@ -2404,26 +2510,57 @@ function Transections() {
 
         {/* CUSTOMER SECTION */}
         <section className="customer-section">
-          <select className="customer-select" onChange={handleCustomerChange}
-            style={{
-              width: "100%",
-              border: "2px solid #007bff",
-              borderRadius: "8px",
-              fontSize: "16px",
-              backgroundColor: "#fff",
-              color: "#333",
-              outline: "none",
-              cursor: "pointer",
-              transition: "0.3s",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            }}>
-            <option>Select Customer</option>
-            {customer.map((cust) => (
-              <option key={cust.cust_code} value={cust.cust_code}>
-                {cust.display_name}
-              </option>
-            ))}
-          </select>
+          <Select
+            className="customer-select"
+            options={customer.map((cust) => ({
+              value: cust.cust_code,
+              label: cust.display_name,
+            }))}
+            onChange={(selectedOption) =>
+              handleCustomerChange({ target: { value: selectedOption?.value } })
+            }
+            placeholder="Select Customer"
+            isSearchable
+            isClearable
+            styles={{
+              container: (base) => ({
+                ...base,
+                width: '100%',
+              }),
+              control: (base, { isFocused }) => ({
+                ...base,
+                minHeight: '48px', // Reduced height
+                height: '48px',
+                border: '2px solid #007bff',
+                borderRadius: '8px',
+                fontSize: '16px',
+                backgroundColor: '#fff',
+                color: '#333',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: '0.3s',
+                boxShadow: isFocused ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.1)', // Removes outer focus border
+                padding: '6px',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                padding: '0 8px',
+                height: '30px',
+              }),
+              placeholder: (base) => ({
+                ...base,
+                fontSize: '16px',
+              }),
+              singleValue: (base) => ({
+                ...base,
+                fontSize: '16px',
+              }),
+              indicatorsContainer: (base) => ({
+                ...base,
+                height: '30px',
+              }),
+            }}
+          />
 
           <button
             className="add-customer"
@@ -2479,27 +2616,56 @@ function Transections() {
             </div>
           )}
 
-          <select className="salesman-select" onChange={handleSalesmanChange}
-            style={{
-              width: "100%",
-              padding: "12px",
-              border: "2px solid #007bff",
-              borderRadius: "8px",
-              fontSize: "16px",
-              backgroundColor: "#fff",
-              color: "#333",
-              outline: "none",
-              cursor: "pointer",
-              transition: "0.3s",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            }}>
-            <option>Select Salesman</option>
-            {salesmen.map((salesman) => (
-              <option key={salesman.id} value={salesman.salesman_code}>
-                {salesman.salesman_name}
-              </option>
-            ))}
-          </select>
+          <Select
+            className="salesman-select"
+            options={salesmen.map((salesman) => ({
+              value: salesman.salesman_code,
+              label: salesman.salesman_name,
+            }))}
+            onChange={(selectedOption) =>
+              handleSalesmanChange({ target: { value: selectedOption?.value } })
+            }
+            placeholder="Select Salesman"
+            isSearchable
+            isClearable
+            styles={{
+              container: (base) => ({
+                ...base,
+                width: '100%',
+              }),
+              control: (base) => ({
+                ...base,
+                minHeight: '48px',
+                height: '48px',
+                border: '2px solid #007bff',
+                borderRadius: '8px',
+                fontSize: '16px',
+                backgroundColor: '#fff',
+                color: '#333',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: '0.3s',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                padding: '0 8px',
+                height: '40px',
+              }),
+              placeholder: (base) => ({
+                ...base,
+                fontSize: '16px',
+              }),
+              singleValue: (base) => ({
+                ...base,
+                fontSize: '16px',
+              }),
+              indicatorsContainer: (base) => ({
+                ...base,
+                height: '40px',
+              }),
+            }}
+          />
           {/* <Link to="/Admin/Salesman">
             <button className="add-customer">+</button>
           </Link> */}
@@ -2513,7 +2679,10 @@ function Transections() {
               }
             }}
           >
-            <button className="add-customer"> <i className="fas fa-plus"></i></button>
+            <button className="add-customer">
+              {' '}
+              <i className="fas fa-plus"></i>
+            </button>
           </Link>
 
           <input
@@ -2526,46 +2695,48 @@ function Transections() {
             tabIndex={tabIndex} // Dynamically set tabIndex
             autoFocus // Keep input in focus
             style={{
-              width: "100%", 
-              padding: "12px",
-              border: "2px solid #007bff",
-              borderRadius: "8px",
-              fontSize: "16px",
-              outline: "none",
-              transition: "0.3s",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              width: '100%',
+              padding: '12px',
+              border: '2px solid #007bff',
+              borderRadius: '8px',
+              fontSize: '16px',
+              outline: 'none',
+              transition: '0.3s',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              height: '63px',
             }}
           />
-          <select className="product-dropdown" onChange={handleProductSelect}
-            style={{
-              width: "100%",
-              padding: "12px",
-              border: "2px solid #007bff",
-              borderRadius: "8px",
-              fontSize: "16px",
-              backgroundColor: "#fff",
-              color: "#333",
-              outline: "none",
-              cursor: "pointer",
-              transition: "0.3s",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            }}>
-            {/* {console.log('All Products:', allProducts)} */}
-            <option>Select Product</option>
-            {Object.keys(allProducts).length > 0 ? (
-              Object.entries(allProducts).map(([productName, productDetails]) => (
-                <optgroup key={productName} label={productName}>
-                  {productDetails.map((product) => (
-                    <option key={product.sku} value={product.sku}>
-                      {product.sku} - {product.item_name} {product.color && `- ${product.color}`}
-                    </option>
-                  ))}
-                </optgroup>
-              ))
-            ) : (
-              <option disabled>No products available</option>
-            )}
-          </select>
+          <Select
+            options={groupedOptions}
+            onChange={(selectedOption) =>
+              handleProductSelect({ target: { value: selectedOption?.value } })
+            }
+            placeholder="Select Product"
+            isSearchable
+            isClearable
+            noOptionsMessage={() => 'No products available'}
+            styles={{
+              container: (base) => ({
+                ...base,
+                width: '100%',
+              }),
+              control: (base, { isFocused }) => ({
+                ...base,
+                minHeight: '63px',
+                height: '63px',
+                border: '2px solid #007bff',
+                borderRadius: '8px',
+                fontSize: '16px',
+                backgroundColor: '#fff',
+                color: '#333',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: '0.3s',
+                boxShadow: isFocused ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                padding: '6px',
+              }),
+            }}
+          />
         </section>
 
         {/* Display Table if a product is selected */}
@@ -2762,26 +2933,26 @@ function Transections() {
             </table>
           </div>
         ) : (
-<div
-  style={{
-    width: "100%",
-    border: "2px dotted #007bff",
-    padding: "15px",
-    borderRadius: "8px",
-    backgroundColor: "#f8f9fa",
-    textAlign: "center",
-    fontSize: "16px",
-    fontWeight: "bold",
-    color: "#333",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "80px", // Adjust height as needed
-  }}
->
-  <p style={{ margin: 0 }}>No products selected yet.</p>
-</div>
+          <div
+            style={{
+              width: '100%',
+              border: '2px dotted #007bff',
+              padding: '15px',
+              borderRadius: '8px',
+              backgroundColor: '#f8f9fa',
+              textAlign: 'center',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: '#333',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '80px', // Adjust height as needed
+            }}
+          >
+            <p style={{ margin: 0 }}>No products selected yet.</p>
+          </div>
         )}
 
         <section className="sales-summary">
@@ -2827,14 +2998,14 @@ function Transections() {
                     value={advancePayment}
                     onChange={(e) => setAdvancePayment(parseFloat(e.target.value) || 0)}
                     style={{
-                      width: "90%", 
-                      padding: "3px",
-                      border: "2px solid #007bff",
-                      borderRadius: "8px",
-                      fontSize: "12px",
-                      outline: "none",
-                      transition: "0.3s",
-                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                      width: '90%',
+                      padding: '3px',
+                      border: '2px solid #007bff',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      outline: 'none',
+                      transition: '0.3s',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                     }}
                   />
                 </td>
@@ -2843,7 +3014,7 @@ function Transections() {
                 <td className="summary-label">SALE</td>
                 <td className="summary-value">{totalPaymentAfterDiscount.toFixed(2)}</td>
                 <td className="summary-label">PURCHASE</td>
-                <td className="summary-value" style={{color: '#0056B3'}}>
+                <td className="summary-value" style={{ color: '#0056B3' }}>
                   {(navigator.onLine ? tableData : cartItems)
                     .reduce(
                       (acc, item) =>
@@ -2856,9 +3027,13 @@ function Transections() {
                     .toFixed(2)}
                 </td>
                 <td className="summary-label">DISCOUNT</td>
-                <td className="summary-value" style={{color : '#34b946'}}>{totalDiscount.toFixed(2)}</td>
+                <td className="summary-value" style={{ color: '#34b946' }}>
+                  {totalDiscount.toFixed(2)}
+                </td>
                 <td className="summary-label">DUE</td>
-                <td className="summary-value" style={{color : 'red'}}>{dueAmount.toFixed(2)}</td>
+                <td className="summary-value" style={{ color: 'red' }}>
+                  {dueAmount.toFixed(2)}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -2866,27 +3041,56 @@ function Transections() {
           <div className="fee-section">
             {/* Fee Select Dropdown */}
             <div className="fee-dropdown">
-            
-              <select id="additional-fee" onChange={handleFeeSelection}  style={{
-                width: "100%",
-                padding: "6px",
-                border: "2px solid #007bff",
-                // borderRadius: "8px",
-                fontSize: "16px",
-                backgroundColor: "#fff",
-                color: "#333",
-                outline: "none",
-                cursor: "pointer",
-                transition: "0.3s",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-              }}>
-                <option value="">Select Additional Fee</option>
-                {additionalFees.map((fee) => (
-                  <option key={fee.id} value={fee.id}>
-                    {fee.fee_name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                id="additional-fee"
+                options={additionalFees.map((fee) => ({
+                  value: fee.id,
+                  label: fee.fee_name,
+                }))}
+                onChange={(selectedOption) =>
+                  handleFeeSelection({ target: { value: selectedOption?.value } })
+                }
+                placeholder="Select Additional Fee"
+                isSearchable
+                isClearable
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: '100%',
+                  }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '32px', // Reduced height
+                    height: '32px', // Ensure consistency
+                    border: '2px solid #007bff',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    color: '#333',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    transition: '0.3s',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  }),
+                  valueContainer: (base) => ({
+                    ...base,
+                    padding: '0 8px',
+                    height: '30px', // Adjust inner height
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    fontSize: '14px',
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    fontSize: '14px',
+                  }),
+                  indicatorsContainer: (base) => ({
+                    ...base,
+                    height: '30px', // Align dropdown indicator height
+                  }),
+                }}
+              />
               {/* <Link to="/Admin/AdditionalFee">
                 <button disabled={!navigator.onLine} className="add-fee-btn">
                   +
@@ -2901,9 +3105,7 @@ function Transections() {
                   }
                 }}
               >
-                <button className="add-fee-btn">
-                +
-                </button>
+                <button className="add-fee-btn">+</button>
               </Link>
             </div>
 
@@ -2917,18 +3119,18 @@ function Transections() {
                     value={fee.fee_amount}
                     onChange={(e) => handleInputChange(fee.id, e.target.value)}
                     style={{
-                      width: "30%", 
-                      padding: "3px",
-                      border: "2px solid #007bff",
+                      width: '30%',
+                      padding: '3px',
+                      border: '2px solid #007bff',
                       // borderRadius: "8px",
-                      fontSize: "12px",
-                      outline: "none",
-                      transition: "0.3s",
-                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                      fontSize: '12px',
+                      outline: 'none',
+                      transition: '0.3s',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                     }}
                   />
                   <button className="remove-btn" onClick={() => handleRemoveFee(fee.id)}>
-                  <i className="fas fa-trash"></i>
+                    <i className="fas fa-trash"></i>
                   </button>
                 </div>
               ))}
@@ -2939,27 +3141,56 @@ function Transections() {
           <div className="payment-summary">
             {/* Payment Method Dropdown */}
             <div className="payment-method-dropdown">
-            
-              <select id="payment-method" onChange={handlePaymentSelection}
-                style={{
-                  width: "100%",
-                  padding: "6px",
-                  border: "2px solid #007bff",
-                  fontSize: "14px",
-                  backgroundColor: "#fff",
-                  color: "#333",
-                  outline: "none",
-                  cursor: "pointer",
-                  transition: "0.3s",
-                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                }}>
-                <option value="">Select Payment Method</option>
-                {paymentMethods.map((method) => (
-                  <option key={method.id} value={method.id}>
-                    {method.pm_name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                id="payment-method"
+                options={paymentMethods.map((method) => ({
+                  value: method.id,
+                  label: method.pm_name,
+                }))}
+                onChange={(selectedOption) =>
+                  handlePaymentSelection({ target: { value: selectedOption?.value } })
+                }
+                placeholder="Select Payment Method"
+                isSearchable
+                isClearable
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: '100%',
+                  }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '32px', // Reduced height
+                    height: '32px', // Ensure consistency
+                    border: '2px solid #007bff',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    color: '#333',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    transition: '0.3s',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  }),
+                  valueContainer: (base) => ({
+                    ...base,
+                    padding: '0 8px',
+                    height: '30px', // Adjust inner height
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    fontSize: '14px',
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    fontSize: '14px',
+                  }),
+                  indicatorsContainer: (base) => ({
+                    ...base,
+                    height: '30px', // Align dropdown indicator height
+                  }),
+                }}
+              />
               <Link
                 to={navigator.onLine ? '/Admin/Payment' : '#'}
                 onClick={(e) => {
@@ -2969,7 +3200,10 @@ function Transections() {
                   }
                 }}
               >
-                <button className="add-payment-method-btn"> <b></b>+ </button>
+                <button className="add-payment-method-btn">
+                  {' '}
+                  <b></b>+{' '}
+                </button>
               </Link>
             </div>
 
@@ -2983,48 +3217,46 @@ function Transections() {
                     value={payment.payment_method_amount}
                     onChange={(e) => handlePaymentInputChange(payment.id, e.target.value)}
                     style={{
-                      width: "30%", 
-                      padding: "3px",
-                      border: "2px solid #007bff",
-                      fontSize: "12px",
-                      outline: "none",
-                      transition: "0.3s",
-                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                      width: '30%',
+                      padding: '3px',
+                      border: '2px solid #007bff',
+                      fontSize: '12px',
+                      outline: 'none',
+                      transition: '0.3s',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                     }}
                   />
                   <button className="remove-btn" onClick={() => handleRemovePayment(payment.id)}>
-                  <i className="fas fa-trash"></i>
+                    <i className="fas fa-trash"></i>
                   </button>
                 </div>
               ))}
             </div>
-
-          
           </div>
           <div className="payment-total">
-              <span className="total-amount">
-                {(
-                  tableData.reduce(
-                    (acc, item) =>
-                      acc +
+            <span className="total-amount">
+              {(
+                (navigator.onLine ? tableData : cartItems).reduce(
+                  (acc, item) =>
+                    acc +
+                    ((item.discount_price
+                      ? item.discount_price * item.quantity
+                      : item.selling_price * item.quantity) -
                       ((item.discount_price
                         ? item.discount_price * item.quantity
-                        : item.selling_price * item.quantity) -
-                        ((item.discount_price
-                          ? item.discount_price * item.quantity
-                          : item.selling_price * item.quantity) *
-                          item.discount) /
-                          100),
-                    0,
-                  ) + selectedFees.reduce((acc, fee) => acc + (fee.fee_amount || 0), 0)
-                ) // Add additional fees
-                  .toFixed(2)}
-              </span>
+                        : item.selling_price * item.quantity) *
+                        item.discount) /
+                        100),
+                  0,
+                ) + selectedFees.reduce((acc, fee) => acc + (fee.fee_amount || 0), 0)
+              ) // Add additional fees
+                .toFixed(2)}
+            </span>
 
-              <CButton color="primary" onClick={handlePayment}>
-                Payment
-              </CButton>
-            </div>
+            <CButton color="primary" onClick={handlePayment}>
+              Payment
+            </CButton>
+          </div>
         </section>
       </div>
     </div>

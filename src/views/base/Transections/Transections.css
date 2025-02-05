@@ -135,6 +135,7 @@ body {
   border: none;
   border-radius: 7px;
   cursor: pointer;
+  height: 60px;
 }
 
 .add-customer:hover {
