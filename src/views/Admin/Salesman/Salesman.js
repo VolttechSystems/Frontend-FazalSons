@@ -114,7 +114,7 @@ const Salesman = () => {
       }
     } catch (error) {
       // Handle unexpected errors
-      const errorMessage = error.response?.data?.error || 'An unexpected error occurred.'
+      const errorMessage = error.response?.data?.error || 's'
       toast.error(errorMessage)
       console.error('Error submitting data:', error)
     }
@@ -168,119 +168,121 @@ const Salesman = () => {
 
   return (
     <div className="salesman-container">
-      <form className="salesman-form" onSubmit={handleSubmit}>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-        <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
-        <div>
-          <label>Salesman Name: *</label>
-          <input
-            type="text"
-            name="salesman_name"
-            value={formData.salesman_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Show Commission Fields:</label>
-          <input
-            type="checkbox"
-            checked={showCommissions}
-            onChange={() => setShowCommissions(!showCommissions)}
-          />
-        </div>
-        {!showCommissions && (
-          <>
-            <div>
-              <label>Wholesale Commission:</label>
-              <input
-                type="number"
-                name="wholesale_commission"
-                value={formData.wholesale_commission}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Retail Commission:</label>
-              <input
-                type="number"
-                name="retail_commission"
-                value={formData.retail_commission}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Token Commission:</label>
-              <input
-                type="number"
-                name="token_commission"
-                value={formData.token_commission}
-                onChange={handleChange}
-              />
-            </div>
-          </>
-        )}
-        <div>
-          <label>Outlet:</label>
-          <Select
-            isMulti
-            name="outlet"
-            options={outlets}
-            onChange={handleOutletChange}
-            value={formData.outlet}
-            placeholder="Select outlets"
-          />
-        </div>
-        <button type="submit" className="salesman-submit-btn">
-          {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
-        </button>
-      </form>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <div className="salesman-wrapper">
+        <form className="salesman-form" onSubmit={handleSubmit}>
+          <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
+          <div>
+            <label>Salesman Name: *</label>
+            <input
+              type="text"
+              name="salesman_name"
+              value={formData.salesman_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Show Commission Fields:</label>
+            <input
+              type="checkbox"
+              checked={showCommissions}
+              onChange={() => setShowCommissions(!showCommissions)}
+            />
+          </div>
+          {!showCommissions && (
+            <>
+              <div>
+                <label>Wholesale Commission:</label>
+                <input
+                  type="number"
+                  name="wholesale_commission"
+                  value={formData.wholesale_commission}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label>Retail Commission:</label>
+                <input
+                  type="number"
+                  name="retail_commission"
+                  value={formData.retail_commission}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label>Token Commission:</label>
+                <input
+                  type="number"
+                  name="token_commission"
+                  value={formData.token_commission}
+                  onChange={handleChange}
+                />
+              </div>
+            </>
+          )}
+          <div>
+            <label>Outlet:</label>
+            <Select
+              isMulti
+              name="outlet"
+              options={outlets}
+              onChange={handleOutletChange}
+              value={formData.outlet}
+              placeholder="Select outlets"
+            />
+          </div>
+          <button type="submit" className="salesman-submit-btn">
+            {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}
+          </button>
+        </form>
 
-      <table className="salesman-table">
-        <thead
-          className="salesman-table-header"
-          style={{ backgroundColor: '#007BFF', color: 'white' }}
-        >
-          <tr>
-            <th>Salesman Name</th>
-            <th>Wholesale Commission</th>
-            <th>Retail Commission</th>
-            <th>Token Commission</th>
-            <th>Outlets</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {salesmen.map((salesman) => (
-            <tr key={salesman.id}>
-              <td>{salesman.salesman_name}</td>
-              <td>{salesman.wholesale_commission || 'N/A'}</td>
-              <td>{salesman.retail_commission || 'N/A'}</td>
-              <td>{salesman.token_commission || 'N/A'}</td>
-              <td>
-                {salesman.outlet.length > 0
-                  ? salesman.outlet.map((outlet) => outlet.outlet_name).join(', ')
-                  : 'N/A'}
-              </td>
-              <td>
-                <button onClick={() => handleEdit(salesman)}>Edit</button>
-                <button onClick={() => handleDelete(salesman.id)}>Delete</button>
-              </td>
+        <table className="salesman-table">
+          <thead
+            className="salesman-table-header"
+            style={{ backgroundColor: '#007BFF', color: 'white' }}
+          >
+            <tr>
+              <th>Salesman Name</th>
+              <th>Wholesale Commission</th>
+              <th>Retail Commission</th>
+              <th>Token Commission</th>
+              <th>Outlets</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {salesmen.map((salesman) => (
+              <tr key={salesman.id}>
+                <td>{salesman.salesman_name}</td>
+                <td>{salesman.wholesale_commission || 'N/A'}</td>
+                <td>{salesman.retail_commission || 'N/A'}</td>
+                <td>{salesman.token_commission || 'N/A'}</td>
+                <td>
+                  {salesman.outlet.length > 0
+                    ? salesman.outlet.map((outlet) => outlet.outlet_name).join(', ')
+                    : 'N/A'}
+                </td>
+                <td>
+                  <button onClick={() => handleEdit(salesman)}>Edit</button>
+                  <button onClick={() => handleDelete(salesman.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div
         className="pagination"
@@ -319,5 +321,4 @@ const Salesman = () => {
     </div>
   )
 }
-
 export default Salesman

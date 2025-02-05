@@ -117,62 +117,63 @@ const Payment = () => {
         pauseOnHover
         theme="colored"
       />
+      <div className="payment-wrapper">
+        <form onSubmit={handleSubmit}>
+          <h2 style={{ fontFamily: 'emoji', textAlign: 'center', fontSize: '25px' }}>
+            {editingPaymentId ? 'Edit Payment Method' : 'Add New Payment Method'}
+          </h2>
+          <div>
+            <label>
+              Payment Method Name: <span style={{ color: 'red' }}>*</span>
+            </label>
+            <input
+              type="text"
+              name="pm_name"
+              value={formData.pm_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit">
+            {editingPaymentId ? 'Update Payment Method' : 'Add Payment Method'}
+          </button>
+        </form>
 
-      <form onSubmit={handleSubmit}>
-        <h2 style={{ fontFamily: 'emoji', textAlign: 'center', fontSize: '25px' }}>
-          {editingPaymentId ? 'Edit Payment Method' : 'Add New Payment Method'}
-        </h2>
-        <div>
-          <label>
-            Payment Method Name: <span style={{ color: 'red' }}>*</span>
-          </label>
-          <input
-            type="text"
-            name="pm_name"
-            value={formData.pm_name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">
-          {editingPaymentId ? 'Update Payment Method' : 'Add Payment Method'}
-        </button>
-      </form>
-
-      {/* Payment Methods Table */}
-      {payments.length > 0 && (
-        <table className="payment-methods-table">
-          <thead className="payment-methods-header">
-            <tr>
-              <th>Payment Method Name</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map((payment) => (
-              <tr key={payment.id}>
-                <td>{payment.pm_name}</td>
-                <td>
-                  <button
-                    className="payment-edit-button"
-                    type="button"
-                    onClick={() => handleEdit(payment)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="payment-delete-button"
-                    type="button"
-                    onClick={() => handleDelete(payment.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+        {/* Payment Methods Table */}
+        {payments.length > 0 && (
+          <table className="payment-methods-table">
+            <thead className="payment-methods-header">
+              <tr>
+                <th>Payment Method Name</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {payments.map((payment) => (
+                <tr key={payment.id}>
+                  <td>{payment.pm_name}</td>
+                  <td>
+                    <button
+                      className="payment-edit-button"
+                      type="button"
+                      onClick={() => handleEdit(payment)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="payment-delete-button"
+                      type="button"
+                      onClick={() => handleDelete(payment.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   )
 }
