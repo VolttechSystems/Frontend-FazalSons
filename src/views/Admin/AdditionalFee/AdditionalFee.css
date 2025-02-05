@@ -1,148 +1,157 @@
 /* Container styling */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Form styling */
-  form {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  form h2 {
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 20px;
-  }
-  
-  form div {
-    margin-bottom: 15px;
-  }
-  
-  form label {
-    display: block;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 5px;
-  }
-  
-  form input {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s ease;
-  }
-  
-  form input:focus {
-    outline: none;
-    border-color: #6aac85;
-  }
-  
-  /* Form Styles */
-.add-fee-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: green; /* Add button - Green */
-  color: white;
-  font-weight: bold;
+.fee-container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form styling */
+form {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+label{
+  font-family: emoji;
+}
+.font{
+  font-family: emoji;
+  text-align: center;
+}
+form h2 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 20px;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+form label {
+  display: block;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+form input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
+  transition: border-color 0.3s ease;
+}
+
+form input:focus {
+  outline: none;
+  border-color: #6aac85;
+}
+
+/* Form Styles */
+.add-fee-button {
+padding: 10px 20px;
+border: none;
+background-color: green; /* Add button - Green */
+color: white;
+font-weight: bold;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+margin-top: 10px;
 }
 
 .add-fee-button:hover {
-  background-color: darkgreen;
+background-color: darkgreen;
 }
 
 /* Table Styles */
 .fee-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+width: 100%;
+border-collapse: collapse;
+margin-top: 20px;
 }
 
 .fee-table-header {
-  background-color:#0056b3;
-  color: white; /* White font */
+background-color:#0056b3;
+color: white; /* White font */
 }
 
 .fee-table th,
 .fee-table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
+padding: 10px;
+border: 1px solid #ddd;
+text-align: left;
+
+}
+th{
+  background-color: #0056B3;
 }
 
 .fee-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+background-color: #f9f9f9;
 }
 
 
 /* Button Styles for Actions */
 .edit-fee-button {
-  padding: 8px 16px;
-  border: none;
-  background-color: green; /* Edit button - Green */
-  color: white;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-right: 5px;
+padding: 8px 16px;
+border: none;
+background-color: green; /* Edit button - Green */
+color: white;
+font-weight: bold;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+margin-right: 5px;
 }
 
 .edit-fee-button:hover {
-  background-color: darkgreen;
+background-color: darkgreen;
 }
 
 .delete-fee-button {
-  padding: 8px 16px;
-  border: none;
-  background-color: red; /* Delete button - Red */
-  color: white;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+padding: 8px 16px;
+border: none;
+background-color: red; /* Delete button - Red */
+color: white;
+font-weight: bold;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease;
 }
 
 .delete-fee-button:hover {
-  background-color: darkred;
+background-color: darkred;
 }
 
-  
-  /* Responsive Design */
-  @media (max-width: 600px) {
-    .container {
-      padding: 10px;
-    }
-  
-    form h2 {
-      font-size: 18px;
-    }
-  
-    form button {
-      width: 100%;
-    }
-  
-    table thead th, table tbody td {
-      font-size: 12px;
-    }
-  
-    table tbody td button {
-      padding: 5px;
-      font-size: 10px;
-    }
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
   }
-  
+
+  form h2 {
+    font-size: 18px;
+  }
+
+  form button {
+    width: 100%;
+  }
+
+  table thead th, table tbody td {
+    font-size: 12px;
+  }
+
+  table tbody td button {
+    padding: 5px;
+    font-size: 10px;
+  }
+}

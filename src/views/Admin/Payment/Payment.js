@@ -104,7 +104,7 @@ const Payment = () => {
   }
 
   return (
-    <div className="container">
+    <div className="payment-container">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -119,7 +119,7 @@ const Payment = () => {
       />
 
       <form onSubmit={handleSubmit}>
-        <h2 style={{ fontFamily: 'Times New Roman, serif', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: 'emoji', textAlign: 'center', fontSize: '25px' }}>
           {editingPaymentId ? 'Edit Payment Method' : 'Add New Payment Method'}
         </h2>
         <div>

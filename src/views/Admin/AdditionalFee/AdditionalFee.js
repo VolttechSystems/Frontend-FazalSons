@@ -136,7 +136,7 @@ const AdditionalFee = () => {
   }
 
   return (
-    <div className="container">
+    <div className="fee-container">
       <form onSubmit={handleSubmit}>
         <ToastContainer
           position="top-right"
@@ -150,7 +150,7 @@ const AdditionalFee = () => {
           pauseOnHover
           theme="colored"
         />
-        <h2>{editingFeeId ? 'Edit Additional Fee' : 'Add New Additional Fee'}</h2>
+        <h2 style={{fontFamily:'emoji', textAlign:'center', fontSize: '25px'}}>{editingFeeId ? 'Edit Additional Fee' : 'Add New Additional Fee'}</h2>
         <div>
           <label>Fee Type:</label>
           <input
@@ -159,28 +159,26 @@ const AdditionalFee = () => {
             value={formData.fee_name}
             onChange={handleChange}
             required
+            style={{fontFamily:'emoji'}}
           />
         </div>
-        <button className="add-fee-button" type="submit">
+        <button className="add-fee-button" type="submit" style={{fontFamily:'emoji'}}>
           {editingFeeId ? 'Update Fee' : 'Add Fee'}
         </button>
-      </form>
-
-      {/* Fee Table */}
-      {fees.length > 0 ? (
+        {fees.length > 0 ? (
         <>
           <table className="fee-table">
             <thead>
               <tr className="fee-table-header">
-                <th>Fee Type</th>
-                <th>Actions</th>
+                <th style={{fontFamily:'emoji', textAlign:'center'}}>Fee Type</th>
+                <th style={{fontFamily:'emoji', textAlign:'center'}}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {fees.map((fee) => (
                 <tr key={fee.id}>
-                  <td>{fee.fee_name}</td>
-                  <td>
+                  <td  style={{fontFamily:'emoji', textAlign:'center'}}>{fee.fee_name}</td>
+                  <td  style={{fontFamily:'emoji', textAlign:'center'}}>
                     <button
                       className="edit-fee-button"
                       type="button"
@@ -201,44 +199,14 @@ const AdditionalFee = () => {
             </tbody>
           </table>
 
-          <div
-            className="pagination"
-            style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
-          >
-            <button
-              style={{
-                padding: '5px 10px',
-                marginRight: '5px',
-                backgroundColor: '#007BFF', // Blue background
-                color: 'white', // White text
-                border: 'none', // Remove border
-                borderRadius: '4px', // Rounded corners
-                cursor: 'pointer',
-              }}
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 0}
-            >
-              Previous
-            </button>
-            <button
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#007BFF', // Blue background
-                color: 'white', // White text
-                border: 'none', // Remove border
-                borderRadius: '4px', // Rounded corners
-                cursor: 'pointer',
-              }}
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages - 1}
-            >
-              Next
-            </button>
-          </div>
         </>
       ) : (
-        <p>No fees found.</p>
+        <p style={{fontFamily:'emoji', textAlign:'center' , color:'red', fontSize: '20px'}}>No fees found.</p>
       )}
+    
+      </form>
+
+      {/* Fee Table */}
     </div>
   )
 }

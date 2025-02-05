@@ -1931,7 +1931,7 @@ function Transections() {
   }
 
   return (
-    <div className={`container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
+    <div className={`pos-container ${isFullscreen ? 'fullscreen-mode' : 'simple-mode'}`}>
       <div className={`transactions-page ${isSidebarVisible ? 'with-sidebar' : 'no-sidebar'}`}>
         <ToastContainer
           position="top-right"

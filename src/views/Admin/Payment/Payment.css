@@ -1,122 +1,122 @@
 /* General container styling */
-.container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  /* Form styling */
-  form {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  form h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  form div {
-    margin-bottom: 15px;
-  }
-  
-  form label {
-    font-size: 16px;
-    color: #555;
-  }
-  
-  form input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  form button {
-    background-color: green;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  form button:hover {
-    background-color: darkgreen;
-  }
-  
+.payment-container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
 
- /* Table Styling */
-.payment-methods-table {
+/* Form styling */
+form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+form h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+form label {
+  font-size: 16px;
+  color: #555;
+}
+
+form input {
   width: 100%;
-  border-collapse: collapse; /* Ensures borders don't overlap */
-  margin-top: 20px;
+  padding: 10px;
+  margin-top: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  background-color: green;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: darkgreen;
+}
+
+
+/* Table Styling */
+.payment-methods-table {
+width: 100%;
+border-collapse: collapse; /* Ensures borders don't overlap */
+margin-top: 20px;
 }
 
 .payment-methods-table th,
 .payment-methods-table td {
-  border: 1px solid #ddd; /* Light gray border */
-  padding: 10px; /* Spacing inside cells */
-  text-align: left; /* Align text to the left */
-  font-family: 'Times New Roman', serif;
+border: 1px solid #ddd; /* Light gray border */
+padding: 10px; /* Spacing inside cells */
+text-align: left; /* Align text to the left */
+font-family: 'Times New Roman', serif;
 }
 
 .payment-methods-header {
-  background-color: #0056b3; /* Blue background */
-  color: white; /* White font */
-  border-bottom: 2px solid #0056b3; /* Slightly darker border under the header */
-  font-family: 'Times New Roman', serif;
+background-color: #0056b3; /* Blue background */
+color: white; /* White font */
+border-bottom: 2px solid #0056b3; /* Slightly darker border under the header */
+font-family: 'Times New Roman', serif;
 }
 
 /* Table Row Borders */
 .payment-methods-table tr:nth-child(even) {
-  background-color: #f9f9f9; /* Light gray for alternate rows */
-  font-family: 'Times New Roman', serif;
+background-color: #f9f9f9; /* Light gray for alternate rows */
+font-family: 'Times New Roman', serif;
 }
 
 
 /* Edit Button Styling */
 .payment-edit-button {
-  padding: 8px 15px;
-  margin-right: 10px; /* Adds space to the right of the Edit button */
-  border: 1px solid green; /* Green border */
-  background-color: green; /* Green background */
-  color: white; /* White font */
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+padding: 8px 15px;
+margin-right: 10px; /* Adds space to the right of the Edit button */
+border: 1px solid green; /* Green border */
+background-color: green; /* Green background */
+color: white; /* White font */
+font-weight: bold;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .payment-edit-button:hover {
-  background-color: darkgreen; /* Darker green on hover */
-  border-color: darkgreen; /* Darker green border on hover */
+background-color: darkgreen; /* Darker green on hover */
+border-color: darkgreen; /* Darker green border on hover */
 }
 
 /* Delete Button Styling */
 .payment-delete-button {
-  padding: 8px 15px;
-  margin-left: 10px; /* Optional: Adds space to the left of the Delete button */
-  border: 1px solid red; /* Red border */
-  background-color: red; /* Red background */
-  color: white; /* White font */
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+padding: 8px 15px;
+margin-left: 10px; /* Optional: Adds space to the left of the Delete button */
+border: 1px solid red; /* Red border */
+background-color: red; /* Red background */
+color: white; /* White font */
+font-weight: bold;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .payment-delete-button:hover {
-  background-color: darkred; /* Darker red on hover */
-  border-color: darkred; /* Darker red border on hover */
+background-color: darkred; /* Darker red on hover */
+border-color: darkred; /* Darker red border on hover */
 }
 label, button {
-  font-family: 'Times New Roman', serif;
+font-family: 'Times New Roman', serif;
 }
