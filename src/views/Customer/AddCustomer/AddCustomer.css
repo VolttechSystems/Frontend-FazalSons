@@ -56,9 +56,9 @@ input[type="radio"] {
 
 button[type="submit"] {
   display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
+  width: auto; /* Adjust width as needed */
+  padding: 10px 20px; /* Adjust padding for better appearance */
+  background-color: #006400;
   color: white;
   font-size: 1.2em;
   font-weight: bold;
@@ -66,11 +66,13 @@ button[type="submit"] {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  text-align: left;
 }
 
 button[type="submit"]:hover {
-  background-color: #45a049;
+  background-color: #0d47a1;
 }
+
 
 /* Styling for individual sections */
 section {
@@ -98,7 +100,7 @@ th, td {
 }
 
 th {
-  background-color: #4CAF50;
+  background-color: #0D47A1;
   color: white;
   font-weight: bold;
 }

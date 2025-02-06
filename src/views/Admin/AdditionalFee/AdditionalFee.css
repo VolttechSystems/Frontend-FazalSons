@@ -9,7 +9,7 @@
 }
 
 /* Form styling */
-form {
+.add-fee-form {
   margin-bottom: 20px;
   padding: 15px;
   background: #fff;
@@ -23,24 +23,24 @@ label{
   font-family: emoji;
   text-align: center;
 }
-form h2 {
+.add-fee-form h2 {
   margin-bottom: 15px;
   color: #333;
   font-size: 20px;
 }
 
-form div {
+.add-fee-form div {
   margin-bottom: 15px;
 }
 
-form label {
+.add-fee-form label {
   display: block;
   font-weight: 600;
   color: #555;
   margin-bottom: 5px;
 }
 
-form input {
+.add-fee-form input {
   width: 100%;
   padding: 10px;
   font-size: 14px;
@@ -49,7 +49,7 @@ form input {
   transition: border-color 0.3s ease;
 }
 
-form input:focus {
+.add-fee-form input:focus {
   outline: none;
   border-color: #6aac85;
 }

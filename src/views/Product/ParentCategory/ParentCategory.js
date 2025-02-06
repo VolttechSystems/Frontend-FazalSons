@@ -100,7 +100,7 @@ const ParentCategory = () => {
     <CRow>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
         <Link to="/Product/AddParentCategory">
-          <CButton color="primary" className="me-md-2">
+          <CButton color="primary" className="me-md-2 mb-3">
             Add Parent Category
           </CButton>
         </Link>
@@ -148,7 +148,7 @@ const ParentCategory = () => {
                       <CTableDataCell>{parent.description}</CTableDataCell>
                       <CTableDataCell>{parent.status}</CTableDataCell>
                       <CTableDataCell>
-                        <CButton color="warning" size="sm" onClick={() => handleEdit(parent.id)}>
+                        <CButton color="primary" size="sm" onClick={() => handleEdit(parent.id)}>
                           Edit
                         </CButton>
                         <CButton
@@ -163,40 +163,45 @@ const ParentCategory = () => {
                     </CTableRow>
                   ))}
                 </CTableBody>
+
                 <div
-                  className="pagination"
-                  style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    width: '100%',
+                    marginTop: '20px',
+                  }}
                 >
-                  <CButton
-                    style={{
-                      padding: '5px 8px',
-                      marginRight: '5px',
-                      backgroundColor: '#007BFF',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
-                    onClick={handlePrevious}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </CButton>
-                  <CButton
-                    style={{
-                      padding: '5px 8px',
-                      marginRight: '5px',
-                      backgroundColor: '#007BFF',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
-                    onClick={handleNext}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </CButton>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <CButton
+                      style={{
+                        padding: '5px 12px',
+                        backgroundColor: '#007BFF',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={handlePrevious}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </CButton>
+                    <CButton
+                      style={{
+                        padding: '5px 12px',
+                        backgroundColor: '#007BFF',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={handleNext}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </CButton>
+                  </div>
                 </div>
               </CTable>
             )}

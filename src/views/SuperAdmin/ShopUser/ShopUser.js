@@ -32,6 +32,24 @@ function ShopUser() {
     suggestions: [],
   })
 
+  const [error, setError] = useState('')
+
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value
+    setFormData((prevData) => ({
+      ...prevData,
+      email: value, // Update email in formData
+    }))
+
+    if (value && !emailPattern.test(value)) {
+      setError('Invalid email format (e.g., abc@gmail.com)')
+    } else {
+      setError('')
+    }
+  }
+
   // Fetch shops from the API
   const fetchShops = async () => {
     try {
@@ -195,10 +213,12 @@ function ShopUser() {
           shop: '',
         }) // Reset form fields
         fetchUsers() // Refresh user list
+
         toast.success('Shop user added successfully!') // Show success notification
       } else {
-        setMessage('Failed to add shop user. Please try again.') // Show error message
-        toast.error('Failed to add shop user.') // Show error notification
+        toast.error(
+          'Failed to add shop user. Fields username, password, shop and is_active are required.',
+        ) // Show error notification
       }
     } catch (error) {
       console.error('Error submitting data:', error)
@@ -294,7 +314,6 @@ function ShopUser() {
                 { label: 'Phone Number', name: 'phone_number', type: 'text' },
                 { label: 'First Name', name: 'first_name', type: 'text' },
                 { label: 'Last Name', name: 'last_name', type: 'text' },
-                { label: 'Email', name: 'email', type: 'email' },
               ].map((field) => (
                 <div key={field.name}>
                   <label style={{ display: 'block', marginBottom: '5px' }}>{field.label}:</label>
@@ -313,6 +332,21 @@ function ShopUser() {
                   />
                 </div>
               ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <label>Email:</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleEmailChange}
+                  style={{
+                    padding: '8px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
+                />
+                {error && <span style={{ color: 'red', fontSize: '12px' }}>{error}</span>}
+              </div>
 
               {/* Password Input Section */}
               <div>

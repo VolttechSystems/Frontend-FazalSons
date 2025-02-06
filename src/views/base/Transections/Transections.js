@@ -716,11 +716,13 @@ function Transections() {
   }, []) // Remove `shopId` from dependency array since it's retrieved from localStorage
 
   const resetCustomerForm = () => {
-    setCustomerForm({
+    setCustomerForm((prevState) => ({
       display_name: '',
       mobile_no: '',
       address: '',
-    })
+      shop: prevState.shop, // Retain shop
+      outlet: prevState.outlet, // Retain outlet
+    }))
 
     // Close the modal
     setShowCustomerModal(false)
@@ -729,10 +731,12 @@ function Transections() {
   // Handle form submission (add customer)
   const handleAddCustomer = async () => {
     const shopId = localStorage.getItem('shop_id')
-    const response = await Network.post(
-      `${Urls.addCustomerinPOS}/${shopId}/${outletId}`,
-      customerForm,
-    )
+    const payload = {
+      ...customerForm,
+      shop: shopId,
+      outlet: outletId,
+    }
+    const response = await Network.post(`${Urls.addCustomerinPOS}/${shopId}/${outletId}`, payload)
 
     if (response.ok) {
       toast.success('Customer Added Successfully!') // Success message

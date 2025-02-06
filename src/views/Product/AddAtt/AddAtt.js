@@ -408,17 +408,15 @@ class AddAtt extends Component {
           <table border="1" style={{ width: '100%', textAlign: 'left' }}>
             <thead>
               <tr>
-                <th>Attribute ID</th>
-                <th>Attribute Type</th>
-                <th>Attribute Group</th>
-                <th>Attribute</th>
-                <th>Actions</th>
+                <th>ATTRIBUTE TYPE</th>
+                <th>ATTRIBUTE GROUP</th>
+                <th>ATTRIBUTE</th>
+                <th>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
               {apiData.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.att_id}</td>
                   <td>{item.att_type}</td>
                   <td>{item.attribute_name}</td>
                   <td>

@@ -48,6 +48,29 @@
   color: #333;
   background-color: #fff;
 }
+/* Fix checkbox alignment */
+/* Make sure checkbox aligns properly */
+.salesman-form .commission-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between checkbox and label */
+  margin-bottom: 15px;
+}
+
+/* Prevent inherited styles from affecting checkbox size */
+.salesman-form input[type="checkbox"] {
+  transform: scale(1.2);
+  margin: 0; /* Remove any inherited margin */
+}
+
+/* Prevent label misalignment */
+.salesman-form .commission-checkbox label {
+  margin: 0;
+  font-size: 16px;
+  color: #555;
+}
+
+
 
 .salesman-form select {
   cursor: pointer;
@@ -157,4 +180,22 @@ table button:last-child:hover {
 
 label, button {
   font-family: 'Times New Roman', serif;
+}
+
+/* Style the commission fields to be vertical */
+.commission-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Adds spacing between fields */
+  margin-bottom: 15px;
+}
+
+.commission-fields div {
+  display: flex;
+  flex-direction: column;
+}
+
+.commission-fields label {
+  font-weight: bold;
+  margin-bottom: 5px;
 }

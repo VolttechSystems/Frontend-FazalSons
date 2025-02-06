@@ -21,6 +21,7 @@ const Salesman = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
   const [pageSize] = useState(10)
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
     fetchSalesmen(currentPage)
@@ -40,6 +41,14 @@ const Salesman = () => {
       console.error('Error fetching salesmen:', error)
     }
   }
+  useEffect(() => {
+    // Force reset styles when the page loads
+    document.querySelectorAll('.salesman-form input, .salesman-form select').forEach((el) => {
+      el.style.border = '1px solid #ccc'
+      el.style.backgroundColor = '#fff'
+      el.style.color = '#333'
+    })
+  }, [])
 
   const fetchOutlets = async () => {
     const shopId = localStorage.getItem('shop_id')
@@ -58,6 +67,12 @@ const Salesman = () => {
 
   const handleOutletChange = (selectedOptions) => {
     setFormData({ ...formData, outlet: selectedOptions || [] })
+
+    // Clear error if user selects at least one outlet
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      outlet: selectedOptions.length === 0 ? 'Outlet is required.' : '',
+    }))
   }
 
   const handleChange = (e) => {
@@ -74,6 +89,19 @@ const Salesman = () => {
     }
 
     const selectedOutlets = formData.outlet.map((outlet) => outlet.value)
+
+    let validationErrors = {}
+
+    // Check required fields
+    if (formData.outlet.length === 0) {
+      validationErrors.outlet = 'Outlet is required.'
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      toast.error('Please fill all required fields.')
+      return
+    }
 
     const dataToSend = {
       CheckBoxValue: showCommissions ? 'true' : 'false',
@@ -184,7 +212,7 @@ const Salesman = () => {
         <form className="salesman-form" onSubmit={handleSubmit}>
           <h2>{editingSalesmanId ? 'Edit Salesman' : 'Add New Salesman'}</h2>
           <div>
-            <label>Salesman Name: *</label>
+            <label>Salesman Name *</label>
             <input
               type="text"
               name="salesman_name"
@@ -193,16 +221,19 @@ const Salesman = () => {
               required
             />
           </div>
-          <div>
-            <label>Show Commission Fields:</label>
+          {/* Show Commission Checkbox */}
+          <div className="commission-checkbox">
             <input
               type="checkbox"
               checked={showCommissions}
               onChange={() => setShowCommissions(!showCommissions)}
             />
+            <label>Show Commission Fields</label>
           </div>
+
+          {/* Commission Fields (Now Vertical) */}
           {!showCommissions && (
-            <>
+            <div className="commission-fields">
               <div>
                 <label>Wholesale Commission:</label>
                 <input
@@ -230,10 +261,10 @@ const Salesman = () => {
                   onChange={handleChange}
                 />
               </div>
-            </>
+            </div>
           )}
-          <div>
-            <label>Outlet:</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <label>Outlet *</label>
             <Select
               isMulti
               name="outlet"
@@ -242,6 +273,9 @@ const Salesman = () => {
               value={formData.outlet}
               placeholder="Select outlets"
             />
+            {errors.outlet && (
+              <span style={{ color: 'red', fontSize: '12px' }}>{errors.outlet}</span>
+            )}
           </div>
           <button type="submit" className="salesman-submit-btn">
             {editingSalesmanId ? 'Update Salesman' : 'Add Salesman'}

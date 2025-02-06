@@ -176,11 +176,11 @@ const CustomerType = () => {
         </Typography>
       </CardHeader>
       <CardContent>
-        <Link to="/Customer/AddCustomer">
+        {/* <Link to="/Customer/AddCustomer">
           <Button variant="outlined" color="primary" sx={{ mb: 2 }}>
             Back to Add Customer
           </Button>
-        </Link>
+        </Link> */}
 
         <ToastContainer
           position="top-right"
@@ -277,7 +277,7 @@ const CustomerType = () => {
           </Table>
         </TableContainer>
 
-        <Pagination
+        {/* <Pagination
           count={totalPages}
           page={currentPage + 1}
           onChange={handlePageChange}
@@ -291,7 +291,7 @@ const CustomerType = () => {
               borderRadius: '50%',
             },
           }}
-        />
+        /> */}
       </CardContent>
     </Card>
   )

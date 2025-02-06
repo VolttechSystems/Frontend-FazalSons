@@ -140,9 +140,12 @@ const AddHeadCategory = () => {
     <CRow>
       <CCol xs={12}>
         <CCard className="mb-3">
-          <CCardHeader>
-            <strong>{editingIndex !== null ? 'Edit category head' : 'Add category head'}</strong>
+          <CCardHeader className="text-center">
+            <h5 className="mb-0 fw-bold">
+              {editingIndex !== null ? 'Edit Category Head' : 'Add Category Head'}
+            </h5>
           </CCardHeader>
+
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
               <ToastContainer
@@ -258,7 +261,7 @@ const AddHeadCategory = () => {
                     <CTableDataCell>{item.description}</CTableDataCell>
 
                     <CTableDataCell>
-                      <CButton color="warning" onClick={() => handleEdit(index)}>
+                      <CButton color="primary" onClick={() => handleEdit(index)} className="me-2">
                         Edit
                       </CButton>
                       <CButton color="danger" onClick={() => handleDelete(index)}>

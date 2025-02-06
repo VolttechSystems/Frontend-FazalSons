@@ -115,9 +115,10 @@ const AddParentCategory = () => {
   return (
     <CRow>
       <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>{id ? 'Edit Parent Category' : 'Add Parent Category'}</strong>
+        <CCard className="mb-3">
+          <CCardHeader className="text-center">
+            <h4 className="mb-0 fw-bold">{id ? 'Edit Parent Category' : 'Add Parent Category'}</h4>
+
             <ToastContainer
               position="top-right"
               autoClose={3000}
@@ -140,25 +141,33 @@ const AddParentCategory = () => {
             {errorMessage && <p className="text-danger">{errorMessage}</p>}
             <CForm onSubmit={handleSubmit}>
               <div className="mb-3">
+                {/* Label Above */}
                 <CFormLabel htmlFor="categoryHead">Category Head *</CFormLabel>
-                <CFormSelect
-                  id="categoryHead"
-                  value={hc_name}
-                  onChange={(e) => setCategoryHead(e.target.value)}
-                  required
-                >
-                  <option value="">Select Category Head</option>
-                  {categoryHeads.map((head) => (
-                    <option key={head.id} value={head.id}>
-                      {head.hc_name}
-                    </option>
-                  ))}
-                </CFormSelect>
-                <CButton color="primary" onClick={handleAddCategoryHead} className="ms-2">
-                  {' '}
-                  +{' '}
-                </CButton>
+
+                {/* Input + Button in a single row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <CFormSelect
+                    id="categoryHead"
+                    value={hc_name}
+                    onChange={(e) => setCategoryHead(e.target.value)}
+                    required
+                    style={{ flex: 1 }} // Makes input take full space while keeping button aligned
+                  >
+                    <option value="">Select Category Head</option>
+                    {categoryHeads.map((head) => (
+                      <option key={head.id} value={head.id}>
+                        {head.hc_name}
+                      </option>
+                    ))}
+                  </CFormSelect>
+
+                  {/* Aligned + Button */}
+                  <CButton color="primary" onClick={handleAddCategoryHead}>
+                    +
+                  </CButton>
+                </div>
               </div>
+
               <div className="mb-3">
                 <CFormLabel htmlFor="pc_name">Parent Category *</CFormLabel>
                 <CFormInput
@@ -219,12 +228,14 @@ const AddParentCategory = () => {
                   />
                 </div>
               </div>
-              <CButton type="submit" color="primary">
-                {id ? 'Update Parent Category' : 'Add Parent Category'}
-              </CButton>
-              <Link to="/Product/ParentCategory" className="btn btn-secondary ms-2">
-                Cancel
-              </Link>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <CButton type="submit" color="primary">
+                  {id ? 'Update Parent Category' : 'Add Parent Category'}
+                </CButton>
+                <Link to="/Product/ParentCategory" className="btn btn-secondary ms-2">
+                  Cancel
+                </Link>
+              </div>
             </CForm>
           </CCardBody>
         </CCard>

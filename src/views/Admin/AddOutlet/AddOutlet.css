@@ -36,7 +36,7 @@
 .outlet-form-button {
   padding: 10px 20px;
   border: none;
-  background-color: #0056B3;
+  background-color: rgb(69, 160, 73);
   color: white;
   font-weight: bold;
   border-radius: 4px;
@@ -109,7 +109,7 @@
 
 
 .outlet-table-actions .E-button {
-  background-color: #0056B3;
+  background-color: rgb(69, 160, 73);
 }
 
 .outlet-table-actions .E-button:hover {

@@ -137,7 +137,7 @@ const AdditionalFee = () => {
 
   return (
     <div className="fee-container">
-      <form onSubmit={handleSubmit}>
+      <form className="add-fee-form" onSubmit={handleSubmit}>
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -150,7 +150,9 @@ const AdditionalFee = () => {
           pauseOnHover
           theme="colored"
         />
-        <h2 style={{fontFamily:'emoji', textAlign:'center', fontSize: '25px'}}>{editingFeeId ? 'Edit Additional Fee' : 'Add New Additional Fee'}</h2>
+        <h2 style={{ fontFamily: 'emoji', textAlign: 'center', fontSize: '25px' }}>
+          {editingFeeId ? 'Edit Additional Fee' : 'Add New Additional Fee'}
+        </h2>
         <div>
           <label>Fee Type:</label>
           <input
@@ -159,51 +161,51 @@ const AdditionalFee = () => {
             value={formData.fee_name}
             onChange={handleChange}
             required
-            style={{fontFamily:'emoji'}}
+            style={{ fontFamily: 'emoji' }}
           />
         </div>
-        <button className="add-fee-button" type="submit" style={{fontFamily:'emoji'}}>
+        <button className="add-fee-button" type="submit" style={{ fontFamily: 'emoji' }}>
           {editingFeeId ? 'Update Fee' : 'Add Fee'}
         </button>
         {fees.length > 0 ? (
-        <>
-          <table className="fee-table">
-            <thead>
-              <tr className="fee-table-header">
-                <th style={{fontFamily:'emoji', textAlign:'center'}}>Fee Type</th>
-                <th style={{fontFamily:'emoji', textAlign:'center'}}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fees.map((fee) => (
-                <tr key={fee.id}>
-                  <td  style={{fontFamily:'emoji', textAlign:'center'}}>{fee.fee_name}</td>
-                  <td  style={{fontFamily:'emoji', textAlign:'center'}}>
-                    <button
-                      className="edit-fee-button"
-                      type="button"
-                      onClick={() => handleEdit(fee)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="delete-fee-button"
-                      type="button"
-                      onClick={() => handleDelete(fee.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+          <>
+            <table className="fee-table">
+              <thead>
+                <tr className="fee-table-header">
+                  <th style={{ fontFamily: 'emoji', textAlign: 'center' }}>Fee Type</th>
+                  <th style={{ fontFamily: 'emoji', textAlign: 'center' }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-
-        </>
-      ) : (
-        <p style={{fontFamily:'emoji', textAlign:'center' , color:'red', fontSize: '20px'}}>No fees found.</p>
-      )}
-    
+              </thead>
+              <tbody>
+                {fees.map((fee) => (
+                  <tr key={fee.id}>
+                    <td style={{ fontFamily: 'emoji', textAlign: 'center' }}>{fee.fee_name}</td>
+                    <td style={{ fontFamily: 'emoji', textAlign: 'center' }}>
+                      <button
+                        className="edit-fee-button"
+                        type="button"
+                        onClick={() => handleEdit(fee)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-fee-button"
+                        type="button"
+                        onClick={() => handleDelete(fee.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ) : (
+          <p style={{ fontFamily: 'emoji', textAlign: 'center', color: 'red', fontSize: '20px' }}>
+            No fees found.
+          </p>
+        )}
       </form>
 
       {/* Fee Table */}

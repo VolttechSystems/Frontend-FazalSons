@@ -410,19 +410,25 @@ const CustomerChannel = () => {
   }
 
   return (
-    <Card sx={{ border: '1px solid #ddd', maxWidth: 1200, margin: '0 auto' }}>
+    <Card
+      sx={{
+        border: '1px solid #ddd',
+        maxWidth: 1200,
+        margin: '0 auto',
+        fontFamily: 'Times New Roman, serif',
+      }}
+    >
       <CardHeader>
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          sx={{ fontFamily: 'Times New Roman, serif' }}
+        >
           {isEditing ? 'Edit Customer Channel' : 'Add Customer Channel'}
         </Typography>
       </CardHeader>
       <CardContent>
-        {/* <Link to="/Customer/AddCustomer">
-          <Button variant="outlined" color="primary" sx={{ mb: 2 }}>
-            Back to Add Customer
-          </Button>
-        </Link> */}
-
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -436,7 +442,7 @@ const CustomerChannel = () => {
           theme="colored"
         />
 
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Times New Roman, serif' }}>
           Customer Channel
         </Typography>
 
@@ -449,14 +455,20 @@ const CustomerChannel = () => {
               onChange={handleChange}
               fullWidth
               required
+              sx={{ fontFamily: 'Times New Roman, serif' }}
             />
           </Box>
-          <Button type="submit" variant="contained" color="primary">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ fontFamily: 'Times New Roman, serif' }}
+          >
             {isEditing ? 'Update' : 'Add'}
           </Button>
         </form>
 
-        <Typography variant="h5" sx={{ mt: 4 }} gutterBottom>
+        <Typography variant="h5" sx={{ mt: 4, fontFamily: 'Times New Roman, serif' }} gutterBottom>
           Customer Channels
         </Typography>
 
@@ -465,16 +477,43 @@ const CustomerChannel = () => {
             sx={{
               borderCollapse: 'collapse',
               tableLayout: 'fixed',
-              '& td, & th': { border: '1px solid #ddd', padding: '8px' },
+              '& td, & th': {
+                border: '1px solid #ddd',
+                padding: '8px',
+                fontFamily: 'Times New Roman, serif',
+              },
             }}
           >
             <TableHead sx={{ backgroundColor: '#1976d2' }}>
               <TableRow>
-                <TableCell sx={{ color: '#fff', textAlign: 'center', width: '33%' }}>ID</TableCell>
-                <TableCell sx={{ color: '#fff', textAlign: 'center', width: '33%' }}>
+                <TableCell
+                  sx={{
+                    color: '#fff',
+                    textAlign: 'center',
+                    width: '33%',
+                    fontFamily: 'Times New Roman, serif',
+                  }}
+                >
+                  ID
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: '#fff',
+                    textAlign: 'center',
+                    width: '33%',
+                    fontFamily: 'Times New Roman, serif',
+                  }}
+                >
                   Channel
                 </TableCell>
-                <TableCell sx={{ color: '#fff', textAlign: 'center', width: '33%' }}>
+                <TableCell
+                  sx={{
+                    color: '#fff',
+                    textAlign: 'center',
+                    width: '33%',
+                    fontFamily: 'Times New Roman, serif',
+                  }}
+                >
                   Actions
                 </TableCell>
               </TableRow>
@@ -483,8 +522,12 @@ const CustomerChannel = () => {
               {channels.length > 0 ? (
                 channels.map((channel) => (
                   <TableRow key={channel.id}>
-                    <TableCell align="center">{channel.id}</TableCell>
-                    <TableCell align="center">{channel.customer_channel}</TableCell>
+                    <TableCell align="center" sx={{ fontFamily: 'Times New Roman, serif' }}>
+                      {channel.id}
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontFamily: 'Times New Roman, serif' }}>
+                      {channel.customer_channel}
+                    </TableCell>
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                         <Button
@@ -492,6 +535,7 @@ const CustomerChannel = () => {
                           color="primary"
                           size="small"
                           onClick={() => handleEdit(channel.id)}
+                          sx={{ fontFamily: 'Times New Roman, serif' }}
                         >
                           Edit
                         </Button>
@@ -500,6 +544,7 @@ const CustomerChannel = () => {
                           color="error"
                           size="small"
                           onClick={() => handleDelete(channel.id)}
+                          sx={{ fontFamily: 'Times New Roman, serif' }}
                         >
                           Delete
                         </Button>
@@ -509,7 +554,11 @@ const CustomerChannel = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={3} align="center">
+                  <TableCell
+                    colSpan={3}
+                    align="center"
+                    sx={{ fontFamily: 'Times New Roman, serif' }}
+                  >
                     No channels found.
                   </TableCell>
                 </TableRow>
@@ -517,22 +566,6 @@ const CustomerChannel = () => {
             </TableBody>
           </Table>
         </TableContainer>
-
-        <Pagination
-          count={totalPages}
-          page={currentPage + 1}
-          onChange={handlePageChange}
-          sx={{
-            mt: 2,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            '& .MuiPaginationItem-root': {
-              backgroundColor: '#1976d2',
-              color: '#fff',
-              borderRadius: '50%',
-            },
-          }}
-        />
       </CardContent>
     </Card>
   )

@@ -152,7 +152,7 @@ const AddCustomer = () => {
           setCustomers((prev) => [response.data, ...prev]) // Add new customer to top
           toast.success('Customer added successfully!')
         } else {
-          toast.error('Error adding customer.')
+          toast.error('Error adding customer. Please fill in the required fields')
         }
       }
 
@@ -243,7 +243,7 @@ const AddCustomer = () => {
 
         {/* Customer Channel */}
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
-          <label style={{ fontWeight: 'bold' }}>Customer Channel: *</label>
+          <label style={{ fontWeight: 'bold' }}>Customer Channel *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
             <Select
               name="customer_channel"
@@ -301,7 +301,7 @@ const AddCustomer = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
-          <label style={{ fontWeight: 'bold' }}>Customer Type: *</label>
+          <label style={{ fontWeight: 'bold' }}>Customer Type *</label>
           <div style={{ display: 'flex', gap: '7px', alignItems: 'center' }}>
             <Select
               name="customer_type"
@@ -356,7 +356,7 @@ const AddCustomer = () => {
 
         {/* Display Name */}
         <div>
-          <label>Display Name:</label>
+          <label>Display Name *</label>
           <input
             type="text"
             name="display_name"
@@ -367,7 +367,7 @@ const AddCustomer = () => {
 
         {/* Gender */}
         <div>
-          <label>Gender:</label>
+          <label>Gender *</label>
           <select name="gender" value={formData.gender} onChange={handleChange}>
             <option value="" disabled>
               Select Gender
@@ -381,7 +381,7 @@ const AddCustomer = () => {
 
         {/* Company Name */}
         <div>
-          <label>Company Name:</label>
+          <label>Company Name</label>
           <input
             type="text"
             name="company_name"
@@ -392,13 +392,13 @@ const AddCustomer = () => {
 
         {/* Email */}
         <div>
-          <label>Email:</label>
+          <label>Email</label>
           <input type="email" name="email" value={formData.email} onChange={handleChange} />
         </div>
 
         {/* Mobile Number */}
         <div>
-          <label>Mobile #</label>
+          <label>Mobile # *</label>
           <input
             type="text"
             name="mobile_no"
@@ -421,7 +421,7 @@ const AddCustomer = () => {
 
         {/* Landline Number */}
         <div>
-          <label>Landline Number:</label>
+          <label>Landline Number</label>
           <input
             type="text"
             name="landline_no"
@@ -432,7 +432,7 @@ const AddCustomer = () => {
 
         {/* Password */}
         <div>
-          <label>Password:</label>
+          <label>Password</label>
           <input
             type="password"
             name="password"
@@ -443,7 +443,7 @@ const AddCustomer = () => {
 
         {/* Address */}
         <div>
-          <label>Address:</label>
+          <label>Address</label>
           <input type="text" name="address" value={formData.address} onChange={handleChange} />
         </div>
 
@@ -468,7 +468,7 @@ const AddCustomer = () => {
 
         {/* Shipping Address */}
         <div>
-          <label>Shipping Address:</label>
+          <label>Shipping Address</label>
           <input
             type="text"
             name="shipping_address"
@@ -478,37 +478,37 @@ const AddCustomer = () => {
           />
         </div>
         <div>
-          <label>City:</label>
+          <label>City</label>
           <input type="text" name="city" value={formData.city} onChange={handleChange} />
         </div>
 
         <div>
-          <label>Zip Code:</label>
+          <label>Zip Code</label>
           <input type="text" name="zip_code" value={formData.zip_code} onChange={handleChange} />
         </div>
 
         <div>
-          <label>Province:</label>
+          <label>Province</label>
           <input type="text" name="province" value={formData.province} onChange={handleChange} />
         </div>
 
         <div>
-          <label>Country:</label>
+          <label>Country</label>
           <input type="text" name="country" value={formData.country} onChange={handleChange} />
         </div>
 
         <div>
-          <label>Internal Note:</label>
+          <label>Internal Note</label>
           <textarea name="internal_note" value={formData.internal_note} onChange={handleChange} />
         </div>
 
         <div>
-          <label>Image:</label>
+          <label>Image</label>
           <input type="file" name="image" onChange={handleChange} />
         </div>
 
         <div>
-          <label>Online Access:</label>
+          <label>Online Access</label>
           <select name="online_access" value={formData.online_access} onChange={handleChange}>
             <option value="no">No</option>
             <option value="yes">Yes</option>
@@ -516,7 +516,7 @@ const AddCustomer = () => {
         </div>
 
         <div>
-          <label>Status:</label>
+          <label>Status</label>
           <select name="status" value={formData.status} onChange={handleChange}>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
