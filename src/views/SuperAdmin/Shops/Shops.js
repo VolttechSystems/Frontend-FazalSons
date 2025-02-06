@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Network, Urls } from '../../../api-config'
+import './Shops.css'
 
 const Shops = () => {
   const [shopData, setShopData] = useState({
@@ -108,8 +109,7 @@ const Shops = () => {
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ color: '#333', textAlign: 'center' }}>Add Shops</h1>
+    <div className="shops-container">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -122,267 +122,107 @@ const Shops = () => {
         pauseOnHover
         theme="colored"
       />
+      {/* <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1 style={{ color: '#333', textAlign: 'center' }}>Add Shops</h1> */}
+      {/* Wrapper for form and table */}
+      <div className="shops-wrapper">
+        <h1 className="shops-header">{isUpdate ? 'Update Shop' : 'Add Shops'}</h1>
 
-      <div
-        style={{
-          marginBottom: '20px',
-          border: '1px solid #ccc',
-          padding: '15px',
-          borderRadius: '5px',
-        }}
-      >
-        <label style={{ display: 'block', marginBottom: '5px' }}>Shop Name:</label>
-        <input
-          type="text"
-          name="name"
-          value={shopData.name}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-          }}
-        />
+        {/* Shop Form */}
+        <form className="shops-form">
+          <div>
+            <label>Shop Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={shopData.name}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
 
-        <label style={{ display: 'block', marginBottom: '5px' }}>Status:</label>
-        <select
-          name="status"
-          value={shopData.status}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-          }}
-        >
-          <option value="" disabled>
-            Select Status
-          </option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
+          <div>
+            <label>Status:</label>
+            <select name="status" value={shopData.status} onChange={handleInputChange} required>
+              <option value="" disabled>
+                Select Status
+              </option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
 
-        <label style={{ display: 'block', marginBottom: '5px' }}>Number of Outlets Allowed:</label>
-        <input
-          type="number"
-          name="no_of_outlets"
-          value={shopData.no_of_outlets}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-          }}
-        />
+          <div>
+            <label>Number of Outlets Allowed:</label>
+            <input
+              type="number"
+              name="no_of_outlets"
+              value={shopData.no_of_outlets}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
 
-        <label style={{ display: 'block', marginBottom: '5px' }}>
-          Number of Registered Per Outlets Allowed:
-        </label>
-        <input
-          type="number"
-          name="no_of_registered_outlets"
-          value={shopData.no_of_registered_outlets}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-          }}
-        />
+          <div>
+            <label>Number of Registered Per Outlets Allowed:</label>
+            <input
+              type="number"
+              name="no_of_registered_outlets"
+              value={shopData.no_of_registered_outlets}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
 
-        <button
-          onClick={handleAddShop}
-          style={{
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-        >
-          {isUpdate ? 'Update Shop' : 'Add Shop'}
-        </button>
-      </div>
+          <div style={{ textAlign: 'left' }}>
+            <button type="button" onClick={handleAddShop}>
+              {isUpdate ? 'Update Shop' : 'Add Shop'}
+            </button>
+          </div>
+        </form>
 
-      <h3 style={{ marginBottom: '20px', color: '#333', fontSize: '24px' }}>Shop List</h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '2px solid #ddd' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#007bff', borderBottom: '2px solid #ddd' }}>
-            <th
-              style={{
-                padding: '12px',
-                textAlign: 'left',
-                fontSize: '16px',
-                color: '#fff',
-                fontWeight: '600',
-                borderRight: '1px solid #ddd',
-                width: '20%',
-              }}
-            >
-              Shop Name
-            </th>
-            <th
-              style={{
-                padding: '12px',
-                textAlign: 'left',
-                fontSize: '16px',
-                color: '#fff',
-                fontWeight: '600',
-                borderRight: '1px solid #ddd',
-                width: '20%',
-              }}
-            >
-              Status
-            </th>
-            <th
-              style={{
-                padding: '12px',
-                textAlign: 'left',
-                fontSize: '16px',
-                color: '#fff',
-                fontWeight: '600',
-                borderRight: '1px solid #ddd',
-                width: '20%',
-              }}
-            >
-              No. of Outlets
-            </th>
-            <th
-              style={{
-                padding: '12px',
-                textAlign: 'left',
-                fontSize: '16px',
-                color: '#fff',
-                fontWeight: '600',
-                width: '20%',
-              }}
-            >
-              No. of Registered Outlets
-            </th>
-            <th
-              style={{
-                padding: '12px',
-                textAlign: 'left',
-                fontSize: '16px',
-                color: '#fff',
-                fontWeight: '600',
-                width: '20%',
-              }}
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {shopList.length > 0 ? (
-            shopList.map((shop, index) => (
-              <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'left',
-                    color: '#000',
-                    fontSize: '14px',
-                    borderRight: '1px solid #ddd',
-                    width: '20%',
-                  }}
-                >
-                  {shop.name}
-                </td>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'left',
-                    color: shop.status === 'Active' ? '#4caf50' : '#f44336',
-                    fontSize: '14px',
-                    borderRight: '1px solid #ddd',
-                    width: '20%',
-                  }}
-                >
-                  {shop.status}
-                </td>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'left',
-                    color: '#000',
-                    fontSize: '14px',
-                    borderRight: '1px solid #ddd',
-                    width: '20%',
-                  }}
-                >
-                  {shop.no_of_outlets}
-                </td>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'left',
-                    color: '#000',
-                    fontSize: '14px',
-                    width: '20%',
-                  }}
-                >
-                  {shop.no_of_registered_outlets}
-                </td>
-                <td
-                  style={{
-                    padding: '12px',
-                    textAlign: 'left',
-                    color: '#000',
-                    fontSize: '14px',
-                  }}
-                >
-                  <button
-                    onClick={() => handleEdit(shop)}
-                    style={{
-                      backgroundColor: 'green',
-                      color: 'white',
-                      padding: '5px 10px',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      marginRight: '5px',
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(shop.id)}
-                    style={{
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      padding: '5px 10px',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Delete
-                  </button>
+        {/* Shop List Table */}
+        <h3 className="shops-subheader">Shop List</h3>
+        <table className="shops-table">
+          <thead>
+            <tr>
+              <th>Shop Name</th>
+              <th>Status</th>
+              <th>No. of Outlets</th>
+              <th>No. of Registered Outlets</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {shopList.length > 0 ? (
+              shopList.map((shop, index) => (
+                <tr key={index}>
+                  <td>{shop.name}</td>
+                  <td style={{ color: shop.status === 'Active' ? 'green' : 'red' }}>
+                    {shop.status}
+                  </td>
+                  <td>{shop.no_of_outlets}</td>
+                  <td>{shop.no_of_registered_outlets}</td>
+                  <td>
+                    <button className="shops-edit-button" onClick={() => handleEdit(shop, index)}>
+                      Edit
+                    </button>
+                    <button className="shops-delete-button" onClick={() => handleDelete(index)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="no-data">
+                  No shops available
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan="5"
-                style={{ padding: '15px', textAlign: 'center', fontSize: '14px', color: '#777' }}
-              >
-                No shops available
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

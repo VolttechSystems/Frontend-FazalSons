@@ -229,268 +229,270 @@ function ShopUser() {
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ color: '#333', textAlign: 'center' }}>Create Shop User</h1>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
-
-      {/* Form Section */}
-      <div
-        style={{
-          marginBottom: '20px',
-          border: '1px solid #ccc',
-          padding: '15px',
-          borderRadius: '5px',
-        }}
-      >
-        {/* Username Field with Suggestions */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleUsernameChange}
-            style={{
-              width: '100%',
-              padding: '8px',
-              marginBottom: '10px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
+    <div className="shop-user-container">
+      <div style={{ padding: '20px', fontFamily: 'Times New Roman, serif' }}>
+        <div className="shop-user-wrapper">
+          <h1 style={{ color: '#333', textAlign: 'center' }}>Create Shop User</h1>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
           />
-          {usernameStatus.isTaken === true && (
-            <div style={{ color: 'red', marginTop: '10px' }}>
-              <p>Username is already taken. Suggestions:</p>
-              <ul style={{ listStyle: 'none', padding: 0 }}>
-                {usernameStatus.suggestions.map((suggestion, index) => (
-                  <li
-                    key={index}
-                    style={{ cursor: 'pointer', color: 'blue', marginBottom: '5px' }}
-                    onClick={() =>
-                      setFormData((prevState) => ({
-                        ...prevState,
-                        username: suggestion,
-                      }))
-                    }
-                  >
-                    {suggestion}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {usernameStatus.isTaken === false && (
-            <div style={{ color: 'green', marginTop: '10px' }}>Username is available!</div>
-          )}
-        </div>
-        {[
-          { label: 'Phone Number', name: 'phone_number', type: 'text' },
-          { label: 'First Name', name: 'first_name', type: 'text' },
-          { label: 'Last Name', name: 'last_name', type: 'text' },
-          { label: 'Email', name: 'email', type: 'email' },
-        ].map((field) => (
-          <div key={field.name}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>{field.label}:</label>
-            <input
-              type={field.type}
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '8px',
-                marginBottom: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            />
-          </div>
-        ))}
 
-        {/* Password Input Section */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '8px',
-                marginBottom: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            />
-            {/* Toggle password visibility */}
-            <i
-              onClick={() => setShowPassword(!showPassword)}
-              className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-              style={{
-                position: 'absolute',
-                right: '10px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                cursor: 'pointer',
-              }}
-            ></i>
-          </div>
-        </div>
-
-        {/* Dropdown for is_active */}
-        <label style={{ display: 'block', marginBottom: '5px' }}>Is Active:</label>
-        <select
-          name="is_active"
-          value={formData.is_active}
-          onChange={handleChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-          }}
-        >
-          <option value="" disabled>
-            Select Status
-          </option>
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
-
-        {/* Shop selection using Autocomplete */}
-        <label style={{ display: 'block', marginBottom: '5px' }}>Shop:</label>
-        <Autocomplete
-          name="shop"
-          value={shops.find((shop) => shop.id === formData.shop) || null}
-          onChange={(event, newValue) => {
-            handleChange({
-              target: { name: 'shop', value: newValue ? newValue.id : '' },
-            })
-          }}
-          options={shops}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              fullWidth
-              style={{
-                backgroundColor: 'white',
-                width: '100%',
-                padding: '8px',
-                marginBottom: '20px',
-              }}
-              InputProps={{
-                ...params.InputProps,
-                disableUnderline: true,
-              }}
-            />
-          )}
-          disableClearable
-        />
-
-        {/* Submit Button */}
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-          disabled={loading}
-        >
-          {loading ? 'Submitting...' : 'Add User'}
-        </button>
-        {message && <p style={{ marginTop: '10px', color: 'blue' }}>{message}</p>}
-      </div>
-
-      {/* User Table */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-        <thead style={{ backgroundColor: '#007bff', color: 'white' }}>
-          <tr>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Username</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Email</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Phone Number</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Shop</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Is Active</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.length > 0 ? (
-            users.map((user) => (
-              <tr key={user.user_id}>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.username}</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.email}</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.phone_number}</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.shop}</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  {user.is_active ? 'Yes' : 'No'}
-                </td>
-
-                <td style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-                  <button
-                    onClick={() => handleEditClick(user)}
+          {/* Form Section */}
+          <form className="shop-user-form">
+            <div>
+              {/* Username Field with Suggestions */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleUsernameChange}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    marginBottom: '10px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
+                />
+                {usernameStatus.isTaken === true && (
+                  <div style={{ color: 'red', marginTop: '10px' }}>
+                    <p>Username is already taken. Suggestions:</p>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                      {usernameStatus.suggestions.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          style={{ cursor: 'pointer', color: 'blue', marginBottom: '5px' }}
+                          onClick={() =>
+                            setFormData((prevState) => ({
+                              ...prevState,
+                              username: suggestion,
+                            }))
+                          }
+                        >
+                          {suggestion}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {usernameStatus.isTaken === false && (
+                  <div style={{ color: 'green', marginTop: '10px' }}>Username is available!</div>
+                )}
+              </div>
+              {[
+                { label: 'Phone Number', name: 'phone_number', type: 'text' },
+                { label: 'First Name', name: 'first_name', type: 'text' },
+                { label: 'Last Name', name: 'last_name', type: 'text' },
+                { label: 'Email', name: 'email', type: 'email' },
+              ].map((field) => (
+                <div key={field.name}>
+                  <label style={{ display: 'block', marginBottom: '5px' }}>{field.label}:</label>
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
                     style={{
-                      backgroundColor: 'green',
-                      color: 'white',
-                      padding: '5px 10px',
-                      border: 'none',
+                      width: '100%',
+                      padding: '8px',
+                      marginBottom: '10px',
+                      border: '1px solid #ccc',
                       borderRadius: '4px',
-                      cursor: 'pointer',
-                      marginRight: '10px',
                     }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user.user_id)}
+                  />
+                </div>
+              ))}
+
+              {/* Password Input Section */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
                     style={{
-                      backgroundColor: 'red',
-                      color: 'white',
-                      padding: '5px 10px',
-                      border: 'none',
+                      width: '100%',
+                      padding: '8px',
+                      marginBottom: '10px',
+                      border: '1px solid #ccc',
                       borderRadius: '4px',
+                    }}
+                  />
+                  {/* Toggle password visibility */}
+                  <i
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
                       cursor: 'pointer',
                     }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan="5"
-                style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}
+                  ></i>
+                </div>
+              </div>
+
+              {/* Dropdown for is_active */}
+              <label style={{ display: 'block', marginBottom: '5px' }}>Is Active:</label>
+              <select
+                name="is_active"
+                value={formData.is_active}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  marginBottom: '10px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                }}
               >
-                No users available.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+                <option value="" disabled>
+                  Select Status
+                </option>
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+
+              {/* Shop selection using Autocomplete */}
+              <label style={{ display: 'block', marginBottom: '5px' }}>Shop:</label>
+              <Autocomplete
+                name="shop"
+                value={shops.find((shop) => shop.id === formData.shop) || null}
+                onChange={(event, newValue) => {
+                  handleChange({
+                    target: { name: 'shop', value: newValue ? newValue.id : '' },
+                  })
+                }}
+                options={shops}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    style={{
+                      backgroundColor: 'white',
+                      width: '100%',
+                      padding: '8px',
+                      marginBottom: '20px',
+                    }}
+                    InputProps={{
+                      ...params.InputProps,
+                      disableUnderline: true,
+                    }}
+                  />
+                )}
+                disableClearable
+              />
+
+              {/* Submit Button */}
+              <button
+                type="button"
+                onClick={handleSubmit}
+                style={{
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+                disabled={loading}
+              >
+                {loading ? 'Submitting...' : 'Add User'}
+              </button>
+
+              {message && <p style={{ marginTop: '10px', color: 'blue' }}>{message}</p>}
+            </div>
+          </form>
+
+          {/* User Table */}
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+            <thead style={{ backgroundColor: '#007bff', color: 'white' }}>
+              <tr>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Username</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Email</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Phone Number</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Shop</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Is Active</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <tr key={user.user_id}>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.username}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.email}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                      {user.phone_number}
+                    </td>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{user.shop}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                      {user.is_active ? 'Yes' : 'No'}
+                    </td>
+
+                    <td style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                      <button
+                        onClick={() => handleEditClick(user)}
+                        style={{
+                          backgroundColor: 'green',
+                          color: 'white',
+                          padding: '5px 10px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          marginRight: '10px',
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(user.user_id)}
+                        style={{
+                          backgroundColor: 'red',
+                          color: 'white',
+                          padding: '5px 10px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}
+                  >
+                    No users available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Edit Modal */}
       {showEditModal && editFormData && (
